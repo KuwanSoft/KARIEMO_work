@@ -312,6 +312,7 @@ class Scene_Map < Scene_Base
     Graphics.wait(15)
     @spriteset = Spriteset_Map.new  # スプライトセットを再作成
     $threedmap.start_drawing        # 3Dの描画
+    $game_temp.need_sub_refresh = true
     fadein(30) if fade
     Input.update
     exp_bonus_messages

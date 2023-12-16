@@ -22,6 +22,7 @@ class Game_System
   attr_accessor :npc_dead                 # NPCの死活
   attr_accessor :terminated_party_id      # 中断したパーティID
   attr_accessor :skill_gain_queue         # スキル上昇キュー
+  attr_accessor :number_store             # ワンダリング数保管
   attr_reader   :box_unique_id            # 使用不能にしたunique_idの配列
   attr_reader   :evil_statue_side         # 各階のプラスマイナスの定義
   attr_reader   :evil_statue_kind         # 各階の邪神像の種類
@@ -48,7 +49,15 @@ class Game_System
     @roomguard_grids = {}
     @alert = {}
     @guide_usage = {}   # ガイドの利用状況
+    @number_store = {}  # フロア毎の徘徊モンスター数
     parties_location    # 初期化
+  end
+  #--------------------------------------------------------------------------
+  # ● 後定義のインスタンス変数に対してのゲッター作成と初期化、初回で上記initializeが行われる場合は省ける。
+  #--------------------------------------------------------------------------
+  def number_store
+    @number_store ||= {}
+    return @number_store
   end
   #--------------------------------------------------------------------------
   # ● 未アサインのIDの取得
@@ -630,8 +639,8 @@ class Game_System
   # 玄室座標ですでに討伐済みをランダムでチェックしリスポーンさせる。
   #--------------------------------------------------------------------------
   def respawn_roomguard(floor)
-    genshitsu_array = get_all_genshitsu(floor)
-    diff = genshitsu_array - (genshitsu_array - @roomguard_grids[floor].size)
+    genshitsu_array = get_all_genshitsu(floor)  # 玄室箇所の座標取得
+    diff = genshitsu_array.size - (genshitsu_array.size - @roomguard_grids[floor].size) # 踏破済み玄室との差分を取得
     if diff > rand(genshitsu_array)
       DEBUG.write(c_m, "復活スキップ RATIO:#{diff}/#{genshitsu_array} ストア数:#{@roomguard_grids[floor].size}")
       return

@@ -17,7 +17,6 @@ class Game_WanderingList
     @see_frequency = Constant_Table::SEE_FREQ
     @seeing = false
     @respawn = false
-    @number_store = {}  # フロア毎の徘徊モンスター数
   end
   #--------------------------------------------------------------------------
   # ● 群のリセット
@@ -25,18 +24,18 @@ class Game_WanderingList
   def setup(map_id)
     @data = []
     ## 初期時:ストアに徘徊数が無い場合
-    if @number_store[map_id] == nil
+    if $game_system.number_store[map_id] == nil
       number = get_predefined_wandering_number(map_id)
     else
       ## すでに徘徊数あり
-      number = @number_store[map_id]
+      number = $game_system.number_store[map_id]
     end
     @loc_array = make_predefined_wandering_location
     for i in 1..number
       self[i]
     end
-    @number_store[map_id] = number  # 徘徊数の保存
-    DEBUG.write(c_m, "MAPID:#{map_id} ワンダリング数:#{number} ストア数:#{@number_store[map_id]}")
+    $game_system.number_store[map_id] = number  # 徘徊数の保存
+    DEBUG.write(c_m, "MAPID:#{map_id} ワンダリング数:#{number} ストア数:#{$game_system.number_store[map_id]}")
   end
   #--------------------------------------------------------------------------
   # ● 初期徘徊数の取得
@@ -58,9 +57,9 @@ class Game_WanderingList
   # ● 休息時間経過によるワンダリングの復活
   #--------------------------------------------------------------------------
   def respawn_wandering(floor)
-    return if @number_store[floor] >= get_predefined_wandering_number(floor)
-    @number_store[floor] += 1  # 徘徊の復活
-    DEBUG.write(c_m, "休息時間経過によるワンダリングの復活 ストア数:#{@number_store[floor]}")
+    return if $game_system.number_store[floor] >= get_predefined_wandering_number(floor)
+    $game_system.number_store[floor] += 1  # 徘徊の復活
+    DEBUG.write(c_m, "休息時間経過によるワンダリングの復活 ストア数:#{$game_system.number_store[floor]}")
   end
   #--------------------------------------------------------------------------
   # ● 固定ワンダリングの場所をマップから取得
@@ -82,8 +81,8 @@ class Game_WanderingList
       if @data[id] == nil # すでに空になっているところを探す
         @respawn = true   # リスポーンフラグありで再度初期化
         self[id]
-        @number_store[$game_map.map_id] += 1  # 徘徊の復活
-        DEBUG.write(c_m, "逃亡による再度ワンダリング発生 群ID:#{id} ストア数:#{@number_store[$game_map.map_id]}")
+        $game_system.number_store[$game_map.map_id] += 1  # 徘徊の復活
+        DEBUG.write(c_m, "逃亡による再度ワンダリング発生 群ID:#{id} ストア数:#{$game_system.number_store[$game_map.map_id]}")
         break
       end
     end
@@ -182,8 +181,8 @@ class Game_WanderingList
   #--------------------------------------------------------------------------
   def remove_wandering(wandering_id)
     @data[wandering_id] = nil
-    @number_store[$game_map.map_id] -= 1  # 徘徊の削除
-    DEBUG.write(c_m, "遭遇による徘徊モンスター ID:#{wandering_id} 削除 ストア数:#{@number_store[$game_map.map_id]}")
+    $game_system.number_store[$game_map.map_id] -= 1  # 徘徊の削除
+    DEBUG.write(c_m, "遭遇による徘徊モンスター ID:#{wandering_id} 削除 ストア数:#{$game_system.number_store[$game_map.map_id]}")
   end
   #--------------------------------------------------------------------------
   # ● アップデート
