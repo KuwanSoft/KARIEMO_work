@@ -19,7 +19,8 @@ jobs:
         echo "This issue was closed." > "issue_closed_${issue_number}.txt"
     - name: Commit and push
       run: |
-        git config --global user.name 'KuwanSoft'
+        git config --global user.name 'moccori1@gmail.com'
+        git config --global user.email 'moccori1@gmail.com'
         git add "issue_closed_${{ github.event.issue.number }}.txt"
         git commit -m "Automatically created file for closed issue #${{ github.event.issue.number }}"
         git push origin development
