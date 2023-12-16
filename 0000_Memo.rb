@@ -23,5 +23,4 @@ DEBUG::write(c_m,"param:#{valiable}")
 __END__
 -- この行以降すべてがコメントになる
 
-
 =end

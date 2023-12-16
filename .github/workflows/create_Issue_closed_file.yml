@@ -1,0 +1,25 @@
+name: Create Issue-Closed File
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  create_file:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: development
+    - name: Create Issue-Closed File
+      run: |
+        issue_number=${{ github.event.issue.number }}
+        echo "This issue was closed." > "issue_closed_${issue_number}.txt"
+    - name: Commit and push
+      run: |
+        git config --global user.name 'KuwanSoft'
+        git add "issue_closed_${{ github.event.issue.number }}.txt"
+        git commit -m "Automatically created file for closed issue #${{ github.event.issue.number }}"
+        git push origin development
