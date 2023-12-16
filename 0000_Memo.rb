@@ -22,4 +22,6 @@ DEBUG::write(c_m,"param:#{valiable}")
 --「=begin」から「=end」の間がコメントになる
 __END__
 -- この行以降すべてがコメントになる
+
+
 =end
