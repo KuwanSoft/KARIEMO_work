@@ -427,10 +427,12 @@ module MISC
   # end
   #--------------------------------------------------------------------------
   # ● ランタン自然減少
+  # MapとCamp時に自然現象する
   #--------------------------------------------------------------------------
   def self.update_light_timer
-    return unless $scene.is_a?(Scene_Map)
-    $game_system.convergence_light
+    if $scene.is_a?(Scene_CAMP) or $scene.is_a?(Scene_Map)
+      $game_system.convergence_light
+    end
   end
   #--------------------------------------------------------------------------
   # ● ボリュームの管理

@@ -641,8 +641,8 @@ class Game_System
   def respawn_roomguard(floor)
     genshitsu_array = get_all_genshitsu(floor)  # 玄室箇所の座標取得
     diff = genshitsu_array.size - (genshitsu_array.size - @roomguard_grids[floor].size) # 踏破済み玄室との差分を取得
-    if diff > rand(genshitsu_array)
-      DEBUG.write(c_m, "復活スキップ RATIO:#{diff}/#{genshitsu_array} ストア数:#{@roomguard_grids[floor].size}")
+    if diff > rand(genshitsu_array.size)
+      DEBUG.write(c_m, "復活スキップ RATIO:#{diff}/#{genshitsu_array.size} ストア数:#{@roomguard_grids[floor].size}")
       return
     end
     while (@roomguard_grids[floor].size < genshitsu_array.size)
