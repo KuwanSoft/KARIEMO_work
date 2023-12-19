@@ -4320,17 +4320,17 @@ class Game_Actor < Game_Battler
   # ● 毒塗
   #--------------------------------------------------------------------------
   def add_poison_weapon
-    @poison_weapon ||= 0
-    main = (can_poison? % 2 == 1) ? true : false
-    sub = (can_poison? / 2 % 2 == 1) ? true : false
-    if main
-      num = rand(20) + rand(20) + rand(20) + rand(20) + 1
-    else
-      return
-    end
-    @poison_weapon += num
-    @poison_weapon = [@poison_weapon, 99].min
-    DEBUG.write(c_m, "毒塗+: 残り#{@poison_weapon}回")
+    @poison_weapon = 1  # 0はdisable 1<の場合は毒塗あり
+    # main = (can_poison? % 2 == 1) ? true : false
+    # sub = (can_poison? / 2 % 2 == 1) ? true : false
+    # if main
+    #   num = rand(20) + rand(20) + rand(20) + rand(20) + 1
+    # else
+    #   return
+    # end
+    # @poison_weapon += num
+    # @poison_weapon = [@poison_weapon, 99].min
+    # DEBUG.write(c_m, "毒塗+: 残り#{@poison_weapon}回")
   end
   #--------------------------------------------------------------------------
   # ● 毒塗の残回数取得
@@ -4343,14 +4343,26 @@ class Game_Actor < Game_Battler
   # ● 毒塗の消費
   #--------------------------------------------------------------------------
   def consume_poison
-    @poison_weapon -= 1
+    @poison_weapon += 1
     chance_skill_increase(SKILLID::POISONING) # ポイゾニング
-    DEBUG.write(c_m, "毒塗消費: 残り#{@poison_weapon}")
+    case @poison_weapon
+    when  1..10; clear_poison if Constant_Table::P_RATIO_01_10 > rand(100)
+    when 11..20; clear_poison if Constant_Table::P_RATIO_11_20 > rand(100)
+    when 21..30; clear_poison if Constant_Table::P_RATIO_21_30 > rand(100)
+    when 31..40; clear_poison if Constant_Table::P_RATIO_31_40 > rand(100)
+    when 41..50; clear_poison if Constant_Table::P_RATIO_41_50 > rand(100)
+    when 51..60; clear_poison if Constant_Table::P_RATIO_51_60 > rand(100)
+    when 61..70; clear_poison if Constant_Table::P_RATIO_61_70 > rand(100)
+    else
+      clear_poison if Constant_Table::P_RATIO_ELSE > rand(100)
+    end
+    DEBUG.write(c_m, "毒塗使用回数:#{@poison_weapon}回")
   end
   #--------------------------------------------------------------------------
   # ● 毒塗のクリア（村に帰還）
   #--------------------------------------------------------------------------
   def clear_poison
+    DEBUG.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回")
     @poison_weapon ||= 0
     @poison_weapon = 0
   end
