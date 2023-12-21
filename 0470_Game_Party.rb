@@ -1526,12 +1526,13 @@ class Game_Party < Game_Unit
     @pm_identify = 0
   end
   #--------------------------------------------------------------------------
-  # ● 村に帰還時に毒状態をリセットする
+  # ● 村に帰還時に毒と吐き気状態をリセットする
   #--------------------------------------------------------------------------
-  def clean_poison
+  def clean_poison_nausea
     for member in members
-      state_id = STATEID::POISON  # 毒
-      member.remove_state(state_id)
+      for state_id in[STATEID::POISON, STATEID::NAUSEA]  # 毒と吐き気
+        member.remove_state(state_id)
+      end
     end
   end
   #--------------------------------------------------------------------------
@@ -1733,6 +1734,7 @@ class Game_Party < Game_Unit
                                               # 回復はスキップ
         next                                  # 次のメンバー
       end
+      member.recover_nausea                   # 吐き気の回復
       next unless member.good_condition?      # 健康でないと回復しない
       ## HP回復
       unless member.hp > member.maxhp * member.resting_thres  # 回復上限％

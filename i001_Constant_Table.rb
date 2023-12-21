@@ -233,6 +233,9 @@ module Constant_Table
   BROKEN_RATIO = 15         # 鍵穴を壊す確率
   MAX_ATTEMPTS = 5          # 最大宝箱調査回数
   SECONDS_PER_TURN = 30     # 1ターンで経過する治療秒数
+  STUN_EVISON = 5           # スタン回避率
+  SEVERE_THRES = 50         # 重症化のHPロスト閾値
+  REST_NAUSEA_RECOVER_RATIO_PER_TURN = 5  # 吐き気の累積値1を減少させる休息のターン毎の確率
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
@@ -382,18 +385,18 @@ module Constant_Table
   NAME_EDGE_OF_VILLAGE = "EdgeOfVil."
 
   PERSONALITY_P_hash = {
-  :Sociable => "しゃこうてき",
-  :Optimist => "らくてんか",             # 2
-  :Faithful => "せいじつ",             # 3
-  :Dedication => "けんしんてき",           # 4
-  :Humility => "けんきょ",             # 5
-  :Kindness => "しんせつ",             # 6
-  :Sincere => "すなお",              # 7
-  :Responsible => "せきにんかん",          # 8
-  :Cooperative => "きょうちょうせい",          # 9
-  :Flexible => "りんきおうへん",             #10
-  :Enthusiasm => "こりしょう",           #11
-  :MonsterMania => "モンスターマニア"         #12
+  :Sociable => "しゃこうてき",          # 1
+  :Optimist => "らくてんか",            # 2
+  :Faithful => "せいじつ",              # 3
+  :Dedication => "けんしんてき",        # 4
+  :Humility => "けんきょ",              # 5
+  :Kindness => "しんせつ",              # 6
+  :Sincere => "すなお",                 # 7
+  :Responsible => "せきにんかん",       # 8
+  :Cooperative => "きょうちょうせい",   # 9
+  :Flexible => "りんきおうへん",        #10
+  :Enthusiasm => "こりしょう",          #11
+  :MonsterMania => "モンスターマニア"   #12
   }
 
   PERSONALITY_N_hash = {
@@ -551,7 +554,6 @@ module Constant_Table
   FEE_PET = 3      # 石化時の費用
   FEE_MIA = 3      # 病気時の費用
   FEE_FRA = 3      # 骨折時の費用
-  FEE_NAU = 3      # 吐き気時の費用
   FEE_SEV = 3      # 重症時の費用
 
   BREATH1_ID  = 83  # ノーマルブレスの呪文ID

@@ -4346,23 +4346,26 @@ class Game_Actor < Game_Battler
     @poison_weapon += 1
     chance_skill_increase(SKILLID::POISONING) # ポイゾニング
     case @poison_weapon
-    when  1..10; clear_poison if Constant_Table::P_RATIO_01_10 > rand(100)
-    when 11..20; clear_poison if Constant_Table::P_RATIO_11_20 > rand(100)
-    when 21..30; clear_poison if Constant_Table::P_RATIO_21_30 > rand(100)
-    when 31..40; clear_poison if Constant_Table::P_RATIO_31_40 > rand(100)
-    when 41..50; clear_poison if Constant_Table::P_RATIO_41_50 > rand(100)
-    when 51..60; clear_poison if Constant_Table::P_RATIO_51_60 > rand(100)
-    when 61..70; clear_poison if Constant_Table::P_RATIO_61_70 > rand(100)
-    else
-      clear_poison if Constant_Table::P_RATIO_ELSE > rand(100)
+    when  1..10; ratio = Constant_Table::P_RATIO_01_10
+    when 11..20; ratio = Constant_Table::P_RATIO_11_20
+    when 21..30; ratio = Constant_Table::P_RATIO_21_30
+    when 31..40; ratio = Constant_Table::P_RATIO_31_40
+    when 41..50; ratio = Constant_Table::P_RATIO_41_50
+    when 51..60; ratio = Constant_Table::P_RATIO_51_60
+    when 61..70; ratio = Constant_Table::P_RATIO_61_70
+    else; ratio = Constant_Table::P_RATIO_ELSE
     end
-    DEBUG.write(c_m, "毒塗使用回数:#{@poison_weapon}回")
+    if ratio > rand(100)
+      DEBUG.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回 解除:#{ratio}%")
+      clear_poison
+    else
+      DEBUG.write(c_m, "毒塗使用回数:#{@poison_weapon}回")
+    end
   end
   #--------------------------------------------------------------------------
   # ● 毒塗のクリア（村に帰還）
   #--------------------------------------------------------------------------
   def clear_poison
-    DEBUG.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回")
     @poison_weapon ||= 0
     @poison_weapon = 0
   end
@@ -4518,7 +4521,6 @@ class Game_Actor < Game_Battler
     return true if stone?    # 石化
     return true if rotten?   # 腐敗
     return true if fracture? # 骨折
-    return true if nausea?   # 吐き気
     return true if severe?   # 重症
     return false
   end
@@ -4673,9 +4675,6 @@ class Game_Actor < Game_Battler
       if self.state?(STATEID::FRACTURE)  # 骨折
         fee += [@level ** Constant_Table::FEE_FRA, 50].max
       end
-      if self.state?(STATEID::NAUSEA)  # 吐き気
-        fee += [@level ** Constant_Table::FEE_NAU, 50].max
-      end
       if self.state?(STATEID::SEVERE)  # 重症
         fee += [@level ** Constant_Table::FEE_SEV, 50].max
       end
@@ -4744,6 +4743,22 @@ class Game_Actor < Game_Battler
       return weapon_data.element_type
     else
       return 0                                          # 無属性
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 休息中の吐き気の回復
+  #--------------------------------------------------------------------------
+  def recover_nausea
+    ratio = Constant_Table::REST_NAUSEA_RECOVER_RATIO_PER_TURN
+    state_id = STATEID::NAUSEA
+    if ratio > rand(100)
+      @state_depth[state_id] -= 1
+      if @state_depth[state_id] <= 0
+        ## 回復値で累積値が0以下になる
+        @state_depth[state_id] = 0    # リセット
+        remove_state(state_id)
+        DEBUG.write(c_m, "休息中の吐き気の回復")
+      end
     end
   end
 end

@@ -1186,25 +1186,6 @@ class Game_Battler
       value += "#{d3}" if d3 < 0
       DEBUG::write(c_m,"回復値:#{value} #{rec_depth}")
 
-      ## 恐怖状態は固定値が減少
-      # if i == STATEID::FEAR
-      #   @state_depth[i] -= Constant_Table::FEAR_DECREASE
-      #   DEBUG::write(c_m,"#{self.name} 恐怖累積値減少 => #{@state_depth[i]}")
-      #   if @state_depth[i] < 1
-      #     remove_state(i)
-      #     @removed_states.push(i)
-      #     DEBUG::write(c_m,"#{self.name} 恐怖状態解除")
-      #   end
-      #   next
-      # end
-      ## 通常異常の自然解除判定開始
-      # rate = @state_depth[i]          # 異常深度を取得
-      ## 自然回復判定
-      # if rate < rand(100)
-      #   remove_state(i)
-      #   @removed_states.push(i)
-      #   DEBUG::write(c_m,"ステート自然解除成功 ID#{i} 異常深度:#{rate}")
-
       ## 新・自然回復判定
       @state_depth[i] -= rec_depth
       if @state_depth[i] <= 0
@@ -2169,7 +2150,7 @@ class Game_Battler
   #    呼び出し前に @hp_damage、@mp_damage、@absorbed が設定されていること。
   #--------------------------------------------------------------------------
   def execute_damage(user)
-    if @hp_damage > 0 # 回復は吸収しない
+    if @hp_damage > 0 || @element_damage > 0 # 回復は吸収しない
       ## 痛みをそらせチェック(モンスターも使用する)
       if @protection_times > 0
         @protection_times -= 1
@@ -2181,12 +2162,14 @@ class Game_Battler
         @protection_act_flag = true
       elsif @sacrifice_hp == 0 # 身代わりが存在しない場合は処理なし
       ## 身代わりの呪文効果(モンスターは使用しない)
-      elsif @sacrifice_hp >= @hp_damage
-        DEBUG::write(c_m,"身代わりでダメージ吸収 元ダメ:#{@hp_damage} 身代:#{@sacrifice_hp}")
-        @sacrifice_hp -= @hp_damage
+      elsif @sacrifice_hp >= (@hp_damage + @element_damage)
+        DEBUG::write(c_m,"身代わりでダメージ吸収 元ダメ:#{@hp_damage+@element_damage} 身代:#{@sacrifice_hp}")
+        @sacrifice_hp -= (@hp_damage+@element_damage)
         @hp_damage = 0
-        if @hp_subdamage > 0
+        @element_damage = 0
+        if @hp_subdamage > 0 || @element_subdamage > 0
           @hp_subdamage = 0
+          @element_subdamage = 0
           DEBUG::write(c_m,"Mainダメージ吸収の為、Subダメージは0に変更")
         end
       else
@@ -2202,9 +2185,9 @@ class Game_Battler
       judge_bone_crash     # 骨折判定
     end
     ## サブダメージが正の数
-    if @hp_subdamage > 0 || @element_subdamage > 0
-      remove_states_shock
-    end
+    # if @hp_subdamage > 0 || @element_subdamage > 0
+    #   remove_states_shock
+    # end
     ##> 吸収の場合
     if @absorbed
       user.hp += @hp_damage
@@ -2236,7 +2219,7 @@ class Game_Battler
     return unless @action.magic?  # 詠唱中か？
     return if @interruption   # すでに中断されたか？
     damage_amount = @hp_damage + @hp_subdamage + @element_damage + @element_subdamage
-    return if damage_amount < 0
+    return if damage_amount < 1
     ratio = 100 * damage_amount / maxhp
     if ratio > rand(100)
       @spell_break = true   # スペルブレイクフラグ
@@ -2249,10 +2232,21 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def judge_bone_crash
     damage_amount = @hp_damage + @hp_subdamage + @element_damage + @element_subdamage
-    return if damage_amount < 0
+    return if damage_amount < 1
     ratio = 100 * damage_amount / maxhp
     if ratio > rand(100)
       @weakened = true   # ボーンクラッシュされる可能性フラグオン
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 重症化の判定
+  #--------------------------------------------------------------------------
+  def judge_severe
+    damage_amount = @hp_damage + @hp_subdamage + @element_damage + @element_subdamage
+    return if damage_amount < 1
+    ratio = 100 * damage_amount / maxhp
+    if ratio > Constant_Table::SEVERE_THRES
+      @severe = true   # 重症化される可能性フラグオン
     end
   end
   #--------------------------------------------------------------------------
@@ -2275,12 +2269,17 @@ class Game_Battler
       end
     end
     @weakened = false
-
+    ## 重症化追加
+    if @severe and obj.is_a?(Game_Battler)
+      plus += "重"  unless plus.include?("重")
+      DEBUG.write(c_m, "#{obj.name} 重症化フラグ検知")
+    end
+    @severe = false
     ## インパクトスキルによるスタン
     if obj.is_a?(Game_Battler) && obj.get_impact
       plus += "ス" unless plus.include?("ス")
     end
-    ###---
+    ###-------------------
 
     return if (plus + minus).empty?
     DEBUG::write(c_m,"Battler名:#{self.name}")
@@ -2318,6 +2317,7 @@ class Game_Battler
       when "魅"; state_id = STATEID::MUPPET
       when "吐"; state_id = STATEID::NAUSEA
       when "出"; state_id = STATEID::BLEEDING
+      when "重"; state_id = STATEID::SEVERE
       when "無"; return
       when "後"; next
       when nil;  break          # リストの最後
@@ -3130,7 +3130,10 @@ class Game_Battler
         when STATEID::FREEZE;       value = self.enemy.sr12   # 凍結
         when STATEID::MUPPET;       value = self.enemy.sr13   # 魅了
         when STATEID::KABANE;       value = self.enemy.sr1    # 屍は首はねと同様
-        when STATEID::STUN;         value = 5                 # 固定値
+        when STATEID::STUN;         value = Constant_Table::STUN_EVISON # 固定値
+        when STATEID::NAUSEA;       value = self.enemy.sr14   # 吐き気
+        when STATEID::BLEEDING;     value = self.enemy.sr15   # 出血
+        when STATEID::SEVERE;       value = 100               # 敵は重症化しない
         else
           value = 0
         end

@@ -286,6 +286,8 @@ class Scene_CAMP < Scene_Base
         end_camp
       when "memo"
         start_memo
+      when "museum"
+        start_museum
       end
     elsif Input.trigger?(Input::B)
       end_camp
@@ -294,6 +296,12 @@ class Scene_CAMP < Scene_Base
       @pm.active = true
       @pm.index = 0
     end
+  end
+  #--------------------------------------------------------------------------
+  # ● モンスターミュージアムへ
+  #--------------------------------------------------------------------------
+  def start_museum
+    $scene = Scene_MonsterLibrary.new(true)
   end
   #--------------------------------------------------------------------------
   # ● キャンプの終了

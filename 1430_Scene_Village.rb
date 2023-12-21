@@ -12,7 +12,7 @@ class Scene_Village < Scene_Base
     $game_party.dispose_party_magic       # パーティマジック消去
     $game_mercenary.clear                 # 傭兵の解雇
     $game_player.clear_broken             # 扉破損情報をクリア
-    $game_party.clean_poison              # 毒状態を解除
+    $game_party.clean_poison_nausea       # 毒・吐き気状態を解除
     $game_system.clear_queue              # スキルメッセージキュークリア
     $game_party.reset_tired_thres_plus    # 疲労許容値プラスのリセット
     $game_party.clear_poison              # 毒塗のリセット

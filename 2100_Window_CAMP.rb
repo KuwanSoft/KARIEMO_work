@@ -30,14 +30,15 @@ class Window_CAMP < Window_Selectable
     @s1 = "パーティ"
     @s2 = "メモをみる"
     @s3 = "じゅもん"
-    @s4 = "たいれつ"
+    @s4 = "たいれつへんこう"
     @s5 = "きゅうそく"
     @s6 = "たちさる"
     @s7 = "セーブ <#{$game_party.save_ticket}>"
+    @s8 = "モンスターずかん"
     if @prepare
       @commands = [@s1, @s4, @s6]
     else
-      @commands = [@s1, @s3, @s7, @s4, @s5, @s2, @s6]
+      @commands = [@s1, @s3, @s7, @s4, @s5, @s2, @s8, @s6]
     end
     @item_max = @commands.size
     self.contents.clear
@@ -60,6 +61,7 @@ class Window_CAMP < Window_Selectable
     when @s5; return "rest"
     when @s6; return "quit"
     when @s7; return "quick_save"
+    when @s8; return "museum"
     end
   end
 end

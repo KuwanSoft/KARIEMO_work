@@ -8,10 +8,9 @@ class Scene_MonsterLibrary < Scene_Base
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
-  def initialize
+  def initialize(camp = false)
+    @back_to_camp = camp
     @window_enemy = Window_MonsterLibrary.new
-#~     @window_param = Window_MonsterParam.new
-#~     @list = Window_MonsterList.new(@window_enemy.get_id_array)
     @top = Window_Top.new
   end
   #--------------------------------------------------------------------------
@@ -21,9 +20,6 @@ class Scene_MonsterLibrary < Scene_Base
     super
     $music.play("ミュージアム")
     @window_enemy.refresh
-#~     @window_param.refresh
-#~     @list.index = @window_enemy.get_current_id - 1
-#~     @list.refresh
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -31,8 +27,6 @@ class Scene_MonsterLibrary < Scene_Base
   def terminate
     super
     @window_enemy.dispose
-#~     @window_param.dispose
-#~     @list.dispose
     @top.dispose
   end
   #--------------------------------------------------------------------------
@@ -42,16 +36,16 @@ class Scene_MonsterLibrary < Scene_Base
     super
     if Input.repeat?(Input::RIGHT)
       @window_enemy.refresh(1)
-#~       @list.index = @window_enemy.get_current_id - 1
-#~       @list.refresh
     elsif Input.repeat?(Input::LEFT)
       @window_enemy.refresh(-1)
-#~       @list.index = @window_enemy.get_current_id - 1
-#~       @list.refresh
     elsif Input.trigger?(Input::Z)
       @window_enemy.draw_graphic(true)
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Title.new
+      if @back_to_camp
+        $scene = Scene_CAMP.new
+      else
+        $scene = Scene_Title.new
+      end
     end
   end
 end
