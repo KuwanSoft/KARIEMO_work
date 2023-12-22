@@ -27,20 +27,14 @@ class ThreeDmap < Scene_Map
     for key in @down_stairs.keys
       @down_stairs[key].visible = false
     end
-    # for key in @t_wall.keys
-    #   @t_wall[key].visible = false
-    # end
     for key in @floor.keys
       @floor[key].visible = false
     end
     @field.visible = false
-    # @kakushi.visible = false
     @switch_wall.visible = false
     @chest_wall.visible = false
     @darkzone.visible = false
     @drawing_fountain.visible = false
-    # @frame.visible = false
-    # @frame_b.visible = false
   end
   #--------------------------------------------------------------------------
   # ● メインルーチン
@@ -48,14 +42,18 @@ class ThreeDmap < Scene_Map
   #--------------------------------------------------------------------------
   def start_drawing(no_step = false)
     no_visible_all_wall
-    # define_all_wall($game_map.map_id)
     check_wall_info
-    draw_walls(no_step) unless $game_party.light < 1
-    # draw_kakushi unless $game_party.light < 1
+    draw_walls(no_step)
     draw_darkzone unless $game_party.light < 1
     draw_frame
     check_drawing_fountain
     change_wall_tone(@prev_tone)
+    ## 灯りが無くなっているか
+    if $game_party.light < 1
+      $threedmap.change_gray_all_wall(240)
+    else
+      $threedmap.change_gray_all_wall(0)
+    end
   end
   #--------------------------------------------------------------------------
   # ● 戦闘用バックスプライト
@@ -68,25 +66,18 @@ class ThreeDmap < Scene_Map
   # ● 枠の描画
   #--------------------------------------------------------------------------
   def draw_frame
-    # @frame.visible = true
-    # @frame_b.visible = true
   end
   #--------------------------------------------------------------------------
   # ● 壁の描画
   #--------------------------------------------------------------------------
 	def draw_wall(loc)
 		@wall["#{loc}"].visible = true
-    # DEBUG.write(c_m, "壁(#{loc})描画開始")
   end
   #--------------------------------------------------------------------------
   # ● 扉の描画
   #--------------------------------------------------------------------------
   def draw_door(loc)
     @wall["#{loc}"].visible = false # 扉と壁が重なるので、壁を消す
-#~     case $game_map.map_id
-#~     when 1 ; @door["#{loc}"].tone = Constant_Table::TONE_B1F
-#~     when 2 ; @door["#{loc}"].tone = Constant_Table::TONE_B2F
-#~     end
 		@door["#{loc}"].visible = true
   end
   #--------------------------------------------------------------------------
