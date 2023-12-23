@@ -1497,8 +1497,7 @@ class Game_Battler
         e_dp = sub ? attacker.sub_dice_plus(true) : attacker.dice_plus(true)
         e_d1 = MISC.dice(e_dn, e_dm, e_dp)
         e_d2 = attacker.use_mindpower
-        e_d3 = self.get_element_DR(@damage_element_type)
-        e_d = (e_d1 + e_d2) - e_d3
+        e_d = self.calc_element_damage(@damage_element_type, e_d1) + e_d2
         e_d = [Integer(e_d), 0].max                           # 最低値の補正
         e_damage += e_d
       end

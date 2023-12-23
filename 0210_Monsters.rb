@@ -22,10 +22,6 @@ class Monsters
   attr_reader :dr_leg
   attr_reader :dr_ph
   attr_reader :dr_ave
-  attr_reader :dr_element1
-  attr_reader :dr_element2
-  attr_reader :dr_element3
-  attr_reader :dr_element4
   attr_reader :dr_tr
   attr_reader :sr1
   attr_reader :sr2
@@ -55,7 +51,7 @@ class Monsters
   attr_reader :resist
   attr_reader :resist_tr
   attr_reader :skill
-  attr_reader :weak
+  attr_reader :element_resistant
   attr_reader :cast
   attr_reader :num
   attr_reader :floor
@@ -144,18 +140,6 @@ class Monsters
   def dr_ph
     return @dr_ph.to_i
   end
-  def dr_element1
-    return @dr_element1.to_i
-  end
-  def dr_element2
-    return @dr_element2.to_i
-  end
-  def dr_element3
-    return @dr_element3.to_i
-  end
-  def dr_element4
-    return @dr_element4.to_i
-  end
   def magic1_name
     return @magic1_name.delete("\"")
   end
@@ -173,6 +157,31 @@ class Monsters
   end
   def magic6_name
     return @magic6_name.delete("\"")
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性防御
+  # 炎0 = 弱点属性 炎ダメージ2倍
+  # 炎2 = 炎ダメージ 1/2倍
+  # 炎3 = 炎ダメージ 1/3倍
+  #--------------------------------------------------------------------------
+  def calc_element_damage(element_type, damage)
+    case element_type
+    when 0; str = "炎"
+    when 1; str = "氷"
+    when 2; str = "雷"
+    when 3; str = "毒"
+    when 4; str = "風"
+    when 5; str = "地"
+    end
+    return damage unless @element_resistant.include?(str)  # 属性防御無し
+    value = @element_resistant.scan(/#{str}(d)/)[0][0].to_i
+    case value
+    when 0; return Integer(damage * 2)
+    when 2; return Integer(damage * 1/2)
+    when 3; return Integer(damage * 1/3)
+    when 4; return Integer(damage * 1/4)
+    when 5; return Integer(damage * 1/5)
+    end
   end
   #--------------------------------------------------------------------------
   # ● コメントを取得

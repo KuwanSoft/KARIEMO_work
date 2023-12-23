@@ -229,15 +229,10 @@ class Game_Enemy < Game_Battler
     return dr
   end
   #--------------------------------------------------------------------------
-  # ● 属性DRの取得
+  # ● 属性ダメージ倍率の計算
   #--------------------------------------------------------------------------
-  def get_element_DR(element_type)
-    case element_type
-    when 1; return enemy.dr_element1
-    when 2; return enemy.dr_element2
-    when 3; return enemy.dr_element3
-    when 4; return enemy.dr_element4
-    end
+  def calc_element_damage(element_type, damage)
+    return enemy.calc_element_damage(element_type, damage)
   end
   #--------------------------------------------------------------------------
   # ● 呪文無効化確率の取得

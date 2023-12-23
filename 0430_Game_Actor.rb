@@ -4761,4 +4761,10 @@ class Game_Actor < Game_Battler
       end
     end
   end
+  #--------------------------------------------------------------------------
+  # ● 属性ダメージ倍率の計算
+  #--------------------------------------------------------------------------
+  def calc_element_damage(element_type, damage)
+    return damage
+  end
 end
