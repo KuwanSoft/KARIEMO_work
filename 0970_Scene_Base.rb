@@ -54,7 +54,7 @@ class Scene_Base
   def create_frame
     if self.is_a?(Scene_Map) or self.is_a?(Scene_Battle) or self.is_a?(Scene_Treasure) or
       self.is_a?(Scene_CAMP) or self.is_a?(Scene_Fountain) or self.is_a?(Scene_BBS) or
-      self.is_a?(Scene_NPC) then
+      self.is_a?(Scene_NPC) or self.is_a?(Scene_ToolShop) then
       width = 432+4
       height = 360+4
       x = (512-(432+4))/2

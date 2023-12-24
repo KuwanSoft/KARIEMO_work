@@ -229,6 +229,31 @@ class Game_Enemy < Game_Battler
     return dr
   end
   #--------------------------------------------------------------------------
+  # ● DamageReduction値(シールドあり？)
+  #    hitした場所
+  #--------------------------------------------------------------------------
+  def get_Damage_Reduction(shield, attacker, sub, part = 9)
+    dr = 0
+    part = @hit_part unless part != 9
+    case part
+    when 0 # 兜：頭部 10%
+      dr += dr_head
+    when 1 # 鎧：胴 50%
+      dr += dr_body
+    when 2 # 小手：腕 15%
+      dr += dr_arm
+    when 3 # 具足：脚 25%
+      dr += dr_leg
+    when 4 # 弱点
+      dr = enemy.dr_ph
+      shield = false        # 弱点は盾発動キャンセル
+    end
+    dr *= 2 if (dr > 0) && shield # 盾防御時は2倍
+    dr -= reduce_dr               # ペナルティステート [DR減少] 判定
+    dr = [dr, 0].max
+    return dr
+  end
+  #--------------------------------------------------------------------------
   # ● 属性ダメージ倍率の計算
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)

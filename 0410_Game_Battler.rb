@@ -1496,8 +1496,7 @@ class Game_Battler
         e_dm = sub ? attacker.sub_dice_max(true) : attacker.dice_max(true)
         e_dp = sub ? attacker.sub_dice_plus(true) : attacker.dice_plus(true)
         e_d1 = MISC.dice(e_dn, e_dm, e_dp)
-        e_d2 = attacker.use_mindpower
-        e_d = self.calc_element_damage(@damage_element_type, e_d1) + e_d2
+        e_d = self.calc_element_damage(@damage_element_type, e_d1)
         e_d = [Integer(e_d), 0].max                           # 最低値の補正
         e_damage += e_d
       end
@@ -1519,7 +1518,7 @@ class Game_Battler
       end
     end
 
-    ## ２倍撃判定
+    ## 物理ダメージのみ２倍撃判定
     double = 1
     # 種族による2倍撃判定
     if check_double(attacker.double(sub))
@@ -1537,12 +1536,12 @@ class Game_Battler
       double += 1
     end
     damage *= double
-    e_damage *= double
     DEBUG::write(c_m,"#{self.name} 総合 被#{double}倍撃") if double != 1
 
-    if damage <= 0 # 0以下であれば0へ
-      damage = 0
-      @dual_attacked = false if sub # サブウェポン攻撃は無かったことに。
+    ## サブ攻撃が物理・属性ともに0ダメージ以下の場合
+    if damage <= 0 && e_damage <= 0 && sub  # 0以下であれば0へ
+      damage = e_damage = 0
+      @dual_attacked = false                # サブウェポン攻撃は無かったことに。
     end
 
     unless sub
@@ -3186,7 +3185,7 @@ class Game_Battler
   #   最大威力は自身のレベルとなる。
   #--------------------------------------------------------------------------
   def use_mindpower
-    @mind_power = 0 if @mind_power == nil
+    return 0 unless $game_temp.in_battle
     return 0 if @mind_power == 0
     if self.level < @mind_power
       @mind_power -= self.level

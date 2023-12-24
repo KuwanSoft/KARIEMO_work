@@ -165,15 +165,8 @@ class Monsters
   # 炎3 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
-    case element_type
-    when 0; str = "炎"
-    when 1; str = "氷"
-    when 2; str = "雷"
-    when 3; str = "毒"
-    when 4; str = "風"
-    when 5; str = "地"
-    end
-    return damage unless @element_resistant.include?(str)  # 属性防御無し
+    str = Constant_Table::ELEMENTAL_STR[element_type]       # 属性STRの代入
+    return damage unless @element_resistant.include?(str)   # 属性防御無し
     value = @element_resistant.scan(/#{str}(d)/)[0][0].to_i
     case value
     when 0; return Integer(damage * 2)

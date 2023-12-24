@@ -9,7 +9,8 @@ class Scene_ToolShop < Scene_Base
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    define_toolshop_inventory
+    define_toolshop_inventory # 抽選可能アイテムの抽出
+    make_weighted_items       # Oddsの作成
     @back_s = Window_ShopBack_Small.new           # メッセージ枠
   end
   #--------------------------------------------------------------------------
@@ -29,18 +30,20 @@ class Scene_ToolShop < Scene_Base
     @inventory = []
     candidate = []
     book_candidate = []
+    ## ツールショップ用アイテムの抽出
     for item in $data_items
       next if item == nil
       next unless item.tool_shop == 1
       candidate.push([0, item.id])
     end
+    ## スキルブックの抽出
     for item in $data_items
       next if item == nil
       next unless item.kind == "skillbook"
       book_candidate.push([0, item.id])
     end
-    ## ランダムで4アイテムを抽出、被りはしない
-    while @inventory.size < 5
+    ## ランダムで8アイテムを抽出、被りはしない
+    while @inventory.size < 8
       picked = candidate[rand(candidate.size)]
       next if @inventory.include?(picked)               # すでにある？
       @inventory.push(picked)
@@ -48,18 +51,37 @@ class Scene_ToolShop < Scene_Base
     @inventory.push(book_candidate[rand(book_candidate.size)])
   end
   #--------------------------------------------------------------------------
+  # ● token数の逆数でoddsを出す
+  #--------------------------------------------------------------------------
+  def make_weighted_items
+    total_odds = @inventory.inject(0.0) { |sum, item| sum + (1.0 / MISC.item(item[0], item[1]).token) }
+    DEBUG.write(c_m, "Total Odds:#{total_odds}")
+    @weighted_items = @inventory.map do |item|
+      probability = (1.0 / MISC.item(item[0], item[1]).token) / total_odds
+      DEBUG.write(c_m, "ITEM:#{MISC.item(item[0], item[1]).name} Probability:#{probability}")
+      [item, probability]
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 累積確率法にて抽選実施
+  #--------------------------------------------------------------------------
+  def lottery_item
+    random_pick = rand                             # 0~1までの乱数
+    cumulative = 0.0
+    @weighted_items.each do |item, probability|
+      cumulative += probability
+      return item if random_pick < cumulative
+    end
+  end
+  #--------------------------------------------------------------------------
   # ● 開始処理
   #--------------------------------------------------------------------------
   def start
     super
     @ps = Window_PartyStatus.new                  # PartyStatus
-    @window_shop = Window_ToolShop.new(@inventory)# 買い物window
-    @window_shop.index = 0
+    @window_shop = Window_ToolShop.new(@weighted_items)
     @attention_window = Window_ShopAttention.new(110)  # attention表示用
     create_menu_background  # 背景
-#~     text1 = ""
-#~     text2 = "[B]で おわる"
-#~     @back_s.set_text(text1, text2, 0, 2)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -80,7 +102,8 @@ class Scene_ToolShop < Scene_Base
     @ps.update
     @window_shop.update
     $game_party.update                      # スキルインターバルの更新
-    if @window_shop.active
+    $game_system.update
+    if @window_shop.visible
       update_shop_window
     end
   end
@@ -90,17 +113,17 @@ class Scene_ToolShop < Scene_Base
   def update_shop_window
     if Input.trigger?(Input::C)
       unless @window_shop.can_buy?
-        @attention_window.set_text("かえません")
+        @attention_window.set_text("ふくびきけんが ない")
         wait_for_attention
         return
       else
-        @window_shop.consume_stock
-        $game_party.consume_token(@window_shop.item_obj.token)
-        item = @window_shop.item
+        token = 1
+        $game_party.consume_token(token)
+        item = lottery_item
         $game_party.gain_item(item, true)
         $game_party.combine_token
         @window_shop.refresh
-        @attention_window.set_text("* マイドー *")
+        @attention_window.set_text("#{MISC.item(item[0], item[1]).name} があたった!")
         wait_for_attention
       end
     elsif Input.trigger?(Input::B)

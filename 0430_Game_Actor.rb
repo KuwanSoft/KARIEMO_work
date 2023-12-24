@@ -898,8 +898,6 @@ class Game_Actor < Game_Battler
     dr = 0
     dr += MISC.item(2, @armor2_id).dr if shield # 盾DRは乱数では無く直で加算
     part = @hit_part unless part != 9
-    ## PARTYMAGIC効果(既存D.R.が0ならば加算しない)
-    dr += 2 if $game_party.pm_armor > 0
     case part
     when 0 # 兜：頭部 10%
       dr += dr_head
@@ -917,8 +915,9 @@ class Game_Actor < Game_Battler
       end
     end
     unless part == 4
+      dr += 2 if $game_party.pm_armor > 0 ## PARTYMAGIC効果(既存D.R.が0ならば加算しない)
       dr += get_magic_attr(9)   # ルーンの効果(盾以外)
-      dr -= reduce_dr           # 状態異常・火傷/骨折/弱点暴露ペナルティ
+      dr -= reduce_dr           # ペナルティステート [DR減少] 判定
     end
     dr = [dr, 0].max
     return dr

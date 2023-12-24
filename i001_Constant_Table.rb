@@ -252,6 +252,17 @@ module Constant_Table
     return array
   end
 
+  ELEMENTAL_STR = [
+    "炎",   # 0
+    "氷",   # 1
+    "雷",   # 2
+    "毒",   # 3
+    "風",   # 4
+    "地",   # 5
+    "爆",   # 6
+    "呪"    # 7
+  ]
+
   ITEM_RANK_NAME = [
     "N/A",      # No Rank
     "Esquire",  # RANK1
