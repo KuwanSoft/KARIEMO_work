@@ -9,8 +9,7 @@ class Scene_CAMP < Scene_Base
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
   #--------------------------------------------------------------------------
-  def initialize(prepare = false)
-    @prepare = prepare
+  def initialize
   end
   #--------------------------------------------------------------------------
   # ● アテンション表示が終わるまでウェイト
@@ -30,7 +29,7 @@ class Scene_CAMP < Scene_Base
     @attention_window = Window_Attention.new # attention表示用
     @attention_window.y = WLH*10
     @ps = Window_PartyStatus.new            # パーティステータス
-    @camp = Window_CAMP.new(@prepare)       # キャンプウィンドウ(準備フラグ)
+    @camp = Window_CAMP.new       # キャンプウィンドウ(準備フラグ)
     @pm = Window_PartyMagic.new
     @equip = Window_EQUIP.new               # 装備ウィンドウ
     @target_ps = Window_TargetParty.new     # partystatus
@@ -61,12 +60,6 @@ class Scene_CAMP < Scene_Base
     @itemgen_res = Window_ItemGen_result.new
     create_bar                            # 合成バー
 
-    if @prepare              # 冒険の準備メニュー
-      @camp.visible = true
-      @camp.active = true
-      @camp.index = 0
-      return
-    end
     $music.play("パーティ")
     @camp.visible = true
     @camp.active = true
@@ -311,11 +304,7 @@ class Scene_CAMP < Scene_Base
     @camp.visible = false
     @camp.active = false
     @pm.visible = false
-    if @prepare
-      $scene = Scene_Maze.new
-    else
-      $scene = Scene_Map.new
-    end
+    $scene = Scene_Map.new
   end
   #--------------------------------------------------------------------------
   # ● キャラクタ選択画面

@@ -2465,8 +2465,8 @@ class Scene_Battle < Scene_Base
       else
         ## 呪文かアイテム
         if obj.is_a?(Magics) or obj.is_a?(Items2)
-          text = sprintf(Vocab::EnemyDamage_mag, target.name, target.hp_damage) #modified
-          @damage.start_drawing(target.screen_x, target.screen_y, target.hp_damage, target.power_attacked)
+          text = sprintf(Vocab::EnemyDamage_mag, target.name, target.hp_damage)
+          @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.hp_damage)
         else
           ## 物理攻撃時
           text = sprintf(Vocab::EnemyDamage, target.hits, target.hp_damage + target.element_damage)
@@ -2477,7 +2477,7 @@ class Scene_Battle < Scene_Base
           ## 属性武器の時にのみ属性ダメージを0でも表示させる。(0は属性ダメージが属性防御にて減退させられていることを示す)
           if target.damage_element_type > 0
             total_element_damage = target.element_damage + target.element_subdamage # 属性ダメージの合計
-            @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, total_element_damage)
+            @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, total_element_damage, true) # リバース表示
           end
           if target.shield_block
             $music.se_play("盾発動")

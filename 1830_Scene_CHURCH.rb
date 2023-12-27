@@ -53,8 +53,9 @@ class Scene_CHURCH < Scene_Base
     @attention_window = Window_ShopAttention.new  # attention表示用
     @result_window = Window_Attention4.new  # attention表示用
     @back_s = Window_ShopBack_Small.new     # メッセージ枠小
-    @back_s.y += 96                         # メッセージ枠小
+    @back_s.y += 96-24                      # メッセージ枠小
     @ps = Window_PartyStatus.new            # PartyStatus
+    turn_on_face
     @menu_window = Window_CHURCH_Menu.new   # メインメニュー
     @menu_window.change_page(1)             # 初期ページ１
     @cure = Window_CURE.new                 # 治療リスト

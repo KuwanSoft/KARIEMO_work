@@ -55,7 +55,6 @@ module Constant_Table
   BREATH_RATIO_ADD = 15     # ブレスの発動増加度
   NM = 2                    # NMとの遭遇確率（％）
   OPEN_TREASURE = 25        # 宝箱を破壊してこじ開ける成功率（25%）
-  # CLASS_BONUS = 10          # クラス毎の特性値成長ボーナス
   INITIAL_LP = 10           # 初期ラーニングポイント
   REST_COUNTER = 35         # 休息１ターンのタイマー時間
   IDENTIFY_RATE = 500       # 鑑定力（レベルｘRATE）
@@ -236,6 +235,8 @@ module Constant_Table
   STUN_EVISON = 5           # スタン回避率
   SEVERE_THRES = 50         # 重症化のHPロスト閾値
   REST_NAUSEA_RECOVER_RATIO_PER_TURN = 5  # 吐き気の累積値1を減少させる休息のターン毎の確率
+  UNLOCK_MAGIC_ID = 37      # 扉よ開けの呪文ID
+  RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
@@ -253,14 +254,15 @@ module Constant_Table
   end
 
   ELEMENTAL_STR = [
-    "炎",   # 0
-    "氷",   # 1
-    "雷",   # 2
-    "毒",   # 3
-    "風",   # 4
-    "地",   # 5
-    "爆",   # 6
-    "呪"    # 7
+    "",
+    "炎",   # 1
+    "氷",   # 2
+    "雷",   # 3
+    "毒",   # 4
+    "風",   # 5
+    "地",   # 6
+    "爆",   # 7
+    "呪"    # 8
   ]
 
   ITEM_RANK_NAME = [
@@ -327,7 +329,7 @@ module Constant_Table
 
   ## 古びた錠前の難易度
   LOCK_NUM_B1F = 1
-  LOCK_NUM_B2F = 1
+  LOCK_NUM_B2F = 1+4
   LOCK_NUM_B3F = 2
   LOCK_NUM_B4F = 2
   LOCK_NUM_B5F = 3
@@ -337,7 +339,7 @@ module Constant_Table
   LOCK_NUM_B9F = 5
 
   LOCK_DIF_B1F = 10
-  LOCK_DIF_B2F = 12
+  LOCK_DIF_B2F = 12+50
   LOCK_DIF_B3F = 14
   LOCK_DIF_B4F = 16
   LOCK_DIF_B5F = 18

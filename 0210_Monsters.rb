@@ -113,8 +113,12 @@ class Monsters
   #--------------------------------------------------------------------------
   def skill
     return @skill.delete("\"")
-    # return NKF.nkf("-s", str)
-    # return @skill.encode('ASCII-8BIT')
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性防御を取得
+  #--------------------------------------------------------------------------
+  def element_resistant
+    return @element_resistant.delete("\"")
   end
   #--------------------------------------------------------------------------
   # ● フロアはストリングで渡す
@@ -157,24 +161,6 @@ class Monsters
   end
   def magic6_name
     return @magic6_name.delete("\"")
-  end
-  #--------------------------------------------------------------------------
-  # ● 属性防御
-  # 炎0 = 弱点属性 炎ダメージ2倍
-  # 炎2 = 炎ダメージ 1/2倍
-  # 炎3 = 炎ダメージ 1/3倍
-  #--------------------------------------------------------------------------
-  def calc_element_damage(element_type, damage)
-    str = Constant_Table::ELEMENTAL_STR[element_type]       # 属性STRの代入
-    return damage unless @element_resistant.include?(str)   # 属性防御無し
-    value = @element_resistant.scan(/#{str}(d)/)[0][0].to_i
-    case value
-    when 0; return Integer(damage * 2)
-    when 2; return Integer(damage * 1/2)
-    when 3; return Integer(damage * 1/3)
-    when 4; return Integer(damage * 1/4)
-    when 5; return Integer(damage * 1/5)
-    end
   end
   #--------------------------------------------------------------------------
   # ● コメントを取得

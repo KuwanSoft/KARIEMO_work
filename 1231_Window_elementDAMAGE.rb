@@ -11,15 +11,17 @@ class Window_elementDAMAGE < Window_DAMAGE
   # ● 初期化
   #--------------------------------------------------------------------------
   def initialize
+    @reverse = false
     super
   end
   #--------------------------------------------------------------------------
   # ● 描画開始
   #--------------------------------------------------------------------------
-  def start_drawing(x, y, element_kind = 0, element_damage = 0)
+  def start_drawing(x, y, element_kind = 0, element_damage = 0, reverse = false)
     if @running
       clear
     end
+    @reverse = reverse
     @running = true
     @delay = DELAY        # ディレイタイマー
     @duration = DURATION  # フレームリセット
@@ -31,10 +33,15 @@ class Window_elementDAMAGE < Window_DAMAGE
     self.x = x + 40       # ウインドウの場所,40はエネミーのビューポートの始まり
     self.y = @initial_y = y + 165 + 40 # 165もビューポートの始まり40は調整
     case @element_kind
-    when 1; self.contents.font.color = fire_color # 炎
-    when 2; self.contents.font.color = ice_color   # 氷
-    when 3; self.contents.font.color = thunder_color # 雷
+    when 0; self.contents.font.color = normal_color   # 無
+    when 1; self.contents.font.color = fire_color     # 炎
+    when 2; self.contents.font.color = ice_color      # 氷
+    when 3; self.contents.font.color = thunder_color  # 雷
     when 4; self.contents.font.color = poison_color   # 毒
+    when 5; self.contents.font.color = air_color      # 風
+    when 6; self.contents.font.color = earth_color    # 地面
+    when 7; self.contents.font.color = paralyze_color # 爆発
+    when 8; self.contents.font.color = curse_color    # 呪い
     end
     self.contents.draw_text(0, 0, self.width-(32*2), WLH, @element_damage, 2)
   end
@@ -71,6 +78,11 @@ class Window_elementDAMAGE < Window_DAMAGE
         self.y += velocity            # 下げる
       end
     end
-    self.x += 1                       # 右へ放物線
+    case @reverse
+    when true
+      self.x += 1                       # 右へ放物線
+    when false
+      self.x -= 1                       # 左へ放物線（物理ダメージと同一向き）
+    end
   end
 end

@@ -2401,5 +2401,15 @@ class Game_Party < Game_Unit
     DEBUG.write(c_m, "平均レベル:#{result / members.size}")
     return result / members.size
   end
+  #--------------------------------------------------------------------------
+  # ● DEBUG:: 全呪文を覚える
+  #--------------------------------------------------------------------------
+  def get_all_magic
+    for member in members
+      next unless member.magic_user?
+      member.get_all_magic
+    end
+    DEBUG.write(c_m, "全呪文習得")
+  end
 end
 

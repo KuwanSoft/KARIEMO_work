@@ -29,6 +29,7 @@ class Scene_Map < Scene_Base
     ## search
     @search = Window_SEARCH.new           # 探索メニュー
     @search2 = Window_SEARCH2.new         # 探索メニュー2
+    @search3 = Window_SEARCH3.new         # 探索メニュー2
     @inventory = Window_BagSelection.new("キャンプ", 100)
     @target_ps = Window_TargetParty.new   # アイテム使用先
     @window_other = Window_OtherParty.new # 他のパーティを探す
@@ -38,6 +39,7 @@ class Scene_Map < Scene_Base
     @map_info = Map_info.new              # 地図情報
     ## lockpick
     @window_lock = Window_Lock.new        # 判定ウインドウ
+    @window_lock.z = @search3.z + 2       # ウインドウの優先度
     @time = 0
     ## alter
     @alter = Window_ALTER.new
@@ -168,6 +170,7 @@ class Scene_Map < Scene_Base
     @pm.dispose
     @search.dispose
     @search2.dispose
+    @search3.dispose
     @alter.dispose
     @yesno.dispose
     @inventory.dispose
@@ -209,6 +212,7 @@ class Scene_Map < Scene_Base
     @pm.update
     @search.update
     @search2.update
+    @search3.update
 
     @window_lock.update
 
@@ -229,7 +233,7 @@ class Scene_Map < Scene_Base
     elsif @locate_window.active
       @locate_window.update
       update_locate                         # KANDI
-    elsif @ps.active && (@search.index == 1)
+    elsif @ps.active && (@search3.index == 0 || @search3.index == 1)
       update_picklock_selection             # 鍵をこじ開けるメンバーの選択
     elsif @inventory.active
       @inventory.update
@@ -244,6 +248,8 @@ class Scene_Map < Scene_Base
       update_picklock_result                # 解錠結果の更新
     elsif @view_map.visible
       update_view_map                       # マップの閲覧の更新
+    elsif @search3.active
+      update_search3_selection              # 探索コマンドの選択
     elsif @search2.active
       update_search2_selection              # 探索コマンドの選択
     elsif @search.active
@@ -439,9 +445,10 @@ class Scene_Map < Scene_Base
   # ● 他パーティメニューの呼び出し
   #--------------------------------------------------------------------------
   def update_call_alter_menu
-    if Input.trigger?(Input::Z)
+    if Input.trigger?(Input::Y)
       return if $game_map.interpreter.running?        # イベント実行中？
       $game_temp.next_scene = "alter"
+      DEBUG.write(c_m, "--call alter menu--")
     end
   end
   #--------------------------------------------------------------------------
@@ -458,9 +465,9 @@ class Scene_Map < Scene_Base
   # ● DEBUGの呼び出し
   #--------------------------------------------------------------------------
   def update_call_debug
-    if Input.trigger?(Input::Y)
-      DEBUG.write(c_m, "--SELECT BUTTON PUSHED--")
-    end
+    # if Input.trigger?(Input::Y)
+    #   DEBUG.write(c_m, "--SELECT BUTTON PUSHED--")
+    # end
   end
   #--------------------------------------------------------------------------
   # ● 画面切り替えの実行
@@ -730,6 +737,9 @@ class Scene_Map < Scene_Base
     @search2.visible = false
     @search2.active = false
     @search2.index = -1
+    @search3.visible = false
+    @search3.active = false
+    @search3.index = -1
     $game_temp.ignore_move = false
   end
   #--------------------------------------------------------------------------
@@ -764,6 +774,50 @@ class Scene_Map < Scene_Base
     wait_for_ps                     # PS待機
     $game_party.increase_light_time # 灯りを失う
     $game_party.tired_searching     # 疲労
+  end
+  #--------------------------------------------------------------------------
+  # ● 鍵の難易度セットアップ
+  #--------------------------------------------------------------------------
+  def setup_lock
+    @search3.active = false
+    @search3.visible = false
+    case $game_map.map_id
+    when 1; num = Constant_Table::LOCK_NUM_B1F; dif = Constant_Table::LOCK_DIF_B1F
+    when 2; num = Constant_Table::LOCK_NUM_B2F; dif = Constant_Table::LOCK_DIF_B2F
+    when 3; num = Constant_Table::LOCK_NUM_B3F; dif = Constant_Table::LOCK_DIF_B3F
+    when 4; num = Constant_Table::LOCK_NUM_B4F; dif = Constant_Table::LOCK_DIF_B4F
+    when 5; num = Constant_Table::LOCK_NUM_B5F; dif = Constant_Table::LOCK_DIF_B5F
+    when 6; num = Constant_Table::LOCK_NUM_B6F; dif = Constant_Table::LOCK_DIF_B6F
+    when 7; num = Constant_Table::LOCK_NUM_B7F; dif = Constant_Table::LOCK_DIF_B7F
+    when 8; num = Constant_Table::LOCK_NUM_B8F; dif = Constant_Table::LOCK_DIF_B8F
+    when 9; num = Constant_Table::LOCK_NUM_B9F; dif = Constant_Table::LOCK_DIF_B9F
+    end
+    $game_temp.lock_num = num
+    $game_temp.lock_diff = dif
+    $game_temp.used_action = :picking
+    MISC.s_on(2)  # 鍵開けスイッチフラグオン
+    $game_temp.event_switch = true  # ボタン開始イベント発動フラグオン
+  end
+  #--------------------------------------------------------------------------
+  # ● 探索メニュー3の更新
+  #--------------------------------------------------------------------------
+  def update_search3_selection
+    if Input.trigger?(Input::C)
+      case @search3.index
+      when 0 # 鍵を外す
+        setup_lock
+      when 1 # 呪文で外す
+        setup_lock
+      when 2 # 戻る
+        @search3.visible = false
+        @search3.active = false
+        @search3.index = -1
+        @search.visible = true
+        @search.active = true
+      end
+    elsif Input.trigger?(Input::B)
+      @search3.index = 2
+    end
   end
   #--------------------------------------------------------------------------
   # ● 探索メニュー2の更新
@@ -803,24 +857,12 @@ class Scene_Map < Scene_Base
         @search2.index = 0
         @search.visible = false
         @search.active = false
-      when 1 # かぎをこじあける
+      when 1 # かぎをあける
+        @search3.visible = true
+        @search3.active = true
+        @search3.index = 0
         @search.active = false
-        case $game_map.map_id
-        when 1; num = Constant_Table::LOCK_NUM_B1F; dif = Constant_Table::LOCK_DIF_B1F
-        when 2; num = Constant_Table::LOCK_NUM_B2F; dif = Constant_Table::LOCK_DIF_B2F
-        when 3; num = Constant_Table::LOCK_NUM_B3F; dif = Constant_Table::LOCK_DIF_B3F
-        when 4; num = Constant_Table::LOCK_NUM_B4F; dif = Constant_Table::LOCK_DIF_B4F
-        when 5; num = Constant_Table::LOCK_NUM_B5F; dif = Constant_Table::LOCK_DIF_B5F
-        when 6; num = Constant_Table::LOCK_NUM_B6F; dif = Constant_Table::LOCK_DIF_B6F
-        when 7; num = Constant_Table::LOCK_NUM_B7F; dif = Constant_Table::LOCK_DIF_B7F
-        when 8; num = Constant_Table::LOCK_NUM_B8F; dif = Constant_Table::LOCK_DIF_B8F
-        when 9; num = Constant_Table::LOCK_NUM_B9F; dif = Constant_Table::LOCK_DIF_B9F
-        end
-        $game_temp.lock_num = num
-        $game_temp.lock_diff = dif
-        $game_temp.used_action = :picking
-        MISC.s_on(2)  # 鍵開けスイッチフラグオン
-        $game_temp.event_switch = true  # ボタン開始イベント発動フラグオン
+        @search.visible = false
       when 2 # アイテムをつかう
         text1 = "だれがつかいますか?"
         text2 = "[B]でやめます"
@@ -1166,7 +1208,12 @@ class Scene_Map < Scene_Base
       @back_s.visible = true
       @ps.active = true
       @ps.index = 0
-      @ps.start_skill_view(SKILLID::PICKLOCK)  # ピッキング
+      case @search3.index
+      when 0
+        @ps.start_skill_view(SKILLID::PICKLOCK)  # ピッキング
+      when 1
+        @ps.start_skill_view(SKILLID::RATIONAL)  # 理性呪文
+      end
     end
   end
   #--------------------------------------------------------------------------
@@ -1214,15 +1261,28 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def update_picklock_selection
     if Input.trigger?(Input::C)
-      if @ps.actor.nofpicks > 0
-        @ps.active = false
-        @back_s.visible = false
-        @ps.turn_off_sv
-        @window_lock.culc_unlock(@ps.actor)
-        @window_lock.active = true
-      else
-        @attention_window.set_text("どうぐがない")
-        wait_for_attention
+      if @search3.index == 0  # ピックツールで開ける
+        if @ps.actor.nofpicks > 0
+          @ps.active = false
+          @back_s.visible = false
+          @ps.turn_off_sv
+          @window_lock.calc_unlock(@ps.actor)
+          @window_lock.active = true
+        else
+          @attention_window.set_text("どうぐがない")
+          wait_for_attention
+        end
+      elsif @search3.index == 1 # 呪文で鍵を開ける
+        if @ps.actor.can_cast_unlock
+          @ps.active = false
+          @back_s.visible = false
+          @ps.turn_off_sv
+          @window_lock.calc_unlock_magic(@ps.actor)
+          @window_lock.active = true
+        else
+          @attention_window.set_text("できません")
+          wait_for_attention
+        end
       end
     elsif Input.trigger?(Input::B)
       @ps.turn_off_sv
@@ -1235,13 +1295,19 @@ class Scene_Map < Scene_Base
   def update_lock
     return if @window_lock.showing_result
     if @time == 0
-      @window_lock.refresh($game_temp.lock_num, $game_temp.lock_diff)
+      @window_lock.refresh($game_temp.lock_num, $game_temp.lock_diff, (@search3.index == 1))
       @time = 5
-    end
-    if Input.trigger?(Input::C)
-      @ps.actor.chance_skill_increase(SKILLID::PICKLOCK) # スキル：ピッキング
-      @ps.actor.tired_picking             # 疲労度加算
-      $game_party.increase_light_time     # 灯りを失う
+    elsif Input.trigger?(Input::C)
+      case @search3.index
+      when 0
+        @ps.actor.chance_skill_increase(SKILLID::PICKLOCK) # スキル：ピッキング
+        @ps.actor.tired_picking             # 疲労度加算
+        $game_party.increase_light_time     # 灯りを失う
+      when 1
+        magic = $data_magics[Constant_Table::UNLOCK_MAGIC_ID]
+        @ps.actor.reserve_cast(magic, 1) # MPを消費、スキル上昇もここで行う
+        @ps.actor.tired_casting(1)              # 疲労度加算
+      end
       @window_lock.show_result            # 結果の表示
       @window_lock.active = false
     elsif Input.trigger?(Input::B)
@@ -1270,6 +1336,9 @@ class Scene_Map < Scene_Base
     @search.index = -1
     @search.visible = false
     @search.active = false
+    @search3.index = -1
+    @search3.visible = false
+    @search3.active = false
     $game_temp.lock_num = 0
     $game_temp.lock_diff = 0
   end
@@ -1394,8 +1463,8 @@ class Scene_Map < Scene_Base
           end_alter
         when 1  # 記録しないで冒険を終了する
           DEBUG.write(c_m, "SYSTEM MENU => GO Title ===========================")
-          $game_temp.next_scene = "title"          # ゲームの強制中断
-          DEBUG.increase_reset_count  # リセット扱いとする
+          $game_temp.next_scene = "title"   # ゲームの強制中断
+          DEBUG.increase_reset_count        # リセット扱いとする
           end_alter
         when 2  # ゲームを中断する
           DEBUG.write(c_m, "SYSTEM MENU => MAKE TERMINATED SAVE")

@@ -8,13 +8,8 @@ class Window_CAMP < Window_Selectable
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
-  def initialize(prepare)
-    @prepare = prepare
-    if @prepare
-      super((512-190)/2, 74, 190, WLH*4+32)
-    else
-      super((512-190)/2, 74, 190, WLH*7+32)
-    end
+  def initialize
+    super((512-190)/2, 74, 190, WLH*8+32)
     self.visible = false
     self.active = false
     self.opacity = 255
@@ -35,11 +30,7 @@ class Window_CAMP < Window_Selectable
     @s6 = "たちさる"
     @s7 = "セーブ <#{$game_party.save_ticket}>"
     @s8 = "モンスターずかん"
-    if @prepare
-      @commands = [@s1, @s4, @s6]
-    else
-      @commands = [@s1, @s3, @s7, @s4, @s5, @s2, @s8, @s6]
-    end
+    @commands = [@s1, @s3, @s7, @s4, @s5, @s2, @s8, @s6]
     @item_max = @commands.size
     self.contents.clear
     for command in @commands

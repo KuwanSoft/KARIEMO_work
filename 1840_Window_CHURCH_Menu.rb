@@ -112,12 +112,16 @@ class Window_CHURCH_Menu < Window_Selectable
   # ● ゴールドとEPの変換表を表示
   #--------------------------------------------------------------------------
   def show_expvsgold(actor)
+    change_font_to_v
     self.contents.clear
     str1 = "きふは だいかんげいです。"
-    ep = 1
-    gp = MISC.ep2gp(ep, actor)
-    str3 = sprintf("1E.P. = %.2fGold", gp)
+    ep = 1000
+    gp = MISC.ep2gp(ep, actor).to_i
+    str2 = "1000E.P. ="
+    str3 = "#{gp}Goldです。"
     self.contents.draw_text(0, 0, self.width-32, 24, str1, 1)
-    self.contents.draw_text(0, 24*2, self.width-32, 24, str3, 1)
+    self.contents.draw_text(0, 24*1, self.width-32, 24, str2, 0)
+    self.contents.draw_text(0, 24*2, self.width-32, 24, str3, 2)
+    change_font_to_normal
   end
 end

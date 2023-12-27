@@ -11,7 +11,7 @@ class Window_WalletInfo < Window_Base
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super( (512-(WLW*10+32))/2, WLH*21, WLW*10+32, WLH*2+32)
+    super( (512-(WLW*10+32))/2, WLH*24, WLW*10+32, WLH*2+32)
     self.z = 104        # 先にz座標を指定すること
     self.visible = false
     self.active = false

@@ -4,14 +4,14 @@
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_SEARCH < Window_Selectable
+class Window_SEARCH3 < Window_Selectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super((512-WLW*15)/2, (448-(WLH*5+32))/2, WLW*15, WLH*5+32)
+    super((512-WLW*15)/2, (448-(WLH*5+32))/2, WLW*15, WLH*4+32)
     self.visible = false
     self.active = false
     @adjust_x = WLW
@@ -30,12 +30,11 @@ class Window_SEARCH < Window_Selectable
   def drawing
     index = 0
     gray = false
-    top = "<たんさく>"
-    s1 = "さがす"
-    s2 = "かぎを はずす"
-    s3 = "アイテムを つかう"
-    s4 = "まえに もどる"
-    @commands = [s1, s2, s3, s4]
+    top = "<とびら>"
+    s1 = "かぎを こじあける"
+    s2 = "#{$data_magics[37].name}"
+    s3 = "まえに もどる"
+    @commands = [s1, s2, s3]
     @item_max = @commands.size
     self.contents.clear
     self.contents.draw_text(0,0,self.width-32, WLH, top, 1)

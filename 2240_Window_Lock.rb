@@ -30,9 +30,17 @@ class Window_Lock < Window_Base
   #--------------------------------------------------------------------------
   # ● 開錠能力の計算
   #--------------------------------------------------------------------------
-  def culc_unlock(actor)
+  def calc_unlock(actor)
     @unlock = MISC.skill_value(SKILLID::PICKLOCK, actor)  # スキル値を取得
     DEBUG::write(c_m, "開錠能力: #{@unlock}")
+    @actor = actor
+  end
+  #--------------------------------------------------------------------------
+  # ● 開錠能力の計算
+  #--------------------------------------------------------------------------
+  def calc_unlock_magic(actor)
+    @unlock = MISC.skill_value(SKILLID::RATIONAL, actor)  # スキル値を取得
+    DEBUG::write(c_m, "呪文開錠能力: #{@unlock}")
     @actor = actor
   end
   #--------------------------------------------------------------------------
@@ -41,14 +49,14 @@ class Window_Lock < Window_Base
   def estimate_unlock_rate(lock_num, lock_diff)
     skill = @unlock
     @ratio = ([(skill - lock_diff), 0].max / skill.to_f) ** lock_num
-    DEBUG.write(c_m, "skill:#{skill} lock_diff:#{lock_diff} lock_num:#{lock_num} ratio:#{@ratio}")
+    # DEBUG.write(c_m, "skill:#{skill} lock_diff:#{lock_diff} lock_num:#{lock_num} ratio:#{@ratio}")
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ
   #     lock : ロックの数
   #     difficulty   : 難易度
   #--------------------------------------------------------------------------
-  def refresh(lock_num, lock_diff)
+  def refresh(lock_num, lock_diff, magic = false)
     estimate_unlock_rate(lock_num, lock_diff)
     @showing_result = false
     self.visible = true
@@ -68,14 +76,21 @@ class Window_Lock < Window_Base
     bitmap = Cache.system("lock")
     self.contents.blt(0, 16*2+6, bitmap, bitmap.rect)
     self.contents.draw_text(32, 16*3, 48, 16, lock_diff, 2)
-    ## ピックツール数の表示
-    bitmap = Cache.icon("icon_item2")
-    self.contents.blt(0, 16*3+6, bitmap, bitmap.rect)
-    self.contents.draw_text(32, 16*4, 48, 16, "x#{@actor.nofpicks}", 2)
-    text1 = "[A]あける(#{Integer(@ratio*100)}%"
+    if magic
+      ## MPの表示
+      self.contents.draw_text(8, 16*4, 24, 16, "M")
+      self.contents.draw_text(32, 16*4, 48, 16, @actor.mp_air, 2)
+    else
+      ## ピックツール数の表示
+      bitmap = Cache.icon("icon_item2")
+      self.contents.blt(0, 16*3+6, bitmap, bitmap.rect)
+      self.contents.draw_text(32, 16*4, 48, 16, "#{@actor.nofpicks}", 2)
+    end
+
+    text1 = "[A]あける #{Integer(@ratio*100)}%"
     text2 = "[B]もどる"
-    self.contents.draw_text(96, 16*3, self.width-32, WLH, text1, 0)
-    self.contents.draw_text(96, 16*4, self.width-32, WLH, text2, 0)
+    self.contents.draw_text(96+8, 16*3, self.width-32, WLH, text1, 0)
+    self.contents.draw_text(96+8, 16*4, self.width-32, WLH, text2, 0)
     case lock_num
     when 1;
       @result = value1 > lock_diff

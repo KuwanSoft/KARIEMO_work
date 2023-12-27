@@ -571,14 +571,18 @@ module MISC
   # ● GOLD vs EP 寄付金
   #--------------------------------------------------------------------------
   def self.gp2ep(gp, actor)
+    param_a = 1000
+    param_b = 2000
     ratio = actor.personality_n == :tiredness ? 1.05 : 1.00 # 性格によるボーナス
-    ep = [[gp * 4 / (1.45 ** (actor.exp / 1000)), 0].max, Constant_Table::MAX_EP].min.to_i
+    ep = [[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max, Constant_Table::MAX_EP].min.to_i
     return Integer(ep * ratio)
   end
   #--------------------------------------------------------------------------
   # ● EP vs GOLD 寄付金
   #--------------------------------------------------------------------------
   def self.ep2gp(ep, actor)
-    return [ep * 0.25 * 1.45 ** (actor.exp / 1000), 0].max
+    param_a = 1000
+    param_b = 2000
+    return [ep * 0.25 * 1.45 ** (actor.exp / param_b), 0].max
   end
 end

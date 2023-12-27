@@ -128,7 +128,6 @@ class Spriteset_Battle
   #--------------------------------------------------------------------------
   def all_redraw_complete?
     for enemy_sprite in @enemy_sprites
-      DEBUG.write(c_m, "sprite:#{enemy_sprite.battler.name} redraw:#{enemy_sprite.battler.redraw}")
       return false if enemy_sprite.battler.redraw
     end
     return true

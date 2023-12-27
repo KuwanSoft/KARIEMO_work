@@ -2110,7 +2110,26 @@ class Game_Actor < Game_Battler
     return damage
   end
   #--------------------------------------------------------------------------
-  # ● 罠調査呪文が詠唱可能？
+  # ● 扉開錠呪文が詠唱可能？(マップシーン)
+  # キャンセルする可能性があるので実際のMP消費は別に定義
+  #--------------------------------------------------------------------------
+  def can_cast_unlock
+    return false unless movable? # 動ける状態であるか？
+    return false if silent?      # 呪文詠唱可能か？
+    have = false
+    for id in @magic
+      magic = $data_magics[id]
+      if magic.purpose == "unlock"
+        have = true
+        break
+      end
+    end
+    return false unless have                  # 呪文を覚えているか？
+    return false unless mp_available?(magic)  # MPが足りているか？
+    return true
+  end
+  #--------------------------------------------------------------------------
+  # ● 罠調査呪文が詠唱可能？(宝箱シーン)
   #--------------------------------------------------------------------------
   def can_cast_trap_identify
     return false unless movable? # 動ける状態であるか？
@@ -2125,11 +2144,11 @@ class Game_Actor < Game_Battler
     end
     return false unless have                  # 呪文を覚えているか？
     return false unless mp_available?(magic)  # MPが足りているか？
-    consume_mp(magic)       # MP消費
+    reserve_cast(magic, 1)       # MP消費
     return true
   end
   #--------------------------------------------------------------------------
-  # ● 魅了呪文が詠唱可能？
+  # ● 魅了呪文が詠唱可能？(NPCシーン)
   #--------------------------------------------------------------------------
   def can_cast_fascinate
     return false unless movable? # 動ける状態であるか？
@@ -2144,7 +2163,7 @@ class Game_Actor < Game_Battler
     end
     return false unless have                  # 呪文を覚えているか？
     return false unless mp_available?(magic)  # MPが足りているか？
-    consume_mp(magic)       # MP消費
+    reserve_cast(magic, 1)       # MP消費
     return true
   end
   #--------------------------------------------------------------------------
@@ -2793,35 +2812,6 @@ class Game_Actor < Game_Battler
     return array
   end
   #--------------------------------------------------------------------------
-  # ● 属性抵抗の有無（アクターのみ）
-  #     element_id_set : 属性ID SET
-  #--------------------------------------------------------------------------
-  def elemental_resist?(element)
-    for item in armors.compact
-      return true if item.element.include?(element)
-    end
-    if @veil_element.include?(element)
-      DEBUG.write(c_m, "ベール属性と一致；ダメージ半減")
-      return true
-    end
-    if element == "氷" && @class_id == 7 # 狩人は寒さに強い
-      DEBUG.write(c_m, "狩人＝氷属性と一致；ダメージ半減")
-      return true
-    end
-    if Constant_Table::MAGIC_HASH_ELEMENT_ARRAY[get_magic_attr(8)].include?(element)
-      DEBUG.write(c_m, "ルーンの属性防御と一致；ダメージ半減")
-      return true
-    end
-
-    return false
-  end
-  #--------------------------------------------------------------------------
-  # ● 宝箱調査が2回できる？　*盗賊のマスタースキル
-  #--------------------------------------------------------------------------
-  def inspect_twice?
-    return false
-  end
-  #--------------------------------------------------------------------------
   # ● 精神統一可能？　*魔術師の特殊コマンド
   #--------------------------------------------------------------------------
   def can_meditation?
@@ -2857,21 +2847,6 @@ class Game_Actor < Game_Battler
       DEBUG.write(c_m,"#{@name} 高速詠唱発動:#{ratio}%")
     end
     return result
-  end
-  #--------------------------------------------------------------------------
-  # ● ヒーリング可能？　*聖職者のマスタースキル
-  #--------------------------------------------------------------------------
-  def can_healing?
-#~     return false if healing_done    # すでにヒーリングを実施済み
-#~     return true if already_have(14)
-    return false
-  end
-  #--------------------------------------------------------------------------
-  # ● 白刃取り可能？　*忍者のマスタースキル
-  #--------------------------------------------------------------------------
-  def can_shirahadori?
-#~     return true if already_have(10)
-    return false
   end
   #--------------------------------------------------------------------------
   # ● 不意打ち実施後の隠密解除判定
@@ -2945,17 +2920,22 @@ class Game_Actor < Game_Battler
     return (1 - tired_ratio)
   end
   #--------------------------------------------------------------------------
-  # ● ブレス耐性（狩人の野生の勘で耐性あり）
-  #--------------------------------------------------------------------------
-  def breath_defence
-#~     return already_have(12)
-  end
-  #--------------------------------------------------------------------------
   # ● 呪文の習得
   #--------------------------------------------------------------------------
   def get_magic(magic_id)
     @magic.push(magic_id)
     @magic.uniq!
+  end
+  #--------------------------------------------------------------------------
+  # ● すべての呪文の習得
+  #--------------------------------------------------------------------------
+  def get_all_magic
+    for magic in $data_magics
+      next if magic == nil
+      if (magic.domain == 1) || (magic.domain == 0)
+        get_magic(magic.id)
+      end
+    end
   end
   #--------------------------------------------------------------------------
   # ● 弱点属性:アクターは無し
@@ -2993,14 +2973,6 @@ class Game_Actor < Game_Battler
   def check_double(double_string)
     return false
   end
-  #--------------------------------------------------------------------------
-  # ● 経験値ロスト
-  #--------------------------------------------------------------------------
-#~   def lost_exp
-#~     prev = @exp
-#~     @exp = Integer(@exp * 0.99)
-#~     DEBUG::write(c_m,"経験値ロスト発生:#{prev}=>#{@exp}差分:#{prev-@exp}")
-#~   end
   #--------------------------------------------------------------------------
   # ● 忍者の場合のSWING回数ボーナス
   #--------------------------------------------------------------------------
@@ -3054,6 +3026,8 @@ class Game_Actor < Game_Battler
       when 0; skill_id = SKILLID::RATIONAL
       when 1; skill_id = SKILLID::MYSTIC
       end
+      ## 消費の少ない呪文でCPだけを高くしてスキル上昇を狙う方法をフィルターしている
+      ## 純粋に消費MPの総合値で判定している
       case cost
       when 1..9;    cycle = 1
       when 10..19;  cycle = 2
@@ -4750,6 +4724,7 @@ class Game_Actor < Game_Battler
   def recover_nausea
     ratio = Constant_Table::REST_NAUSEA_RECOVER_RATIO_PER_TURN
     state_id = STATEID::NAUSEA
+    return if @state_depth[state_id] == nil
     if ratio > rand(100)
       @state_depth[state_id] -= 1
       if @state_depth[state_id] <= 0
@@ -4761,9 +4736,42 @@ class Game_Actor < Game_Battler
     end
   end
   #--------------------------------------------------------------------------
-  # ● 属性ダメージ倍率の計算
+  # ● 属性抵抗の有無（アクターのみ）
+  #     element_id_set : 属性ID SET
+  #--------------------------------------------------------------------------
+  def elemental_resist?(element_type)
+    str = Constant_Table::ELEMENTAL_STR[element_type]             # 属性STRの代入
+    rank = 0
+    for item in armors.compact
+      rank += 1 if item.element.include?(str)
+      DEBUG.write(c_m, "防具による(#{str})属性防御検知 #{rank}箇所")
+    end
+    if @veil_element.include?(str)
+      DEBUG.write(c_m, "ベール属性と一致(#{str}) rank:#{rank}")
+      rank += 1
+    end
+    if str == Constant_Table::ELEMENTAL_STR[1] && @class_id == 7  # 狩人は寒さに強い
+      DEBUG.write(c_m, "狩人＝#{str}属性と一致 rank:#{rank}")
+      rank += 1
+    end
+    if Constant_Table::MAGIC_HASH_ELEMENT_ARRAY[get_magic_attr(8)].include?(str)
+      DEBUG.write(c_m, "ルーンの属性防御と一致 rank:#{rank}")
+      rank += 1
+    end
+    return rank
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性防御
+  # 炎0 = 耐属性ダメージ装備無し
+  # 炎1 = 炎ダメージ 1/2倍
+  # 炎2 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
+    rank = elemental_resist?(element_type)
+    return damage if rank == 0
+    damage = Integer(damage * 1/(rank+1))  # 属性防御x5箇所
+    self.resist_element_flag = true        # 弱点フラグ
+    DEBUG::write(c_m,"属性抵抗#{rank}個検知 ダメージ1/#{rank+1}倍: TYPE(#{element_type})")
     return damage
   end
 end

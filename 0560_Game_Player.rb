@@ -319,8 +319,8 @@ class Game_Player < Game_Character
               @no_event = false
               text1 = "このかべは もろそうだ。"
               text2 = "なにかどうぐがあれば こわせる。"
-              $game_message.text.push(text1)
-              $game_message.text.push(text2)
+              $game_message.texts.push(text1)
+              $game_message.texts.push(text2)
               # $popup.set_text("このかべは もろい")
               # $popup.visible = true
             end

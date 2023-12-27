@@ -15,6 +15,7 @@ class Magics
   attr_accessor :resist
   attr_accessor :anim_id
   attr_accessor :damage
+  attr_accessor :element_type
   attr_accessor :element
   attr_accessor :add_state_set
   attr_accessor :remove_state_set
@@ -49,6 +50,12 @@ class Magics
   #--------------------------------------------------------------------------
   def remove_state_set
     return @remove_state_set.delete("\"")
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性IDを取得
+  #--------------------------------------------------------------------------
+  def element_type
+    return @element_type.to_i
   end
   #--------------------------------------------------------------------------
   # ● 属性を取得

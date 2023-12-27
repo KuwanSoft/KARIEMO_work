@@ -2,18 +2,16 @@ module DEBUG
   #--------------------------------------------------------------------------
   # ● DEBUGファイルの準備
   #--------------------------------------------------------------------------
-  # def self.prepare
-    @before_method = ""
-    @path = "./Debug/"
-    @dump_str = []
-    @version_path = "G:/マイドライブ/KuwanSoft KARIEMO project/"
-    @version_file = "version_list.txt"
-    @version_file_single = "Work/current_version.txt"
-    @actor_file = "actordata.csv"
-    @reset_file = "rc"
-    @timer = 0
-    @perfd = []
-  # end
+  @before_method = ""
+  @path = "./Debug/"
+  @dump_str = []
+  @version_path = "G:/マイドライブ/KuwanSoft KARIEMO project/"
+  @version_file = "version_list.txt"
+  @version_file_single = "Work/current_version.txt"
+  @actor_file = "actordata.csv"
+  @reset_file = "rc"
+  @timer = 0
+  @perfd = []
   #--------------------------------------------------------------------------
   # ● 【開発用】バージョンをファイルに書き出す
   #     GoogleDriveにversion_list.txtを作成する

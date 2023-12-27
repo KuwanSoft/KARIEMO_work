@@ -254,10 +254,28 @@ class Game_Enemy < Game_Battler
     return dr
   end
   #--------------------------------------------------------------------------
-  # ● 属性ダメージ倍率の計算
+  # ● 属性ダメージ倍率計算
+  # 炎0 = 弱点属性 炎ダメージ2倍
+  # 炎2 = 炎ダメージ 1/2倍
+  # 炎3 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
-    return enemy.calc_element_damage(element_type, damage)
+    str = Constant_Table::ELEMENTAL_STR[element_type]       # 属性STRの代入
+    return damage unless enemy.element_resistant.include?(str)   # 属性防御無し
+    regex = /#{str}([0-9])/
+    value = enemy.element_resistant.scan(regex)[0][0].to_i
+    if value == 0
+      self.weak_flag = true                             # 弱点フラグ
+      return Integer(damage * Constant_Table::RATE_WEAKELEMENT)
+    end
+    case value
+    when 2..5
+      self.resist_element_flag = true                   # 耐性フラグ
+      DEBUG::write(c_m,"属性抵抗 ダメージ1/#{value}倍: TYPE(#{element_type})")
+      return Integer(damage * 1/value)
+    else
+      raise StandardError.new("invalid value, should be in 2..5")
+    end
   end
   #--------------------------------------------------------------------------
   # ● 呪文無効化確率の取得
@@ -795,12 +813,6 @@ class Game_Enemy < Game_Battler
     return 0 if enemy.kind.include?("謎")
     return 2.5 if enemy.kind.include?("竜")
     return 0 if enemy.kind.include?("神")
-  end
-  #--------------------------------------------------------------------------
-  # ● ブレス耐性（モンスターは無し）
-  #--------------------------------------------------------------------------
-  def breath_defence
-    return false
   end
   #--------------------------------------------------------------------------
   # ● 弱点属性

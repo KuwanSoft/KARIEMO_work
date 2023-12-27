@@ -150,6 +150,7 @@ rescue LRSS => e
   DEBUG::write("EXIT", "===============* LRSS *===============")
   DEBUG::write("EXIT", "Forcing DUMP")
   dump_report(e)
+  print "手動で例外を発生させました。\n /Debug/BugReport.txtを確認してください。"
 rescue Errno::ENOENT
   filename = $!.message.sub("No such file or directory - ", "")
   print("ファイル #{filename} が見つかりません。")

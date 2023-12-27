@@ -12,7 +12,7 @@ class Window_GiveMoney < Window_Selectable
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super( (512-(WLW*10+32))/2, WLH*17, WLW*10+32, WLH*2+32)
+    super( (512-(WLW*10+32))/2, WLH*(17+3), WLW*10+32, WLH*2+32)
     self.z = 104        # 先にz座標を指定すること
     self.visible = false
     self.active = false

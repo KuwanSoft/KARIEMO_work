@@ -1672,25 +1672,14 @@ class Game_Battler
     ######### 攻撃系呪文処理(レジストあり) ##########
     # -- 計算には代入済みのhitを使用する。
     when "damage","earthquake" # 攻撃呪文or攻撃アイテム
-      damage_adj = 100
-      ## 属性抵抗判定（冒険者のみ）
-      if self.elemental_resist?(obj.element)  # 属性抵抗ありの場合はダイス値が1/2倍
-        damage_adj /= 2
-        self.resist_element_flag = true                   # 弱点フラグ
-        DEBUG::write(c_m,"属性抵抗検知:#{obj.element}")
-      end
-      ## 弱点属性判定（モンスターのみ）
-      if weak_element?(obj.element)
-        damage_adj *= 2
-        self.weak_flag = true                   # 弱点フラグ
-        DEBUG::write(c_m,"弱点属性検知:#{obj.element}")
-      end
       DEBUG::write(c_m,"ダメージ呪文 #{m_dice_num}D#{m_dice_max}+#{m_dice_plus}")
       hit.times do
-        d = MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
-        damage += Integer(d * damage_adj / 100.0)
+        damage += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       damage *= multipiler
+      ## 属性抵抗判定（フラグも同時にセットする）
+      @damage_element_type = obj.element_type # 呪文の属性IDをセット
+      damage = self.calc_element_damage(@damage_element_type, damage)
       damage = Integer(damage)
       DEBUG::write(c_m,"攻撃呪文ダメージ倍率 x#{multipiler} SKILL値:#{MISC.skill_value(SKILLID::CONCENTRATE,user)}")
       @hits = hit
