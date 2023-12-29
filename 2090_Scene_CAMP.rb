@@ -1124,6 +1124,7 @@ class Scene_CAMP < Scene_Base
     @food.refresh
     @camp.active = false
     @camp.visible = false
+    $game_party.force_sleep # 強制入眠
   end
   #--------------------------------------------------------------------------
   # ● 食事の更新
@@ -1132,16 +1133,17 @@ class Scene_CAMP < Scene_Base
     if Input.trigger?(Input::C)
       case @food.index
       when 0  # はい
-        return if $game_party.food < 1      # 食糧がない場合はスキップ
+        return if $game_party.food < 1        # 食糧がない場合はスキップ
         $threedmap.change_gray_all_wall(200)  # トーンの変更
         @food.active = false
-        @food.rest                          # 休息中表示
-        $game_temp.map_bgm = RPG::BGM.last  # 戦闘用に先にBGM保管
-        $game_temp.map_bgs = RPG::BGS.last  # 戦闘用に先にBGM保管
-        $game_temp.resting = true           # 休息フラグ
+        @food.rest                            # 休息中表示
+        $game_temp.map_bgm = RPG::BGM.last    # 戦闘用に先にBGM保管
+        $game_temp.map_bgs = RPG::BGS.last    # 戦闘用に先にBGM保管
+        $game_temp.resting = true             # 休息フラグ
         $music.play("休息中")
         @rest_counter = Constant_Table::REST_COUNTER  # スリープ設定
         @ps.refresh
+        turn_on_face                          # 顔の表示
       when 1  # いいえ
         end_lunch
       end
@@ -1151,6 +1153,7 @@ class Scene_CAMP < Scene_Base
   end
   #--------------------------------------------------------------------------
   # ● 休息の更新
+  # (resting == true)の時のみupdate
   #--------------------------------------------------------------------------
   def update_resting
     $game_wandering.update
@@ -1165,11 +1168,9 @@ class Scene_CAMP < Scene_Base
       @ps.refresh
       @food.rest  # 休息中表示
       if $game_party.food == 0          # 食糧の枯渇
-        @food.resting = false           # 休憩の終了
         end_lunch
       end
     elsif Input.trigger?(Input::C)
-      @food.resting = false           # 休憩の終了
       end_lunch
     end
   end
@@ -1191,6 +1192,10 @@ class Scene_CAMP < Scene_Base
   # ● 休息の終了
   #--------------------------------------------------------------------------
   def end_lunch
+    @food.resting = false           # 休憩の終了
+    $game_temp.resting = false      # 休息フラグ(wanderingが参照する)
+    $game_party.getup
+    turn_off_face
     $music.play("パーティ")
     @food.active = false
     @food.visible = false
@@ -1205,7 +1210,7 @@ class Scene_CAMP < Scene_Base
   #--------------------------------------------------------------------------
   def call_battle
     $music.me_play("エンカウント")
-    $popup.set_text("なにかにそうぐうした!")
+    $popup.set_text("なにものかに", "そうぐうした!")
     $popup.visible = true
     Graphics.wait(90)
     Graphics.update

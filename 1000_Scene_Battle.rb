@@ -1114,18 +1114,27 @@ class Scene_Battle < Scene_Base
     @message_window.visible = true
     text = sprintf(Vocab::EscapeStart)
     $game_message.texts.push(text)
-    if $game_temp.next_drop_box   # 玄室の場合
-      ratio = Constant_Table::ESCAPE_RATIO_G
-    elsif $game_temp.event_battle # イベントバトル
-      ratio = Constant_Table::ESCAPE_RATIO_E
-    else                          # ワンダリング
-      ratio = Constant_Table::ESCAPE_RATIO_W
+    # if $game_temp.next_drop_box   # 玄室の場合
+    #   ratio = Constant_Table::ESCAPE_RATIO_G
+    # elsif $game_temp.event_battle # イベントバトル
+    #   ratio = Constant_Table::ESCAPE_RATIO_E
+    # else                          # ワンダリング
+    #   ratio = Constant_Table::ESCAPE_RATIO_W
+    # end
+    # penalty = 0
+    case $game_party.get_movable_members.size
+    when 6; ratio = 95
+    when 5; ratio = 85
+    when 4; ratio = 75
+    when 3; ratio = 65
+    when 2; ratio = 55
+    when 1; ratio = 45
+    when 0; ratio = 5
     end
-    penalty = 0
-    penalty += $game_party.dead_members.size * Constant_Table::PENALTY_ESCAPE
-    penalty += $game_troop.get_sharp_eye * Constant_Table::SHARP_EYE_P
-    ratio -= penalty
-    DEBUG::write(c_m,"逃走処理 成功率:#{ratio}% ペナルティ合計:#{penalty}%")
+    # penalty += $game_party.dead_members.size * Constant_Table::PENALTY_ESCAPE
+    # penalty += $game_troop.get_sharp_eye * Constant_Table::SHARP_EYE_P
+    # ratio -= penalty
+    DEBUG::write(c_m,"逃走処理 成功率:#{ratio}%")
     if $game_troop.preemptive
       success = true
     else
@@ -2879,20 +2888,7 @@ class Scene_Battle < Scene_Base
       @miracle = nil
     end
   end
-  #--------------------------------------------------------------------------
-  # ● 顔描画ON
-  #--------------------------------------------------------------------------
-  def turn_on_face
-    $game_temp.hide_face = false
-    $game_temp.need_ps_refresh = true
-  end
-  #--------------------------------------------------------------------------
-  # ● 顔描画OFF
-  #--------------------------------------------------------------------------
-  def turn_off_face
-    $game_temp.hide_face = true
-    $game_temp.need_ps_refresh = true
-  end
+
   #--------------------------------------------------------------------------
   # ● 地上へ飛べ(戦闘時)
   #~   キャンプ時の詠唱は、成功か失敗かの判定のみ。

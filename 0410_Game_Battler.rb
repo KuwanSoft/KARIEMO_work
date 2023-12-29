@@ -123,6 +123,7 @@ class Game_Battler
   attr_accessor :potion_effect            # 薬の効果
   attr_accessor :callhome_flag              # 地上へ飛べフラグ
   attr_accessor :smoke                    # 煙幕使用フラグ
+  attr_accessor :vulnerable               # 脆弱化フラグ（スタン時）
   attr_accessor :arranged                 # 隊列変更後フラグ
   attr_accessor :initiative_bonus         # 速さボーナス（呪文：時間よ速くなれ）
   attr_accessor :swing_bonus              # Swingボーナス（呪文：時間よ速くなれ）
@@ -297,6 +298,7 @@ class Game_Battler
     @identified_flag = false
     @insert = false                 # 連続行動
     @smoke = false
+    @vulnerable = false             # 脆弱化
     @callhome_flag = false
     @veil_ice = false               # ベール系アイテム
     @veil_fire = false
@@ -607,6 +609,7 @@ class Game_Battler
   # ● 行動可能判定
   #--------------------------------------------------------------------------
   def movable?
+    return false if @vulnerable                 # スタン中は行動不可判定
     return (not @hidden and restriction < 4)    # コマンド不可以外
   end
   #--------------------------------------------------------------------------
@@ -948,6 +951,7 @@ class Game_Battler
     if state_id == STATEID::STUN        # スタンの場合
       DEBUG::write(c_m,"#{self.name} スタン：アクションキャンセル")
       @action.clear                     # 戦闘行動をクリアする
+      @vulnerable = true                # 脆弱化フラグ
     end
     unless inputable?                   # 自由意思で行動できない場合
       @action.clear                     # 戦闘行動をクリアする
@@ -1432,7 +1436,10 @@ class Game_Battler
   def make_attack_damage_value(attacker, sub = false)
     armor = self.armor                        # アーマー値の取得
     if armor > 0
-      if guarding?                              # ガードしていればARMOR2倍
+      if @vulnerable
+        armor /= 2
+        DEBUG.write(c_m, "#{self.name} 脆弱化フラグ確認")
+      elsif guarding?                              # ガードしていればARMOR2倍
         armor += self.armor
       elsif check_reflexes                      # 反射神経ボーナス
         armor += self.armor
@@ -2167,9 +2174,10 @@ class Game_Battler
     end
     ## ダメージが正の数
     if @hp_damage > 0 || @element_damage > 0
-      remove_states_shock  # 衝撃によるステート解除
-      judge_spell_break    # スペルブレイク判定
-      judge_bone_crash     # 骨折判定
+      remove_states_shock   # 衝撃によるステート解除
+      judge_spell_break     # スペルブレイク判定
+      judge_bone_crash      # 骨折判定
+      judge_severe          # 重症判定
     end
     ## サブダメージが正の数
     # if @hp_subdamage > 0 || @element_subdamage > 0
@@ -2177,18 +2185,21 @@ class Game_Battler
     # end
     ##> 吸収の場合
     if @absorbed
-      user.hp += @hp_damage
+      user.hp += (@hp_damage + @element_damage)
     end
     ##> スキル：ダメージレジストによるダメージ軽減
-    if self.actor? && @hp_damage > 0
+    if self.actor? && (@hp_damage > 0 || @element_damage > 0)
       sv = MISC.skill_value(SKILLID::D_RESIST, self)
       diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
         @hp_damage = [@hp_damage *= 0.75, 1].max
+        @element_damage = [@element_damage *= 0.75, 1].max
         @hp_subdamage = [@hp_subdamage *= 0.75, 1].max if @hp_subdamage > 0
+        @element_subdamage = [@element_subdamage *= 0.75, 1].max if @element_subdamage > 0
         DEBUG::write(c_m,"ダメージレジスト発動 x0.75 @hp_damage=>#{@hp_damage} @hp_subdamage=>#{@hp_subdamage}")
+        DEBUG::write(c_m,"ダメージレジスト発動 x0.75 @element_damage=>#{@element_damage} @element_subdamage=>#{@element_subdamage}")
       end
       self.chance_skill_increase(SKILLID::D_RESIST)    # ダメージレジスト
     end
@@ -2197,7 +2208,9 @@ class Game_Battler
     self.hp -= Integer(@element_damage)
     self.hp -= Integer(@element_subdamage)
     ## 破砕判定
-    break_stone if user.action.attack? && @hp_damage > 0
+    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0)
+      break_stone
+    end
   end
   #--------------------------------------------------------------------------
   # ● スペルブレイクの判定

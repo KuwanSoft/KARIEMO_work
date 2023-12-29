@@ -249,6 +249,7 @@ class Game_System
     $game_party.restore_pm(@party_pm[unique_id]) if @party_pm != nil
     $game_party.light_time = @party_light_time[unique_id] # 灯り内部カウンタの引継ぎ
     $game_party.save_ticket = @party_ticket[unique_id]    # QS数の引継ぎ
+    $threedmap.define_all_wall($game_map.map_id)
     $music.se_play("階段")
     RPG::BGM.fade(1500)
     Graphics.fadeout(60)

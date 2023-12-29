@@ -2184,10 +2184,20 @@ class Game_Party < Game_Unit
   # ● 戦闘開始時の隠密化
   #--------------------------------------------------------------------------
   def check_preparation
-    for member in existing_members
-      next unless member.movable?
+    for member in get_movable_members
       member.check_preparation
     end
+  end
+  #--------------------------------------------------------------------------
+  # ● 動けるメンバー
+  #--------------------------------------------------------------------------
+  def get_movable_members
+    result = []
+    for member in members
+      next unless member.movable?
+      result.push(member)
+    end
+    return result
   end
   #--------------------------------------------------------------------------
   # ● ターン終了時の隊列自動変更
@@ -2410,6 +2420,22 @@ class Game_Party < Game_Unit
       member.get_all_magic
     end
     DEBUG.write(c_m, "全呪文習得")
+  end
+  #--------------------------------------------------------------------------
+  # ● 休息時の強制入眠
+  #--------------------------------------------------------------------------
+  def force_sleep
+    for member in existing_members
+      member.add_state(STATEID::SLEEP)
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 休息完了時の睡眠除去
+  #--------------------------------------------------------------------------
+  def getup
+    for member in existing_members
+      member.remove_state(STATEID::SLEEP)
+    end
   end
 end
 

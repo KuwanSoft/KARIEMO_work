@@ -951,69 +951,68 @@ class Window_Base < Window
       bitmap = Cache.system("find")
       self.contents.blt(x, y, bitmap, bitmap.rect)
       $music.se_play("発見")
-      return
-    end
-
-
-    ## SubWeaponの表示
-    if actor.subweapon_id != 0
-      item2 = MISC.item(1, actor.subweapon_id)
-      sub = Cache.icon_sub(item2.icon)
-      num2 = actor.get_arrow(true) if item2.stackable?
-      self.contents.blt(x, y, sub, sub.rect)
-    ## Shieldの表示
-    elsif actor.armor2_id != 0
-      item2 = MISC.item(2, actor.armor2_id)
-      sub = Cache.icon(item2.icon)
-      num2 = actor.get_arrow(true) if item2.stackable?
-      self.contents.blt(x, y, sub, sub.rect)
-    end
-
-    ## MainWeaponの表示
-    if actor.weapon_id != 0
-      item = MISC.item(1, actor.weapon_id)
-      wep = Cache.icon(item.icon)
-      num = actor.get_arrow if item.stackable?
+      ## backの表示
+      back = Cache.system("weapon2_back")
+      self.contents.blt(x, y, back, back.rect)
     else
-      wep = Cache.icon("")        # 素手の場合
-    end
-    self.contents.blt(x, y, wep, wep.rect)
+      ## SubWeaponの表示
+      if actor.subweapon_id != 0
+        item2 = MISC.item(1, actor.subweapon_id)
+        sub = Cache.icon_sub(item2.icon)
+        num2 = actor.get_arrow(true) if item2.stackable?
+        self.contents.blt(x, y, sub, sub.rect)
+      ## Shieldの表示
+      elsif actor.armor2_id != 0
+        item2 = MISC.item(2, actor.armor2_id)
+        sub = Cache.icon(item2.icon)
+        num2 = actor.get_arrow(true) if item2.stackable?
+        self.contents.blt(x, y, sub, sub.rect)
+      end
+      ## MainWeaponの表示
+      if actor.weapon_id != 0
+        item = MISC.item(1, actor.weapon_id)
+        wep = Cache.icon(item.icon)
+        num = actor.get_arrow if item.stackable?
+      else
+        wep = Cache.icon("")        # 素手の場合
+      end
+      self.contents.blt(x, y, wep, wep.rect)
+      ## backの表示
+      back = Cache.system("weapon2_back")
+      self.contents.blt(x, y, back, back.rect)
 
-    ## backの表示
-    back = Cache.system("weapon2_back")
-    self.contents.blt(x, y, back, back.rect)
-
-    ## スタック数の表示
-    change_font_to_skill
-    if actor.weapon_id != 0
-      if item.stackable?
-        case actor.index
-        when 0,2,4
-          self.contents.draw_text(x+4, y+2, 16, 16, num, 2)
-        when 1,3,5
-          self.contents.draw_text(x+4, y+2, 16, 16, num, 2)
+      ## スタック数の表示
+      change_font_to_skill
+      if actor.weapon_id != 0
+        if item.stackable?
+          case actor.index
+          when 0,2,4
+            self.contents.draw_text(x+4, y+2, 16, 16, num, 2)
+          when 1,3,5
+            self.contents.draw_text(x+4, y+2, 16, 16, num, 2)
+          end
         end
       end
-    end
-    unless actor.subweapon_id == 0
-      if item2.stackable?
-        case actor.index
-        when 0,2,4
-          self.contents.draw_text(x+14, y+16, 16, 16, num2, 2)
-        when 1,3,5
-          self.contents.draw_text(x+14, y+16, 16, 16, num2, 2)
+      unless actor.subweapon_id == 0
+        if item2.stackable?
+          case actor.index
+          when 0,2,4
+            self.contents.draw_text(x+14, y+16, 16, 16, num2, 2)
+          when 1,3,5
+            self.contents.draw_text(x+14, y+16, 16, 16, num2, 2)
+          end
         end
       end
-    end
-    ## 毒塗の表示(メインのみ塗布可能)
-    return unless actor.get_poison_number != 0
-    self.contents.font.color = poison_color
-    num = actor.get_poison_number
-    case actor.index
-    when 0,2,4
-      self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
-    when 1,3,5
-      self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
+      ## 毒塗の表示(メインのみ塗布可能)
+      return unless actor.get_poison_number != 0
+      self.contents.font.color = poison_color
+      num = actor.get_poison_number
+      case actor.index
+      when 0,2,4
+        self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
+      when 1,3,5
+        self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
+      end
     end
     change_font_to_normal
   end

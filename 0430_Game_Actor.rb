@@ -4346,7 +4346,6 @@ class Game_Actor < Game_Battler
   # ● インパクトスキルの取得
   #--------------------------------------------------------------------------
   def get_impact
-    return true
     return false unless @action.attack? # 物理攻撃中に限る
     sv = MISC.skill_value(SKILLID::IMPACT, self)
     case weapon?

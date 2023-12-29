@@ -166,6 +166,7 @@ class Game_WanderingList
   def check_encount
     x = $game_player.x
     y = $game_player.y
+    ## 同じマスにいるかどうか
     for wandering in @data
       next if wandering == nil
       next unless x == wandering.x
@@ -174,7 +175,32 @@ class Game_WanderingList
       remove_wandering(wandering.id)
       return true
     end
+    ## 休息中に限り一番近いノイズの大きさ％で毎休息ターンに判定が入る
+    ## updateルーチンの内部の判定なのでフレームレートをかけて確率の調整
+    if $game_temp.resting && (check_noise_level > rand(100*Graphics.frame_rate))
+      DEBUG.write(c_m, "休息中のエンカウント判定 ノイズレベル:#{check_noise_level}")
+      remove_most_closest_wandering
+      return true
+    end
     return false
+  end
+  #--------------------------------------------------------------------------
+  # ● 休息中エンカウント用（一番近い距離の群をエンカウント済みとして削除）
+  #--------------------------------------------------------------------------
+  def remove_most_closest_wandering
+    closest = 999
+    closest_id = 999
+    for wandering in @data
+      next if wandering == nil
+      if closest > wandering.how_far_from_wandering
+        closest = wandering.how_far_from_wandering
+        closest_id = wandering.id
+      end
+    end
+    ## 一番近い距離の群を削除
+    unless closest == 999
+      remove_wandering(closest_id)
+    end
   end
   #--------------------------------------------------------------------------
   # ● エンカウント済を削除

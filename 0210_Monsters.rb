@@ -36,6 +36,7 @@ class Monsters
   attr_reader :sr11
   attr_reader :sr12
   attr_reader :sr13
+  attr_reader :sr14
   attr_reader :sr_sum
   attr_reader :sr_tr
   attr_reader :AP

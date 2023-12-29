@@ -82,9 +82,9 @@ module Constant_Table
   UP_RATE = 6               # 特性値上昇確率係数：MAX差分 x 係数
   SHIELD = 25               # 敵のシールド防御確率
   PENALTY_ESCAPE = 5        # 死者1人のペナルティ
-  ESCAPE_RATIO_G = 85       # 玄室逃走成功率
+  ESCAPE_RATIO_G = 85       # 玄室逃走成功率(玄室は抽選を避けるために少し低く設定)
   ESCAPE_RATIO_W = 95       # 徘徊逃走成功率
-  ESCAPE_RATIO_E = 90       # 固定逃走成功率
+  ESCAPE_RATIO_E = 95       # 固定逃走成功率
   ENCOUNT = 1               # エンカウント自動減少％
   MAGIC_IDENTIFY_RATIO = 90 # 識別呪文での識別成功率
   FRIENDSHIP_P = 2          # 信頼増加値
