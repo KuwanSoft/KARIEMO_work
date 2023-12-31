@@ -167,7 +167,7 @@ class Window_Message < Window_Selectable
   def start_message
     @text = ""
     for i in 0...$game_message.texts.size
-      @text += "　　" if i >= $game_message.choice_start
+      @text += "" if i >= $game_message.choice_start
       @text += $game_message.texts[i].clone + "\x00"
     end
     @item_max = $game_message.choice_max
@@ -184,7 +184,8 @@ class Window_Message < Window_Selectable
     cnt = 0
     ## 次にくるメッセージによってウインドウの大きさを可変
     $game_message.texts.each{|line|cnt += 1}
-    cnt = [cnt, MAX_LINE].min          # 4行制限
+    # cnt = [cnt, MAX_LINE].min          # 4行制限
+    cnt = MAX_LINE  # 4行固定
     height = (BLH+4) * cnt + 32
     self.height = height
     ################################################

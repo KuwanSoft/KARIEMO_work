@@ -31,7 +31,9 @@ class Scene_Map < Scene_Base
     @search2 = Window_SEARCH2.new         # 探索メニュー2
     @search3 = Window_SEARCH3.new         # 探索メニュー2
     @inventory = Window_BagSelection.new("キャンプ", 100)
-    @target_ps = Window_TargetParty.new   # アイテム使用先
+    @target_ps = Window_PartyStatus.new(true)   # アイテム使用先
+    @target_ps.turn_off
+    @effect_window = Window_ActorStatusEffect.new  # アイテム・呪文エフェクト
     @window_other = Window_OtherParty.new # 他のパーティを探す
     ## マップ用
     @floor_info = Window_FloorList.new    # フロアリスト
@@ -175,12 +177,10 @@ class Scene_Map < Scene_Base
     @yesno.dispose
     @inventory.dispose
     @target_ps.dispose
+    @effect_window.dispose
     @window_other.dispose
     @window_lock.dispose
     @skill_gain.dispose
-    # @window_alembic.dispose
-    # @herblist.dispose
-    # @h_command.dispose
     dispose_arrows
     snapshot_for_background
     $threedmap.no_visible_all_wall
@@ -200,6 +200,7 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def update
     super
+    # DEBUG.write(c_m, "@target_ps.visible:#{@target_ps.visible}")
     $game_map.interpreter.update
     $game_map.update
     $game_player.update
@@ -208,19 +209,17 @@ class Scene_Map < Scene_Base
     @message_window.update
     @search_message.update
     @ps.update
+    @target_ps.update
     @sub_window.update
     @pm.update
     @search.update
     @search2.update
     @search3.update
-
     @window_lock.update
-
     check_start_picklock
     $game_wandering.update
     @sign.update
     $game_party.update                      # スキルインターバルの更新
-
     @yesno.update
     @skill_gain.update
     update_arrows
@@ -255,7 +254,6 @@ class Scene_Map < Scene_Base
     elsif @search.active
       update_search_selection               # 探索コマンドの選択
     elsif @target_ps.active
-      @target_ps.update
       update_target_selection               # 対象アクターの選択
     elsif @alter.active
       @alter.update
@@ -731,6 +729,8 @@ class Scene_Map < Scene_Base
   def end_search
     @ps.index = -1
     @ps.refresh
+    @target_ps.index = -1
+    @target_ps.refresh
     @search.visible = false
     @search.active = false
     @search.index = -1
@@ -969,9 +969,6 @@ class Scene_Map < Scene_Base
         text2 = "[B]でやめます"
         @back_s.set_text(text1, text2, 0, 2)
         @back_s.visible = true
-        DEBUG.write(c_m,"@ps.active:#{@ps.active}")
-        DEBUG.write(c_m,"@target_ps.active:#{@target_ps.active}")
-        DEBUG.write(c_m,"@inventory.active:#{@inventory.active}")
       end
     elsif @item_data.bridge?     # 渡し橋アイテムか？
       use_item_nontarget
@@ -986,17 +983,16 @@ class Scene_Map < Scene_Base
   # ● ターゲット選択の更新
   #--------------------------------------------------------------------------
   def update_target_selection
-    DEBUG.write(c_m,"")
     if Input.trigger?(Input::B)
       @target_ps.index = -1
       @target_ps.active = false
-      @target_ps.visible = false
+      # @target_ps.visible = false
       @inventory.active = true
       @inventory.visible = true
       @back_s.visible = false
     elsif Input.trigger?(Input::C)
       @target_ps.active = false
-      @target_ps.visible = false
+      # @target_ps.visible = false
       @back_s.visible = false
       determine_target
     end
@@ -1006,7 +1002,6 @@ class Scene_Map < Scene_Base
   #    効果なしの場合 (戦闘不能にポーションなど) ブザー SE を演奏。
   #--------------------------------------------------------------------------
   def determine_target
-    DEBUG.write(c_m,"target name:#{@target_ps.actor.name}")
     target = @target_ps.actor
     target.item_effect(@ps.actor, @item_data)
     use_item_nontarget

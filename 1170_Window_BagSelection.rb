@@ -11,7 +11,7 @@ class Window_BagSelection < Window_Selectable
     when "キャンプ" ,"戦闘"          # キャンプメニューの場合のサイズ
       width = 320
       x = (512 - width)/2
-      height = WLH*11+32
+      height = WLH*12+32
       opacity = 255
     when 1..99                      # NPC IDの場合
       x = 0

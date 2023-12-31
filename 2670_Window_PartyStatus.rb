@@ -10,10 +10,12 @@ class Window_PartyStatus < Window_Selectable
   #--------------------------------------------------------------------------
   # ● 初期化処理
   #--------------------------------------------------------------------------
-  def initialize
+  def initialize(target_use = false)
+    @target_use = target_use
     create_subwindows
     super( -16, -16, 512+32, 448+32)
     self.active = false
+    self.visible = false if @target_use
     self.opacity = 0
     self.z = 102
     @index = -1
@@ -29,6 +31,13 @@ class Window_PartyStatus < Window_Selectable
         @ms = Window_MercenaryStatus.new  # 傭兵ステータス
       end
     end
+  end
+  #--------------------------------------------------------------------------
+  # ● サブウインドウのvisibleを連携
+  #--------------------------------------------------------------------------
+  def visible=(new)
+    super
+    @windowL.visible = @windowR.visible = new
   end
   #--------------------------------------------------------------------------
   # ● サブウインドウの作成
@@ -76,9 +85,15 @@ class Window_PartyStatus < Window_Selectable
   #--------------------------------------------------------------------------
   def active=(new)
     super
-    if new == true
+    if new == true && @target_use
+      $game_temp.hide_face_target = false   # ターゲット用
+      return
+    elsif new == true
       $game_temp.hide_face = false
       $game_temp.need_ps_refresh = true
+    elsif new == false && @target_use
+      $game_temp.need_ps_refresh = true
+      $game_temp.hide_face_target = true    # ターゲット用
     elsif new == false
       return if @sv == nil
       turn_off_sv
@@ -97,7 +112,7 @@ class Window_PartyStatus < Window_Selectable
     super
     update_scout_check
     update_lr
-    if $game_temp.need_ps_refresh
+    if $game_temp.need_ps_refresh && !(@target_use)
       refresh
       $game_temp.need_ps_refresh = false
     end
@@ -143,19 +158,45 @@ class Window_PartyStatus < Window_Selectable
   # ● サブウインドウの移動
   #--------------------------------------------------------------------------
   def update_lr
-    if $game_temp.hide_face
-      unless @windowL.x == -74
-        @windowL.x -= 4
+    ## TargetPS用
+    if @target_use
+      ## 顔を隠す
+      if $game_temp.hide_face_target
+        if @windowL.x != -74
+          @windowL.x -= 4
+        else
+          @windowL.visible = false
+        end
+        if @windowR.x != 462
+          @windowR.x += 4
+        else
+          @windowR.visible = false
+        end
+      ## 顔を出す
+      else
+        unless @windowL.x == -14
+          @windowL.x += 4
+        end
+        unless @windowR.x == 402
+          @windowR.x -= 4
+        end
       end
-      unless @windowR.x == 462
-        @windowR.x += 4
-      end
-    else
-      unless @windowL.x == -14
-        @windowL.x += 4
-      end
-      unless @windowR.x == 402
-        @windowR.x -= 4
+    ## 通常のPS
+    elsif !(@target_use)
+      if $game_temp.hide_face
+        unless @windowL.x == -74
+          @windowL.x -= 4
+        end
+        unless @windowR.x == 462
+          @windowR.x += 4
+        end
+      else
+        unless @windowL.x == -14
+          @windowL.x += 4
+        end
+        unless @windowR.x == 402
+          @windowR.x -= 4
+        end
       end
     end
   end
@@ -163,10 +204,18 @@ class Window_PartyStatus < Window_Selectable
   # ● 顔を表示・非表示の動作中か？
   #--------------------------------------------------------------------------
   def moving?
-    if $game_temp.hide_face
-      return true unless @windowL.x == -74
+    if @target_use
+      if $game_temp.hide_face_target
+        return true unless @windowL.x == -74
+      else
+        return true unless @windowL.x == -14
+      end
     else
-      return true unless @windowL.x == -14
+      if $game_temp.hide_face
+        return true unless @windowL.x == -74
+      else
+        return true unless @windowL.x == -14
+      end
     end
     return false
   end

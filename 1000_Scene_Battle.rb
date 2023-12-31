@@ -1642,8 +1642,11 @@ class Scene_Battle < Scene_Base
     counter = false # カウンターフラグ初期化
     skip = false    # 心眼による攻撃スキップフラグ
     no_counter = @active_battler.can_back_attack? ? true : false # 遠距離攻撃にはカウンタ不可
-    ## カウンターか？
-    if @active_battler.counter?
+    if @active_battler.countered
+      DEBUG.write(c_m, "カウンターフラグあり、以降の攻撃はスキップ。カウンターフラグは一度攻撃済みの証拠")
+      return
+    elsif @active_battler.counter?
+      ## カウンターか？
       DEBUG.write(c_m, "#{@active_battler.name}のカウンター開始")
       @active_battler.unset_counter
       str1 = Vocab::Counter
@@ -1687,6 +1690,7 @@ class Scene_Battle < Scene_Base
       target.attack_effect(@active_battler)
       display_action_effects(target, nil, @active_battler)
       @active_battler.consume_arrow   # 矢弾の消費
+      target.set_countered
     end
     return if counter     # カウンターにカウンターは行わない
     return if no_counter  # 遠距離攻撃にはカウンタ不可

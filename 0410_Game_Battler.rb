@@ -146,6 +146,7 @@ class Game_Battler
   attr_reader   :fascinated               # 魅了値
   attr_accessor :insert                   # 連続動作フラグ
   attr_reader   :resisted_states          # 無効化したSTATE_ID
+  attr_reader   :countered                # カウンタを食らったフラグ
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -306,6 +307,7 @@ class Game_Battler
     @veil_poison = false
     @veil_air = false
     @status_up_flag = false         # ポーション使用時
+    @countered = false
     @hp_damage = 0
     @hp_subdamage = 0
     @element_damage = 0
@@ -3421,5 +3423,11 @@ class Game_Battler
   def redraw=(new)
     @redraw = new
     DEBUG.write(c_m, "name:#{@battler_name} redraw flag changed to #{@redraw}") if new == true
+  end
+  #--------------------------------------------------------------------------
+  # ● カウンター食らったフラグ
+  #--------------------------------------------------------------------------
+  def set_countered
+    @countered = true
   end
 end

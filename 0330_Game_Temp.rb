@@ -54,6 +54,7 @@ class Game_Temp
   attr_accessor :resting                  # 休息中
   attr_accessor :ignore_move              # 十字キー移動無効化フラグ
   attr_accessor :hide_face                #
+  attr_accessor :hide_face_target         # 顔を隠す
   attr_accessor :run                      # RUNモード
   attr_accessor :prediction               # 危険予知
   attr_accessor :magic_not_working        # 帰還呪文発動失敗
@@ -110,6 +111,7 @@ class Game_Temp
     @resting = false
     @ignore_move = false
     @hide_face = true
+    @hide_face_target = true
     @prediction = false
     @magic_not_working = false
     @mood_npc = {}

@@ -32,7 +32,8 @@ class Scene_CAMP < Scene_Base
     @camp = Window_CAMP.new       # キャンプウィンドウ(準備フラグ)
     @pm = Window_PartyMagic.new
     @equip = Window_EQUIP.new               # 装備ウィンドウ
-    @target_ps = Window_TargetParty.new     # partystatus
+    @target_ps = Window_PartyStatus.new(true)     # partystatus
+    @target_ps.turn_off
     @view = Window_VIEW.new                 # ステータス閲覧ウィンドウ
     @back_s = Window_ShopBack_Small.new     # メッセージ枠
     @swap_window = Window_SWAP.new          # SwapのActorリスト
@@ -491,8 +492,7 @@ class Scene_CAMP < Scene_Base
     @ps.index = -1
     @ps.active = false
     @ps.refresh
-    @target_ps.index = -1
-    @target_ps.visible = false
+    @target_ps.refresh
     @target_ps.active = false
     @magic_detail.visible = false
     @magic_detail.active = false
@@ -505,17 +505,18 @@ class Scene_CAMP < Scene_Base
       wait_for_attention
     elsif success
       magic_skill_increase_chance(@ps.actor, @magic, @magic_level)
-      @target_ps.turn_on     # 一度詠唱結果を出す
-      @target_ps.update
+      # @target_ps.turn_on     # 一度詠唱結果を出す
+      # @target_ps.update
       @attention_window.set_text("#{@magic.name}!")
       wait_for_attention
-      @target_ps.index = -1
-      @target_ps.visible = false
-      @target_ps.active = false
+      # @target_ps.index = -1
+      # @target_ps.visible = false
+      # @target_ps.active = false
     else
       @attention_window.set_text("* はつどうしない *")
       wait_for_attention
     end
+    @target_ps.index = -1
     if $game_party.all_dead?
       $scene = Scene_Gameover.new
     end
@@ -1160,7 +1161,7 @@ class Scene_CAMP < Scene_Base
     update_encounter
     @rest_counter -= 1
     if @rest_counter == 0
-      DEBUG::write(c_m,"休息中...")
+      DEBUG.write(c_m, "休息中... ノイズレベル:#{$game_wandering.check_noise_level}")
       @rest_counter = Constant_Table::REST_COUNTER
       $game_party.chance_skill_increase(SKILLID::SURVIVALIST) # スキル：野営の知識
       $game_party.resting               # パーティ休息１ターン

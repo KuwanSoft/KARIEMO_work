@@ -1668,10 +1668,10 @@ class Game_Actor < Game_Battler
     diff = base_skill - tactics
     ## 戦術スキルのほうが小さい場合
     if diff > 0
-      DEBUG.write(c_m, "#{self.name} 戦術スキルが足りない 戦術:#{tactics} 武器スキル:#{base_skill}")
+      # DEBUG.write(c_m, "#{self.name} 戦術スキルが足りない 戦術:#{tactics} 武器スキル:#{base_skill}")
       base_skill = tactics      # 戦術スキル値に差分の半分を追加して武器スキル値とする
       base_skill += (diff / 2)
-      DEBUG.write(c_m, "差分:#{diff} 補正後武器スキル:#{base_skill}")
+      # DEBUG.write(c_m, "差分:#{diff} 補正後武器スキル:#{base_skill}")
     end
     ## バックスタブの場合：武器スキル値補正あり
     if self.onmitsu?
@@ -3948,15 +3948,7 @@ class Game_Actor < Game_Battler
   # ● MPを成長
   #--------------------------------------------------------------------------
   def grow_actor_mp
-    case @class_id
-    when 4; class_c = 10 # 騎士
-    when 3; class_c = 5 # 魔術師
-    when 6; class_c = 5 # 賢者
-    when 8; class_c = 5 # 聖職者
-    when 9; class_c = 10 # 従士
-    else
-      return
-    end
+    return unless magic_user?               # マジックユーザーのみ
     fire,water,air,earth = count_magickind  # 各呪文の習得数をカウント
     if fire > 0
       a = 1
@@ -4328,7 +4320,7 @@ class Game_Actor < Game_Battler
     when 61..70; ratio = Constant_Table::P_RATIO_61_70
     else; ratio = Constant_Table::P_RATIO_ELSE
     end
-    if ratio > rand(100)
+    if ratio.to_i > rand(100)
       DEBUG.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回 解除:#{ratio}%")
       clear_poison
     else
