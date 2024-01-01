@@ -1986,7 +1986,7 @@ class Game_Battler
   #     obj  : スキルまたはアイテム
   #    結果は @hp_damage または @mp_damage に代入する。
   #--------------------------------------------------------------------------
-  def make_item_damage_value(user, item, cp)
+  def make_item_damage_value(user, item, cp = 1)
     DEBUG::write(c_m,"[#{user.name} ⇒⇒アイテム使用⇒⇒ #{self.name}]") # debug
     DEBUG::write(c_m,"[アイテム名：#{item.name}] CP:#{cp}") # debug
     # オブジェクトの種類情報を取得
@@ -1995,26 +1995,26 @@ class Game_Battler
 
     case purpose  # 用途によって分岐
     ######### 攻撃・回復系アイテム処理 ##########
-    when "damage","heal" # 攻撃/回復アイテム
-      damage_adj = 100
+    when "damage" # 攻撃アイテム
       m_dice_num = item.damage.scan(/(\S+)d/)[0][0].to_i
       m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
       m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
-      ## 弱点属性判定（モンスターのみ）
-      if weak_element?(item.element)
-        damage_adj *= 2
-        self.weak_flag = true                   # 弱点フラグ
-        DEBUG::write(c_m,"弱点属性:#{item.element}")
-      end
       cp.times do
-        case purpose
-        when "damage";  damage += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
-        when "heal";  damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
-        end
+        damage += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
-      damage *= damage_adj
-      damage /= 100
-      DEBUG::write(c_m,"ダメージor回復アイテム Value:#{damage}")
+      ## 属性抵抗判定（フラグも同時にセットする）
+      @damage_element_type = item.element_type # 呪文の属性IDをセット
+      damage = self.calc_element_damage(@damage_element_type, damage)
+      damage = Integer(damage)
+      DEBUG::write(c_m,"ダメージアイテム Dmg:#{damage}")
+    when "heal"
+      m_dice_num = item.damage.scan(/(\S+)d/)[0][0].to_i
+      m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
+      m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
+      cp.times do
+        damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+      end
+      DEBUG::write(c_m,"回復アイテム Dmg:#{damage}")
     ######### 瓶系回復アイテム処理 ##########
     when "potion","a_potion"
       user.chance_skill_increase(SKILLID::ANATOMY) # 解剖学
@@ -2034,6 +2034,20 @@ class Game_Battler
       damage = MISC.dice(a, b, c)
       damage = -Integer(damage)
       DEBUG::write(c_m,"回復アイテム 回復量:#{damage} 値:#{a}D#{b}+#{c} 回復Lv:#{potion_lv}")
+    ######### ワインアイテム処理 ##########
+    when "wine1","wine2"
+      m_dice_num = item.damage.scan(/(\S+)d/)[0][0].to_i
+      m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
+      m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
+      cp.times do
+        damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+      end
+      case purpose
+      when "wine1"; ratio = 15   # やすワインは15%の疲労許容度上昇
+      when "wine2"; ratio = 30   # 古酒は30%
+      end
+      value = (maxhp * Constant_Table::TIRED_RATIO) * ratio / 100
+      self.add_thres(value)
     ######### 毒アイテム処理 ##########
     when "poison"
       user.chance_skill_increase(SKILLID::POISONING) # ポイゾニング
@@ -2175,12 +2189,12 @@ class Game_Battler
       end
     end
     ## ダメージが正の数
-    if @hp_damage > 0 || @element_damage > 0
-      remove_states_shock   # 衝撃によるステート解除
-      judge_spell_break     # スペルブレイク判定
-      judge_bone_crash      # 骨折判定
-      judge_severe          # 重症判定
-    end
+    # if @hp_damage > 0 || @element_damage > 0
+    #   remove_states_shock   # 衝撃によるステート解除
+    #   judge_spell_break     # スペルブレイク判定
+    #   judge_bone_crash      # 骨折判定
+    #   judge_severe          # 重症判定
+    # end
     ## サブダメージが正の数
     # if @hp_subdamage > 0 || @element_subdamage > 0
     #   remove_states_shock
@@ -2205,12 +2219,19 @@ class Game_Battler
       end
       self.chance_skill_increase(SKILLID::D_RESIST)    # ダメージレジスト
     end
+    ## いずれかのダメージが正の数
+    if @hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0
+      remove_states_shock   # 衝撃によるステート解除
+      judge_spell_break     # スペルブレイク判定
+      judge_bone_crash      # 骨折判定
+      judge_severe          # 重症判定
+    end
     self.hp -= Integer(@hp_damage)
     self.hp -= Integer(@hp_subdamage)
     self.hp -= Integer(@element_damage)
     self.hp -= Integer(@element_subdamage)
     ## 破砕判定
-    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0)
+    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0)
       break_stone
     end
   end
@@ -2248,6 +2269,15 @@ class Game_Battler
     return if damage_amount < 1
     ratio = 100 * damage_amount / maxhp
     if ratio > Constant_Table::SEVERE_THRES
+      ## フォーリーブスで重症化を回避
+      sv = MISC.skill_value(SKILLID::FOURLEAVES, self)
+      diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+      ratio_f = Integer([sv * diff, 95].min)
+      ratio_f /= 2 if tired?
+      if ratio_f > rand(100)
+        DEBUG.write(c_m, "フォーリーブスで重症化を回避")
+        return
+      end
       @severe = true   # 重症化される可能性フラグオン
     end
   end
@@ -2262,13 +2292,10 @@ class Game_Battler
     minus = obj.remove_state_set  # ステート変化(-) を取得
 
     ### 特殊異常判定
-    ## メイスによる骨折追加
-    if @weakened and obj.is_a?(Game_Battler)
-      ## 物理鈍器攻撃中？
-      if obj.attacking_with_club?
-        plus += "骨"  unless plus.include?("骨")
-        DEBUG.write(c_m, "#{obj.name} ボーンクラッシュ発動検知")
-      end
+    ## メイスによる骨折追加,物理鈍器攻撃中？
+    if @weakened && obj.is_a?(Game_Battler) && obj.attacking_with_club?
+      plus += "骨"  unless plus.include?("骨")
+      DEBUG.write(c_m, "#{obj.name} ボーンクラッシュ発動検知")
     end
     @weakened = false
     ## 重症化追加
@@ -2277,10 +2304,6 @@ class Game_Battler
       DEBUG.write(c_m, "#{obj.name} 重症化フラグ検知")
     end
     @severe = false
-    ## インパクトスキルによるスタン
-    if obj.is_a?(Game_Battler) && obj.get_impact
-      plus += "ス" unless plus.include?("ス")
-    end
     ###-------------------
 
     return if (plus + minus).empty?
@@ -2502,8 +2525,8 @@ class Game_Battler
       if obj.is_a?(Items2)
         DEBUG::write(c_m,"アイテム攻撃")
         method = "item"
-        avoidance /= 2
-        DEBUG::write(c_m,"アイテム攻撃→回避値1/2倍 ヒット数:#{cp}")
+        # avoidance /= 2
+        # DEBUG::write(c_m,"アイテム攻撃→回避値1/2倍 ヒット数:#{cp}")
       ## 呪文
       elsif obj.is_a?(Magics)
         if user.action.breath?

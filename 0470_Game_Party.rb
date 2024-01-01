@@ -618,7 +618,7 @@ class Game_Party < Game_Unit
   def chance_skillgain_packing
     for member in existing_members
       next unless member.carry_ratio > Constant_Table::PACK_SG_THRES
-      DEBUG.write(c_m, "#{member.name}c_ratio#{member.carry_ratio}")
+      DEBUG.write(c_m, "#{member.name} c_ratio#{member.carry_ratio}")
       if member.carry_ratio > rand(100)
         member.chance_skill_increase(SKILLID::PACKING)  # パッキング
         member.chance_skill_increase(SKILLID::STAMINA)  # スタミナ
@@ -1950,7 +1950,7 @@ class Game_Party < Game_Unit
     str = ""
     for member in existing_members
       idx, num = member.tired_step
-      str += "id#{idx}:+#{num}|"
+      str += "actor_id#{idx}: 疲労度+#{num}|"
     end
   end
   #--------------------------------------------------------------------------

@@ -236,6 +236,7 @@ module Constant_Table
   REST_NAUSEA_RECOVER_RATIO_PER_TURN = 5  # 吐き気の累積値1を減少させる休息のターン毎の確率
   UNLOCK_MAGIC_ID = 37      # 扉よ開けの呪文ID
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
+  TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids

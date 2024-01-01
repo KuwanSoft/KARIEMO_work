@@ -1007,10 +1007,13 @@ class Window_Base < Window
       return unless actor.get_poison_number != 0
       self.contents.font.color = poison_color
       num = actor.get_poison_number
+      bitmap = Cache.system("poison_mark")
       case actor.index
       when 0,2,4
+        self.contents.blt(x, y, bitmap, bitmap.rect)
         self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
       when 1,3,5
+        self.contents.blt(x, y, bitmap, bitmap.rect)
         self.contents.draw_text(x+2, y+2, 16, 16, num, 2)
       end
     end

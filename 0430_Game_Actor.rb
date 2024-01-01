@@ -815,6 +815,8 @@ class Game_Actor < Game_Battler
     str += "祓" if MISC.skill_value(SKILLID::EXORCIST, self) > 0
     ## フィニッシュブロー
     str += "止" if @action.supattack?
+    ## インパクトスキルによるスタン
+    str += "ス" if get_impact
     DEBUG.write(c_m, "通常攻撃に状態異常付与:#{str}") unless str == ""
     return str
   end
@@ -822,14 +824,7 @@ class Game_Actor < Game_Battler
   # ● 首可能なスキルと装備か？
   #--------------------------------------------------------------------------
   def can_neck_chop?
-    return false unless MISC.skill_value(SKILLID::CRITICAL, self) > 0
-    unless self.weapon_id == 0 #素手では無い場合
-      return true if $data_weapons[self.weapon_id].critical > 0
-    end
-    unless self.subweapon_id == 0 #素手では無い場合
-      return true if $data_weapons[self.subweapon_id].critical > 0
-    end
-    return false
+    return (MISC.skill_value(SKILLID::CRITICAL, self) > 0)
   end
   #--------------------------------------------------------------------------
   # ● 被弾部位固定
@@ -3202,7 +3197,6 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def tired_skill_increase
     add_tired([maxhp / 100, 0].max)
-    DEBUG.write(c_m, "疲労度加算:スキル上昇")
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:調査時
@@ -3232,7 +3226,7 @@ class Game_Actor < Game_Battler
   # ● 疲労度加算:宝箱罠（金切り声）
   #--------------------------------------------------------------------------
   def tired_trap
-    add_tired([maxhp * 5, 1].max)
+    add_tired(Constant_Table::TIRED_TRAP_PER_FLOOR * $game_map.map_id)
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:鑑定時

@@ -11,8 +11,9 @@ class Window_BagSelection < Window_Selectable
     when "キャンプ" ,"戦闘"          # キャンプメニューの場合のサイズ
       width = 320
       x = (512 - width)/2
-      height = WLH*12+32
+      height = WLH*10+32
       opacity = 255
+      @iteminfo = Window_ITEMINFO.new
     when 1..99                      # NPC IDの場合
       x = 0
       y = WLH*7
@@ -36,24 +37,32 @@ class Window_BagSelection < Window_Selectable
     @row_height = 32
   end
   #--------------------------------------------------------------------------
+  # ● 更新
+  #--------------------------------------------------------------------------
+  # def update
+  #   super
+  #   if Input.press?(Input::X) && (@iteminfo != nil)
+  #     @iteminfo.visible = true
+  #   elsif (@iteminfo != nil)
+  #     @iteminfo.visible = false
+  #   end
+  # end
+  #--------------------------------------------------------------------------
   # ● 開放
   #--------------------------------------------------------------------------
   def dispose
     super
-    return if @wallet == nil
-    return if @help == nil
-    @wallet.dispose
-    @help.dispose
+    @wallet.dispose unless @wallet == nil
+    @help.dispose unless @help == nil
+    @iteminfo.dispose unless @iteminfo == nil
   end
   #--------------------------------------------------------------------------
   # ● 可視不可視の連携: ある場合
   #--------------------------------------------------------------------------
   def visible=(new)
     super
-    return if @wallet == nil
-    return if @help == nil
-    @wallet.visible = new
-    @help.visible = new
+    @wallet.visible = new unless @wallet == nil
+    @help.visible = new unless @help == nil
   end
   #--------------------------------------------------------------------------
   # ● 項目のリフレッシュ
@@ -68,10 +77,9 @@ class Window_BagSelection < Window_Selectable
     for i in 0...@item_max
       draw_item(i)
     end
-    return if @wallet == nil
-    return if @help == nil
-    @wallet.refresh(actor)
-    @help.refresh(@scene)
+    @iteminfo.refresh(item_obj) unless @iteminfo == nil
+    @wallet.refresh(actor) unless @wallet == nil
+    @help.refresh(@scene) unless @help == nil
   end
   #--------------------------------------------------------------------------
   # ● 項目の描画
@@ -224,5 +232,19 @@ class Window_BagSelection < Window_Selectable
     rect = item_rect(@cursor_index)      # 選択されている項目の矩形を取得
     rect.y -= self.oy             # 矩形をスクロール位置に合わせる
     self.cursor_rect = rect       # カーソルの矩形を更新
+  end
+  #--------------------------------------------------------------------------
+  # ● index更新時毎に呼び出される動作
+  #--------------------------------------------------------------------------
+  def action_index_change
+    @iteminfo.refresh(item_obj) unless @iteminfo == nil
+  end
+  #--------------------------------------------------------------------------
+  # ● 選択中のアイテムオブジェクトを取得
+  #--------------------------------------------------------------------------
+  def item_obj
+    kind = @data[index][0][0]
+    id = @data[index][0][1]
+    return MISC.item(kind, id)
   end
 end

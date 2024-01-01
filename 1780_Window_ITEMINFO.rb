@@ -18,6 +18,10 @@ class Window_ITEMINFO < Window_Base
       super(4, 448-(WLH*7+32+24)-4, 512-8, WLH*7+32+24+8)
       self.z = 120
       self.visible = false
+    else
+      super(4, 448-(WLH*7+32+24)-4, 512-8, WLH*7+32+24+8)
+      self.z = 120
+      self.visible = false
     end
   end
   #--------------------------------------------------------------------------
@@ -31,7 +35,7 @@ class Window_ITEMINFO < Window_Base
   #--------------------------------------------------------------------------
   def refresh(item, actor = nil)
     @actor = actor
-    if item.is_a?(Weapons2) or item.is_a?(Armors2) or item.is_a?(Items2)
+    if item.is_a?(Weapons2) || item.is_a?(Armors2) || item.is_a?(Items2) || item.is_a?(Drops)
       @item = item
     else
       kind = item[0][0]
