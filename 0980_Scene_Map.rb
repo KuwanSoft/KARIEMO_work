@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Map
+# ■ SceneMap
 #------------------------------------------------------------------------------
 # 　マップ画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Map < Scene_Base
+class SceneMap < SceneBase
   #--------------------------------------------------------------------------
   # ● 開始処理
   #--------------------------------------------------------------------------
@@ -16,7 +16,7 @@ class Scene_Map < Scene_Base
       $game_map.autoplay                # BGM と BGS の自動切り替え
     end
     $game_map.refresh
-    @spriteset = Spriteset_Map.new
+    @spriteset = SpritesetMap.new
     @message_window = Window_Message.new
     @attention_window = Window_Attention.new # attention表示用
     @ps = Window_PartyStatus.new        # パーティステータス
@@ -61,13 +61,14 @@ class Scene_Map < Scene_Base
   # ● イベント画像の定義
   #--------------------------------------------------------------------------
   def set_picture(path)
-    @window_picture = Window_Picture.new(160, 192)
+    @window_picture = Window_Picture.new(160-16, 192)
     @window_picture.create_picture( path, "")
   end
   #--------------------------------------------------------------------------
   # ● イベント画像の消去
   #--------------------------------------------------------------------------
   def erase_picture
+    return if @window_picure == nil
     @window_picture.temp_dispose
     @window_picture.visible = false
   end
@@ -183,6 +184,7 @@ class Scene_Map < Scene_Base
     @skill_gain.dispose
     dispose_arrows
     snapshot_for_background
+    erase_picture
     $threedmap.no_visible_all_wall
   end
   #--------------------------------------------------------------------------
@@ -200,7 +202,7 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def update
     super
-    # DEBUG.write(c_m, "@target_ps.visible:#{@target_ps.visible}")
+    # Debug.write(c_m, "@target_ps.visible:#{@target_ps.visible}")
     $game_map.interpreter.update
     $game_map.update
     $game_player.update
@@ -314,7 +316,7 @@ class Scene_Map < Scene_Base
     $game_map.autoplay              # BGM と BGS の自動切り替え
     $game_map.update
     Graphics.wait(15)
-    @spriteset = Spriteset_Map.new  # スプライトセットを再作成
+    @spriteset = SpritesetMap.new  # スプライトセットを再作成
     $threedmap.start_drawing        # 3Dの描画
     $game_temp.need_sub_refresh = true
     fadein(30) if fade
@@ -334,14 +336,14 @@ class Scene_Map < Scene_Base
   def exp_bonus_messages
     map_id = $game_map.map_id
     case map_id
-    when 2; bonus = Constant_Table::BONUS_FLOOR2
-    when 3; bonus = Constant_Table::BONUS_FLOOR3
-    when 4; bonus = Constant_Table::BONUS_FLOOR4
-    when 5; bonus = Constant_Table::BONUS_FLOOR5
-    when 6; bonus = Constant_Table::BONUS_FLOOR6
-    when 7; bonus = Constant_Table::BONUS_FLOOR7
-    when 8; bonus = Constant_Table::BONUS_FLOOR8
-    when 9; bonus = Constant_Table::BONUS_FLOOR9
+    when 2; bonus = ConstantTable::BONUS_FLOOR2
+    when 3; bonus = ConstantTable::BONUS_FLOOR3
+    when 4; bonus = ConstantTable::BONUS_FLOOR4
+    when 5; bonus = ConstantTable::BONUS_FLOOR5
+    when 6; bonus = ConstantTable::BONUS_FLOOR6
+    when 7; bonus = ConstantTable::BONUS_FLOOR7
+    when 8; bonus = ConstantTable::BONUS_FLOOR8
+    when 9; bonus = ConstantTable::BONUS_FLOOR9
     end
     return if map_id == 1
     return if $game_party.arrived_floor?(map_id)
@@ -364,15 +366,15 @@ class Scene_Map < Scene_Base
       return if $game_map.interpreter.running?          # イベント実行中？
       return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
       return unless $game_wandering.check_encount
-      ratio = Constant_Table::NM
-      DEBUG::write(c_m,"***********【ENCOUNT type:Wondering】***********")
+      ratio = ConstantTable::NM
+      Debug::write(c_m,"***********【ENCOUNT type:Wondering】***********")
     ## 玄室がオンのとき
     else
       return if $game_map.interpreter.running?          # イベント実行中？
       return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
       $game_temp.next_drop_box = true                   # 宝箱出現フラグオン
       ratio = 0       # NM出現確率リセット
-      DEBUG::write(c_m,"***********【ENCOUNT type:Room Guard】***********")
+      Debug::write(c_m,"***********【ENCOUNT type:Room Guard】***********")
     end
     ## NM抽選
     $game_troop.setup($game_map.map_id, (ratio > rand(100))) # マップIDを与える
@@ -388,31 +390,31 @@ class Scene_Map < Scene_Base
     ## 危険予知＋玄室
     if $game_temp.prediction
       if roomguard
-        DEBUG::write(c_m,"危険予知による先制攻撃")
+        Debug::write(c_m,"危険予知による先制攻撃")
         $game_troop.preemptive = true
         $game_temp.prediction = false
         return
       end
     end
     ratio_1 = $game_map.map_id.to_i * 2     # バックアタック率
-    DEBUG::write(c_m,"バックアタック率:#{ratio_1}")
+    Debug::write(c_m,"バックアタック率:#{ratio_1}")
     ratio_2 = $game_party.preemptive_ratio  # 先制攻撃率
-    DEBUG::write(c_m,"先制攻撃率率:#{ratio_2}")
+    Debug::write(c_m,"先制攻撃率率:#{ratio_2}")
     ratio_1 *= 2 if $threedmap.dark_zone?   # ダークゾーンでは2倍
-    DEBUG::write(c_m,"バックアタック率(DZ補正後):#{ratio_1}")
+    Debug::write(c_m,"バックアタック率(DZ補正後):#{ratio_1}")
     ratio_1 /= 2 if $game_party.check_moonlight
-    DEBUG::write(c_m,"バックアタック率(月明り補正後):#{ratio_1}")
+    Debug::write(c_m,"バックアタック率(月明り補正後):#{ratio_1}")
     ratio_1 /= 2 if $game_party.pm_float > 0 # 浮遊
-    DEBUG::write(c_m,"バックアタック率(浮遊補正後):#{ratio_1}")
+    Debug::write(c_m,"バックアタック率(浮遊補正後):#{ratio_1}")
     ratio_1 = $game_party.count_timid(ratio_1)  # 小心者の人数
-    DEBUG::write(c_m,"バックアタック率(小心者補正後):#{ratio_1}")
+    Debug::write(c_m,"バックアタック率(小心者補正後):#{ratio_1}")
     ratio_1 = 0 if $game_party.check_prevent_backattack # バックアタック無効
-    DEBUG::write(c_m,"バックアタック率(無効補正後):#{ratio_1}")
+    Debug::write(c_m,"バックアタック率(無効補正後):#{ratio_1}")
     if ratio_1.to_i > rand(100)                  # バックアタック判定
-      DEBUG::write(c_m,"バックアタック検知 確率:#{ratio_1}% DZ?:#{$threedmap.dark_zone?}")
+      Debug::write(c_m,"バックアタック検知 確率:#{ratio_1}% DZ?:#{$threedmap.dark_zone?}")
       $game_troop.surprise = true
     elsif ratio_2 > rand(100)               # 先制攻撃判定
-      DEBUG::write(c_m,"先制攻撃検知 先制確率:#{ratio_2}%")
+      Debug::write(c_m,"先制攻撃検知 先制確率:#{ratio_2}%")
       $game_troop.preemptive = true
     end
   end
@@ -446,7 +448,7 @@ class Scene_Map < Scene_Base
     if Input.trigger?(Input::Y)
       return if $game_map.interpreter.running?        # イベント実行中？
       $game_temp.next_scene = "alter"
-      DEBUG.write(c_m, "--call alter menu--")
+      Debug.write(c_m, "--call alter menu--")
     end
   end
   #--------------------------------------------------------------------------
@@ -460,11 +462,11 @@ class Scene_Map < Scene_Base
     end
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGの呼び出し
+  # ● Debugの呼び出し
   #--------------------------------------------------------------------------
   def update_call_debug
     # if Input.trigger?(Input::Y)
-    #   DEBUG.write(c_m, "--SELECT BUTTON PUSHED--")
+    #   Debug.write(c_m, "--SELECT BUTTON PUSHED--")
     # end
   end
   #--------------------------------------------------------------------------
@@ -506,7 +508,7 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def call_name
     $game_temp.next_scene = nil
-    $scene = Scene_Name.new(false, true)
+    $scene = SceneName.new(false, true)
   end
   #--------------------------------------------------------------------------
   # ● ガイド遭遇への切り替え
@@ -531,9 +533,9 @@ class Scene_Map < Scene_Base
     RPG::BGM.stop
     RPG::BGS.stop
     $music.se_play("戦闘開始")
-    MISC.battle_bgm  # 戦闘音楽演奏
+    Misc.battle_bgm  # 戦闘音楽演奏
     $game_temp.next_scene = nil
-    $scene = Scene_Battle.new
+    $scene = SceneBattle.new
   end
   #--------------------------------------------------------------------------
   # ● NPCショップ画面への切り替え
@@ -542,28 +544,28 @@ class Scene_Map < Scene_Base
     array = []
     for npc in $data_npcs
       next if npc == nil
-      DEBUG::write(c_m,"NPC:#{npc} ID:#{npc.id} floor:#{npc.floor}")
+      Debug::write(c_m,"NPC:#{npc} ID:#{npc.id} floor:#{npc.floor}")
       if npc.floor.to_s.include?($game_map.map_id.to_s)
         array.push(npc.id)
       end
     end
-    DEBUG::write(c_m,"npc candidate:#{array}")
+    Debug::write(c_m,"npc candidate:#{array}")
 
     ## 出会うNPCの決定
     npc_id = array[rand(array.size)]
     ## GAMETEMPに既に入っている（固定NPCとの遭遇）
     npc_id = $game_temp.npc_id != 0 ? $game_temp.npc_id : npc_id
     $game_temp.npc_id = 0
-    DEBUG::write(c_m,"NPC確定 ID:#{npc_id}")
+    Debug::write(c_m,"NPC確定 ID:#{npc_id}")
 
     if $game_system.npc_dead[npc_id] == true  # NPC不在
-      DEBUG::write(c_m,"NPCエンカウントキャンセル:NPC不在")
+      Debug::write(c_m,"NPCエンカウントキャンセル:NPC不在")
       $game_temp.next_scene = nil
       return
     end
 
-    if $game_temp.get_mood_percentage(npc_id) <= Constant_Table::NPC_MOOD_THRES
-      DEBUG::write(c_m,"NPCエンカウントキャンセル:NPC機嫌が悪い 現在:#{$game_temp.get_mood_percentage(npc_id)}%")
+    if $game_temp.get_mood_percentage(npc_id) <= ConstantTable::NPC_MOOD_THRES
+      Debug::write(c_m,"NPCエンカウントキャンセル:NPC機嫌が悪い 現在:#{$game_temp.get_mood_percentage(npc_id)}%")
       $game_temp.next_scene = nil
       return
     end
@@ -609,16 +611,16 @@ class Scene_Map < Scene_Base
     RPG::BGM.stop
     RPG::BGS.stop
     $music.se_play("戦闘開始")
-    MISC.battle_bgm  # 戦闘音楽演奏
+    Misc.battle_bgm  # 戦闘音楽演奏
     $game_temp.next_scene = nil
-    $scene = Scene_Battle.new
+    $scene = SceneBattle.new
   end
   #--------------------------------------------------------------------------
   # ● キャンプへの切り替え
   #--------------------------------------------------------------------------
   def call_camp
     $game_temp.next_scene = nil
-    $scene = Scene_CAMP.new
+    $scene = SceneCamp.new
   end
   #--------------------------------------------------------------------------
   # ● 探索メニューへの切り替え
@@ -694,14 +696,14 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def call_gameover
     $game_temp.next_scene = nil
-    $scene = Scene_Gameover.new
+    $scene = SceneGameover.new
   end
   #--------------------------------------------------------------------------
   # ● タイトル画面への切り替え
   #--------------------------------------------------------------------------
   def call_title
     $game_temp.next_scene = nil
-    $scene = Scene_Title.new
+    $scene = SceneTitle.new
     fadeout(60)
   end
   #--------------------------------------------------------------------------
@@ -749,7 +751,7 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   def searching(kind)
     ## PSでスキル表示
-    c = Constant_Table::DIFF_70[$game_map.map_id] # チェック係数
+    c = ConstantTable::DIFF_70[$game_map.map_id] # チェック係数
     @search_message.text = "しらべています\x03.\x03.\x03.\x03.\x03.\x03.\x03."
     @search_message.visible = true
     @search_message.start_message # 開始処理
@@ -763,7 +765,7 @@ class Scene_Map < Scene_Base
       case kind
       ## アイテムを探す
       when 1;
-        MISC.s_on(1)  # アイテム探すスイッチフラグオン
+        Misc.s_on(1)  # アイテム探すスイッチフラグオン
         $game_temp.used_action = :searching
       ## 扉を探す
       when 2;
@@ -782,20 +784,20 @@ class Scene_Map < Scene_Base
     @search3.active = false
     @search3.visible = false
     case $game_map.map_id
-    when 1; num = Constant_Table::LOCK_NUM_B1F; dif = Constant_Table::LOCK_DIF_B1F
-    when 2; num = Constant_Table::LOCK_NUM_B2F; dif = Constant_Table::LOCK_DIF_B2F
-    when 3; num = Constant_Table::LOCK_NUM_B3F; dif = Constant_Table::LOCK_DIF_B3F
-    when 4; num = Constant_Table::LOCK_NUM_B4F; dif = Constant_Table::LOCK_DIF_B4F
-    when 5; num = Constant_Table::LOCK_NUM_B5F; dif = Constant_Table::LOCK_DIF_B5F
-    when 6; num = Constant_Table::LOCK_NUM_B6F; dif = Constant_Table::LOCK_DIF_B6F
-    when 7; num = Constant_Table::LOCK_NUM_B7F; dif = Constant_Table::LOCK_DIF_B7F
-    when 8; num = Constant_Table::LOCK_NUM_B8F; dif = Constant_Table::LOCK_DIF_B8F
-    when 9; num = Constant_Table::LOCK_NUM_B9F; dif = Constant_Table::LOCK_DIF_B9F
+    when 1; num = ConstantTable::LOCK_NUM_B1F; dif = ConstantTable::LOCK_DIF_B1F
+    when 2; num = ConstantTable::LOCK_NUM_B2F; dif = ConstantTable::LOCK_DIF_B2F
+    when 3; num = ConstantTable::LOCK_NUM_B3F; dif = ConstantTable::LOCK_DIF_B3F
+    when 4; num = ConstantTable::LOCK_NUM_B4F; dif = ConstantTable::LOCK_DIF_B4F
+    when 5; num = ConstantTable::LOCK_NUM_B5F; dif = ConstantTable::LOCK_DIF_B5F
+    when 6; num = ConstantTable::LOCK_NUM_B6F; dif = ConstantTable::LOCK_DIF_B6F
+    when 7; num = ConstantTable::LOCK_NUM_B7F; dif = ConstantTable::LOCK_DIF_B7F
+    when 8; num = ConstantTable::LOCK_NUM_B8F; dif = ConstantTable::LOCK_DIF_B8F
+    when 9; num = ConstantTable::LOCK_NUM_B9F; dif = ConstantTable::LOCK_DIF_B9F
     end
     $game_temp.lock_num = num
     $game_temp.lock_diff = dif
     $game_temp.used_action = :picking
-    MISC.s_on(2)  # 鍵開けスイッチフラグオン
+    Misc.s_on(2)  # 鍵開けスイッチフラグオン
     $game_temp.event_switch = true  # ボタン開始イベント発動フラグオン
   end
   #--------------------------------------------------------------------------
@@ -909,7 +911,7 @@ class Scene_Map < Scene_Base
     if Input.trigger?(Input::C)
       kind = @inventory.item[0][0]
       id = @inventory.item[0][1]
-      @item_data = MISC.item(kind, id)
+      @item_data = Misc.item(kind, id)
       @inventory.visible = false
       @inventory.active = false
       unless @inventory.item[1] == false # 鑑定されているか
@@ -976,7 +978,7 @@ class Scene_Map < Scene_Base
       $game_party.party_magic_effect(@item_data, @item_data.cp)
       use_item_nontarget
     else
-      DEBUG.write(c_m,"no purpose item #{@item_data.name}")
+      Debug.write(c_m,"no purpose item #{@item_data.name}")
     end
   end
   #--------------------------------------------------------------------------
@@ -1022,7 +1024,7 @@ class Scene_Map < Scene_Base
     end
     ## アイテムのその他の効果処理
     if $game_party.all_dead?
-      $scene = Scene_Gameover.new
+      $scene = SceneGameover.new
     elsif no_effect   # 使用不可能アイテムの選択
       $game_temp.used_action = :item
       $game_temp.event_switch = true
@@ -1033,7 +1035,7 @@ class Scene_Map < Scene_Base
       return          # 未鑑定の場合は消費しない
     elsif @item_data.key > 0 # 鍵の選択
       $game_temp.used_action = :item
-      MISC.s_on(@item_data.key)  # 鍵IDのスイッチオン
+      Misc.s_on(@item_data.key)  # 鍵IDのスイッチオン
       $game_temp.event_switch = true
       ## 要確認
       $game_temp.previous_actor = @ps.actor # 後に消費する用(古びた鍵or交換アイテム)
@@ -1146,16 +1148,16 @@ class Scene_Map < Scene_Base
     elsif Input.trigger?(Input::R)
       @maplist_index += 1
       @draw_floor = @maplist[@maplist_index % @maplist.size]
-      DEBUG.write(c_m, "@maplist_index:#{@maplist_index}")
-      DEBUG.write(c_m, "@maplist_index % @maplist.size:#{@maplist_index % @maplist.size}")
-      DEBUG.write(c_m, "@maplist[@maplist_index % @maplist.size]:#{@maplist[@maplist_index % @maplist.size]}")
+      Debug.write(c_m, "@maplist_index:#{@maplist_index}")
+      Debug.write(c_m, "@maplist_index % @maplist.size:#{@maplist_index % @maplist.size}")
+      Debug.write(c_m, "@maplist[@maplist_index % @maplist.size]:#{@maplist[@maplist_index % @maplist.size]}")
       @need_redraw = true
     elsif Input.trigger?(Input::L)
       @maplist_index -= 1
       @draw_floor = @maplist[@maplist_index % @maplist.size]
-      DEBUG.write(c_m, "@maplist_index:#{@maplist_index}")
-      DEBUG.write(c_m, "@maplist_index % @maplist.size:#{@maplist_index % @maplist.size}")
-      DEBUG.write(c_m, "@maplist[@maplist_index % @maplist.size]:#{@maplist[@maplist_index % @maplist.size]}")
+      Debug.write(c_m, "@maplist_index:#{@maplist_index}")
+      Debug.write(c_m, "@maplist_index % @maplist.size:#{@maplist_index % @maplist.size}")
+      Debug.write(c_m, "@maplist[@maplist_index % @maplist.size]:#{@maplist[@maplist_index % @maplist.size]}")
       @need_redraw = true
     elsif Input.trigger?(Input::B)
       @view_map.visible = false
@@ -1205,9 +1207,9 @@ class Scene_Map < Scene_Base
       @ps.index = 0
       case @search3.index
       when 0
-        @ps.start_skill_view(SKILLID::PICKLOCK)  # ピッキング
+        @ps.start_skill_view(SkillId::PICKLOCK)  # ピッキング
       when 1
-        @ps.start_skill_view(SKILLID::RATIONAL)  # 理性呪文
+        @ps.start_skill_view(SkillId::RATIONAL)  # 理性呪文
       end
     end
   end
@@ -1295,13 +1297,12 @@ class Scene_Map < Scene_Base
     elsif Input.trigger?(Input::C)
       case @search3.index
       when 0
-        @ps.actor.chance_skill_increase(SKILLID::PICKLOCK) # スキル：ピッキング
+        @ps.actor.chance_skill_increase(SkillId::PICKLOCK) # スキル：ピッキング
         @ps.actor.tired_picking             # 疲労度加算
         $game_party.increase_light_time     # 灯りを失う
       when 1
-        magic = $data_magics[Constant_Table::UNLOCK_MAGIC_ID]
+        magic = $data_magics[ConstantTable::UNLOCK_MAGIC_ID]
         @ps.actor.reserve_cast(magic, 1) # MPを消費、スキル上昇もここで行う
-        @ps.actor.tired_casting(1)              # 疲労度加算
       end
       @window_lock.show_result            # 結果の表示
       @window_lock.active = false
@@ -1443,11 +1444,11 @@ class Scene_Map < Scene_Base
         case @alter.index
         when 0 # 記録して冒険を終了する
           return if $game_party.save_ticket < 1
-          SAVE.write_stats_data               # STAT DATAの保存
+          Save.write_stats_data               # STAT DATAの保存
           $game_party.save_ticket -= 1
-          DEBUG.write(c_m, "SYSTEM MENU => SAVE AND GO TO VILLAGE")
+          Debug.write(c_m, "SYSTEM MENU => Save AND GO TO VILLAGE")
           $game_system.input_party_location   # パーティの場所とメンバーを記憶
-          SAVE::do_save("#{self.class.name}") # セーブの実行
+          Save::do_save("#{self.class.name}") # セーブの実行
           @attention_window.set_text("* むらへもどります *")
           wait_for_attention
           RPG::BGM.fade(400)
@@ -1457,16 +1458,16 @@ class Scene_Map < Scene_Base
           $game_system.go_home              # メンバーをリセットし村へ帰還
           end_alter
         when 1  # 記録しないで冒険を終了する
-          DEBUG.write(c_m, "SYSTEM MENU => GO Title ===========================")
+          Debug.write(c_m, "SYSTEM MENU => GO Title ===========================")
           $game_temp.next_scene = "title"   # ゲームの強制中断
-          DEBUG.increase_reset_count        # リセット扱いとする
+          Debug.increment_reset_count        # リセット扱いとする
           end_alter
         when 2  # ゲームを中断する
-          DEBUG.write(c_m, "SYSTEM MENU => MAKE TERMINATED SAVE")
+          Debug.write(c_m, "SYSTEM MENU => MAKE TERMINATED Save")
           ## ユニークIDを保存
           $game_system.terminated_party_id = $game_party.unique_id
           $game_system.input_party_location   # パーティの場所とメンバーを記憶
-          SAVE::do_save("#{self.class.name}", false, true) # 中断セーブの実行
+          Save::do_save("#{self.class.name}", false, true) # 中断セーブの実行
           @attention_window.set_text("* おつかれさまでした *")
           wait_for_attention
           RPG::BGM.fade(800)
@@ -1517,7 +1518,7 @@ class Scene_Map < Scene_Base
     @gas_timer -= 1
     return unless @gas_timer < 1
     if $threedmap.check_poison_floor            # 毒霧床の上にいる
-      DEBUG.write(c_m, "毒霧床につきスリップダメージ")
+      Debug.write(c_m, "毒霧床につきスリップダメージ")
       for actor in $game_party.members
         actor.poison_damage_effect if rand(2) == 0
       end

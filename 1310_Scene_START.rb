@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_START
+# ■ SceneStart
 #------------------------------------------------------------------------------
 # オープニングテロップ
 #==============================================================================
 
-class Scene_START < Scene_Base
+class SceneStart < SceneBase
   def initialize
     @time = 0
   end
@@ -31,12 +31,12 @@ class Scene_START < Scene_Base
     @time += 1
     if @time == 500
       set_initial_charactors
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
       RPG::BGM.fade(1500)
       Graphics.fadeout(60)
       Graphics.wait(40)
       Graphics.frame_count = 0
-      $game_system.playid = MISC::generate_playid # PLAYIDの作成
+      $game_system.playid = Misc.generate_playid # PLAYIDの作成
       IniFile.write("Game.ini", "Game", "PlayID", $game_system.playid) # INIファイル操作
     end
   end

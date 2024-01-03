@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneGuild
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_OFFICE < Scene_Base
+class SceneGuild < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -59,7 +59,7 @@ class Scene_OFFICE < Scene_Base
   def create_whowindow
     command = []
     for member in $game_party.members do command.push(member.name) end
-    @who_window = Window_Command.new(200, command)
+    @who_window = WindowCommand.new(200, command)
     @who_window.x = 172
     @who_window.y = 100
     @who_window.opacity = 0
@@ -122,7 +122,7 @@ class Scene_OFFICE < Scene_Base
     @face_window = Window_FaceSelection.new # ポートレートの選択
     @top_message = Window_Message_Top.new  # 上部枠
     @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/guild", "Adventurers' Guild")
+    @window_picture.create_picture("Graphics/System/guild", ConstantTable::NAME_GUILD)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -188,7 +188,7 @@ class Scene_OFFICE < Scene_Base
         @command_window1.visible = true
         @command_window1.index = 0
       when 1;
-        DEBUG::remove_save_data
+        Debug::remove_save_data
         @attention_window.set_text("さくじょかんりょう")
         wait_for_attention
         $scene = nil
@@ -205,8 +205,8 @@ class Scene_OFFICE < Scene_Base
         if check_available_charactor?
           # 名前の登録シーンへ移る
           $game_temp.name_actor_id = check_available_charactorid # 空きIDを取得
-          $game_temp.name_max_char = Constant_Table::MAX_CHAR # 名前の最大文字を定義
-          $scene = Scene_Name.new(false, false)
+          $game_temp.name_max_char = ConstantTable::MAX_CHAR # 名前の最大文字を定義
+          $scene = SceneName.new(false, false)
         else
           @attention_window.set_text("あきが ありません")
           wait_for_attention
@@ -289,7 +289,7 @@ class Scene_OFFICE < Scene_Base
         @wait_list.refresh
         @wait_list.index = 0
       when 7
-        $scene = Scene_Village.new
+        $scene = SceneVillage.new
       end
     elsif Input.trigger?(Input::B)
       @command_window1.index = 7
@@ -320,8 +320,8 @@ class Scene_OFFICE < Scene_Base
       when 3; # 名前の変更
         return if @wait_list.actor.out
         $game_temp.name_actor_id = @wait_list.actor.id
-        $game_temp.name_max_char = Constant_Table::MAX_CHAR
-        $scene = Scene_Name.new(true, false)
+        $game_temp.name_max_char = ConstantTable::MAX_CHAR
+        $scene = SceneName.new(true, false)
       when 4; # クラスの変更
         return if @wait_list.actor.out
         return unless @class_selection.change_available?(@wait_list.actor)
@@ -390,7 +390,7 @@ class Scene_OFFICE < Scene_Base
   def update_face_window
     if Input.trigger?(Input::C)
       @wait_list.actor.set_face(@face_window.get_face_name) # 顔グラの設定
-      DEBUG::write(c_m,"(#{@wait_list.actor.name})顔グラの変更:#{@face_window.get_face_name}")
+      Debug::write(c_m,"(#{@wait_list.actor.name})顔グラの変更:#{@face_window.get_face_name}")
       end_of_face_change
     elsif Input.trigger?(Input::B)
       end_of_face_change
@@ -479,8 +479,8 @@ class Scene_OFFICE < Scene_Base
       unless @wait_list.actor.name == "** みとうろく **"
         # 名前の登録から入る
         $game_temp.name_actor_id = @wait_list.actor.id
-        $game_temp.name_max_char = Constant_Table::MAX_CHAR
-        $scene = Scene_Name.new(true, false)
+        $game_temp.name_max_char = ConstantTable::MAX_CHAR
+        $scene = SceneName.new(true, false)
       end
     elsif Input.trigger?(Input::B)
       text1 = ""

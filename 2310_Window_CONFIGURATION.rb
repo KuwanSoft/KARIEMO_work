@@ -4,7 +4,7 @@
 # # 　ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 # #==============================================================================
 
-# class Window_CONFIGURATION < Window_Selectable
+# class Window_CONFIGURATION < WindowSelectable
 #   #--------------------------------------------------------------------------
 #   # ● オブジェクト初期化
 #   #     x : ウィンドウの X 座標
@@ -34,7 +34,7 @@
 #     self.contents.draw_text(STA, WLH*15, self.width-(STA*2+32), WLH, str, 0)
 
 #     self.contents.font.color = normal_color
-#     str = "V" + Constant_Table::VERSION.to_s
+#     str = "V" + ConstantTable::VERSION.to_s
 #     self.contents.draw_text(STA, WLH*9, self.width-(STA*2+32), WLH, str, 2)
 #     str = "*PRESS SHIFT+A*"
 #     self.contents.draw_text(STA, WLH*15, self.width-(STA*2+32), WLH, str, 2)

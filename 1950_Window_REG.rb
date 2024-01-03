@@ -4,7 +4,7 @@
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_REG < Window_Base
+class Window_REG < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -57,8 +57,8 @@ class Window_REG < Window_Base
       self.contents.draw_text(WLW*12, WLH*9, WLW*8, WLH, @actor.maxhp, 2)
       self.contents.draw_text(WLW*12, WLH*10, WLW*6, WLH, "しゅぎ") #
       self.contents.draw_text(WLW*12, WLH*10, WLW*8, WLH, principle, 2)
-      text1 = Constant_Table::PERSONALITY_P_hash[@actor.personality_p]
-      text2 = Constant_Table::PERSONALITY_N_hash[@actor.personality_n]
+      text1 = ConstantTable::PERSONALITY_P_hash[@actor.personality_p]
+      text2 = ConstantTable::PERSONALITY_N_hash[@actor.personality_n]
       self.contents.draw_text(WLW*12, WLH*11, WLW*20, WLH, text1)
       self.contents.draw_text(WLW*12, WLH*12, WLW*20, WLH, text2)
       draw_face(WLW*8, WLH*6, @actor)

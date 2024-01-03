@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　スキルリスト
 #==============================================================================
-class Window_Skill < Window_Selectable
+class Window_Skill < WindowSelectable
   def initialize
     super(512-300, BLH, 300, 448-BLH)
     @base = Window_SkillBase.new    # 下地の定義
@@ -51,7 +51,7 @@ class Window_Skill < Window_Selectable
   #--------------------------------------------------------------------------
   def refresh(actor, page = 1, switch_adjust = false)
     @include_adjust = !(@include_adjust) if switch_adjust   # 補正込みの値の表示フラグ
-    @include_adjust = false unless $scene.is_a?(Scene_CAMP) # キャンプのみ
+    @include_adjust = false unless $scene.is_a?(SceneCamp) # キャンプのみ
     @page += page
     @page = [[@page, 1].max, 4].min
     if @before_page != @page      # ページ変更時に限りIndexリセット
@@ -76,7 +76,7 @@ class Window_Skill < Window_Selectable
     for i in 0...@item_max
       draw_item(i)
     end
-    unless $scene.is_a?(Scene_CAMP) # キャンプ時には残りスキルポイントは表示させない
+    unless $scene.is_a?(SceneCamp) # キャンプ時には残りスキルポイントは表示させない
       self.contents.draw_text(0, 24*15, self.width-32, 24, "スキルP:#{@actor.skill_point/10.0}(+#{@actor.sp_getback/10.0})", 2)
     end
     self.contents.draw_text(0, 24*16, self.width-32, 24, "Page.#{@page}/4", 1)
@@ -89,7 +89,7 @@ class Window_Skill < Window_Selectable
   def draw_item(index)
     color = normal_color
     ## 宿かギルドにて
-    if $scene.is_a?(Scene_INN) or $scene.is_a?(Scene_REG)
+    if $scene.is_a?(SceneInn) or $scene.is_a?(SceneRegistration)
       ## 宿屋：青色判定
       if get_blue_skill(@actor) == @data[index].id
         color = system_color
@@ -102,14 +102,14 @@ class Window_Skill < Window_Selectable
       end
     end
     ## キャンプ時
-    if $scene.is_a?(Scene_CAMP)
+    if $scene.is_a?(SceneCamp)
       ## 呪文や装備などでボーナスがある場合
       if @actor.enchanted_skill?(@data[index].id)
         color = poison_color
       end
     end
     ## 迷宮時
-    if $scene.is_a?(Scene_Map)
+    if $scene.is_a?(SceneMap)
       color = normal_color
     end
     draw_skill( @actor, 0, index*24, @data[index].id, color, @include_adjust)
@@ -119,7 +119,7 @@ class Window_Skill < Window_Selectable
   # ● 自動取得スキルの色を青に
   #--------------------------------------------------------------------------
   def get_blue_skill(actor)
-    return Constant_Table::CLASS_SKILL[actor.class_id]
+    return ConstantTable::CLASS_SKILL[actor.class_id]
   end
   #--------------------------------------------------------------------------
   # ● スキルポイントの割り振り更新
@@ -128,7 +128,7 @@ class Window_Skill < Window_Selectable
     @actor.sp_prev ||= {}
     return if @actor.skill[@data[@index].id] < 0  # 封印されたスキルの場合はｽｷｯﾌﾟ
     ## ルーンの知識
-    if @data[@index].id == SKILLID::RUNE
+    if @data[@index].id == SkillId::RUNE
     ## 従士か？
     elsif @actor.class_id == 9
       ## 従士の場合はボーナスポイント割り振りあり
@@ -139,16 +139,16 @@ class Window_Skill < Window_Selectable
     case value
     when 1;
       ## 現状のスキルポイントが正の場合かつ1000未満の時
-      max = Constant_Table::MAX_SKILLP
+      max = ConstantTable::MAX_SKILLP
       case @actor.level
       when 1..19;
-      when 20..29; max += Constant_Table::PLUS_MAXP_20_29
-      when 30..39; max += Constant_Table::PLUS_MAXP_30_39
-      when 40..999; max += Constant_Table::PLUS_MAXP_40_999
+      when 20..29; max += ConstantTable::PLUS_MAXP_20_29
+      when 30..39; max += ConstantTable::PLUS_MAXP_30_39
+      when 40..999; max += ConstantTable::PLUS_MAXP_40_999
       end
       if @actor.skill_point > 0 and @actor.skill[@data[@index].id] < max
         ## 記憶値から3.0以上割り振っていたら却下
-        return if @actor.skill[@data[@index].id] == @memory_skill[@data[@index].id] + Constant_Table::SKILL_ASSIGN_LIMIT
+        return if @actor.skill[@data[@index].id] == @memory_skill[@data[@index].id] + ConstantTable::SKILL_ASSIGN_LIMIT
         @actor.skill[@data[@index].id] += value
         @actor.skill_point -= 1
         @modified.push([@page,@index])  # 変更したスキルを記憶

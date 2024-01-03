@@ -1,4 +1,4 @@
-class Window_Message_Top < Window_Base
+class Window_Message_Top < WindowBase
   def initialize
     super( 0, 0, 512, 24+32)
     self.opacity = 255

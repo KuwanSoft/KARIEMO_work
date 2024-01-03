@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Troop
+# ■ GameTroop
 #------------------------------------------------------------------------------
 # 　敵グループおよび戦闘に関するデータを扱うクラスです。バトルイベントの処理も
 # 行います。このクラスのインスタンスは $game_troop で参照されます。
 #==============================================================================
 
-class Game_Troop < Game_Unit
+class GameTroop < GameUnit
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -30,8 +30,8 @@ class Game_Troop < Game_Unit
   #--------------------------------------------------------------------------
   def initialize
     super
-    @screen = Game_Screen.new
-    @interpreter = Game_Interpreter.new
+    @screen = GameScreen.new
+    @interpreter = GameInterpreter.new
     @event_flags = {}
     @enemies = []       # トループメンバー (敵キャラオブジェクトの配列)
     @group1 = []
@@ -135,14 +135,14 @@ class Game_Troop < Game_Unit
       for floor in e.floor.split(";")
         if map_id.to_s == floor.to_s     # 出現階数が現在と同一の場合
           id_array.push(e.id)
-          DEBUG.write(c_m, "候補追加:#{e.name} floor:#{floor}")
+          Debug.write(c_m, "候補追加:#{e.name} floor:#{floor}")
           next
         end
         ## エリア情報が一致の場合
         for area in $data_areas.values
           if floor == area.name and $game_player.in_area?(area) # setupでは必ず現在地のmap_idしか入ってこない
             id_array.push(e.id)
-            DEBUG.write(c_m, "エリア情報(#{area.name})合致の為エンカウントリストに入れる:#{e.name}")
+            Debug.write(c_m, "エリア情報(#{area.name})合致の為エンカウントリストに入れる:#{e.name}")
           end
         end
       end
@@ -190,11 +190,11 @@ class Game_Troop < Game_Unit
 
     ###>>>  モンスターの決定
     troop_members = [top_enemy_id, back1_enemy_id, back2_enemy_id, back3_enemy_id].compact
-    DEBUG::write(c_m,"************** Notorious Monster!! ***********") if nm
-    DEBUG::write(c_m,"先頭モンスター [#{top_enemy.name}]")
-    DEBUG::write(c_m,"後続1 (#{back1_enemy_ratio}%) [#{back1_enemy.name}]") unless back1_enemy_id == nil
-    DEBUG::write(c_m,"後続2 (#{back2_enemy_ratio}%) [#{back2_enemy.name}]") unless back2_enemy_id == nil
-    DEBUG::write(c_m,"後続2 (#{back3_enemy_ratio}%) [#{back3_enemy.name}]") unless back3_enemy_id == nil
+    Debug::write(c_m,"************** Notorious Monster!! ***********") if nm
+    Debug::write(c_m,"先頭モンスター [#{top_enemy.name}]")
+    Debug::write(c_m,"後続1 (#{back1_enemy_ratio}%) [#{back1_enemy.name}]") unless back1_enemy_id == nil
+    Debug::write(c_m,"後続2 (#{back2_enemy_ratio}%) [#{back2_enemy.name}]") unless back2_enemy_id == nil
+    Debug::write(c_m,"後続2 (#{back3_enemy_ratio}%) [#{back3_enemy.name}]") unless back3_enemy_id == nil
 
     for id in troop_members
       next if id == nil
@@ -202,32 +202,32 @@ class Game_Troop < Game_Unit
         a = $data_monsters[id].num.scan(/(\S+)d/)[0][0].to_i
         b = $data_monsters[id].num.scan(/d(\d)/)[0][0].to_i
         c = $data_monsters[id].num.scan(/\+(\d)/)[0][0].to_i
-        number_max = MISC.dice(a,b,c)
-        DEBUG::write(c_m,"#{$data_monsters[id].name} 出現数:#{number_max}体 <#{a}D#{b}+#{c}>") # debug
+        number_max = Misc.dice(a,b,c)
+        Debug::write(c_m,"#{$data_monsters[id].name} 出現数:#{number_max}体 <#{a}D#{b}+#{c}>") # debug
         for e in 1..number_max
-          enemy = Game_Enemy.new(@enemies.size, id, group)  # group =  group_id
+          enemy = GameEnemy.new(@enemies.size, id, group)  # group =  group_id
           enemy.identified = true if enemy.npc? # 初期で確定化
-          DEBUG::write(c_m,"敵の名前:#{enemy.original_name} MAXHP:#{enemy.maxhp} INDEX:#{enemy.index} Group:#{enemy.group_id+1}") # debug
+          Debug::write(c_m,"敵の名前:#{enemy.original_name} MAXHP:#{enemy.maxhp} INDEX:#{enemy.index} Group:#{enemy.group_id+1}") # debug
           ## Groupインデックスにて決めうちで座標を入力
           case group
           when 0;
             if troop_members.size == 1  # 1グループのみの出現
-              enemy.screen_x = Constant_Table::SCREEN_XC
+              enemy.screen_x = ConstantTable::SCREEN_XC
             else
-              enemy.screen_x = Constant_Table::SCREEN_X
+              enemy.screen_x = ConstantTable::SCREEN_X
             end
-            enemy.screen_y = Constant_Table::SCREEN_Y
+            enemy.screen_y = ConstantTable::SCREEN_Y
           when 1;
-            enemy.screen_x = Constant_Table::SCREEN_X2
-            enemy.screen_y = Constant_Table::SCREEN_Y
+            enemy.screen_x = ConstantTable::SCREEN_X2
+            enemy.screen_y = ConstantTable::SCREEN_Y
           when 2;
-            enemy.screen_x = Constant_Table::SCREEN_X3
-            enemy.screen_y = Constant_Table::SCREEN_Y
+            enemy.screen_x = ConstantTable::SCREEN_X3
+            enemy.screen_y = ConstantTable::SCREEN_Y
           when 3;
-            enemy.screen_x = Constant_Table::SCREEN_X4
-            enemy.screen_y = Constant_Table::SCREEN_Y
+            enemy.screen_x = ConstantTable::SCREEN_X4
+            enemy.screen_y = ConstantTable::SCREEN_Y
           end
-          # enemy.screen_x += Constant_Table::SCREEN_PREP_ADJ # 登場前の待機
+          # enemy.screen_x += ConstantTable::SCREEN_PREP_ADJ # 登場前の待機
           @enemies.push(enemy)
         end
       end
@@ -266,9 +266,9 @@ class Game_Troop < Game_Unit
   def identified_change
     for member in $game_party.existing_members
       next unless member.movable?
-      c = Constant_Table::IDENTIFY_C
-      skill = MISC.skill_value(SKILLID::DEMONOLOGY, member) / c * 100  # 魔物の知識
-      magic = Constant_Table::MAGIC_IDENTIFY_RATIO
+      c = ConstantTable::IDENTIFY_C
+      skill = Misc.skill_value(SkillId::DEMONOLOGY, member) / c * 100  # 魔物の知識
+      magic = ConstantTable::MAGIC_IDENTIFY_RATIO
       case rand(4)
       when 0
         next if existing_g1_members.empty?        # グループ1が存在？
@@ -278,7 +278,7 @@ class Game_Troop < Game_Unit
         ratio = [[5, Integer(ratio)].max, 95].min
         if ratio > rand(100)
           for member in existing_g1_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP1(#{existing_g1_members[0].name})の確定化:#{ratio}%")
+          Debug::write(c_m,"GROUP1(#{existing_g1_members[0].name})の確定化:#{ratio}%")
         end
       when 1
         next if existing_g2_members.empty?  # グループ2が存在？
@@ -288,7 +288,7 @@ class Game_Troop < Game_Unit
         ratio = [[5, Integer(ratio)].max, 95].min
         if ratio > rand(100)
           for member in existing_g2_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP2(#{existing_g2_members[0].name})の確定化:#{ratio}%")
+          Debug::write(c_m,"GROUP2(#{existing_g2_members[0].name})の確定化:#{ratio}%")
         end
       when 2
         next if existing_g3_members.empty?  # グループ3が存在？
@@ -298,7 +298,7 @@ class Game_Troop < Game_Unit
         ratio = [[5, Integer(ratio)].max, 95].min
         if ratio > rand(100)
           for member in existing_g3_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP3(#{existing_g3_members[0].name})の確定化:#{ratio}%")
+          Debug::write(c_m,"GROUP3(#{existing_g3_members[0].name})の確定化:#{ratio}%")
         end
       when 3
         next if existing_g4_members.empty?  # グループ4が存在？
@@ -308,7 +308,7 @@ class Game_Troop < Game_Unit
         ratio = [[5, Integer(ratio)].max, 95].min
         if ratio > rand(100)
           for member in existing_g4_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP4(#{existing_g4_members[0].name})の確定化:#{ratio}%")
+          Debug::write(c_m,"GROUP4(#{existing_g4_members[0].name})の確定化:#{ratio}%")
         end
       end
     end
@@ -325,28 +325,28 @@ class Game_Troop < Game_Unit
         next if existing_g1_members[0].identified # すでに確定化か？
         if power > rand(existing_g1_members[0].level)
           for member in existing_g1_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP1(#{existing_g1_members[0].name})の確定化")
+          Debug::write(c_m,"GROUP1(#{existing_g1_members[0].name})の確定化")
         end
       when 1
         next if existing_g2_members.empty?        # グループ2が存在？
         next if existing_g2_members[0].identified # すでに確定化か？
         if power > rand(existing_g2_members[0].level)
           for member in existing_g2_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP2(#{existing_g2_members[0].name})の確定化")
+          Debug::write(c_m,"GROUP2(#{existing_g2_members[0].name})の確定化")
         end
       when 2
         next if existing_g3_members.empty?        # グループ3が存在？
         next if existing_g3_members[0].identified # すでに確定化か？
         if power > rand(existing_g3_members[0].level)
           for member in existing_g3_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP3(#{existing_g3_members[0].name})の確定化")
+          Debug::write(c_m,"GROUP3(#{existing_g3_members[0].name})の確定化")
         end
       when 3
         next if existing_g4_members.empty?        # グループ4が存在？
         next if existing_g4_members[0].identified # すでに確定化か？
         if power > rand(existing_g4_members[0].level)
           for member in existing_g4_members do member.transition = true end
-          DEBUG::write(c_m,"GROUP4(#{existing_g4_members[0].name})の確定化")
+          Debug::write(c_m,"GROUP4(#{existing_g4_members[0].name})の確定化")
         end
       end
     end
@@ -378,25 +378,25 @@ class Game_Troop < Game_Unit
           @group1, @group2, @group3, @group4 = @group4, @group1, @group2, @group3
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_XC
+            member.screen_x = ConstantTable::SCREEN_XC
             member.redraw = true
           end
         elsif existing_g4_members.empty?# g1とg2とg4がクリア：g3がセンター(3)
           @group1, @group2, @group3, @group4 = @group3, @group1, @group2, @group4
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_XC
+            member.screen_x = ConstantTable::SCREEN_XC
             member.redraw = true
           end
         else                            # g1とg2がクリア：g3とg4(3/4)
           @group1, @group2, @group3, @group4 = @group3, @group4, @group1, @group2
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_X
+            member.screen_x = ConstantTable::SCREEN_X
             member.redraw = true
           end
           for member in existing_g2_members
-            member.screen_x = Constant_Table::SCREEN_X2
+            member.screen_x = ConstantTable::SCREEN_X2
             member.redraw = true
           end
         end
@@ -405,18 +405,18 @@ class Game_Troop < Game_Unit
           @group1, @group2, @group3, @group4 = @group2, @group1, @group3, @group4
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_XC
+            member.screen_x = ConstantTable::SCREEN_XC
             member.redraw = true
           end
         else                            # g1とg3がクリア：g2とg4(2/4)
           @group1, @group2, @group3, @group4 = @group2, @group4, @group1, @group3
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_X
+            member.screen_x = ConstantTable::SCREEN_X
             member.redraw = true
           end
           for member in existing_g2_members
-            member.screen_x = Constant_Table::SCREEN_X2
+            member.screen_x = ConstantTable::SCREEN_X2
             member.redraw = true
           end
         end
@@ -424,26 +424,26 @@ class Game_Troop < Game_Unit
         @group1, @group2, @group3, @group4 = @group2, @group3, @group1, @group4
         resetting_group_id  #  隊列変更時のグループIDを再設定
         for member in existing_g1_members
-          member.screen_x = Constant_Table::SCREEN_X
+          member.screen_x = ConstantTable::SCREEN_X
           member.redraw = true
         end
         for member in existing_g2_members
-          member.screen_x = Constant_Table::SCREEN_X2
+          member.screen_x = ConstantTable::SCREEN_X2
           member.redraw = true
         end
       else                              # g1がクリア：g2とg3とg4(2/3/4)
         @group1, @group2, @group3, @group4 = @group2, @group3, @group4, @group1
         resetting_group_id  #  隊列変更時のグループIDを再設定
         for member in existing_g1_members
-          member.screen_x = Constant_Table::SCREEN_X
+          member.screen_x = ConstantTable::SCREEN_X
           member.redraw = true
         end
         for member in existing_g2_members
-          member.screen_x = Constant_Table::SCREEN_X2
+          member.screen_x = ConstantTable::SCREEN_X2
           member.redraw = true
         end
         for member in existing_g3_members
-          member.screen_x = Constant_Table::SCREEN_X3
+          member.screen_x = ConstantTable::SCREEN_X3
           member.redraw = true
         end
       end
@@ -451,18 +451,18 @@ class Game_Troop < Game_Unit
       if existing_g3_members.empty?      # g2とg3がクリア
         if existing_g4_members.empty?     # g2とg3とg4がクリア：g1がセンター(1)
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_XC
+            member.screen_x = ConstantTable::SCREEN_XC
             member.redraw = true
           end
         else                              # g2とg3がクリア：g1とg4(1/4)
           @group1, @group2, @group3, @group4 = @group1, @group4, @group2, @group3
           resetting_group_id  #  隊列変更時のグループIDを再設定
           for member in existing_g1_members
-            member.screen_x = Constant_Table::SCREEN_X
+            member.screen_x = ConstantTable::SCREEN_X
             member.redraw = true
           end
           for member in existing_g2_members
-            member.screen_x = Constant_Table::SCREEN_X2
+            member.screen_x = ConstantTable::SCREEN_X2
             member.redraw = true
           end
         end
@@ -470,26 +470,26 @@ class Game_Troop < Game_Unit
         @group1, @group2, @group3, @group4 = @group1, @group3, @group2, @group4
         resetting_group_id  #  隊列変更時のグループIDを再設定
         for member in existing_g1_members
-          member.screen_x = Constant_Table::SCREEN_X
+          member.screen_x = ConstantTable::SCREEN_X
           member.redraw = true
         end
         for member in existing_g2_members
-          member.screen_x = Constant_Table::SCREEN_X2
+          member.screen_x = ConstantTable::SCREEN_X2
           member.redraw = true
         end
       else                                  # g2がクリア：g1とg3とg4(1/3/4)
         @group1, @group2, @group3, @group4 = @group1, @group3, @group4, @group2
         resetting_group_id  #  隊列変更時のグループIDを再設定
         for member in existing_g1_members
-          member.screen_x = Constant_Table::SCREEN_X
+          member.screen_x = ConstantTable::SCREEN_X
           member.redraw = true
         end
         for member in existing_g2_members
-          member.screen_x = Constant_Table::SCREEN_X2
+          member.screen_x = ConstantTable::SCREEN_X2
           member.redraw = true
         end
         for member in existing_g3_members
-          member.screen_x = Constant_Table::SCREEN_X3
+          member.screen_x = ConstantTable::SCREEN_X3
           member.redraw = true
         end
       end
@@ -501,15 +501,15 @@ class Game_Troop < Game_Unit
         @group1, @group2, @group3, @group4 = @group1, @group2, @group4, @group3
         resetting_group_id  #  隊列変更時のグループIDを再設定
         for member in existing_g1_members
-          member.screen_x = Constant_Table::SCREEN_X
+          member.screen_x = ConstantTable::SCREEN_X
           member.redraw = true
         end
         for member in existing_g2_members
-          member.screen_x = Constant_Table::SCREEN_X2
+          member.screen_x = ConstantTable::SCREEN_X2
           member.redraw = true
         end
         for member in existing_g3_members
-          member.screen_x = Constant_Table::SCREEN_X3
+          member.screen_x = ConstantTable::SCREEN_X3
           member.redraw = true
         end
       end
@@ -526,53 +526,53 @@ class Game_Troop < Game_Unit
   def platoon_change
     ## 前進処理判定(1/2/3/4)
     ## グループ４=>３
-    if Constant_Table::FORWARD_RATE > rand(100)
+    if ConstantTable::FORWARD_RATE > rand(100)
       @group1, @group2, @group3, @group4 = @group1, @group2, @group4, @group3
       resetting_group_id  #  隊列変更時のグループIDを再設定
       for member in existing_g3_members
-        member.screen_x = Constant_Table::SCREEN_X3
+        member.screen_x = ConstantTable::SCREEN_X3
         member.redraw = true
         name = existing_g3_members[0].name
       end
       for member in existing_g4_members
-        member.screen_x = Constant_Table::SCREEN_X4
+        member.screen_x = ConstantTable::SCREEN_X4
         member.redraw = true
         member.backward_start = true
       end
-      DEBUG::write(c_m,"隊列変更 4 => 3")
+      Debug::write(c_m,"隊列変更 4 => 3")
       return name
     ## グループ３=>２
-    elsif Constant_Table::FORWARD_RATE > rand(100)
+    elsif ConstantTable::FORWARD_RATE > rand(100)
       @group1, @group2, @group3, @group4 = @group1, @group3, @group2, @group4
       resetting_group_id  #  隊列変更時のグループIDを再設定
       for member in existing_g2_members
-        member.screen_x = Constant_Table::SCREEN_X2
+        member.screen_x = ConstantTable::SCREEN_X2
         member.redraw = true
         name = existing_g2_members[0].name
       end
       for member in existing_g3_members
-        member.screen_x = Constant_Table::SCREEN_X3
+        member.screen_x = ConstantTable::SCREEN_X3
         member.redraw = true
         member.backward_start = true
       end
-      DEBUG::write(c_m,"隊列変更 3 => 2")
+      Debug::write(c_m,"隊列変更 3 => 2")
       return name
     ## グループ２=>１
-#~       elsif Constant_Table::FORWARD_RATE > rand(100)
+#~       elsif ConstantTable::FORWARD_RATE > rand(100)
     elsif 100 > rand(100)
       @group1, @group2, @group3, @group4 = @group2, @group1, @group3, @group4
       resetting_group_id  #  隊列変更時のグループIDを再設定
       for member in existing_g1_members
-        member.screen_x = Constant_Table::SCREEN_X
+        member.screen_x = ConstantTable::SCREEN_X
         member.redraw = true
         name = existing_g1_members[0].name
       end
       for member in existing_g2_members
-        member.screen_x = Constant_Table::SCREEN_X2
+        member.screen_x = ConstantTable::SCREEN_X2
         member.redraw = true
         member.backward_start = true
       end
-      DEBUG::write(c_m,"隊列変更 2 => 1")
+      Debug::write(c_m,"隊列変更 2 => 1")
       return name
     end
     return nil
@@ -639,7 +639,7 @@ class Game_Troop < Game_Unit
   #--------------------------------------------------------------------------
   def increase_turn
     @turn_count += 1
-    DEBUG::write(c_m,"ターン増加:#{@turn_count}")
+    Debug::write(c_m,"ターン増加:#{@turn_count}")
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の作成
@@ -680,16 +680,16 @@ class Game_Troop < Game_Unit
       total_tr += enemy.enemy.TR.to_f
     end
     return total_tr
-    # multiplier = Constant_Table::exp_multiplier(dead_members.size)
+    # multiplier = ConstantTable::exp_multiplier(dead_members.size)
     # exp *= multiplier
-    # hash = Constant_Table::E_TABLE
+    # hash = ConstantTable::E_TABLE
     # array = []
     # for key in hash.keys
     #   next if exp < hash[key]
     #   array.push key
     # end
-    # DEBUG.write(c_m, "敵#{dead_members.size}体 倍率:x#{multiplier} E.P.#{exp}")
-    # DEBUG.write(c_m, "敵パーティ脅威度:#{array.max.to_f}")
+    # Debug.write(c_m, "敵#{dead_members.size}体 倍率:x#{multiplier} E.P.#{exp}")
+    # Debug.write(c_m, "敵パーティ脅威度:#{array.max.to_f}")
     # return array.max.to_f
   end
   #--------------------------------------------------------------------------
@@ -724,8 +724,8 @@ class Game_Troop < Game_Unit
       when 18..20; table = 5
       when 21..99; table = 6
       end
-      gold += Constant_Table::BASE_GOLD * (Constant_Table::GOLD_ROOT ** (table-1))
-      DEBUG.write(c_m, "#{enemy.name} gold計算:#{gold}G TR:#{enemy.enemy.TR.to_f}")
+      gold += ConstantTable::BASE_GOLD * (ConstantTable::GOLD_ROOT ** (table-1))
+      Debug.write(c_m, "#{enemy.name} gold計算:#{gold}G TR:#{enemy.enemy.TR.to_f}")
     end
     return gold.to_i
   end
@@ -737,7 +737,7 @@ class Game_Troop < Game_Unit
     eval_num = 0
     for enemy in dead_members
       ## キャラクタ1人に対しての各モンスターTRとの差分で経験値を算出
-      case MISC.get_diff(actor.expected_level, enemy.enemy.TR.to_f)
+      case Misc.get_diff(actor.expected_level, enemy.enemy.TR.to_f)
       when -99..-7; m = 0.125 # 1/8
       when -6; m = 0.142    # 1/7
       when -5; m = 0.166    # 1/6
@@ -754,11 +754,11 @@ class Game_Troop < Game_Unit
       when 6;  m = 7
       when 7..99; m = 8
       end
-      total_exp += Constant_Table::BASE_EXP * m
-      DEBUG.write(c_m, "#{enemy.name}vs#{actor.name} 脅威度倍率:x#{m} 獲得経験値:#{Constant_Table::BASE_EXP * m}")
+      total_exp += ConstantTable::BASE_EXP * m
+      Debug.write(c_m, "#{enemy.name}vs#{actor.name} 脅威度倍率:x#{m} 獲得経験値:#{ConstantTable::BASE_EXP * m}")
 
       ## 討伐数ボーナスはパーティの平均レベルを基に計算
-      case MISC.get_diff($game_party.ave_level, enemy.enemy.TR.to_f)
+      case Misc.get_diff($game_party.ave_level, enemy.enemy.TR.to_f)
       when -99..-7; n = 0.125
       when -6; n = 0.142
       when -5; n = 0.166
@@ -778,8 +778,8 @@ class Game_Troop < Game_Unit
       eval_num += n       # 出現モンスター数を計算(TR差分で計算)
     end
     ## 討伐数ボーナスの算出
-    bonus = Constant_Table::exp_multiplier(eval_num.to_i)
-    DEBUG.write(c_m, "#{actor.name} 最終人数ボーナス計算 #{eval_num}体 倍率x#{bonus} =>EXP:#{Integer(total_exp * bonus)}")
+    bonus = ConstantTable::exp_multiplier(eval_num.to_i)
+    Debug.write(c_m, "#{actor.name} 最終人数ボーナス計算 #{eval_num}体 倍率x#{bonus} =>EXP:#{Integer(total_exp * bonus)}")
     return Integer(total_exp * bonus)
   end
   #--------------------------------------------------------------------------
@@ -802,7 +802,7 @@ class Game_Troop < Game_Unit
         next if drop == nil
         next if drop.kind != enemy.enemy.drop # 同じ種類
         next if drop.rank > rank              # 上限ランク
-        next unless Constant_Table::BASE_DROP_RATIO > rand(100) # 基礎ドロップ率
+        next unless ConstantTable::BASE_DROP_RATIO > rand(100) # 基礎ドロップ率
         ## ハッシュにIDと個数を保存
         ## 1/rank^2 で計算する。
         if drops[drop.id] != nil
@@ -820,11 +820,11 @@ class Game_Troop < Game_Unit
   def food_total
     f = 0
     for enemy in dead_members
-      DEBUG::write(c_m,"#{enemy.enemy.name} 獲得食料:#{enemy.food}")
+      Debug::write(c_m,"#{enemy.enemy.name} 獲得食料:#{enemy.food}")
       f += enemy.food
     end
     plus = $game_mercenary.skill_check("food")
-    DEBUG::write(c_m,"獲得食料の合計:#{f} ガイドボーナス:+#{plus}")
+    Debug::write(c_m,"獲得食料の合計:#{f} ガイドボーナス:+#{plus}")
     return (plus + f).to_i, plus
   end
   #--------------------------------------------------------------------------
@@ -832,7 +832,7 @@ class Game_Troop < Game_Unit
   #--------------------------------------------------------------------------
   def get_identify_skill
     dead_members.size.times do
-      $game_party.chance_skill_increase(SKILLID::DEMONOLOGY)   # 魔物の知識
+      $game_party.chance_skill_increase(SkillId::DEMONOLOGY)   # 魔物の知識
     end
   end
   #--------------------------------------------------------------------------
@@ -850,7 +850,7 @@ class Game_Troop < Game_Unit
         drop_items.push [member.enemy.drop_kind, member.enemy.drop_id]  # 固有ドロップ
       end
     end
-    DEBUG::write(c_m,"チャンス数:#{chances} DROP LIST:#{drop_items}")
+    Debug::write(c_m,"チャンス数:#{chances} DROP LIST:#{drop_items}")
     return drop_items
   end
   #--------------------------------------------------------------------------

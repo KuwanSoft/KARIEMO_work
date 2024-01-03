@@ -1,4 +1,4 @@
-class Scene_Arrange < Scene_Base
+class Scene_Arrange < SceneBase
   #--------------------------------------------------------------------------
   # ● 開始処理
   #--------------------------------------------------------------------------
@@ -88,6 +88,6 @@ class Scene_Arrange < Scene_Base
   # ● 元の画面へ戻る
   #--------------------------------------------------------------------------
   def return_scene
-    $scene = Scene_Map.new
+    $scene = SceneMap.new
   end
 end

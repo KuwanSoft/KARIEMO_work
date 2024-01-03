@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 #   KANDIで調べるべきリスト
 #==============================================================================
-class Window_Missing < Window_Selectable
+class Window_Missing < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -94,9 +94,9 @@ class Window_Missing < Window_Selectable
     target_mapid = array[0]
     target_x = array[1]
     target_y = array[2]
-    DEBUG::write(c_m,"target mapid:#{target_mapid} 自身:#{now_mapid}")
-    DEBUG::write(c_m,"target x:#{target_x} 自身:#{now_x}")
-    DEBUG::write(c_m,"target y:#{target_y} 自身:#{now_y}")
+    Debug::write(c_m,"target mapid:#{target_mapid} 自身:#{now_mapid}")
+    Debug::write(c_m,"target x:#{target_x} 自身:#{now_x}")
+    Debug::write(c_m,"target y:#{target_y} 自身:#{now_y}")
     if now_mapid < target_mapid
       text = "#{member.name} は、これより かそうの"
     elsif now_mapid > target_mapid
@@ -130,7 +130,7 @@ class Window_Missing < Window_Selectable
       end
     end
     text3 = "...#{target_x + rand(3)*[1,-1][rand(2)]}の#{target_y + rand(3)*[1,-1][rand(2)]}ふきんに けはいをかんじる。"
-    DEBUG.write(c_m, "仲間の場所は=> x:#{target_x} y:#{target_y} map:#{target_mapid}")
+    Debug.write(c_m, "仲間の場所は=> x:#{target_x} y:#{target_y} map:#{target_mapid}")
     change_font_to_v
     self.contents.draw_text(0, 24, self.width-32, 24, text, 1)
     self.contents.draw_text(0, 24*2, self.width-32, 24, text2, 1)

@@ -4,7 +4,7 @@
 # セーブ画面およびロード画面で表示する、セーブファイルのウィンドウです。
 #==============================================================================
 
-class Window_Everard < Window_Base
+class Window_Everard < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     file_index : セーブファイルのインデックス (0～3)
@@ -23,59 +23,59 @@ class Window_Everard < Window_Base
     self.contents.clear
     case page
     when 1
-      text1 = Constant_Table::E1
-      text2 = Constant_Table::E2
-      text3 = Constant_Table::E3
-      text4 = Constant_Table::E4
-      text5 = Constant_Table::E5
-      text6 = Constant_Table::E6
-      text7 = Constant_Table::E7
-      text8 = Constant_Table::E8
-      text9 = Constant_Table::E9
-      text10 = Constant_Table::E10
-      text11 = Constant_Table::E11
-      text12 = Constant_Table::E12
-      text13 = Constant_Table::E13
-      text14 = Constant_Table::E14
-      text15 = Constant_Table::E15
-      text16 = Constant_Table::E16
-      text17 = Constant_Table::E17
-      text18 = Constant_Table::E18
-      text19 = Constant_Table::E19
-      text20 = Constant_Table::E20
-      text21 = Constant_Table::E21
-      text22 = Constant_Table::E22
-      text23 = Constant_Table::E23
-      text24 = Constant_Table::E24
-      text25 = Constant_Table::E25
-      text26 = Constant_Table::E26
+      text1 = ConstantTable::E1
+      text2 = ConstantTable::E2
+      text3 = ConstantTable::E3
+      text4 = ConstantTable::E4
+      text5 = ConstantTable::E5
+      text6 = ConstantTable::E6
+      text7 = ConstantTable::E7
+      text8 = ConstantTable::E8
+      text9 = ConstantTable::E9
+      text10 = ConstantTable::E10
+      text11 = ConstantTable::E11
+      text12 = ConstantTable::E12
+      text13 = ConstantTable::E13
+      text14 = ConstantTable::E14
+      text15 = ConstantTable::E15
+      text16 = ConstantTable::E16
+      text17 = ConstantTable::E17
+      text18 = ConstantTable::E18
+      text19 = ConstantTable::E19
+      text20 = ConstantTable::E20
+      text21 = ConstantTable::E21
+      text22 = ConstantTable::E22
+      text23 = ConstantTable::E23
+      text24 = ConstantTable::E24
+      text25 = ConstantTable::E25
+      text26 = ConstantTable::E26
     when 2
-      text1 = Constant_Table::E27
-      text2 = Constant_Table::E28
-      text3 = Constant_Table::E29
-      text4 = Constant_Table::E30
-      text5 = Constant_Table::E31
-      text6 = Constant_Table::E32
-      text7 = Constant_Table::E33
-      text8 = Constant_Table::E34
-      text9 = Constant_Table::E35
-      text10 = Constant_Table::E36
-      text11 = Constant_Table::E37
-      text12 = Constant_Table::E38
-      text13 = Constant_Table::E39
-      text14 = Constant_Table::E40
-      text15 = Constant_Table::E41
-      text16 = Constant_Table::E42
-      text17 = Constant_Table::E43
-      text18 = Constant_Table::E44
-      text19 = Constant_Table::E45
-      text20 = Constant_Table::E46
-      text21 = Constant_Table::E47
-      text22 = Constant_Table::E48
-      text23 = Constant_Table::E49
-      text24 = Constant_Table::E50
-      text25 = Constant_Table::E51
-      text26 = Constant_Table::E52
+      text1 = ConstantTable::E27
+      text2 = ConstantTable::E28
+      text3 = ConstantTable::E29
+      text4 = ConstantTable::E30
+      text5 = ConstantTable::E31
+      text6 = ConstantTable::E32
+      text7 = ConstantTable::E33
+      text8 = ConstantTable::E34
+      text9 = ConstantTable::E35
+      text10 = ConstantTable::E36
+      text11 = ConstantTable::E37
+      text12 = ConstantTable::E38
+      text13 = ConstantTable::E39
+      text14 = ConstantTable::E40
+      text15 = ConstantTable::E41
+      text16 = ConstantTable::E42
+      text17 = ConstantTable::E43
+      text18 = ConstantTable::E44
+      text19 = ConstantTable::E45
+      text20 = ConstantTable::E46
+      text21 = ConstantTable::E47
+      text22 = ConstantTable::E48
+      text23 = ConstantTable::E49
+      text24 = ConstantTable::E50
+      text25 = ConstantTable::E51
+      text26 = ConstantTable::E52
     end
 
     self.contents.draw_text(0, WLH*0, self.width-32, WLH, text1,1)

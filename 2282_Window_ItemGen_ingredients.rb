@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　アイテム合成可能なアイテムリスト
 #==============================================================================
-class Window_ItemGen_ingredients < Window_Base
+class Window_ItemGen_ingredients < WindowBase
   #--------------------------------------------------------------------------
   # ● 初期化処理
   #--------------------------------------------------------------------------
@@ -18,8 +18,8 @@ class Window_ItemGen_ingredients < Window_Base
   def refresh(item_obj)
     self.contents.clear
     return if item_obj == nil
-    ing1 = MISC.item(3, item_obj.ing1_id)
-    ing2 = MISC.item(3, item_obj.ing2_id)
+    ing1 = Misc.item(3, item_obj.ing1_id)
+    ing2 = Misc.item(3, item_obj.ing2_id)
     unless ing1 == nil
       result, qty = $game_party.has_item?([3, item_obj.ing1_id], true, qty = 1, true, true)
       draw_ingredient_item(0, 0, ing1, 0, qty)

@@ -5,7 +5,7 @@
 # に加え、戦闘進行のナレーションを表示する機能を持ちます。
 #==============================================================================
 
-class Window_SearchMessage < Window_Selectable
+class Window_SearchMessage < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class Window_SearchMessage < Window_Selectable
     @pause_skip = false         # 入力待ち省略フラグ
     @mes = ""                   # mesの初期化
     create_number_input_window
-    self.contents.font.name = Constant_Table::Font_main_v  # フォント縦長
+    self.contents.font.name = ConstantTable::Font_main_v  # フォント縦長
     self.contents.font.size = BLH
   end
   #--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class Window_SearchMessage < Window_Selectable
   # ● 数値入力ウィンドウの作成
   #--------------------------------------------------------------------------
   def create_number_input_window
-    @number_input_window = Window_NumberInput.new
+    @number_input_window = WindowNumberInput.new
     @number_input_window.visible = false
   end
   #--------------------------------------------------------------------------
@@ -154,7 +154,7 @@ class Window_SearchMessage < Window_Selectable
   #--------------------------------------------------------------------------
   def draw_mes
     contents.draw_text(0, @contents_y, self.width-32, BLH, @mes, 1)
-    MISC.check_keyword(@mes) # キーワードであればストア
+    Misc.check_keyword(@mes) # キーワードであればストア
     @mes = ""
   end
   #--------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Village
+# ■ SceneVillage
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Village < Scene_Base
+class SceneVillage < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -22,14 +22,14 @@ class Scene_Village < Scene_Base
   # ● ゲームオーバーの確認
   #--------------------------------------------------------------------------
   def check_gameover
-    $scene = Scene_AllDead.new if $game_actors.gameover?
+    $scene = SceneAllDead.new if $game_actors.gameover?
   end
   #--------------------------------------------------------------------------
   # ● 開始処理
   #--------------------------------------------------------------------------
   def start
     check_gameover
-    SAVE::do_save("#{self.class.name}") # セーブの実行
+    Save::do_save("#{self.class.name}") # セーブの実行
     $music.play("へんきょうのむら")
     super
     @ps = Window_PartyStatus.new
@@ -86,8 +86,10 @@ class Scene_Village < Scene_Base
         @minstrel.turn_on
       end
     end
-    if @injured.openness < 255
-      @injured.openness += 16+16
+    if @injured.confirmed && @injured.openness > 0
+      @injured.openness -= 32
+    elsif !(@injured.confirmed) && @injured.openness < 255
+      @injured.openness += 32
     end
     if @injured.visible
       update_injured
@@ -110,7 +112,7 @@ class Scene_Village < Scene_Base
     for member in members
       m.push member.name
     end
-    str = "きょうかいへ はこばれます。"
+    str = "しんでんへ はこばれます。"
     @injured.set_text(str,m[0],m[1],m[2],m[3],m[4],m[5])
   end
   #--------------------------------------------------------------------------
@@ -122,7 +124,8 @@ class Scene_Village < Scene_Base
         @attention_window.set_text("きかんのあかし をうけとった")
         wait_for_attention
       end
-      @injured.visible = false
+      @injured.set_confirm
+      # @injured.visible = false
       @ps.refresh
       @village_command.active = true  # 村メニューをアクティブへ戻す
     end
@@ -134,29 +137,29 @@ class Scene_Village < Scene_Base
     if Input.trigger?(Input::C)
       case @village_command.index
       when 0
-        $scene = Scene_PUB.new
+        $scene = ScenePub.new
       when 1
         if $game_party.existing_members.size == 0
           @village_command.index = 0
         else
-          $scene = Scene_INN.new
+          $scene = SceneInn.new
         end
       when 2
         if $game_party.existing_members.size == 0
           @village_command.index = 0
         else
-          $scene = Scene_SHOP.new
+          $scene = SceneShop.new
         end
       when 3
         if $game_party.existing_members.size == 0
           @village_command.index = 0
         else
-          $scene = Scene_CHURCH.new
+          $scene = SceneTemple.new
         end
       when 4
-        $scene = Scene_OFFICE.new
+        $scene = SceneGuild.new
       when 5
-        $scene = Scene_Maze.new
+        $scene = SceneMaze.new
       end
     elsif Input.trigger?(Input::B)
       @village_command.index = 5
@@ -174,7 +177,7 @@ class Scene_Village < Scene_Base
     if Input.press?(Input::C)
       case @system_menu.index
       when 1;
-        SAVE::do_save("#{self.class.name}") # セーブの実行
+        Save::do_save("#{self.class.name}") # セーブの実行
         @attention_window.set_text("* おつかれさまでした *")
         wait_for_attention
         RPG::BGM.fade(800)

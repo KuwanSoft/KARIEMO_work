@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Character
+# ■ GameCharacter
 #------------------------------------------------------------------------------
-# 　キャラクターを扱うクラスです。このクラスは Game_Player クラスと Game_Event
+# 　キャラクターを扱うクラスです。このクラスは GamePlayer クラスと GameEvent
 # クラスのスーパークラスとして使用されます。
 #==============================================================================
 
-class Game_Character
+class GameCharacter
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -173,7 +173,7 @@ class Game_Character
   def collide_with_characters?(x, y)
     for event in $game_map.events_xy(x, y)          # イベントの座標と一致
       unless event.through                          # すり抜け OFF？
-        return true if self.is_a?(Game_Event)       # 自分がイベント
+        return true if self.is_a?(GameEvent)       # 自分がイベント
         return true if event.priority_type == 1     # 相手が通常キャラ
       end
     end
@@ -305,9 +305,9 @@ class Game_Character
   def update_move
 #~     distance = 2 ** @move_speed   # 移動速度から移動距離に変換
     # if $game_temp.run
-      distance = Constant_Table::MOVE_SPEED_RUN
+      distance = ConstantTable::MOVE_SPEED_RUN
     # else
-      # distance = Constant_Table::MOVE_SPEED
+      # distance = ConstantTable::MOVE_SPEED
     # end
     @real_x = [@real_x - distance, @x * 256].max if @x * 256 < @real_x
     @real_x = [@real_x + distance, @x * 256].min if @x * 256 > @real_x
@@ -740,14 +740,14 @@ class Game_Character
   #--------------------------------------------------------------------------
   def store_location
     @previous_address = [$game_map.map_id, @x, @y, @direction]
-    # DEBUG.write(c_m, "場所を記憶 ID:#{@id} x:#{@x} y:#{@y} direction:#{@direction}")
+    # Debug.write(c_m, "場所を記憶 ID:#{@id} x:#{@x} y:#{@y} direction:#{@direction}")
   end
   #--------------------------------------------------------------------------
   # ● 前の場所に戻る
   #--------------------------------------------------------------------------
   def backto_previous_address
     if $game_map.map_id != @previous_address[0]
-      DEBUG.write(c_m, "元いた場所が別のマップIDになっている*************")
+      Debug.write(c_m, "元いた場所が別のマップIDになっている*************")
       return
     end
     self.reserve_transfer($game_map.map_id, @previous_address[1], @previous_address[2], @previous_address[3])

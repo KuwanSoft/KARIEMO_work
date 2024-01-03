@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　パーティのステータス表示を行うクラスです。
 #==============================================================================
-class Window_PartyStatus < Window_Selectable
+class Window_PartyStatus < WindowSelectable
   SPACE_X = 2+1
   TOP_Y = 2
   ADJ_Y = 144
@@ -26,7 +26,7 @@ class Window_PartyStatus < Window_Selectable
     @scout = false
     refresh
     @sv = Window_SkillValue.new   # スキル値の表示
-    if $scene.is_a?(Scene_CAMP)
+    if $scene.is_a?(SceneCamp)
       unless $game_mercenary.all_dead?
         @ms = Window_MercenaryStatus.new  # 傭兵ステータス
       end
@@ -45,8 +45,8 @@ class Window_PartyStatus < Window_Selectable
   def create_subwindows
     width = 96+48-12
     height = 330
-    @windowL = Window_Base.new(-74, 130, width, height)
-    @windowR = Window_Base.new(462, 130, width, height)
+    @windowL = WindowBase.new(-74, 130, width, height)
+    @windowR = WindowBase.new(462, 130, width, height)
     @windowL.opacity = 0
     @windowR.opacity = 0
   end
@@ -99,7 +99,7 @@ class Window_PartyStatus < Window_Selectable
       turn_off_sv
       $game_temp.need_ps_refresh = true
       ## 村では顔をひっこめない
-      if $scene.is_a?(Scene_Village) or $scene.is_a?(Scene_PUB)
+      if $scene.is_a?(SceneVillage) or $scene.is_a?(ScenePub)
         return
       end
       $game_temp.hide_face = true

@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Actor
+# ■ GameActor
 #------------------------------------------------------------------------------
-# 　アクターを扱うクラスです。このクラスは Game_Actors クラス ($game_actors)
-# の内部で使用され、Game_Party クラス ($game_party) からも参照されます。
+# 　アクターを扱うクラスです。このクラスは GameActors クラス ($game_actors)
+# の内部で使用され、GameParty クラス ($game_party) からも参照されます。
 #==============================================================================
 
-class Game_Actor < Game_Battler
+class GameActor < GameBattler
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class Game_Actor < Game_Battler
   #     actor_id : アクター ID
   #--------------------------------------------------------------------------
   def setup(actor_id)
-    DEBUG.write(c_m, "キャラクタのセットアップ ID:#{actor_id}")
+    Debug.write(c_m, "キャラクタのセットアップ ID:#{actor_id}")
     @actor_id = actor_id
     @name = "** みとうろく **"
     @class_id = 11
@@ -103,7 +103,7 @@ class Game_Actor < Game_Battler
     @life_span = 0                # 寿命
     @out = false
     @fatigue = 0                  # 疲労値
-    @lp = Constant_Table::INITIAL_LP
+    @lp = ConstantTable::INITIAL_LP
     @skill_point = 0
     @skill_point_store = 0
     @sp_getback = 0               # 取返しスキルポイント総量
@@ -150,7 +150,7 @@ class Game_Actor < Game_Battler
       @skill_interval[key] -= 1
       if @skill_interval[key] == 0
         ## インターバル完了時ログ
-        DEBUG.write(c_m, "#{@name} #{$data_skills[key].name} count expired")
+        Debug.write(c_m, "#{@name} #{$data_skills[key].name} count expired")
       end
     end
   end
@@ -165,7 +165,7 @@ class Game_Actor < Game_Battler
   # ● 信頼度増加
   #--------------------------------------------------------------------------
   def make_friendship(target_actor)
-    rate = Constant_Table::FRIENDSHIP_P
+    rate = ConstantTable::FRIENDSHIP_P
     ## 相手が献身的の場合
     rate += 1 if target_actor.personality_p == :Dedication
     ## 主義が同一の場合
@@ -175,11 +175,11 @@ class Game_Actor < Game_Battler
     ## 初期時
     if @friendship[target_actor.uuid] == nil
       @friendship[target_actor.uuid] = 0
-      # DEBUG.write(c_m, "Actor_id:#{@actor_id} Target_actor_id:#{target_actor.id} FS:#{@friendship[target_actor.uuid]}")
+      # Debug.write(c_m, "Actor_id:#{@actor_id} Target_actor_id:#{target_actor.id} FS:#{@friendship[target_actor.uuid]}")
     ## 追加
     else
       @friendship[target_actor.uuid] += rate
-      # DEBUG.write(c_m, "Actor_id:#{@actor_id} Target_actor_id:#{target_actor.id} FS:#{@friendship[target_actor.uuid]}")
+      # Debug.write(c_m, "Actor_id:#{@actor_id} Target_actor_id:#{target_actor.id} FS:#{@friendship[target_actor.uuid]}")
     end
   end
   #--------------------------------------------------------------------------
@@ -210,7 +210,7 @@ class Game_Actor < Game_Battler
       next if skill == nil
       # 該当スキルが初期スキルか？または特定の習得スキル
       if skill.initial_skill?(self) or (skill.id == skill_id)
-        DEBUG::write(c_m,"スキルSET:#{skill.name} 現在値:#{@skill[skill.id]}")
+        Debug::write(c_m,"スキルSET:#{skill.name} 現在値:#{@skill[skill.id]}")
         if @skill[skill.id] == nil        # 該当スキルを持っていない？
           value = 50
           @skill[skill.id] = value        # 初期値
@@ -225,18 +225,18 @@ class Game_Actor < Game_Battler
   def get_skill_point(initial = false)
     result = 0
     @sp_getback ||= 0
-    a = Constant_Table::SKILL_DICE_A
-    b = Constant_Table::SKILL_DICE_B
-    c = Constant_Table::SKILL_DICE_C
-    c += MISC.skill_value(SKILLID::LEARNING, self) / 4 unless initial  # スキル：ラーニング
-    @level.times do result += MISC.dice(a,b,c) end  # 総SPの計算
+    a = ConstantTable::SKILL_DICE_A
+    b = ConstantTable::SKILL_DICE_B
+    c = ConstantTable::SKILL_DICE_C
+    c += Misc.skill_value(SkillId::LEARNING, self) / 4 unless initial  # スキル：ラーニング
+    @level.times do result += Misc.dice(a,b,c) end  # 総SPの計算
     up = result - @skill_point_store                # 上昇した分の保存
     up = [up, 30].max                              # 最低値の設定
     @skill_point_store += up
     @skill_point += up
     @skill_point += @sp_getback
-    DEBUG::write(c_m,"総スキル値:#{@skill_point_store}")
-    DEBUG::write(c_m,"ダイス:#{a}D#{b}+#{c} 獲得SP:#{up/10.0} 取返しP:#{@sp_getback}")
+    Debug::write(c_m,"総スキル値:#{@skill_point_store}")
+    Debug::write(c_m,"ダイス:#{a}D#{b}+#{c} 獲得SP:#{up/10.0} 取返しP:#{@sp_getback}")
     class_skill_increase
   end
   #--------------------------------------------------------------------------
@@ -300,22 +300,22 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def penalty_sickness
     if miasma?
-      penalty = @state_depth[STATEID::SICKNESS] # 病気の深度
+      penalty = @state_depth[StateId::SICKNESS] # 病気の深度
     else
       penalty = 0
     end
-    return [penalty, Constant_Table::MAX_SICKNESS_PENALTY].min  # 上限
+    return [penalty, ConstantTable::MAX_SICKNESS_PENALTY].min  # 上限
   end
   #--------------------------------------------------------------------------
   # ● 重症からのペナルティ
   #--------------------------------------------------------------------------
   def penalty_severe
     if severe?
-      penalty = @state_depth[STATEID::SEVERE] # 重症の深度
+      penalty = @state_depth[StateId::SEVERE] # 重症の深度
     else
       penalty = 0
     end
-    return [penalty, Constant_Table::MAX_SEVERE_PENALTY].min  # 上限
+    return [penalty, ConstantTable::MAX_SEVERE_PENALTY].min  # 上限
   end
   #--------------------------------------------------------------------------
   # ● 装備品による力補正
@@ -334,7 +334,7 @@ class Game_Actor < Game_Battler
     result -= penalty_sickness
     result -= penalty_severe
     result += @lucky_bonus if @lucky_turn > 0
-    result += Constant_Table::POTION_STR if @potion_effect == "str+"
+    result += ConstantTable::POTION_STR if @potion_effect == "str+"
     return result
   end
   #--------------------------------------------------------------------------
@@ -519,7 +519,7 @@ class Game_Actor < Game_Battler
   def weight_sum
     result = 0.0
     for index in 0...@bag.size  # すべての装備を抽出
-      item_data = MISC.item(@bag[index][0][0], @bag[index][0][1])
+      item_data = Misc.item(@bag[index][0][0], @bag[index][0][1])
       if item_data.stack > 0
         stack = @bag[index][4]
         weight = item_data.weight * stack
@@ -538,7 +538,7 @@ class Game_Actor < Game_Battler
     result = 0.0
     return result if exist?
     for index in 0...@bag.size  # すべての装備を抽出
-      item_data = MISC.item(@bag[index][0][0], @bag[index][0][1])
+      item_data = Misc.item(@bag[index][0][0], @bag[index][0][1])
       if item_data.stack > 0
         stack = @bag[index][4]
         weight = item_data.weight * stack
@@ -547,7 +547,7 @@ class Game_Actor < Game_Battler
       end
       result += weight
     end
-    result += Constant_Table::DEADMAN_WEIGHT
+    result += ConstantTable::DEADMAN_WEIGHT
     return result
   end
   #--------------------------------------------------------------------------
@@ -559,27 +559,27 @@ class Game_Actor < Game_Battler
     result += (str(true) * 9 + vit(true) * 4.5) * 0.4563 * 0.5
     case @class_id
     when 1 # 戦士
-      result *= Constant_Table::CC_ADJUST_WARRIOR
+      result *= ConstantTable::CC_ADJUST_WARRIOR
     when 2 # 盗賊
-      result *= Constant_Table::CC_ADJUST_THIEF
+      result *= ConstantTable::CC_ADJUST_THIEF
     when 3 # 魔術師
-      result *= Constant_Table::CC_ADJUST_SORCERER
+      result *= ConstantTable::CC_ADJUST_SORCERER
     when 4 # 騎士
-      result *= Constant_Table::CC_ADJUST_KNIGHT
+      result *= ConstantTable::CC_ADJUST_KNIGHT
     when 5 # 忍者
-      result *= Constant_Table::CC_ADJUST_NINJA
+      result *= ConstantTable::CC_ADJUST_NINJA
     when 6 # 賢者
-      result *= Constant_Table::CC_ADJUST_WISEMAN
+      result *= ConstantTable::CC_ADJUST_WISEMAN
     when 7 # 狩人
-      result *= Constant_Table::CC_ADJUST_HUNTER
+      result *= ConstantTable::CC_ADJUST_HUNTER
     when 8 # 聖職者
-      result *= Constant_Table::CC_ADJUST_CLERIC
+      result *= ConstantTable::CC_ADJUST_CLERIC
     when 9 # 従士
-      result *= Constant_Table::CC_ADJUST_SERVANT
+      result *= ConstantTable::CC_ADJUST_SERVANT
     when 10 # 侍
-      result *= Constant_Table::CC_ADJUST_SAMURAI
+      result *= ConstantTable::CC_ADJUST_SAMURAI
     end
-    result *= (MISC.skill_value(SKILLID::PACKING, self) + 100)
+    result *= (Misc.skill_value(SkillId::PACKING, self) + 100)
     result /= 100
     result += get_magic_attr(4)
     return result.to_i
@@ -680,15 +680,15 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def make_exp_list
     @exp_list[1] = @exp_list[250] = 0
-    m = Constant_Table::EXP_ROOT_VALUE   # 1000
+    m = ConstantTable::EXP_ROOT_VALUE   # 1000
     ratio = self.class.exp_ratio                # 戦士1.04
     for i in 2..250   # レベル最大250
       @exp_list[i] = @exp_list[i-1] + Integer(m)
       m *= ratio.to_f     # 1000 * 1.04
     end
-    DEBUG.write(c_m, "キャラクタ経験値リスト class:#{@class_id}")
+    Debug.write(c_m, "キャラクタ経験値リスト class:#{@class_id}")
     for i in 1..40
-      DEBUG.write(c_m, "LEVEL#{i} #{@exp_list[i]}")
+      Debug.write(c_m, "LEVEL#{i} #{@exp_list[i]}")
     end
   end
   #--------------------------------------------------------------------------
@@ -710,7 +710,7 @@ class Game_Actor < Game_Battler
       case item[0][0]
       when 1; item[2] = 1 # 主武器
       when 2
-        case MISC.item(item[0][0], item[0][1]).kind
+        case Misc.item(item[0][0], item[0][1]).kind
         when "helm"; item[2] = 4
         when "armor"; item[2] = 3
         when "leg"; item[2] = 5
@@ -744,56 +744,56 @@ class Game_Actor < Game_Battler
     str = ""
     ## 毒塗がある場合
     if get_poison_number != 0
-      sv = MISC.skill_value(SKILLID::POISONING, self)
+      sv = Misc.skill_value(SkillId::POISONING, self)
 
       case @class_id
-      when 2; diff = Constant_Table::DIFF_95[$game_map.map_id] # フロア係数
-      else;   diff = Constant_Table::DIFF_85[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_95[$game_map.map_id] # フロア係数
+      else;   diff = ConstantTable::DIFF_85[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
-        chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+        chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "毒"
       end
       case @class_id
-      when 2; diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
-      else;   diff = Constant_Table::DIFF_35[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
+      else;   diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
-        chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+        chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "暗"
       end
       case @class_id
-      when 2; diff = Constant_Table::DIFF_35[$game_map.map_id] # フロア係数
-      else;   diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
+      else;   diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
-        chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+        chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "痺"
       end
       case @class_id
-      when 2; diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
-      else;   diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
+      else;   diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
-        chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+        chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "狂"
       end
       case @class_id
-      when 2; diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
-      else;   diff = Constant_Table::DIFF_05[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
+      else;   diff = ConstantTable::DIFF_05[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
-        chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+        chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "窒"
       end
       consume_poison # 毒塗の消費
@@ -812,19 +812,19 @@ class Game_Actor < Game_Battler
     ## クリティカルスキル持ち
     str += "首" if can_neck_chop?
     ## エクソシストスキル持ち
-    str += "祓" if MISC.skill_value(SKILLID::EXORCIST, self) > 0
+    str += "祓" if Misc.skill_value(SkillId::EXORCIST, self) > 0
     ## フィニッシュブロー
     str += "止" if @action.supattack?
     ## インパクトスキルによるスタン
     str += "ス" if get_impact
-    DEBUG.write(c_m, "通常攻撃に状態異常付与:#{str}") unless str == ""
+    Debug.write(c_m, "通常攻撃に状態異常付与:#{str}") unless str == ""
     return str
   end
   #--------------------------------------------------------------------------
   # ● 首可能なスキルと装備か？
   #--------------------------------------------------------------------------
   def can_neck_chop?
-    return (MISC.skill_value(SKILLID::CRITICAL, self) > 0)
+    return (Misc.skill_value(SkillId::CRITICAL, self) > 0)
   end
   #--------------------------------------------------------------------------
   # ● 被弾部位固定
@@ -838,7 +838,7 @@ class Game_Actor < Game_Battler
     when 75..99; @hit_part = 3 # 具足：脚 25%
     end
     @hit_part = 0 if head_atk
-    DEBUG::write(c_m,"被弾部位=>#{["0:頭","1:胴","2:腕","3:脚"][@hit_part]} Head?:#{head_atk}")
+    Debug::write(c_m,"被弾部位=>#{["0:頭","1:胴","2:腕","3:脚"][@hit_part]} Head?:#{head_atk}")
   end
   #--------------------------------------------------------------------------
   # ● DRベース値(兜)
@@ -847,7 +847,7 @@ class Game_Actor < Game_Battler
     result = 0
     if not @armor4_id == 0
       result += $data_armors[@armor4_id].dr
-      result += Constant_Table::POTION_DR if @potion_effect == "dr+"
+      result += ConstantTable::POTION_DR if @potion_effect == "dr+"
       result += 1 if @personality_n == :Stubborn # 頑固頭
     end
     return result
@@ -859,7 +859,7 @@ class Game_Actor < Game_Battler
     result = 0
     if not @armor3_id == 0
       result += $data_armors[@armor3_id].dr
-      result += Constant_Table::POTION_DR if @potion_effect == "dr+"
+      result += ConstantTable::POTION_DR if @potion_effect == "dr+"
     end
     return result
   end
@@ -870,7 +870,7 @@ class Game_Actor < Game_Battler
     result = 0
     if not @armor6_id == 0
       result += $data_armors[@armor6_id].dr
-      result += Constant_Table::POTION_DR if @potion_effect == "dr+"
+      result += ConstantTable::POTION_DR if @potion_effect == "dr+"
     end
     return result
   end
@@ -881,7 +881,7 @@ class Game_Actor < Game_Battler
     result = 0
     if not @armor5_id == 0
       result += $data_armors[@armor5_id].dr
-      result += Constant_Table::POTION_DR if @potion_effect == "dr+"
+      result += ConstantTable::POTION_DR if @potion_effect == "dr+"
     end
     return result
   end
@@ -891,7 +891,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def get_Damage_Reduction(shield, attacker, sub, part = 9)
     dr = 0
-    dr += MISC.item(2, @armor2_id).dr if shield # 盾DRは乱数では無く直で加算
+    dr += Misc.item(2, @armor2_id).dr if shield # 盾DRは乱数では無く直で加算
     part = @hit_part unless part != 9
     case part
     when 0 # 兜：頭部 10%
@@ -904,7 +904,7 @@ class Game_Actor < Game_Battler
       dr += dr_leg
     when 4 # 盾の参照用
       if not @armor2_id == 0
-        dr += MISC.item(2, @armor2_id).dr
+        dr += Misc.item(2, @armor2_id).dr
       else
         dr = 0  # 盾を装備していない場合は0
       end
@@ -943,7 +943,7 @@ class Game_Actor < Game_Battler
     result += @level / 3 if @class_id == 5  # 忍者の場合はレベルが足される
     result += get_magic_attr(10)            # ルーンの効果
     result += 2 if $game_party.pm_armor > 0 # PARTYMAGIC効果
-    result += Constant_Table::POTION_ARMOR if @potion_effect == "armor+"
+    result += ConstantTable::POTION_ARMOR if @potion_effect == "armor+"
     return result
   end
   #--------------------------------------------------------------------------
@@ -955,7 +955,7 @@ class Game_Actor < Game_Battler
     for item in armors.compact do result += item.resist / 5 end
     result += @level / 4 if @class_id == 4  # 騎士の場合はレベル÷５が足される
     result += 2 if $game_party.pm_fog > 0   # PARTYMAGIC効果
-    result += Constant_Table::POTION_MARMOR if @potion_effect == "marmor+"
+    result += ConstantTable::POTION_MARMOR if @potion_effect == "marmor+"
     return @summon_resist if self.summon?   # 召喚モンスターRESIST値
     return result # 最大値設定無し
   end
@@ -969,7 +969,7 @@ class Game_Actor < Game_Battler
     odds = [ 6, 5, 4, 3, 2, 1] if back # 後衛攻撃能力を持つ敵用
     result = odds[self.index]
     result += @provoke_power
-    DEBUG::write(c_m,"⇒#{MISC.get_string(@name, 16)} ⇒ODDS:#{result}")
+    Debug::write(c_m,"⇒#{Misc.get_string(@name, 16)} ⇒ODDS:#{result}")
     return result
   end
   #--------------------------------------------------------------------------
@@ -1017,7 +1017,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def equippable?(item)
     ## 武器の装備画面ではFALSEで返答
-    if $scene.is_a?(Scene_CAMP)
+    if $scene.is_a?(SceneCamp)
       return false if item.is_a?(Items2)
       return false if item.is_a?(Drops)
     end
@@ -1112,11 +1112,11 @@ class Game_Actor < Game_Battler
       array.push(lv)
       lv += 1
     end
-    if array.max >= Constant_Table::MAX_EXP_LEVEL
-      return Constant_Table::MAX_EXP_LEVEL
+    if array.max >= ConstantTable::MAX_EXP_LEVEL
+      return ConstantTable::MAX_EXP_LEVEL
     end
-    exp_level = [array.max, Constant_Table::MAX_EXP_LEVEL].min
-    DEBUG.write(c_m, "#{self.name} 実レベル:#{@level} 想定レベル:#{exp_level}")
+    exp_level = [array.max, ConstantTable::MAX_EXP_LEVEL].min
+    Debug.write(c_m, "#{self.name} 実レベル:#{@level} 想定レベル:#{exp_level}")
     return exp_level
   end
   #--------------------------------------------------------------------------
@@ -1139,14 +1139,14 @@ class Game_Actor < Game_Battler
     end
     exp *= 2 if check_double_bonus
     @exp += Integer(exp)
-    DEBUG::write(c_m,"経験値取得 #{@name} EXP+#{Integer(exp)}(+#{plus})")
+    Debug::write(c_m,"経験値取得 #{@name} EXP+#{Integer(exp)}(+#{plus})")
     return Integer(exp)
   end
   #--------------------------------------------------------------------------
   # ● 経験値をレベル初期値へ戻す
   #--------------------------------------------------------------------------
   def back_exp
-    DEBUG::write(c_m,"経験値ペナルティ #{@name} EXP:-#{@exp - @exp_list[@level]}")
+    Debug::write(c_m,"経験値ペナルティ #{@name} EXP:-#{@exp - @exp_list[@level]}")
     @exp = @exp_list[@level]
   end
   #--------------------------------------------------------------------------
@@ -1179,12 +1179,12 @@ class Game_Actor < Game_Battler
       return
     elsif $game_temp.in_battle and dead?
       @collapse = true
-      if self.state?(STATEID::CRITICAL)   # くびはね
+      if self.state?(StateId::CRITICAL)   # くびはね
         $music.se_play("首はね")
       elsif self.summon?  # 召喚モンスター
         $music.se_play("召喚倒れる")
       elsif self.mercenary?
-        DEBUG.write(c_m, "ガイドDEAD")
+        Debug.write(c_m, "ガイドDEAD")
       else                # 通常アクター
         voice_collapse
       end
@@ -1198,7 +1198,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def voice_collapse
     face_id = @face.scan(/face \((\S+)\)/)[0][0].to_i
-    array = Constant_Table::MALE_FACE
+    array = ConstantTable::MALE_FACE
     if array.include?(face_id)
       $music.se_play("味方戦闘不能male")
     else
@@ -1223,13 +1223,13 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def change_exp(exp, grade)
     lvupmsg = []
-    to_max = Constant_Table::MAX_ATTR # 最大値までのポイント
+    to_max = ConstantTable::MAX_ATTR # 最大値までのポイント
     ## 部屋のグレード：年齢と比較する値が変動する
     case grade
-    when 2; c_age = Constant_Table::GRADE2
-    when 3; c_age = Constant_Table::GRADE3
-    when 4; c_age = Constant_Table::GRADE4
-    when 5; c_age = Constant_Table::GRADE5
+    when 2; c_age = ConstantTable::GRADE2
+    when 3; c_age = ConstantTable::GRADE3
+    when 4; c_age = ConstantTable::GRADE4
+    when 5; c_age = ConstantTable::GRADE5
     end
     ## クラス＆主義ボーナス
     str_plus = int_plus = vit_plus = spd_plus = mnd_plus = luk_plus = 0
@@ -1254,33 +1254,33 @@ class Game_Actor < Game_Battler
     spd_plus += self.class.spd_bonus
     mnd_plus += self.class.mnd_bonus
     luk_plus += self.class.luk_bonus
-    # when 2; spd_plus += Constant_Table::CLASS_BONUS # 盗賊
-    # when 3; int_plus += Constant_Table::CLASS_BONUS # 魔術師
+    # when 2; spd_plus += ConstantTable::CLASS_BONUS # 盗賊
+    # when 3; int_plus += ConstantTable::CLASS_BONUS # 魔術師
     # when 4; vit_plus += 0
     # when 5; spd_plus += 0
     # when 6; mnd_plus += 0
-    # when 7; str_plus += Constant_Table::CLASS_BONUS # 狩人
-    # when 8; mnd_plus += Constant_Table::CLASS_BONUS # 聖職者
-    # when 9; luk_plus += Constant_Table::CLASS_BONUS # 従士
+    # when 7; str_plus += ConstantTable::CLASS_BONUS # 狩人
+    # when 8; mnd_plus += ConstantTable::CLASS_BONUS # 聖職者
+    # when 9; luk_plus += ConstantTable::CLASS_BONUS # 従士
     # when 10;luk_plus += 0
     # end
     @exp = exp
     # 一度しかレベルアップをチェックしない
     if @exp >= @exp_list[@level+1] and @exp_list[@level+1] > 0
-      DEBUG::write(c_m, "#{@name}のLEVEL上昇") # debug
-      DEBUG::write(c_m, "運による特性値上昇ボーナス #{plus}%") # debug
-      DEBUG::write(c_m, "STR補正:#{str_plus}%") # debug
-      DEBUG::write(c_m, "INT補正:#{int_plus}%") # debug
-      DEBUG::write(c_m, "VIT補正:#{vit_plus}%") # debug
-      DEBUG::write(c_m, "SPD補正:#{spd_plus}%") # debug
-      DEBUG::write(c_m, "MND補正:#{mnd_plus}%") # debug
-      DEBUG::write(c_m, "LUK補正:#{luk_plus}%") # debug
+      Debug::write(c_m, "#{@name}のLEVEL上昇") # debug
+      Debug::write(c_m, "運による特性値上昇ボーナス #{plus}%") # debug
+      Debug::write(c_m, "STR補正:#{str_plus}%") # debug
+      Debug::write(c_m, "INT補正:#{int_plus}%") # debug
+      Debug::write(c_m, "VIT補正:#{vit_plus}%") # debug
+      Debug::write(c_m, "SPD補正:#{spd_plus}%") # debug
+      Debug::write(c_m, "MND補正:#{mnd_plus}%") # debug
+      Debug::write(c_m, "LUK補正:#{luk_plus}%") # debug
       level_up
       lvupmsg.push("* レベルアップ! *")
       lvupmsg.push(sprintf("%s は L %d になりました。", @name, @level))
 
       # 力の上昇  (5%～85%の間で上昇 15%で下降)
-      ratio = (@init_str + to_max - @str) * Constant_Table::UP_RATE
+      ratio = (@init_str + to_max - @str) * ConstantTable::UP_RATE
       ratio += plus + str_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1298,10 +1298,10 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"STR:#{ratio}%--(#{str})-->#{@str}") # debug
+      Debug::write(c_m,"STR:#{ratio}%--(#{str})-->#{@str}") # debug
 
       # 知恵の上昇  (5%～85%の間で上昇 15%で下降)
-      ratio = (@init_int + to_max - @int) * Constant_Table::UP_RATE
+      ratio = (@init_int + to_max - @int) * ConstantTable::UP_RATE
       ratio += plus + int_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1319,10 +1319,10 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"INT:#{ratio}%--(#{str})-->#{@int}") # debug
+      Debug::write(c_m,"INT:#{ratio}%--(#{str})-->#{@int}") # debug
 
       # 体力の上昇  (5%～85%で上昇 15%で下降)
-      ratio = (@init_vit + to_max - @vit) * Constant_Table::UP_RATE
+      ratio = (@init_vit + to_max - @vit) * ConstantTable::UP_RATE
       ratio += plus + vit_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1340,10 +1340,10 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"VIT:#{ratio}%--(#{str})-->#{@vit}") # debug
+      Debug::write(c_m,"VIT:#{ratio}%--(#{str})-->#{@vit}") # debug
 
       # 速さの上昇  (5%～85%で上昇 15%で下降)
-      ratio = (@init_spd + to_max - @spd) * Constant_Table::UP_RATE
+      ratio = (@init_spd + to_max - @spd) * ConstantTable::UP_RATE
       ratio += plus + spd_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1361,10 +1361,10 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"SPD:#{ratio}%--(#{str})-->#{@spd}") # debug
+      Debug::write(c_m,"SPD:#{ratio}%--(#{str})-->#{@spd}") # debug
 
       # 精神の上昇  (5%～85%で上昇 15%で下降)
-      ratio = (@init_mnd + to_max - @mnd) * Constant_Table::UP_RATE
+      ratio = (@init_mnd + to_max - @mnd) * ConstantTable::UP_RATE
       ratio += plus + mnd_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1382,10 +1382,10 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"MND:#{ratio}%--(#{str})-->#{@mnd}") # debug
+      Debug::write(c_m,"MND:#{ratio}%--(#{str})-->#{@mnd}") # debug
 
       # 運の上昇  (5%～85%で上昇 15%で下降)
-      ratio = (@init_luk + to_max - @luk) * Constant_Table::UP_RATE
+      ratio = (@init_luk + to_max - @luk) * ConstantTable::UP_RATE
       ratio += plus + luk_plus if ratio > 0
       case rand(100)
       when 85..99 # 下降ルーチン開始(15%)
@@ -1403,16 +1403,16 @@ class Game_Actor < Game_Battler
       else  # 何もおきない
         str = "変無"
       end
-      DEBUG::write(c_m,"LUK:#{ratio}%--(#{str})-->#{@luk}") # debug
+      Debug::write(c_m,"LUK:#{ratio}%--(#{str})-->#{@luk}") # debug
 
       # HPの上昇
       # case @class_id      # それぞれのCLASSで基本値を適用
-      # when 1;     dice = Constant_Table::WAR_HP    # 戦士
-      # when 4;     dice = Constant_Table::KGT_HP    # 騎士
-      # when 2,5,9; dice = Constant_Table::THF_HP    # 盗賊・忍者・従士
-      # when 3,6;   dice = Constant_Table::SOR_HP    # 呪術師・賢者
-      # when 7,10;  dice = Constant_Table::HUN_HP    # 狩人・侍
-      # when 8;     dice = Constant_Table::CLE_HP    # 聖職者
+      # when 1;     dice = ConstantTable::WAR_HP    # 戦士
+      # when 4;     dice = ConstantTable::KGT_HP    # 騎士
+      # when 2,5,9; dice = ConstantTable::THF_HP    # 盗賊・忍者・従士
+      # when 3,6;   dice = ConstantTable::SOR_HP    # 呪術師・賢者
+      # when 7,10;  dice = ConstantTable::HUN_HP    # 狩人・侍
+      # when 8;     dice = ConstantTable::CLE_HP    # 聖職者
       # end
       dice = self.class.hp_base
 
@@ -1438,7 +1438,7 @@ class Game_Actor < Game_Battler
       end
       @hp = maxhp  # 回復
       lvupmsg.push(sprintf("H.P.が %d ふえた。", up))
-      DEBUG::write(c_m,"HPダイス:1D#{dice}+"+"#{bonus} @hp#{@hp} 計算値HP:#{maxhp}")
+      Debug::write(c_m,"HPダイス:1D#{dice}+"+"#{bonus} @hp#{@hp} 計算値HP:#{maxhp}")
     end
     next_exp = next_rest_exp_s
     next_exp = 0 if next_exp < 0
@@ -1455,10 +1455,10 @@ class Game_Actor < Game_Battler
       for index in 0...@bag.size  # すべての装備を抽出
         if @bag[index][2] > 0     # 装備中？
           @bag[index][2] = 0      # 装備フラグオフ
-          item_data = MISC.item(@bag[index][0][0], @bag[index][0][1])
+          item_data = Misc.item(@bag[index][0][0], @bag[index][0][1])
           if item_data.mapkit?
             $game_mapkits[item_data.id].set_actor_id(0)
-            DEBUG::write(c_m,"マップキットを外した ID:#{item_data.id}")
+            Debug::write(c_m,"マップキットを外した ID:#{item_data.id}")
           end
         end
         if @bag[index][3] == true # 呪われたアイテムの場合
@@ -1481,7 +1481,7 @@ class Game_Actor < Game_Battler
     ##  呪われていない装備品のみ外す　呪われている部位はArrayで返す
     curse_pos = []
     for item in @bag
-      item_data = MISC.item(item[0][0], item[0][1])
+      item_data = Misc.item(item[0][0], item[0][1])
       curse_pos.push item[2] if item[3]  # 呪われている部位IDをPUSH
       if item[3] == false && item[2] > 0  # 呪われていない&装備中の装備を抽出
         case item[2]
@@ -1497,7 +1497,7 @@ class Game_Actor < Game_Battler
         item[2] = 0 # 装備化フラグ解除
         if item_data.mapkit?
           $game_mapkits[item_data.id].set_actor_id(0)
-          DEBUG::write(c_m,"マップキットを外した ID:#{item_data.id}")
+          Debug::write(c_m,"マップキットを外した ID:#{item_data.id}")
         end
       end
     end
@@ -1576,102 +1576,102 @@ class Game_Actor < Game_Battler
     when "shield";
       for key in @skill.keys
         if $data_skills[key].shield > 0 # 値が入っている場合
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].shield / 100
         end
       end
     when "sword";
       for key in @skill.keys
         if $data_skills[key].sword > 0 # 値が入っている場合
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].sword / 100
         end
       end
     when "axe"
       for key in @skill.keys
         if $data_skills[key].axe > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].axe  / 100
         end
       end
     when "spear"
       for key in @skill.keys
         if $data_skills[key].pole_staff > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].pole_staff / 100
         end
       end
     when "dagger"
       for key in @skill.keys
         if $data_skills[key].wand_dagger > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].wand_dagger / 100
         end
       end
     when "wand"
       for key in @skill.keys
         if $data_skills[key].wand_dagger > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].wand_dagger / 100
         end
       end
     when "club"
       for key in @skill.keys
         if $data_skills[key].mace > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].mace / 100
         end
       end
     when "throw"
       for key in @skill.keys
         if $data_skills[key].throw > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].throw / 100
         end
       end
     when "staff"
       for key in @skill.keys
         if $data_skills[key].pole_staff > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].pole_staff / 100
         end
       end
     when "bow"
       for key in @skill.keys
         if $data_skills[key].bow > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].bow / 100
         end
       end
     when "nothing"
       for key in @skill.keys
         if $data_skills[key].nothing > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].nothing / 100
         end
       end
     when "katana"
       for key in @skill.keys
         if $data_skills[key].katana > 0
-          s = MISC.skill_value(key, self)
+          s = Misc.skill_value(key, self)
           base_skill += s * $data_skills[key].katana / 100
         end
       end
     end
     ## 戦術スキル制限
-    tactics = MISC.skill_value(SKILLID::TACTICS, self)
+    tactics = Misc.skill_value(SkillId::TACTICS, self)
     diff = base_skill - tactics
     ## 戦術スキルのほうが小さい場合
     if diff > 0
-      # DEBUG.write(c_m, "#{self.name} 戦術スキルが足りない 戦術:#{tactics} 武器スキル:#{base_skill}")
+      # Debug.write(c_m, "#{self.name} 戦術スキルが足りない 戦術:#{tactics} 武器スキル:#{base_skill}")
       base_skill = tactics      # 戦術スキル値に差分の半分を追加して武器スキル値とする
       base_skill += (diff / 2)
-      # DEBUG.write(c_m, "差分:#{diff} 補正後武器スキル:#{base_skill}")
+      # Debug.write(c_m, "差分:#{diff} 補正後武器スキル:#{base_skill}")
     end
     ## バックスタブの場合：武器スキル値補正あり
     if self.onmitsu?
-      DEBUG.write(c_m, "バックスタブスキル補正 Base:#{base_skill}+#{MISC.skill_value(SKILLID::BACKSTAB, self)}")
-      base_skill += MISC.skill_value(SKILLID::BACKSTAB, self)
+      Debug.write(c_m, "バックスタブスキル補正 Base:#{base_skill}+#{Misc.skill_value(SkillId::BACKSTAB, self)}")
+      base_skill += Misc.skill_value(SkillId::BACKSTAB, self)
     end
     return base_skill
   end
@@ -1688,18 +1688,18 @@ class Game_Actor < Game_Battler
     val = 0
     ## 両手持ちからのボーナス（弓と杖は除く）
     if t_hand?
-      case MISC.skill_value(SKILLID::TWOHANDED, self)
+      case Misc.skill_value(SkillId::TWOHANDED, self)
       when 50..999;   val = 2 # AP+2
       else;           val = 0
       end
     ## 二刀流
     elsif dual_wield?
-      case MISC.skill_value(SKILLID::DUAL, self)
+      case Misc.skill_value(SkillId::DUAL, self)
       when 50..999;    no_penalty = true
       else;           no_penalty = false
       end
-      sv = MISC.skill_value(SKILLID::DUAL, self)
-      diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::DUAL, self)
+      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       val = 1 if ratio > rand(100) && $game_temp.in_battle # AP+1ボーナス
@@ -1719,7 +1719,7 @@ class Game_Actor < Game_Battler
     ap += get_ArrowAP                     # 弓のAP補正
     ap += 2 if $game_party.pm_sword > 0   # 常駐呪文補正
     ap += get_magic_attr(0)               # マジックアイテム補正
-    ap += Constant_Table::POTION_AP if @potion_effect == "ap+"  # ポーションの効果
+    ap += ConstantTable::POTION_AP if @potion_effect == "ap+"  # ポーションの効果
     return ap
   end
   #--------------------------------------------------------------------------
@@ -1737,14 +1737,14 @@ class Game_Actor < Game_Battler
     val = 0
     ## 二刀流、両手持ちからのボーナス
     if t_hand?
-      sv = MISC.skill_value(SKILLID::TWOHANDED, self)
-      diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::TWOHANDED, self)
+      diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       val = 1 if ratio > rand(100) && $game_temp.in_battle # Swing+1ボーナス
     elsif dual_wield?
-      sv = MISC.skill_value(SKILLID::DUAL, self)
-      diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::DUAL, self)
+      diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       val = 1 if ratio > rand(100) && $game_temp.in_battle # Swing+1ボーナス
@@ -1851,7 +1851,7 @@ class Game_Actor < Game_Battler
         @days += 365
         @age -= 1
       end
-      DEBUG::write(c_m,"[#{@name}] Age:#{@age} Days:#{@days} 若返り済分:#{days}日")
+      Debug::write(c_m,"[#{@name}] Age:#{@age} Days:#{@days} 若返り済分:#{days}日")
     ## 歳をとる
     elsif days > 0
       @days += days
@@ -1859,13 +1859,13 @@ class Game_Actor < Game_Battler
         @days -= 365          # 1年365日
         @age += 1
       end
-      DEBUG::write(c_m,"[#{@name}] Age:#{@age} Days:#{@days} 追加済分:#{days}日")
+      Debug::write(c_m,"[#{@name}] Age:#{@age} Days:#{@days} 追加済分:#{days}日")
     end
     return unless penalty   # ペナルティフラグがなければ終了
     return unless @vit > 2  # 体力が3以上なければ終了
     if @age > rand(100)     # 年齢(%)で体力が-1される
       @vit -= 1
-      DEBUG::write(c_m,"ペナルティにより体力-1 =>#{@vit}")
+      Debug::write(c_m,"ペナルティにより体力-1 =>#{@vit}")
     end
   end
   #--------------------------------------------------------------------------
@@ -1882,10 +1882,10 @@ class Game_Actor < Game_Battler
   #   すべての特性値が年齢÷4される。5に満たないものは5となる。
   #--------------------------------------------------------------------------
   def set_class_parameter
-    penalty = Constant_Table::PENALTY_CLASS_CHANGE  # 固定値は無しとする
+    penalty = ConstantTable::PENALTY_CLASS_CHANGE  # 固定値は無しとする
     penalty += (@age / 4)                           # 年齢÷4を追加
-    DEBUG::write(c_m,"[#{@name}] Age:#{@age} CLASS変更ペナルティ#{penalty}")
-    atleast = Constant_Table::ATLEAST               # 最低保証値
+    Debug::write(c_m,"[#{@name}] Age:#{@age} CLASS変更ペナルティ#{penalty}")
+    atleast = ConstantTable::ATLEAST               # 最低保証値
 
     @str -= penalty
     @int -= penalty
@@ -1896,15 +1896,15 @@ class Game_Actor < Game_Battler
 
     ## 各クラスの必要値を取得
     # case @class_id
-    # when 1; array = Constant_Table::WARRIOR_PARAMETER
-    # when 2; array = Constant_Table::THIEF_PARAMETER
-    # when 3; array = Constant_Table::SORCERER_PARAMETER
-    # when 4; array = Constant_Table::KNIGHT_PARAMETER
-    # when 5; array = Constant_Table::NINJA_PARAMETER
-    # when 6; array = Constant_Table::WISEMAN_PARAMETER
-    # when 7; array = Constant_Table::HUNTER_PARAMETER
-    # when 8; array = Constant_Table::CLERIC_PARAMETER
-    # when 9; array = Constant_Table::SERVANT_PARAMETER
+    # when 1; array = ConstantTable::WARRIOR_PARAMETER
+    # when 2; array = ConstantTable::THIEF_PARAMETER
+    # when 3; array = ConstantTable::SORCERER_PARAMETER
+    # when 4; array = ConstantTable::KNIGHT_PARAMETER
+    # when 5; array = ConstantTable::NINJA_PARAMETER
+    # when 6; array = ConstantTable::WISEMAN_PARAMETER
+    # when 7; array = ConstantTable::HUNTER_PARAMETER
+    # when 8; array = ConstantTable::CLERIC_PARAMETER
+    # when 9; array = ConstantTable::SERVANT_PARAMETER
     # end
 
     class_data = $data_classes[@class_id]
@@ -1999,14 +1999,14 @@ class Game_Actor < Game_Battler
     return true # すべてパスしたら
     # case class_name
     # when "せんし"
-    #   array = Constant_Table::WARRIOR_PARAMETER
+    #   array = ConstantTable::WARRIOR_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
     #   end
     #   return true if result == 6
     # when "とうぞく"
-    #   array = Constant_Table::THIEF_PARAMETER
+    #   array = ConstantTable::THIEF_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
@@ -2014,7 +2014,7 @@ class Game_Actor < Game_Battler
     #   return true if result == 6
     # when "まじゅつし"
     #   return false if @principle > 0  # カルマが正だとなれない
-    #   array = Constant_Table::SORCERER_PARAMETER
+    #   array = ConstantTable::SORCERER_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
@@ -2022,7 +2022,7 @@ class Game_Actor < Game_Battler
     #   return true if result == 6
     # when "きし"
     #   return false if @principle < 0  # カルマが負だとなれない
-    #   array = Constant_Table::KNIGHT_PARAMETER
+    #   array = ConstantTable::KNIGHT_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
@@ -2030,21 +2030,21 @@ class Game_Actor < Game_Battler
     #   return true if result == 6
     # when "にんじゃ"
     #   return false if @principle > 0  # カルマが正だとなれない
-    #   array = Constant_Table::NINJA_PARAMETER
+    #   array = ConstantTable::NINJA_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
     #   end
     #   return true if result == 6
     # when "けんじゃ"
-    #   array = Constant_Table::WISEMAN_PARAMETER
+    #   array = ConstantTable::WISEMAN_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
     #   end
     #   return true if result == 6
     # when "かりうど"
-    #   array = Constant_Table::HUNTER_PARAMETER
+    #   array = ConstantTable::HUNTER_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
@@ -2052,14 +2052,14 @@ class Game_Actor < Game_Battler
     #   return true if result == 6
     # when "せいしょくしゃ"
     #   return false if @principle < 0  # カルマが負だとなれない
-    #   array = Constant_Table::CLERIC_PARAMETER
+    #   array = ConstantTable::CLERIC_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
     #   end
     #   return true if result == 6
     # when "じゅうし"
-    #   array = Constant_Table::SERVANT_PARAMETER
+    #   array = ConstantTable::SERVANT_PARAMETER
     #   result = 0
     #   for index in 0..5
     #     result += 1 if parameter[index] >= array[index]
@@ -2078,16 +2078,16 @@ class Game_Actor < Game_Battler
     sv = get_weapon_skill_value("shield")
     case @class_id
     when 4  # 騎士
-      diff = Constant_Table::DIFF_55[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_55[$game_map.map_id] # フロア係数
     else
-      diff = Constant_Table::DIFF_40[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_40[$game_map.map_id] # フロア係数
     end
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
       @shield_block = true
-      DEBUG::write(c_m,"#{@name} 盾ブロック発動 発動率:#{ratio}%") # debug
-      self.chance_skill_increase(SKILLID::SHIELD)  # パリィ
+      Debug::write(c_m,"#{@name} 盾ブロック発動 発動率:#{ratio}%") # debug
+      self.chance_skill_increase(SkillId::SHIELD)  # パリィ
       return true
     end
     return false                      # 盾の発動失敗
@@ -2097,11 +2097,11 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def apply_ShieldBlock(damage)
     return damage if @armor2_id == 0  # 盾装備していない場合
-    block = MISC.item(2, @armor2_id).block_pow
+    block = Misc.item(2, @armor2_id).block_pow
     block *= 2 if self.guarding?      # ガード時は2倍を防ぐ
     damage -= block
     damage = 0 if damage < 0
-    DEBUG::write(c_m,"#{@name} 盾ブロック値: #{damage}")
+    Debug::write(c_m,"#{@name} 盾ブロック値: #{damage}")
     return damage
   end
   #--------------------------------------------------------------------------
@@ -2178,18 +2178,18 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def combine_token
     return if @bag.size == 0
-    DEBUG.write(c_m, self.name+" => トークンまとめ開始")
+    Debug.write(c_m, self.name+" => トークンまとめ開始")
     total = 0
     ## 全ゴールドを抽出
     for item_info in @bag
-      item_obj = MISC.item(item_info[0][0], item_info[0][1])
+      item_obj = Misc.item(item_info[0][0], item_info[0][1])
       next unless item_obj.kind == "token"
       total += item_info[4]
     end
     ## 最初にまとめる
     first = true
     for index in 0...@bag.size
-      item_obj = MISC.item(@bag[index][0][0], @bag[index][0][1])
+      item_obj = Misc.item(@bag[index][0][0], @bag[index][0][1])
       next unless item_obj.kind == "token"
       ## 最初のもの
       if first
@@ -2209,7 +2209,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def combine_gold
     return if @bag.size == 0
-    # DEBUG.write(c_m, self.name+" => ゴールドまとめ開始")
+    # Debug.write(c_m, self.name+" => ゴールドまとめ開始")
     total = 0
     ## 全ゴールドを抽出
     for item_info in @bag
@@ -2245,7 +2245,7 @@ class Game_Actor < Game_Battler
       next if @bag[i][3] == true  # 呪われている品はスキップ
       kind = @bag[i][0][0]
       id = @bag[i][0][1]
-      item = MISC.item(kind, id)
+      item = Misc.item(kind, id)
       ii = @bag.size-1-i
       for j in 1..ii
         next if @bag[j+i][2] > 0      # 装備品はスキップ
@@ -2257,13 +2257,13 @@ class Game_Actor < Game_Battler
         num1 = @bag[i][4]
         num2 = @bag[j+i][4]
         case kind
-        when 0; limit = Constant_Table::POTION_STACK
-        when 1; limit = Constant_Table::ARROW_STACK
-        when 3; limit = Constant_Table::DROP_STACK
+        when 0; limit = ConstantTable::POTION_STACK
+        when 1; limit = ConstantTable::ARROW_STACK
+        when 3; limit = ConstantTable::DROP_STACK
         end
-        limit = Constant_Table::GARBAGE_STACK if item.garbage?  # ガラクタ？
-        limit = Constant_Table::MONEY_LIMIT if item.money?      # ゴールド？
-        limit = Constant_Table::TOKEN_LIMIT if item.token?      # ゴールド？
+        limit = ConstantTable::GARBAGE_STACK if item.garbage?  # ガラクタ？
+        limit = ConstantTable::MONEY_LIMIT if item.money?      # ゴールド？
+        limit = ConstantTable::TOKEN_LIMIT if item.token?      # ゴールド？
         if num1 + num2 <= limit
           @bag[i][4] = num1 + num2
           @bag[j+i][4] = 0
@@ -2274,7 +2274,7 @@ class Game_Actor < Game_Battler
         end
       end
     end
-    # DEBUG.write(c_m, self.name+" => スタックまとめ完了")
+    # Debug.write(c_m, self.name+" => スタックまとめ完了")
   end
   #--------------------------------------------------------------------------
   # ● バッグの整頓:スタック数ゼロを削除
@@ -2285,7 +2285,7 @@ class Game_Actor < Game_Battler
       next unless @bag[index][4] == 0 ## スタック数ゼロのみ抽出
       kind = @bag[index][0][0]
       id = @bag[index][0][1]
-      item = MISC.item(kind, id)
+      item = Misc.item(kind, id)
       next unless item.stackable?     # スタック可能？
       ## 装備を外す
       case @bag[index][2]
@@ -2301,7 +2301,7 @@ class Game_Actor < Game_Battler
       @bag[index] = nil
     end
     @bag.compact!               # NILを削除
-    # DEBUG.write(c_m, self.name+" => スタック数ゼロ削除完了")
+    # Debug.write(c_m, self.name+" => スタック数ゼロ削除完了")
   end
   #--------------------------------------------------------------------------
   # ● バッグの整頓:順番のソート
@@ -2324,7 +2324,7 @@ class Game_Actor < Game_Battler
     for bag in [bag1, bag2, bag3]
       bag.sort! do |a, b|
         ## SORT部分でsort
-        MISC.item(a[0][0],a[0][1]).sort.to_f <=> MISC.item(b[0][0],b[0][1]).sort.to_f
+        Misc.item(a[0][0],a[0][1]).sort.to_f <=> Misc.item(b[0][0],b[0][1]).sort.to_f
 #~         a[0][1] <=> b[0][1] # IDでSORT
       end
     end
@@ -2346,26 +2346,26 @@ class Game_Actor < Game_Battler
     bag1.compact!               # NILを削除
     @bag = bag1 + bag2 + bag3
 
-    DEBUG.write(c_m, self.name+" => SORT_BAG完了")
+    Debug.write(c_m, self.name+" => SORT_BAG完了")
 #~     debug_bag
   end
 
   def debug_bag
-    DEBUG.write(c_m, self.name+"'s BAG========サイズ:#{@bag.size}")
+    Debug.write(c_m, self.name+"'s BAG========サイズ:#{@bag.size}")
     for index in 0...@bag.size
       kind = @bag[index][0][0]
       id = @bag[index][0][1]
-      item = MISC.item(kind, id)
-      DEBUG.write(c_m, "INDEX:#{index} KIND:#{kind} ID:#{id} #{item.name} x#{@bag[index][4]}")
+      item = Misc.item(kind, id)
+      Debug.write(c_m, "INDEX:#{index} KIND:#{kind} ID:#{id} #{item.name} x#{@bag[index][4]}")
     end
-    DEBUG.write(c_m, "========================END")
+    Debug.write(c_m, "========================END")
   end
   #--------------------------------------------------------------------------
   # ● ロスト処理
   #    名前、年齢、レベル、クラス、時刻
   #--------------------------------------------------------------------------
   def lost
-    DEBUG::write(c_m,"ロスト処理開始") # debug
+    Debug::write(c_m,"ロスト処理開始") # debug
     name = @name
     age = @age
     level = @level
@@ -2409,7 +2409,7 @@ class Game_Actor < Game_Battler
   def get_cast_ratio(magic, cast_power)
     ratio = get_cast_ability(magic.domain) * magic.difficulty
     ratio /= cast_power                                 # 1/CPにする
-    upper = Constant_Table::CAST_UPPER[cast_power]      # 上限値の代入
+    upper = ConstantTable::CAST_UPPER[cast_power]      # 上限値の代入
     cast = [ratio, upper].min                           # 上限値の適用
     return cast.to_i                                    # 整数化
   end
@@ -2422,14 +2422,14 @@ class Game_Actor < Game_Battler
     return 0 if @magic.size < 1
     case domain
     when 0;
-      return 0 if MISC.skill_value(SKILLID::RATIONAL, self) < 1 #スキル無しの場合は0を返す
-      sv = MISC.skill_value(SKILLID::RATIONAL, self)
+      return 0 if Misc.skill_value(SkillId::RATIONAL, self) < 1 #スキル無しの場合は0を返す
+      sv = Misc.skill_value(SkillId::RATIONAL, self)
     when 1;
-      return 0 if MISC.skill_value(SKILLID::MYSTIC, self) < 1 #スキル無しの場合は0を返す
-      sv = MISC.skill_value(SKILLID::MYSTIC, self)
+      return 0 if Misc.skill_value(SkillId::MYSTIC, self) < 1 #スキル無しの場合は0を返す
+      sv = Misc.skill_value(SkillId::MYSTIC, self)
     end
     value = sv * (2+(base_cast_adj/10.0)) + 75
-    value *= Constant_Table::CAMP_CAST_BONUS unless $game_temp.in_battle
+    value *= ConstantTable::CAMP_CAST_BONUS unless $game_temp.in_battle
     value *= 2 if @meditation # 瞑想時の処理
     return Integer(value)
   end
@@ -2451,17 +2451,17 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def get_Power_Hit
     return false if @weapon_id == 0     # 素手の場合
-    sv = MISC.skill_value(SKILLID::ANATOMY, self)       # 解剖学のスキル
+    sv = Misc.skill_value(SkillId::ANATOMY, self)       # 解剖学のスキル
     if self.onmitsu?
-      diff = Constant_Table::DIFF_50[$game_map.map_id]  # フロア係数
+      diff = ConstantTable::DIFF_50[$game_map.map_id]  # フロア係数
     else
-      diff = Constant_Table::DIFF_25[$game_map.map_id]  # フロア係数
+      diff = ConstantTable::DIFF_25[$game_map.map_id]  # フロア係数
     end
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
-      chance_skill_increase(SKILLID::ANATOMY)         # 解剖学スキル上昇
-      DEBUG::write(c_m,"パワーヒット発生 成功率:#{ratio}%")
+      chance_skill_increase(SkillId::ANATOMY)         # 解剖学スキル上昇
+      Debug::write(c_m,"パワーヒット発生 成功率:#{ratio}%")
       return true
     end
     return false
@@ -2485,12 +2485,12 @@ class Game_Actor < Game_Battler
     if @cast_spell_identify == true
       return 90
     end
-    sv = MISC.skill_value(SKILLID::TRAP, self) # 罠の調査 特性値補正後のスキル値
+    sv = Misc.skill_value(SkillId::TRAP, self) # 罠の調査 特性値補正後のスキル値
     case @class_id
     when 2,5
-      diff = Constant_Table::DIFF_70[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
     else
-      diff = Constant_Table::DIFF_60[$game_map.map_id]
+      diff = ConstantTable::DIFF_60[$game_map.map_id]
     end
     ratio = sv * diff
     case @class_id
@@ -2508,12 +2508,12 @@ class Game_Actor < Game_Battler
     if @cast_spell_identify == true
       return 90
     end
-    sv = MISC.skill_value(SKILLID::PICKLOCK, self) # ピッキング 特性値補正後のスキル値
+    sv = Misc.skill_value(SkillId::PICKLOCK, self) # ピッキング 特性値補正後のスキル値
     case @class_id
     when 2,5
-      diff = Constant_Table::DIFF_70[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
     else
-      diff = Constant_Table::DIFF_60[$game_map.map_id]
+      diff = ConstantTable::DIFF_60[$game_map.map_id]
     end
     ratio = sv * diff
     case @class_id                    # クラスによる上限値あり
@@ -2539,40 +2539,40 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def entrapped?
     c = @class_id == 2 ? 8 : 4  # 盗賊であれば分母が4となる
-    sv = MISC.skill_value(SKILLID::FOURLEAVES, self)
-    diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::FOURLEAVES, self)
+    diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     fl = false
     if ratio > rand(100)
-      chance_skill_increase(SKILLID::FOURLEAVES)
+      chance_skill_increase(SkillId::FOURLEAVES)
       fl = true
       c *= 2
     end
     result = (rand(c) == 0)
-    DEBUG::write(c_m,"罠発動率: 1/#{c} FourLeaves?:#{fl} 罠発動?:#{result}")
+    Debug::write(c_m,"罠発動率: 1/#{c} FourLeaves?:#{fl} 罠発動?:#{result}")
     return result
   end
   #--------------------------------------------------------------------------
   # ● アイテムの増加
   #--------------------------------------------------------------------------
   def gain_item(kind, item_id, identified)
-    item = MISC.item(kind, item_id)
+    item = Misc.item(kind, item_id)
     stack = item.stack > 0 ? item.stack : 0
     hash = {}
     ## 抽選当選かつ手にしたアイテムが武具種で尚且つ宝箱シーンの場合
-    diff = Constant_Table::DIFF_01[$game_map.map_id] # フロア係数
-    sv = MISC.skill_value(SKILLID::TREASUREHUNT, self)
+    diff = ConstantTable::DIFF_01[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::TREASUREHUNT, self)
     ratio = Integer(sv * diff)
-    if rand(Constant_Table::MAGIC_ITEM_RATIO) == 0 and stack == 0 and $scene.is_a?(Scene_Treasure)
+    if rand(ConstantTable::MAGIC_ITEM_RATIO) == 0 and stack == 0 and $scene.is_a?(SceneTreasure)
       hash = MAGIC::enchant(item)
-      DEBUG.write(c_m, "====**** MAGIC ITEM DETECTED ****==== #{hash}")
-    elsif ratio > rand(100) and stack == 0 and $scene.is_a?(Scene_Treasure)
+      Debug.write(c_m, "====**** MAGIC ITEM DETECTED ****==== #{hash}")
+    elsif ratio > rand(100) and stack == 0 and $scene.is_a?(SceneTreasure)
       hash = MAGIC::enchant(item)
-      DEBUG.write(c_m, "====**** (TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
-    elsif $TEST and stack == 0 and $scene.is_a?(Scene_Treasure)
+      Debug.write(c_m, "====**** (TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
+    elsif $TEST and stack == 0 and $scene.is_a?(SceneTreasure)
       hash = MAGIC::enchant(item)
-      DEBUG.write(c_m, "====**** ($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
+      Debug.write(c_m, "====**** ($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
     end
 
     @bag.push [[kind, item_id], identified, 0, false, stack, hash]
@@ -2598,17 +2598,17 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def permeation
     value = 1
-    sv = MISC.skill_value(SKILLID::PERMEATION, self)
-    diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::PERMEATION, self)
+    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     if ratio > rand(100)
-      value = Constant_Table::PERMEATION_RATIO
-      chance_skill_increase(SKILLID::PERMEATION) # 浸透呪文
+      value = ConstantTable::PERMEATION_RATIO
+      chance_skill_increase(SkillId::PERMEATION) # 浸透呪文
     elsif onmitsu?
-      value = Constant_Table::PERMEATION_RATIO_HIDE
+      value = ConstantTable::PERMEATION_RATIO_HIDE
     end
-    DEBUG.write(c_m, "#{self.name} RESIST減少係数:#{value}")
+    Debug.write(c_m, "#{self.name} RESIST減少係数:#{value}")
     return value
   end
   #--------------------------------------------------------------------------
@@ -2641,18 +2641,18 @@ class Game_Actor < Game_Battler
   # ● マスタースキル（ダブルアタック）発動？
   #--------------------------------------------------------------------------
   def double_attack_activate?
-    sv = MISC.skill_value(SKILLID::DOUBLEATTACK, self)
+    sv = Misc.skill_value(SkillId::DOUBLEATTACK, self)
     case @class_id
     when 1      # 戦士の場合
-      diff = Constant_Table::DIFF_75[$game_map.map_id]
+      diff = ConstantTable::DIFF_75[$game_map.map_id]
     when 2..10  # その他のクラス
-      diff = Constant_Table::DIFF_50[$game_map.map_id]
+      diff = ConstantTable::DIFF_50[$game_map.map_id]
     end
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
-      chance_skill_increase(SKILLID::DOUBLEATTACK)
-      DEBUG::write(c_m,"#{@name} ダブルアタック発動:#{ratio}%")
+      chance_skill_increase(SkillId::DOUBLEATTACK)
+      Debug::write(c_m,"#{@name} ダブルアタック発動:#{ratio}%")
       return true
     else
       return false
@@ -2682,10 +2682,10 @@ class Game_Actor < Game_Battler
   def base_initiative
     value = p_bonus = f_bonus = h_bonus = l_bonus = r_bonus = 0
     ## 戦術スキルからベースイニシアチブ値
-    t_bonus = MISC.skill_value(SKILLID::TACTICS, self) / 8 + 8
-    p_bonus = Constant_Table::FLEXIBLE_BONUS if @personality_p == :Flexible # 臨機応変
-    f_bonus = Constant_Table::FRONT_BONUS if [0,1,2].include?(index) # 前衛ボーナス
-    l_bonus = Constant_Table::LEADER_INIT_BONUS if leader?
+    t_bonus = Misc.skill_value(SkillId::TACTICS, self) / 8 + 8
+    p_bonus = ConstantTable::FLEXIBLE_BONUS if @personality_p == :Flexible # 臨機応変
+    f_bonus = ConstantTable::FRONT_BONUS if [0,1,2].include?(index) # 前衛ボーナス
+    l_bonus = ConstantTable::LEADER_INIT_BONUS if leader?
     r_bonus = get_magic_attr(7)
     ## 特性値ボーナス
     case spd
@@ -2706,7 +2706,7 @@ class Game_Actor < Game_Battler
 
     ## 二刀流からのボーナス
     if dual_wield?
-      case MISC.skill_value(SKILLID::DUAL, self)
+      case Misc.skill_value(SkillId::DUAL, self)
       when 25..999;  val = 2  # +2
       else;          val = 0
       end
@@ -2716,17 +2716,17 @@ class Game_Actor < Game_Battler
     d_bonus = val
 
     ## 隠密ボーナス
-    h_bonus = Constant_Table::INIT_HIDE_BONUS if onmitsu?
+    h_bonus = ConstantTable::INIT_HIDE_BONUS if onmitsu?
 
     value = t_bonus + p_bonus + f_bonus + spd_bonus + d_bonus + h_bonus + l_bonus + r_bonus
     value *= cc_penalty
     value = Integer(value)
 
-    DEBUG.write(c_m, "戦術スキルイニシアチブ値:#{t_bonus}")
-    DEBUG.write(c_m, "性格ボーナス:+#{p_bonus} 前衛ボーナス:+#{f_bonus} リーダー:+#{l_bonus} ルーン:+#{r_bonus}")
-    DEBUG.write(c_m, "SPD特性値ボーナス:+#{spd_bonus}(SPD:#{spd})")
-    DEBUG.write(c_m, "二刀流ボーナス:#{d_bonus} 隠密ボーナス:#{h_bonus}")
-    DEBUG.write(c_m, "base_init:#{value} c.c.ペナルティ:#{cc_penalty}")
+    Debug.write(c_m, "戦術スキルイニシアチブ値:#{t_bonus}")
+    Debug.write(c_m, "性格ボーナス:+#{p_bonus} 前衛ボーナス:+#{f_bonus} リーダー:+#{l_bonus} ルーン:+#{r_bonus}")
+    Debug.write(c_m, "SPD特性値ボーナス:+#{spd_bonus}(SPD:#{spd})")
+    Debug.write(c_m, "二刀流ボーナス:#{d_bonus} 隠密ボーナス:#{h_bonus}")
+    Debug.write(c_m, "base_init:#{value} c.c.ペナルティ:#{cc_penalty}")
 
     return value
   end
@@ -2755,16 +2755,16 @@ class Game_Actor < Game_Battler
     magic = $data_magics[magic_id]
     case magic.domain
     when 0  # カルマ負の領域の呪文習得判定
-      return false if magic.skill > MISC.skill_value(SKILLID::RATIONAL, self)  # 必要スキルを満たす？
+      return false if magic.skill > Misc.skill_value(SkillId::RATIONAL, self)  # 必要スキルを満たす？
     when 1  # カルマ正の領域の呪文習得判定
-      return false if magic.skill > MISC.skill_value(SKILLID::MYSTIC, self)  # 必要スキルを満たす？
+      return false if magic.skill > Misc.skill_value(SkillId::MYSTIC, self)  # 必要スキルを満たす？
     end
     return false if @magic.include?(magic_id)       # すでに取得済みはfalse
     ## 依存チェック
     if magic.depend != ""                           # 依存関係あり？
       for depend in magic.depend.split(";")
         unless @magic.include?(depend.to_i)         # 前提OK？
-          DEBUG::write(c_m,"依存呪文確認:#{magic_id} 前提:#{depend} SKIPされる")
+          Debug::write(c_m,"依存呪文確認:#{magic_id} 前提:#{depend} SKIPされる")
           return false                              # 前提NG
         end
       end
@@ -2801,7 +2801,7 @@ class Game_Actor < Game_Battler
       if item[3] == true  # 装備済みの呪われた装備
         kind = item[0][0]
         id = item[0][1]
-        array.push(MISC.item(kind, id).curse)
+        array.push(Misc.item(kind, id).curse)
       end
     end
     return array
@@ -2832,14 +2832,14 @@ class Game_Actor < Game_Battler
   # ● 高速詠唱発動判定
   #--------------------------------------------------------------------------
   def rapid_cast?
-    sv = MISC.skill_value(SKILLID::RAPIDCAST, self)
-    diff = Constant_Table::DIFF_75[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::RAPIDCAST, self)
+    diff = ConstantTable::DIFF_75[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     result = (ratio > rand(100))
     if result
-      chance_skill_increase(SKILLID::RAPIDCAST)
-      DEBUG.write(c_m,"#{@name} 高速詠唱発動:#{ratio}%")
+      chance_skill_increase(SkillId::RAPIDCAST)
+      Debug.write(c_m,"#{@name} 高速詠唱発動:#{ratio}%")
     end
     return result
   end
@@ -2848,20 +2848,20 @@ class Game_Actor < Game_Battler
   #   呪文詠唱後の場合 magic flag
   #--------------------------------------------------------------------------
   def check_remove_stealth(magic = false)
-    return unless state?(STATEID::HIDING) # 隠密状態でなければRETURN
+    return unless state?(StateId::HIDING) # 隠密状態でなければRETURN
     return if self.finish_blow            # 止めを刺したので解除されない
     if magic
-      remove_state(STATEID::HIDING)
-      DEBUG::write(c_m,"#{@name}の隠密が呪文詠唱により解除") # debug
+      remove_state(StateId::HIDING)
+      Debug::write(c_m,"#{@name}の隠密が呪文詠唱により解除") # debug
       return
     end
     case range
-    when "C"; ratio = Constant_Table::DETECT_CLOSE
-    when "L"; ratio = Constant_Table::DETECT_LONG
+    when "C"; ratio = ConstantTable::DETECT_CLOSE
+    when "L"; ratio = ConstantTable::DETECT_LONG
     end
     if ratio > rand(100)
-      remove_state(STATEID::HIDING)
-      DEBUG::write(c_m,"#{@name}の隠密が解除 確率:#{ratio}% 射程:#{range}") # debug
+      remove_state(StateId::HIDING)
+      Debug::write(c_m,"#{@name}の隠密が解除 確率:#{ratio}% 射程:#{range}") # debug
     end
   end
   #--------------------------------------------------------------------------
@@ -2876,7 +2876,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def checking_tired
     return unless tired_thres < @fatigue  # 現在の疲労が閾値を超えていないか？
-    add_state(STATEID::TIRED) # 疲労状態へ
+    add_state(StateId::TIRED) # 疲労状態へ
   end
   #--------------------------------------------------------------------------
   # ● 疲労許容値追加処理
@@ -2890,9 +2890,9 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def tired_thres
     @tired_thres_plus ||= 0
-    a = (maxhp * Constant_Table::TIRED_RATIO)
+    a = (maxhp * ConstantTable::TIRED_RATIO)
     a += @tired_thres_plus
-    a *= (MISC.skill_value(SKILLID::STAMINA, self) + 100)
+    a *= (Misc.skill_value(SkillId::STAMINA, self) + 100)
     a /= 100
     return a
   end
@@ -2957,8 +2957,8 @@ class Game_Actor < Game_Battler
       weapon_data = $data_weapons[@subweapon_id] # 装備中のサブ武器データ取得
       str = weapon_data.double
     end
-    str += Constant_Table::MAGIC_HASH_DOUBLE_ARRAY[get_magic_attr(3)]
-    DEBUG.write(c_m, "2倍撃フラグ:#{str}")
+    str += ConstantTable::MAGIC_HASH_DOUBLE_ARRAY[get_magic_attr(3)]
+    Debug.write(c_m, "2倍撃フラグ:#{str}")
     return str
   end
   #--------------------------------------------------------------------------
@@ -3018,8 +3018,8 @@ class Game_Actor < Game_Battler
     ## 戦闘中で無いときに限り成長
     unless $game_temp.in_battle
       case magic.domain
-      when 0; skill_id = SKILLID::RATIONAL
-      when 1; skill_id = SKILLID::MYSTIC
+      when 0; skill_id = SkillId::RATIONAL
+      when 1; skill_id = SkillId::MYSTIC
       end
       ## 消費の少ない呪文でCPだけを高くしてスキル上昇を狙う方法をフィルターしている
       ## 純粋に消費MPの総合値で判定している
@@ -3037,16 +3037,16 @@ class Game_Actor < Game_Battler
       cycle.times do chance_skill_increase(skill_id) end
       #> 四大元素スキルの上昇
       if magic.fire > 0
-        skill_id = SKILLID::FIRE
+        skill_id = SkillId::FIRE
       elsif magic.water > 0
-        skill_id = SKILLID::WATER
+        skill_id = SkillId::WATER
       elsif magic.air > 0
-        skill_id = SKILLID::AIR
+        skill_id = SkillId::AIR
       elsif magic.earth > 0
-        skill_id = SKILLID::EARTH
+        skill_id = SkillId::EARTH
       end
       cycle.times do chance_skill_increase(skill_id) end
-      DEBUG.write(c_m, "非戦闘中の呪文スキル上昇判定 #{@name} #{magic.name} cycle:#{cycle}")
+      Debug.write(c_m, "非戦闘中の呪文スキル上昇判定 #{@name} #{magic.name} cycle:#{cycle}")
     end
     cost /= 2 if r_cast             # リザーブキャストで半減
     if magic.fire > 0
@@ -3058,6 +3058,7 @@ class Game_Actor < Game_Battler
     elsif magic.earth > 0
       self.mp_earth -= cost
     end
+    return cost
   end
   #--------------------------------------------------------------------------
   # ● MPは余っているか？
@@ -3098,39 +3099,39 @@ class Game_Actor < Game_Battler
     if @mp_earth > 0
       self.mp_earth /= 2
     end
-    DEBUG::write(c_m,"MP Drain: #{@name}")
-    DEBUG::write(c_m,"MP(Fire):#{@mp_fire}/#{@maxmp_fire}")
-    DEBUG::write(c_m,"MP(Water):#{@mp_water}/#{@maxmp_water}")
-    DEBUG::write(c_m,"MP(Air):#{@mp_air}/#{@maxmp_air}")
-    DEBUG::write(c_m,"MP(Earth):#{@mp_earth}/#{@maxmp_earth}")
+    Debug::write(c_m,"MP Drain: #{@name}")
+    Debug::write(c_m,"MP(Fire):#{@mp_fire}/#{@maxmp_fire}")
+    Debug::write(c_m,"MP(Water):#{@mp_water}/#{@maxmp_water}")
+    Debug::write(c_m,"MP(Air):#{@mp_air}/#{@maxmp_air}")
+    Debug::write(c_m,"MP(Earth):#{@mp_earth}/#{@maxmp_earth}")
   end
   #--------------------------------------------------------------------------
   # ● 食事毎ターンによる僅かなMP回復
   #   multiplier: 0.01(1%), 0.02(2%), 0.03(3%)
   #--------------------------------------------------------------------------
   def recover_1_mp(multiplier = 0.01)
-    DEBUG::write(c_m,"Start MP Recover #{self.name}")
+    Debug::write(c_m,"Start MP Recover #{self.name}")
     case rand(4)
     when 0;
       return if @maxmp_fire == 0
       return if @mp_fire > @maxmp_fire * resting_thres
       self.mp_fire += [@maxmp_fire * multiplier, rand(2)].max.to_i
-      DEBUG::write(c_m,"MP(Fire)回復:#{@mp_fire}/#{@maxmp_fire} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Fire)回復:#{@mp_fire}/#{@maxmp_fire} 疲労度:#{resting_thres}")
     when 1;
       return if @maxmp_water == 0
       return if @mp_water > @maxmp_water * resting_thres
       self.mp_water += [@maxmp_water * multiplier, rand(2)].max.to_i
-      DEBUG::write(c_m,"MP(Water)回復:#{@mp_water}/#{@maxmp_water} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Water)回復:#{@mp_water}/#{@maxmp_water} 疲労度:#{resting_thres}")
     when 2;
       return if @maxmp_air == 0
       return if @mp_air > @maxmp_air * resting_thres
       self.mp_air += [@maxmp_air * multiplier, rand(2)].max.to_i
-      DEBUG::write(c_m,"MP(Air)回復:#{@mp_air}/#{@maxmp_air} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Air)回復:#{@mp_air}/#{@maxmp_air} 疲労度:#{resting_thres}")
     when 3;
       return if @maxmp_earth == 0
       return if @mp_earth > @maxmp_earth * resting_thres
       self.mp_earth += [@maxmp_earth * multiplier, rand(2)].max.to_i
-      DEBUG::write(c_m,"MP(Earth)回復:#{@mp_earth}/#{@maxmp_earth} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Earth)回復:#{@mp_earth}/#{@maxmp_earth} 疲労度:#{resting_thres}")
     end
   end
   #--------------------------------------------------------------------------
@@ -3144,7 +3145,7 @@ class Game_Actor < Game_Battler
   # ● 訓練の終了
   #--------------------------------------------------------------------------
   def end_training
-    DEBUG::write(c_m,"訓練の終了[#{@name}]:#{@exp}EXP + #{@training_exp}EXP")
+    Debug::write(c_m,"訓練の終了[#{@name}]:#{@exp}EXP + #{@training_exp}EXP")
     @exp += @training_exp
   end
   #--------------------------------------------------------------------------
@@ -3163,7 +3164,7 @@ class Game_Actor < Game_Battler
       a *= 0.95
     end
     @fatigue += Integer(a)
-    # DEBUG::write(c_m,"疲労度加算:#{name} +#{a} 合計:#{@fatigue}(#{(tired_ratio*100).to_i}%)")
+    # Debug::write(c_m,"疲労度加算:#{name} +#{a} 合計:#{@fatigue}(#{(tired_ratio*100).to_i}%)")
   end
   #--------------------------------------------------------------------------
   # ● 重量オーバー
@@ -3183,74 +3184,88 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   # ● 疲労度加算:呪文詠唱時
   #--------------------------------------------------------------------------
-  def tired_casting(cp)
-    add_tired([cp * maxhp / 20, 1].max)
+  def tired_casting(mp_consumed)
+    case mp_consumed
+    when 1..12;     value = TIRED_RATIO * 10 * 1 / 100  # 2
+    when 13..24;    value = TIRED_RATIO * 20 * 1 / 100
+    when 25..36;    value = TIRED_RATIO * 30 * 1 / 100
+    when 37..48;    value = TIRED_RATIO * 50 * 1 / 100
+    when 49..60;    value = TIRED_RATIO * 80 * 1 / 100
+    when 61..72;    value = TIRED_RATIO * 130 * 1 / 100 # 26
+    when 73..84;    value = TIRED_RATIO * 210 * 1 / 100 # 42
+    when 85..96;    value = TIRED_RATIO * 340 * 1 / 100 # 68
+    when 97..108;   value = TIRED_RATIO * 550 * 1 / 100 # 110
+    when 109..120;  value = TIRED_RATIO * 890 * 1 / 100 # 178
+    else;           value = TIRED_RATIO * 1440 * 1 / 100 # 288
+    end
+    Debug.write(c_m, "呪文詠唱による疲労度加算:+#{value}")
+    add_tired(value)
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:泉に潜る
+  # ● 疲労度加算:泉に潜る(2%)
   #--------------------------------------------------------------------------
   def tired_swimming
-    add_tired([maxhp / 30, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.02, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:スキル上昇
+  # ● 疲労度加算:スキル上昇(0.1%)
   #--------------------------------------------------------------------------
   def tired_skill_increase
-    add_tired([maxhp / 100, 0].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.001, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:調査時
+  # ● 疲労度加算:調査時(1%)
   #--------------------------------------------------------------------------
   def tired_searching
-    add_tired([maxhp / 30, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.01, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:鍵こじ開け時
+  # ● 疲労度加算:鍵こじ開け時(1%)
   #--------------------------------------------------------------------------
   def tired_picking
-    add_tired([maxhp / 30, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.01, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:戦闘終了時
+  # ● 疲労度加算:戦闘終了時(3%)
   #--------------------------------------------------------------------------
   def tired_battle
-    add_tired([maxhp / 10, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.03, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:逃走時
+  # ● 疲労度加算:逃走時(5%)
   #--------------------------------------------------------------------------
   def tired_escape
-    add_tired([maxhp / 2, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.05, 1].max))
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:宝箱罠（金切り声）
   #--------------------------------------------------------------------------
   def tired_trap
-    add_tired(Constant_Table::TIRED_TRAP_PER_FLOOR * $game_map.map_id)
+    add_tired(ConstantTable::TIRED_TRAP_PER_FLOOR * $game_map.map_id)
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:鑑定時
+  # ● 疲労度加算:鑑定時(1%)
   #--------------------------------------------------------------------------
   def tired_identify
-    add_tired([maxhp / 2, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.01, 1].max))
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:死亡時
   #--------------------------------------------------------------------------
   def tired_death
-    add_tired(maxhp * Constant_Table::TIRED_RATIO)
+    add_tired(maxhp * ConstantTable::TIRED_RATIO)
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:エンカレッジ時
+  # ● 疲労度加算:エンカレッジ時(1%)
   #--------------------------------------------------------------------------
   def tired_encourage
-    add_tired([maxhp / 10, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.01, 1].max))
   end
   #--------------------------------------------------------------------------
-  # ● 疲労度加算:ターンUD
+  # ● 疲労度加算:ターンUD(2%)
   #--------------------------------------------------------------------------
   def tired_turnud
-    add_tired([maxhp / 8, 1].max)
+    add_tired(Integer([(maxhp * ConstantTable::TIRED_RATIO) * 0.02, 1].max))
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:1歩
@@ -3267,21 +3282,21 @@ class Game_Actor < Game_Battler
   #     rate: 現在の疲労を何％回復 ＊現疲労が大きいほど回復量は大きい
   #--------------------------------------------------------------------------
   def recover_fatigue(rate)
-    DEBUG.write(c_m, "現在疲労値:#{@fatigue}")
+    Debug.write(c_m, "現在疲労値:#{@fatigue}")
     ratio = (100 - rate).to_f
     @fatigue *= ratio
     @fatigue /= 100
     @fatigue = Integer(@fatigue)
-    DEBUG.write(c_m, "回復(#{rate}%)=> #{@fatigue}")
+    Debug.write(c_m, "回復(#{rate}%)=> #{@fatigue}")
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復を絶対値で（未使用）
   #     value: 回復絶対値
   #--------------------------------------------------------------------------
   def recover_fatigue_by(value)
-    DEBUG.write(c_m, "#{@fatigue} tired_ratio:#{tired_ratio} 値:#{value}")
+    Debug.write(c_m, "#{@fatigue} tired_ratio:#{tired_ratio} 値:#{value}")
     @fatigue = [@fatigue - value, 0].max
-    DEBUG.write(c_m, "=> #{@fatigue}")
+    Debug.write(c_m, "=> #{@fatigue}")
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復閾値まで（休息で使用）
@@ -3290,9 +3305,11 @@ class Game_Actor < Game_Battler
   def recover_fatigue_to_in_rest(rate)
     ## 疲労値が限度を超えている？
     if tired_ratio > rate
-      ## 疲労を1%ずつ回復
-      recover_fatigue(5)
-      DEBUG.write(c_m, "=> #{@fatigue}")
+      ## 疲労を2%ずつ回復
+      Debug.write(c_m, "現在疲労値:#{@fatigue}pts")
+      value = ConstantTable::RECOVERRATE_IN_REST # 回復%
+      recover_fatigue(value)
+      Debug.write(c_m, "#{value}%回復=> #{@fatigue}pts")
     end
   end
   #--------------------------------------------------------------------------
@@ -3308,11 +3325,11 @@ class Game_Actor < Game_Battler
     return unless any_equiped?  # １つでも装備品あり
     rusted = false
     while (not rusted)
-      DEBUG::write(c_m,"鎧破壊処理開始:while start")
+      Debug::write(c_m,"鎧破壊処理開始:while start")
       for index in 0...@bag.size
-        DEBUG::write(c_m,"鎧破壊処理判定 index:#{index}")
+        Debug::write(c_m,"鎧破壊処理判定 index:#{index}")
         if (@bag[index][2]) > 0 and (5 > rand(100)) # 装備済み＆５％で判定
-          DEBUG::write(c_m,"５％錆び処理開始 index:#{index}")
+          Debug::write(c_m,"５％錆び処理開始 index:#{index}")
           case @bag[index][2]
           when 1; @weapon_id = 0
           when 2; @sub_weapon_id = @armor2_id = 0
@@ -3323,14 +3340,14 @@ class Game_Actor < Game_Battler
           when 7; @armor7_id = 0
           when 8; @armor8_id = 0
           end
-          DEBUG::write(c_m,"錆び発生:#{self.name} 部位:#{@bag[index][2]}")
-          @bag[index] = [Constant_Table::GARBAGE, true, 0, false]  # 鑑定済みガラクタ
+          Debug::write(c_m,"錆び発生:#{self.name} 部位:#{@bag[index][2]}")
+          @bag[index] = [ConstantTable::GARBAGE, true, 0, false]  # 鑑定済みガラクタ
           rusted = true
           break
         end
       end
     end
-    DEBUG::write(c_m,"鎧破壊処理終了")
+    Debug::write(c_m,"鎧破壊処理終了")
   end
   #--------------------------------------------------------------------------
   # ● 何か装備品はあるか？防具破壊で使用
@@ -3362,18 +3379,18 @@ class Game_Actor < Game_Battler
   # ● クラス固有のスキル固定上昇 +2.0
   #--------------------------------------------------------------------------
   def class_skill_increase
-    id = Constant_Table::CLASS_SKILL[@class_id]
+    id = ConstantTable::CLASS_SKILL[@class_id]
     20.times do skill_increase(id, true) end
-    DEBUG::write(c_m,"スキルの自動取得:#{$data_skills[id].name}=>#{@skill[id]}")
+    Debug::write(c_m,"スキルの自動取得:#{$data_skills[id].name}=>#{@skill[id]}")
   end
   #--------------------------------------------------------------------------
   # ● 取返しスキルのリセット
   #--------------------------------------------------------------------------
   def reset_getback
     @sp_getback = 0
-    DEBUG.write(c_m, "#{self.name}")
+    Debug.write(c_m, "#{self.name}")
     for id in @sp_prev.keys
-      DEBUG.write(c_m, "前レベルより変更スキル ID:#{id} SKILL_P:#{@sp_prev[id]}")
+      Debug.write(c_m, "前レベルより変更スキル ID:#{id} SKILL_P:#{@sp_prev[id]}")
     end
   end
   #--------------------------------------------------------------------------
@@ -3390,30 +3407,30 @@ class Game_Actor < Game_Battler
     ## 使用による自然上昇スキル
     else
       value = 1
-      DEBUG::write(c_m,"スキルID:#{id} PAGE:#{$data_skills[id].page}")
+      Debug::write(c_m,"スキルID:#{id} PAGE:#{$data_skills[id].page}")
       @skill[id] += value
       ## スキル再取得判定-------------------------------
       @sp_getback ||= 0 # 再初期化
       @sp_prev ||= {}   # 再初期化
       ## 取返し非対象
       if @sp_prev[id] == nil
-        # DEBUG.write(c_m, "取返し対象でない SKILLID:#{id}")
+        # Debug.write(c_m, "取返し対象でない SKILLID:#{id}")
       ## 取返し対象
       elsif @sp_prev[id] > 0
-        DEBUG.write(c_m, "取返し対象 SKILLID:#{id}")
+        Debug.write(c_m, "取返し対象 SKILLID:#{id}")
         @sp_prev[id] -= 1
-        ratio = Constant_Table::GETBACK_RATIO
+        ratio = ConstantTable::GETBACK_RATIO
         if ratio > rand(100)
           @sp_getback += 1
-          DEBUG.write(c_m, "取返し成功 SKILLID:#{id} 総ポイント:#{@sp_getback/10.0}")
+          Debug.write(c_m, "取返し成功 SKILLID:#{id} 総ポイント:#{@sp_getback/10.0}")
         else
-          DEBUG.write(c_m, "取返し失敗 SKILLID:#{id} 総ポイント:#{@sp_getback/10.0}")
+          Debug.write(c_m, "取返し失敗 SKILLID:#{id} 総ポイント:#{@sp_getback/10.0}")
         end
       end
       tired_skill_increase
-      DEBUG::write(c_m,"#####################################################")
-      DEBUG::write(c_m,"#{@name} SKILL名:#{$data_skills[id].name} +#{value/10.0}=>#{@skill[id]/10.0}")
-      DEBUG::write(c_m,"#####################################################")
+      Debug::write(c_m,"#####################################################")
+      Debug::write(c_m,"#{@name} SKILL名:#{$data_skills[id].name} +#{value/10.0}=>#{@skill[id]/10.0}")
+      Debug::write(c_m,"#####################################################")
       ## .0になった場合のみ（スキルが1.0くぎりで上昇した場合）にログさせる
       if @skill[id] % 10 == 0
         $game_system.queuing([self.name, $data_skills[id].name, @skill[id]/10])
@@ -3424,13 +3441,13 @@ class Game_Actor < Game_Battler
   # ● 勤勉スキルによる経験値上昇ボーナス
   #--------------------------------------------------------------------------
   def check_double_bonus
-    return false if not $scene.is_a?(Scene_Battle)    # 戦闘中以外
-    sv = MISC.skill_value(SKILLID::HARDLEARN, self)
-    diff = Constant_Table::DIFF_05[$game_map.map_id]  # フロア係数
+    return false if not $scene.is_a?(SceneBattle)    # 戦闘中以外
+    sv = Misc.skill_value(SkillId::HARDLEARN, self)
+    diff = ConstantTable::DIFF_05[$game_map.map_id]  # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     result = (ratio > rand(100))
-    DEBUG.write(c_m, "#{self.name}=>勤勉判定成功") if result
+    Debug.write(c_m, "#{self.name}=>勤勉判定成功") if result
     return result
   end
   #--------------------------------------------------------------------------
@@ -3438,7 +3455,7 @@ class Game_Actor < Game_Battler
   # wep: weapon? or subweapon?　すで=nothing の場合は上昇しない
   #--------------------------------------------------------------------------
   def chance_weapon_skill_increase(sub = false, specified = nil)
-    return if Constant_Table::SUB_RATIO < rand(100) if sub
+    return if ConstantTable::SUB_RATIO < rand(100) if sub
     candidate_id = []
     if specified != nil
       wep = specified
@@ -3514,7 +3531,7 @@ class Game_Actor < Game_Battler
       ## 素手はスキル無し
     end
     ## 武器スキル上昇時に戦術スキルの判定もあり
-    chance_skill_increase(SKILLID::TACTICS)  # 戦術
+    chance_skill_increase(SkillId::TACTICS)  # 戦術
   end
   #--------------------------------------------------------------------------
   # ● スキル値の上昇判定
@@ -3553,7 +3570,7 @@ class Game_Actor < Game_Battler
       when 12..99; c = 2**13
       end
     end
-    if $scene.is_a?(Scene_Battle) and c != 2 and c!= 1
+    if $scene.is_a?(SceneBattle) and c != 2 and c!= 1
       c /= 2    # 戦闘中はスキルが2倍上昇しやすい
     end
     return unless rand(c) == 0
@@ -3569,8 +3586,8 @@ class Game_Actor < Game_Battler
     end
     if diff > rand(100)
       @skill_interval[id] = $data_skills[id].interval * 60
-      DEBUG.write(c_m, "#{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}")
-      DEBUG.write(c_m, "#{$data_skills[id].name} スキル値:#{sv} MAPID:#{map_id} c:#{c} 確率:#{1.0/c*100}%")
+      Debug.write(c_m, "#{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}")
+      Debug.write(c_m, "#{$data_skills[id].name} スキル値:#{sv} MAPID:#{map_id} c:#{c} 確率:#{1.0/c*100}%")
       skill_increase(id)             # 0.1ポイント上昇
     end
   end
@@ -3607,27 +3624,27 @@ class Game_Actor < Game_Battler
       result += $data_armors[@armor8_id].add_value
     end
     ## パーティマジック:観察眼ボーナス
-    if $game_party.pm_detect > 0 and (id == SKILLID::EYE)
-      result += Constant_Table::PM_DETECT_BONUS
+    if $game_party.pm_detect > 0 and (id == SkillId::EYE)
+      result += ConstantTable::PM_DETECT_BONUS
     end
     ## パーティマジック:危険予知ボーナス
-    if $game_party.pm_detect > 0 and (id == SKILLID::PREDICTION)
-      result += Constant_Table::PM_PREDICTION_BONUS
+    if $game_party.pm_detect > 0 and (id == SkillId::PREDICTION)
+      result += ConstantTable::PM_PREDICTION_BONUS
     end
     ## パーティマジック:マッピングボーナス
-    if $game_party.pm_detect > 0 and (id == SKILLID::MAPPING)
-      result += Constant_Table::PM_MAPPING_BONUS
+    if $game_party.pm_detect > 0 and (id == SkillId::MAPPING)
+      result += ConstantTable::PM_MAPPING_BONUS
     end
     ## パーティマジック:水泳ボーナス
-    if $game_party.pm_float > 0 and (id == SKILLID::SWIM)
-      result += Constant_Table::PM_SWIM_BONUS
+    if $game_party.pm_float > 0 and (id == SkillId::SWIM)
+      result += ConstantTable::PM_SWIM_BONUS
     end
     ## ガイドスキル:観察眼ボーナス
-    result += $game_mercenary.skill_check("eye") if id == SKILLID::EYE
+    result += $game_mercenary.skill_check("eye") if id == SkillId::EYE
     ## ガイドスキル:勤勉ボーナス
-    result += $game_mercenary.skill_check("learn") if id == SKILLID::HARDLEARN
+    result += $game_mercenary.skill_check("learn") if id == SkillId::HARDLEARN
     ## ガイドスキル:危険予知ボーナス
-    result += $game_mercenary.skill_check("pre") if id == SKILLID::PREDICTION
+    result += $game_mercenary.skill_check("pre") if id == SkillId::PREDICTION
     return result
   end
   #--------------------------------------------------------------------------
@@ -3677,7 +3694,7 @@ class Game_Actor < Game_Battler
   def add_loyalty(point)
     @loyalty_pazuzu ||= 0     # 定義が無ければリセット
     @loyalty_pazuzu += point
-    DEBUG::write(c_m,"#{@name} 忠誠心=>#{@loyalty_pazuzu}")
+    Debug::write(c_m,"#{@name} 忠誠心=>#{@loyalty_pazuzu}")
   end
   #--------------------------------------------------------------------------
   # ● 貫通矢可能？
@@ -3765,19 +3782,19 @@ class Game_Actor < Game_Battler
       next unless @bag[index][2] > 0 # 装備中のみ抽出
       next unless @bag[index][4] > 0 # スタック数あり
       ## 再利用をチェック
-      sv = MISC.skill_value(SKILLID::REUSE, self)
-      diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::REUSE, self)
+      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)         # 再利用の発動
-        chance_skill_increase(SKILLID::REUSE)
+        chance_skill_increase(SkillId::REUSE)
         next
       end
       ## 再利用失敗
       @bag[index][4] -= 1               # 矢弾の消費
       kind = @bag[index][0][0]
       id = @bag[index][0][1]
-      DEBUG.write(c_m, "#{self.name}>再利用失敗 矢弾消費:#{MISC.item(kind, id).name} 残り:#{@bag[index][4]}")
+      Debug.write(c_m, "#{self.name}>再利用失敗 矢弾消費:#{Misc.item(kind, id).name} 残り:#{@bag[index][4]}")
       need_sort = (@bag[index][4] == 0) # ソートフラグ
     end
     sort_bag_2 if need_sort
@@ -3787,10 +3804,10 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def gain_gold(amount)
     return if amount == 0
-    # DEBUG.write(c_m, "#{self.name} GOLD変動:#{amount}")
+    # Debug.write(c_m, "#{self.name} GOLD変動:#{amount}")
     ## ゴールド増加
     if amount > 0
-      @bag.push([Constant_Table::GOLD_ID, true, 0, false, amount, {}])
+      @bag.push([ConstantTable::GOLD_ID, true, 0, false, amount, {}])
       combine_gold
       return
     end
@@ -3810,9 +3827,9 @@ class Game_Actor < Game_Battler
       return
     end
     combine_gold
-    DEBUG.write(c_m, "***************ERROR***********************")
-    DEBUG.write(c_m, "　　ゴールドを想定より多く削除しています。")
-    DEBUG.write(c_m, "***************ERROR***********************")
+    Debug.write(c_m, "***************ERROR***********************")
+    Debug.write(c_m, "　　ゴールドを想定より多く削除しています。")
+    Debug.write(c_m, "***************ERROR***********************")
   end
   #--------------------------------------------------------------------------
   # ● ゴールドの総量
@@ -3834,7 +3851,7 @@ class Game_Actor < Game_Battler
     for item_info in @bag
       next unless item_info[0][0] == 0
       next unless item_info[1] == true
-      next unless MISC.item(item_info[0][0], item_info[0][1]).purpose == "token"
+      next unless Misc.item(item_info[0][0], item_info[0][1]).purpose == "token"
       result += item_info[4]
     end
     return result
@@ -3847,21 +3864,21 @@ class Game_Actor < Game_Battler
     for item_info in @bag
       next unless item_info[0][0] == 0
       next unless item_info[1] == true
-      next unless MISC.item(item_info[0][0], item_info[0][1]).purpose == "token"
+      next unless Misc.item(item_info[0][0], item_info[0][1]).purpose == "token"
       if item_info[4] >= amount
         item_info[4] -= amount
         result += amount
-        DEBUG.write(c_m, "#{self.name} トークン削除:#{result}")
+        Debug.write(c_m, "#{self.name} トークン削除:#{result}")
         return result
       else
         ## 引く量の方が大きい場合、結果量にADD
         amount -= item_info[4]
         result += item_info[4]
         item_info[4] = 0
-        DEBUG.write(c_m, "#{self.name} トークン削除(引く大):#{result}")
+        Debug.write(c_m, "#{self.name} トークン削除(引く大):#{result}")
       end
     end
-    DEBUG.write(c_m, "#{self.name} トークン削除(Loop外):#{result}")
+    Debug.write(c_m, "#{self.name} トークン削除(Loop外):#{result}")
     return result
   end
   #--------------------------------------------------------------------------
@@ -3880,9 +3897,9 @@ class Game_Actor < Game_Battler
   # ● スカウトスキルチェック実施
   #--------------------------------------------------------------------------
   def scout_check
-    skill_id = SKILLID::EYE # 観察眼
-    sv = MISC.skill_value(skill_id, self)
-    diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+    skill_id = SkillId::EYE # 観察眼
+    sv = Misc.skill_value(skill_id, self)
+    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
     @s_ratio = Integer([sv * diff, 95].min)
     @s_ratio /= 2 if self.tired?
     @s_ratio = 0 unless movable? # 行動不能の場合
@@ -3909,9 +3926,9 @@ class Game_Actor < Game_Battler
 #~     ## ランダムグリッドがアクティブの場合はシークレット発見はスキップされる
 #~     kind = $game_system.check_randomevent($game_map.map_id, $game_map.x, $game_map.y)
 #~     return if kind == 0 # kind=0は何も無いということ。
-    skill_id = SKILLID::EYE # 観察眼
-    sv = MISC.skill_value(skill_id, self) # 罠の調査 特性値補正後のスキル値
-    diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+    skill_id = SkillId::EYE # 観察眼
+    sv = Misc.skill_value(skill_id, self) # 罠の調査 特性値補正後のスキル値
+    diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
@@ -3946,55 +3963,55 @@ class Game_Actor < Game_Battler
     fire,water,air,earth = count_magickind  # 各呪文の習得数をカウント
     if fire > 0
       a = 1
-      b = MISC.skill_value(SKILLID::FIRE, self) / a
+      b = Misc.skill_value(SkillId::FIRE, self) / a
       c = 2 * fire
       mfire = 0
-      @level.times do mfire += MISC.dice(a, b, c) end
+      @level.times do mfire += Misc.dice(a, b, c) end
       if mfire > @maxmp_fire
         @maxmp_fire = mfire
       else
         @maxmp_fire += 1
       end
-      DEBUG::write(c_m,"#{a}D#{b}+#{c} 新MP(火):#{@maxmp_fire}")
+      Debug::write(c_m,"#{a}D#{b}+#{c} 新MP(火):#{@maxmp_fire}")
     end
     if water > 0
       a = 1
-      b = MISC.skill_value(SKILLID::WATER, self) / a
+      b = Misc.skill_value(SkillId::WATER, self) / a
       c = 2 * water
       mwater = 0
-      @level.times do mwater += MISC.dice(a, b, c) end
+      @level.times do mwater += Misc.dice(a, b, c) end
       if mwater > @maxmp_water
         @maxmp_water = mwater
       else
         @maxmp_water += 1
       end
-      DEBUG::write(c_m,"#{a}D#{b}+#{c} 新MP(水):#{@maxmp_water}")
+      Debug::write(c_m,"#{a}D#{b}+#{c} 新MP(水):#{@maxmp_water}")
     end
     if air > 0
       a = 1
-      b = MISC.skill_value(SKILLID::AIR, self) / a
+      b = Misc.skill_value(SkillId::AIR, self) / a
       c = 2 * air
       mair = 0
-      @level.times do mair += MISC.dice(a, b, c) end
+      @level.times do mair += Misc.dice(a, b, c) end
       if mair > @maxmp_air
         @maxmp_air = mair
       else
         @maxmp_air += 1
       end
-      DEBUG::write(c_m,"#{a}D#{b}+#{c} 新MP(気):#{@maxmp_air}")
+      Debug::write(c_m,"#{a}D#{b}+#{c} 新MP(気):#{@maxmp_air}")
     end
     if earth > 0
       a = 1
-      b = MISC.skill_value(SKILLID::EARTH, self) / a
+      b = Misc.skill_value(SkillId::EARTH, self) / a
       c = 2 * earth
       mearth = 0
-      @level.times do mearth += MISC.dice(a, b, c) end
+      @level.times do mearth += Misc.dice(a, b, c) end
       if mearth > @maxmp_earth
         @maxmp_earth = mearth
       else
         @maxmp_earth += 1
       end
-      DEBUG::write(c_m,"#{a}D#{b}+#{c} 新MP(土):#{@maxmp_earth}")
+      Debug::write(c_m,"#{a}D#{b}+#{c} 新MP(土):#{@maxmp_earth}")
     end
   end
   #--------------------------------------------------------------------------
@@ -4025,7 +4042,7 @@ class Game_Actor < Game_Battler
   def make_herbbag
     result = []
     for i in 0...@bag.size
-      item_data = MISC.item(@bag[i][0][0], @bag[i][0][1])
+      item_data = Misc.item(@bag[i][0][0], @bag[i][0][1])
       if item_data.kind == "herb"
         result.push(@bag[i])
         @bag[i] = nil
@@ -4041,11 +4058,11 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def sort_herbbag
     return if @herb_bag.size == 0
-    DEBUG.write(c_m, self.name+" => SORT_HERBBAG開始")
+    Debug.write(c_m, self.name+" => SORT_HERBBAG開始")
     ## スタック品をまとめる
     for i in 0...(@herb_bag.size-1)
       id = @herb_bag[i][0][1]
-      item = MISC.item(3, id)
+      item = Misc.item(3, id)
       ii = @herb_bag.size-1-i
       for j in 1..ii
         next unless id == @herb_bag[j+i][0][1]   # 同じid？
@@ -4084,7 +4101,7 @@ class Game_Actor < Game_Battler
   def nofpicks
     count = 0
     for item in @bag
-      item_obj = MISC.item(item[0][0], item[0][1])
+      item_obj = Misc.item(item[0][0], item[0][1])
       next unless item_obj.picktool?            # ピックツールか？
       next unless item[1] == true               # 鑑定済み？
       count += item[4]                          # 個数を足す
@@ -4096,19 +4113,19 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def consume_pick
     ## 再利用をチェック
-    sv = MISC.skill_value(SKILLID::REUSE, self)
-    diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::REUSE, self)
+    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     if ratio > rand(100)         # 再利用の発動
-      DEBUG.write(c_m, "REUSE Detected for picktool :#{ratio}%")
-      chance_skill_increase(SKILLID::REUSE)
+      Debug.write(c_m, "REUSE Detected for picktool :#{ratio}%")
+      chance_skill_increase(SkillId::REUSE)
       return
     end
     need_sort = false
     for index in 0..@bag.size
       next if @bag[index] == nil
-      item_obj = MISC.item(@bag[index][0][0], @bag[index][0][1])
+      item_obj = Misc.item(@bag[index][0][0], @bag[index][0][1])
       next unless item_obj.picktool?
       @bag[index][4] -= 1                       # 1つ減らす
       need_sort = (@bag[index][4] == 0)         # なくなればソート2
@@ -4139,22 +4156,22 @@ class Game_Actor < Game_Battler
 
     ## スキル値
     case item_data.rank
-    when 2; limit = Constant_Table::SKILLBOOK_L_1
-    when 3; limit = Constant_Table::SKILLBOOK_L_2
-    when 4; limit = Constant_Table::SKILLBOOK_L_3
-    when 5; limit = Constant_Table::SKILLBOOK_L_4
+    when 2; limit = ConstantTable::SKILLBOOK_L_1
+    when 3; limit = ConstantTable::SKILLBOOK_L_2
+    when 4; limit = ConstantTable::SKILLBOOK_L_3
+    when 5; limit = ConstantTable::SKILLBOOK_L_4
     end
-    add_value = Constant_Table::SKILLBOOK_ADD
+    add_value = ConstantTable::SKILLBOOK_ADD
     if self.personality_p == :Sincere # 素直
-      add_value += Constant_Table::SKILLBOOK_ADD_PLUS
+      add_value += ConstantTable::SKILLBOOK_ADD_PLUS
     end
-    DEBUG.write(c_m, "スキルブック使用前 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
+    Debug.write(c_m, "スキルブック使用前 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
 
     ## 追加量分かつリミット以下で上昇させる
     add_value.times do
       @skill[skill_id] += 1 if @skill[skill_id] < limit
     end
-    DEBUG.write(c_m, "スキルブック使用後 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
+    Debug.write(c_m, "スキルブック使用後 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
     return true
   end
   #--------------------------------------------------------------------------
@@ -4165,10 +4182,10 @@ class Game_Actor < Game_Battler
     case @personality_n
     when :Worrywart  # 心配性
       ## 無ければ初期化
-      if @skill[SKILLID::PACKING] == nil
-        @skill[SKILLID::PACKING] = 0
+      if @skill[SkillId::PACKING] == nil
+        @skill[SkillId::PACKING] = 0
       end
-      @skill[SKILLID::PACKING] += 150  # パッキング
+      @skill[SkillId::PACKING] += 150  # パッキング
     when :Rough  # 大雑把
       @init_luk += 1
       self.luk += 1
@@ -4177,37 +4194,37 @@ class Game_Actor < Game_Battler
     case @personality_p
     when :Sociable  # 社交的
       ## 無ければ初期化
-      if @skill[SKILLID::NEGOTIATION] == nil
-        @skill[SKILLID::NEGOTIATION] = 0
+      if @skill[SkillId::NEGOTIATION] == nil
+        @skill[SkillId::NEGOTIATION] = 0
       end
-      @skill[SKILLID::NEGOTIATION] += 150  # 交渉術
+      @skill[SkillId::NEGOTIATION] += 150  # 交渉術
     when :Humility  # 謙虚
       ## 無ければ初期化
-      if @skill[SKILLID::LEARNING] == nil
-        @skill[SKILLID::LEARNING] = 0
+      if @skill[SkillId::LEARNING] == nil
+        @skill[SkillId::LEARNING] = 0
       end
-      @skill[SKILLID::LEARNING] += 150  # ラーニング
+      @skill[SkillId::LEARNING] += 150  # ラーニング
     when :Kindness  # 親切
       @init_luk += 1
       self.luk += 1
     when :Responsible  # 責任感
       ## 無ければ初期化
-      if @skill[SKILLID::LEADERSHIP] == nil
-        @skill[SKILLID::LEADERSHIP] = 0
+      if @skill[SkillId::LEADERSHIP] == nil
+        @skill[SkillId::LEADERSHIP] = 0
       end
-      @skill[SKILLID::LEADERSHIP] += 150  # リーダーシップ
+      @skill[SkillId::LEADERSHIP] += 150  # リーダーシップ
     when :Enthusiasm # 凝り性
       ## 無ければ初期化
-      if @skill[SKILLID::ANATOMY] == nil
-        @skill[SKILLID::ANATOMY] = 0
+      if @skill[SkillId::ANATOMY] == nil
+        @skill[SkillId::ANATOMY] = 0
       end
-      @skill[SKILLID::ANATOMY] += 150  # 解剖学
+      @skill[SkillId::ANATOMY] += 150  # 解剖学
     when :MonsterMania # モンスターマニア
       ## 無ければ初期化
-      if @skill[SKILLID::DEMONOLOGY] == nil
-        @skill[SKILLID::DEMONOLOGY] = 0
+      if @skill[SkillId::DEMONOLOGY] == nil
+        @skill[SkillId::DEMONOLOGY] = 0
       end
-      @skill[SKILLID::DEMONOLOGY] += 150  # 魔物の知識
+      @skill[SkillId::DEMONOLOGY] += 150  # 魔物の知識
     end
   end
   #--------------------------------------------------------------------------
@@ -4289,7 +4306,7 @@ class Game_Actor < Game_Battler
     # end
     # @poison_weapon += num
     # @poison_weapon = [@poison_weapon, 99].min
-    # DEBUG.write(c_m, "毒塗+: 残り#{@poison_weapon}回")
+    # Debug.write(c_m, "毒塗+: 残り#{@poison_weapon}回")
   end
   #--------------------------------------------------------------------------
   # ● 毒塗の残回数取得
@@ -4303,22 +4320,22 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def consume_poison
     @poison_weapon += 1
-    chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+    chance_skill_increase(SkillId::POISONING) # ポイゾニング
     case @poison_weapon
-    when  1..10; ratio = Constant_Table::P_RATIO_01_10
-    when 11..20; ratio = Constant_Table::P_RATIO_11_20
-    when 21..30; ratio = Constant_Table::P_RATIO_21_30
-    when 31..40; ratio = Constant_Table::P_RATIO_31_40
-    when 41..50; ratio = Constant_Table::P_RATIO_41_50
-    when 51..60; ratio = Constant_Table::P_RATIO_51_60
-    when 61..70; ratio = Constant_Table::P_RATIO_61_70
-    else; ratio = Constant_Table::P_RATIO_ELSE
+    when  1..10; ratio = ConstantTable::P_RATIO_01_10
+    when 11..20; ratio = ConstantTable::P_RATIO_11_20
+    when 21..30; ratio = ConstantTable::P_RATIO_21_30
+    when 31..40; ratio = ConstantTable::P_RATIO_31_40
+    when 41..50; ratio = ConstantTable::P_RATIO_41_50
+    when 51..60; ratio = ConstantTable::P_RATIO_51_60
+    when 61..70; ratio = ConstantTable::P_RATIO_61_70
+    else; ratio = ConstantTable::P_RATIO_ELSE
     end
     if ratio.to_i > rand(100)
-      DEBUG.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回 解除:#{ratio}%")
+      Debug.write(c_m, "毒塗解除 累計使用数:#{@poison_weapon}回 解除:#{ratio}%")
       clear_poison
     else
-      DEBUG.write(c_m, "毒塗使用回数:#{@poison_weapon}回")
+      Debug.write(c_m, "毒塗使用回数:#{@poison_weapon}回")
     end
   end
   #--------------------------------------------------------------------------
@@ -4333,28 +4350,28 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def get_impact
     return false unless @action.attack? # 物理攻撃中に限る
-    sv = MISC.skill_value(SKILLID::IMPACT, self)
+    sv = Misc.skill_value(SkillId::IMPACT, self)
     case weapon?
     ## 弓はインパクト発生しない
     when "bow"
       return false
     ## メイス・杖・ワンドの場合
     when "club","staff","wand"
-      diff = Constant_Table::DIFF_35[$game_map.map_id]
+      diff = ConstantTable::DIFF_35[$game_map.map_id]
     else
       ## 両手持ちの場合
       if t_hand?
-        diff = Constant_Table::DIFF_35[$game_map.map_id]
+        diff = ConstantTable::DIFF_35[$game_map.map_id]
       ## その他の片手持ち武器
       else
-        diff = Constant_Table::DIFF_10[$game_map.map_id]
+        diff = ConstantTable::DIFF_10[$game_map.map_id]
       end
     end
     ratio = Integer([sv * diff, 75].min)  # 75%キャップ
     ratio /= 2 if self.tired?
     if ratio > rand(100)
-      DEBUG.write(c_m, "IMPACT発生 #{ratio}%")
-      chance_skill_increase(SKILLID::IMPACT)
+      Debug.write(c_m, "IMPACT発生 #{ratio}%")
+      chance_skill_increase(SkillId::IMPACT)
       return true
     end
     return false
@@ -4372,14 +4389,14 @@ class Game_Actor < Game_Battler
     when 5; @mnd -= 1        # パラメータ せいしんりょく
     when 6; @luk -= 1        # パラメータ うんのよさ
     end
-    DEBUG.write(c_m, "神の瞬きが発生 部位:#{["str","int","vit","spd","mnd","luk"][position-1]}")
+    Debug.write(c_m, "神の瞬きが発生 部位:#{["str","int","vit","spd","mnd","luk"][position-1]}")
   end
   #--------------------------------------------------------------------------
   # ● 攻撃コマンド可能？（骨折判定）
   # 一定の骨折深度がある場合は、攻撃コマンド不可能
   #--------------------------------------------------------------------------
   def canattack?
-    return (@state_depth[STATEID::FRACTURE] < Constant_Table::FRACTURE_THRES) if fracture?
+    return (@state_depth[StateId::FRACTURE] < ConstantTable::FRACTURE_THRES) if fracture?
     return true
   end
   #--------------------------------------------------------------------------
@@ -4390,7 +4407,7 @@ class Game_Actor < Game_Battler
     for id in @magic
       if $data_magics[id].purpose == "home"
         @magic.delete(id)
-        DEBUG.write(c_m, "帰還呪文の忘却 ID:#{id}")
+        Debug.write(c_m, "帰還呪文の忘却 ID:#{id}")
       end
     end
   end
@@ -4405,27 +4422,27 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def check_preparation
     return unless can_hide?
-    sv = MISC.skill_value(SKILLID::HIDE, self)
-    diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::HIDE, self)
+    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
-      add_state(STATEID::HIDING) # 隠密
-      chance_skill_increase(SKILLID::HIDE) # スキル：隠密技
-      DEBUG.write(c_m, "#{self.name}は戦闘開始に隠密化:#{ratio}%")
+      add_state(StateId::HIDING) # 隠密
+      chance_skill_increase(SkillId::HIDE) # スキル：隠密技
+      Debug.write(c_m, "#{self.name}は戦闘開始に隠密化:#{ratio}%")
     end
   end
   #--------------------------------------------------------------------------
   # ● カウンターが可能？
   #--------------------------------------------------------------------------
   def can_counter?
-    return MISC.skill_value(SKILLID::COUNTER, self) > 0
+    return Misc.skill_value(SkillId::COUNTER, self) > 0
   end
   #--------------------------------------------------------------------------
   # ● 心眼が可能かつ実施？
   #--------------------------------------------------------------------------
   def do_shingan?
-    return false if MISC.skill_value(SKILLID::SHINGAN, self) < 1
+    return false if Misc.skill_value(SkillId::SHINGAN, self) < 1
     ## 動けるか？
     return false unless movable?
     ## カウンター不可のステートになっていない？
@@ -4433,8 +4450,8 @@ class Game_Actor < Game_Battler
     ## 物理攻撃かガード時のみ発生
     return false unless @action.attack? or @action.guard?
     ## 心眼をチェック
-    sv = MISC.skill_value(SKILLID::SHINGAN, self)
-    diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::SHINGAN, self)
+    diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     return true if ratio > rand(100)
@@ -4453,18 +4470,18 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def triple_attack_activate?
     return 1 unless $game_temp.in_battle
-    sv = MISC.skill_value(SKILLID::TRICKSTER, self)
+    sv = Misc.skill_value(SkillId::TRICKSTER, self)
     case @class_id
     when 2; # 盗賊のみ
-      diff = Constant_Table::DIFF_10[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_10[$game_map.map_id] # フロア係数
     else
-      diff = Constant_Table::DIFF_05[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_05[$game_map.map_id] # フロア係数
     end
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if self.tired?
     if ratio > rand(100)
-      DEBUG.write(c_m, "トリックスター発動 確率:#{ratio}")
-      chance_skill_increase(SKILLID::TRICKSTER) # スキル：トリックスター
+      Debug.write(c_m, "トリックスター発動 確率:#{ratio}")
+      chance_skill_increase(SkillId::TRICKSTER) # スキル：トリックスター
       return true
     else
       return false
@@ -4488,31 +4505,31 @@ class Game_Actor < Game_Battler
   def get_magic_attr(position)
     result = 0
     case position
-    when  0; attr = Constant_Table::MAGIC_HASH_AP           # 武器AP+
-    when  1; attr = Constant_Table::MAGIC_HASH_SWING        # 武器MaxSwg+
-    when  2; attr = Constant_Table::MAGIC_HASH_DAMAGE       # 武器Dmg+
-    when  3; attr = Constant_Table::MAGIC_HASH_DOUBLE       # 武器2倍撃+
-    when  4; attr = Constant_Table::MAGIC_HASH_CAPACITY_UP  # C.C.+
-    when  5; attr = Constant_Table::MAGIC_HASH_RANGE        # 武器レンジ+
-    when  6; attr = Constant_Table::MAGIC_HASH_SKILL_TACTICS # 戦術スキル+
-    when  7; attr = Constant_Table::MAGIC_HASH_INITIATIVE   # イニシアチブ+
-    when  8; attr = Constant_Table::MAGIC_HASH_A_ELEMENT    # 属性抵抗+
-    when  9; attr = Constant_Table::MAGIC_HASH_DR           # 全防具DR+
-    when 10; attr = Constant_Table::MAGIC_HASH_ARMOR        # アーマー値+
-    when 11; attr = Constant_Table::MAGIC_HASH_DAMAGERESIST # DamageResistスキル+
-    when 12; attr = Constant_Table::MAGIC_HASH_SKILL_SHIELD # シールドスキル+
+    when  0; attr = ConstantTable::MAGIC_HASH_AP           # 武器AP+
+    when  1; attr = ConstantTable::MAGIC_HASH_SWING        # 武器MaxSwg+
+    when  2; attr = ConstantTable::MAGIC_HASH_DAMAGE       # 武器Dmg+
+    when  3; attr = ConstantTable::MAGIC_HASH_DOUBLE       # 武器2倍撃+
+    when  4; attr = ConstantTable::MAGIC_HASH_CAPACITY_UP  # C.C.+
+    when  5; attr = ConstantTable::MAGIC_HASH_RANGE        # 武器レンジ+
+    when  6; attr = ConstantTable::MAGIC_HASH_SKILL_TACTICS # 戦術スキル+
+    when  7; attr = ConstantTable::MAGIC_HASH_INITIATIVE   # イニシアチブ+
+    when  8; attr = ConstantTable::MAGIC_HASH_A_ELEMENT    # 属性抵抗+
+    when  9; attr = ConstantTable::MAGIC_HASH_DR           # 全防具DR+
+    when 10; attr = ConstantTable::MAGIC_HASH_ARMOR        # アーマー値+
+    when 11; attr = ConstantTable::MAGIC_HASH_DAMAGERESIST # DamageResistスキル+
+    when 12; attr = ConstantTable::MAGIC_HASH_SKILL_SHIELD # シールドスキル+
     end
     for item in @bag
       next if item == nil
       next if item[2] == 0
       next if item[5].empty?        # マジックアイテムではない
       next if item[5][attr] == nil  # ハッシュキーを持たない
-      item_data = MISC.item(item[0][0], item[0][1])
+      item_data = Misc.item(item[0][0], item[0][1])
       ## スキル値がアイテムランクを満たしているか
       next if not check_rune_skill(item_data.rank)
       result += item[5][attr]
     end
-#~     DEBUG.write(c_m, "#{self.name} magic hash:#{attr} value:#{result}") unless result == 0
+#~     Debug.write(c_m, "#{self.name} magic hash:#{attr} value:#{result}") unless result == 0
     return result
   end
   #--------------------------------------------------------------------------
@@ -4520,7 +4537,7 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def check_rune_skill(item_rank)
     ## ルーンの知識をチェック
-    case MISC.skill_value(SKILLID::RUNE, self)
+    case Misc.skill_value(SkillId::RUNE, self)
     when  0..4;     rank = 0
     when  5..24;    rank = 1
     when 25..49;    rank = 2
@@ -4548,21 +4565,21 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def rune_skillup
     return unless equip_runed_items
-    chance_skill_increase(SKILLID::RUNE)
+    chance_skill_increase(SkillId::RUNE)
   end
   #--------------------------------------------------------------------------
   # ● 行方不明者か？
   #--------------------------------------------------------------------------
   def survivor?
-    return true if @actor_id == Constant_Table::SURVIVOR_ID1
-    return true if @actor_id == Constant_Table::SURVIVOR_ID2
-    return true if @actor_id == Constant_Table::SURVIVOR_ID3
-    return true if @actor_id == Constant_Table::SURVIVOR_ID4
-    return true if @actor_id == Constant_Table::SURVIVOR_ID5
-    return true if @actor_id == Constant_Table::SURVIVOR_ID6
-    return true if @actor_id == Constant_Table::SURVIVOR_ID7
-    return true if @actor_id == Constant_Table::SURVIVOR_ID8
-    return true if @actor_id == Constant_Table::SURVIVOR_ID9
+    return true if @actor_id == ConstantTable::SURVIVOR_ID1
+    return true if @actor_id == ConstantTable::SURVIVOR_ID2
+    return true if @actor_id == ConstantTable::SURVIVOR_ID3
+    return true if @actor_id == ConstantTable::SURVIVOR_ID4
+    return true if @actor_id == ConstantTable::SURVIVOR_ID5
+    return true if @actor_id == ConstantTable::SURVIVOR_ID6
+    return true if @actor_id == ConstantTable::SURVIVOR_ID7
+    return true if @actor_id == ConstantTable::SURVIVOR_ID8
+    return true if @actor_id == ConstantTable::SURVIVOR_ID9
     return false
   end
   #--------------------------------------------------------------------------
@@ -4576,13 +4593,13 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def get_magic_nod
     value = 1
-    sv = MISC.skill_value(SKILLID::PERMEATION, self)
-    diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::PERMEATION, self)
+    diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     if ratio > rand(100)
       value = 2
-      chance_skill_increase(SKILLID::PERMEATION) # 浸透呪文
+      chance_skill_increase(SkillId::PERMEATION) # 浸透呪文
     end
     return value
   end
@@ -4592,7 +4609,7 @@ class Game_Actor < Game_Battler
   def write_map_data
     for item_info in @bag
       next unless [7, 8].include?(item_info[2]) # アクセサリ装備でなければ
-      item_data = MISC.item(item_info[0][0], item_info[0][1])
+      item_data = Misc.item(item_info[0][0], item_info[0][1])
       next unless item_data.mapkit?             # マップキットでなければ
       use_map = $game_mapkits[item_data.id]     # マップデータの選択
       use_map.merge_map_data                    # マップデータのマージ
@@ -4603,14 +4620,14 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def personality_p=(new)
     @personality_p = new
-    DEBUG.write(c_m, "#{self.name} 性格1の設定:#{new}")
+    Debug.write(c_m, "#{self.name} 性格1の設定:#{new}")
   end
   #--------------------------------------------------------------------------
   # ● 性格の設定
   #--------------------------------------------------------------------------
   def personality_n=(new)
     @personality_n = new
-    DEBUG.write(c_m, "#{self.name} 性格2の設定:#{new}")
+    Debug.write(c_m, "#{self.name} 性格2の設定:#{new}")
   end
   #--------------------------------------------------------------------------
   # ● お布施の料金計算
@@ -4618,23 +4635,23 @@ class Game_Actor < Game_Battler
   def calc_fee
     fee = 0
     ## 腐敗・死亡は重篤な方のコスト
-    if self.state?(STATEID::ROTTEN) # 腐敗
-      fee = [@level ** Constant_Table::FEE_LOT, 100].max
-    elsif self.state?(STATEID::DEATH)  # しぼう
-      fee = [@level ** Constant_Table::FEE_DIE, 100].max
+    if self.state?(StateId::ROTTEN) # 腐敗
+      fee = [@level ** ConstantTable::FEE_LOT, 100].max
+    elsif self.state?(StateId::DEATH)  # しぼう
+      fee = [@level ** ConstantTable::FEE_DIE, 100].max
     else
       ## 病気・骨折・石化・吐き気・重症は足し算される。
-      if self.state?(STATEID::SICKNESS) # 病気
-        fee += [@level ** Constant_Table::FEE_MIA, 50].max
+      if self.state?(StateId::SICKNESS) # 病気
+        fee += [@level ** ConstantTable::FEE_MIA, 50].max
       end
-      if self.state?(STATEID::STONE)  # 石化
-        fee += [@level ** Constant_Table::FEE_PET, 50].max
+      if self.state?(StateId::STONE)  # 石化
+        fee += [@level ** ConstantTable::FEE_PET, 50].max
       end
-      if self.state?(STATEID::FRACTURE)  # 骨折
-        fee += [@level ** Constant_Table::FEE_FRA, 50].max
+      if self.state?(StateId::FRACTURE)  # 骨折
+        fee += [@level ** ConstantTable::FEE_FRA, 50].max
       end
-      if self.state?(STATEID::SEVERE)  # 重症
-        fee += [@level ** Constant_Table::FEE_SEV, 50].max
+      if self.state?(StateId::SEVERE)  # 重症
+        fee += [@level ** ConstantTable::FEE_SEV, 50].max
       end
     end
     return fee
@@ -4662,8 +4679,8 @@ class Game_Actor < Game_Battler
   #--------------------------------------------------------------------------
   def check_recover_done
     if @progress > calc_fee
-      DEBUG.write(c_m, "経過:#{@progress}秒 > 料金:#{calc_fee}G 治療完了")
-      array = [STATEID::SICKNESS, STATEID::STONE, STATEID::FRACTURE, STATEID::NAUSEA, STATEID::SEVERE]
+      Debug.write(c_m, "経過:#{@progress}秒 > 料金:#{calc_fee}G 治療完了")
+      array = [StateId::SICKNESS, StateId::STONE, StateId::FRACTURE, StateId::NAUSEA, StateId::SEVERE]
       for state_id in array
         remove_state(state_id)
       end
@@ -4677,7 +4694,7 @@ class Game_Actor < Game_Battler
   def progress_clock(value)
     @progress ||= 0
     @progress += value
-    DEBUG.write(c_m, "#{@name} 追加:+#{value}秒 経過:#{@progress}秒 料金:#{calc_fee}G")
+    Debug.write(c_m, "#{@name} 追加:+#{value}秒 経過:#{@progress}秒 料金:#{calc_fee}G")
     check_recover_done
   end
   #--------------------------------------------------------------------------
@@ -4707,8 +4724,8 @@ class Game_Actor < Game_Battler
   # ● 休息中の吐き気の回復
   #--------------------------------------------------------------------------
   def recover_nausea
-    ratio = Constant_Table::REST_NAUSEA_RECOVER_RATIO_PER_TURN
-    state_id = STATEID::NAUSEA
+    ratio = ConstantTable::REST_NAUSEA_RECOVER_RATIO_PER_TURN
+    state_id = StateId::NAUSEA
     return if @state_depth[state_id] == nil
     if ratio > rand(100)
       @state_depth[state_id] -= 1
@@ -4716,7 +4733,7 @@ class Game_Actor < Game_Battler
         ## 回復値で累積値が0以下になる
         @state_depth[state_id] = 0    # リセット
         remove_state(state_id)
-        DEBUG.write(c_m, "休息中の吐き気の回復")
+        Debug.write(c_m, "休息中の吐き気の回復")
       end
     end
   end
@@ -4725,22 +4742,22 @@ class Game_Actor < Game_Battler
   #     element_id_set : 属性ID SET
   #--------------------------------------------------------------------------
   def elemental_resist?(element_type)
-    str = Constant_Table::ELEMENTAL_STR[element_type]             # 属性STRの代入
+    str = ConstantTable::ELEMENTAL_STR[element_type]             # 属性STRの代入
     rank = 0
     for item in armors.compact
       rank += 1 if item.element.include?(str)
-      DEBUG.write(c_m, "防具による(#{str})属性防御検知 #{rank}箇所")
+      Debug.write(c_m, "防具による(#{str})属性防御検知 #{rank}箇所")
     end
     if @veil_element.include?(str)
-      DEBUG.write(c_m, "ベール属性と一致(#{str}) rank:#{rank}")
+      Debug.write(c_m, "ベール属性と一致(#{str}) rank:#{rank}")
       rank += 1
     end
-    if str == Constant_Table::ELEMENTAL_STR[1] && @class_id == 7  # 狩人は寒さに強い
-      DEBUG.write(c_m, "狩人＝#{str}属性と一致 rank:#{rank}")
+    if str == ConstantTable::ELEMENTAL_STR[1] && @class_id == 7  # 狩人は寒さに強い
+      Debug.write(c_m, "狩人＝#{str}属性と一致 rank:#{rank}")
       rank += 1
     end
-    if Constant_Table::MAGIC_HASH_ELEMENT_ARRAY[get_magic_attr(8)].include?(str)
-      DEBUG.write(c_m, "ルーンの属性防御と一致 rank:#{rank}")
+    if ConstantTable::MAGIC_HASH_ELEMENT_ARRAY[get_magic_attr(8)].include?(str)
+      Debug.write(c_m, "ルーンの属性防御と一致 rank:#{rank}")
       rank += 1
     end
     return rank
@@ -4756,7 +4773,7 @@ class Game_Actor < Game_Battler
     return damage if rank == 0
     damage = Integer(damage * 1/(rank+1))  # 属性防御x5箇所
     self.resist_element_flag = true        # 弱点フラグ
-    DEBUG::write(c_m,"属性抵抗#{rank}個検知 ダメージ1/#{rank+1}倍: TYPE(#{element_type})")
+    Debug::write(c_m,"属性抵抗#{rank}個検知 ダメージ1/#{rank+1}倍: TYPE(#{element_type})")
     return damage
   end
 end

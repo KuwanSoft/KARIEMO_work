@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneTreasure
 #------------------------------------------------------------------------------
 # 冒険の再開を行うクラスです。
 #==============================================================================
 
-class Scene_Continue < Scene_Base
+class Scene_Continue < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -79,7 +79,7 @@ class Scene_Continue < Scene_Base
       $game_system.load_party_location(unique_id)
     elsif Input.trigger?(Input::B)
       $game_party.reset_party               # パーティメンバーをリセット
-      $scene = Scene_Maze.new
+      $scene = SceneMaze.new
     end
   end
 end

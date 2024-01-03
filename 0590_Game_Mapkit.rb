@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Game_Mapkit
+# ■ GameMapkit
 #------------------------------------------------------------------------------
 # 　マップキットの内部データ
 #==============================================================================
 
-class Game_Mapkit
+class GameMapkit
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class Game_Mapkit
   # ● アクターIDをセット　＊装備時
   #--------------------------------------------------------------------------
   def set_actor_id(actor_id)
-    DEBUG::write(c_m,"MAP#{@id} #{self}")
+    Debug::write(c_m,"MAP#{@id} #{self}")
     @actor_id = actor_id
   end
   #--------------------------------------------------------------------------
@@ -77,9 +77,9 @@ class Game_Mapkit
   def merge_old_maptype
     return if @map_data == nil  # まだ未装備の場合
     return if @map_data.empty?  # 移管済みならスキップ
-    DEBUG.write(c_m, "@id:#{@id}")
-    DEBUG.write(c_m, "@map_data:#{@map_data}")
-    DEBUG.write(c_m, "@actor_id:#{@actor_id}")
+    Debug.write(c_m, "@id:#{@id}")
+    Debug.write(c_m, "@map_data:#{@map_data}")
+    Debug.write(c_m, "@actor_id:#{@actor_id}")
     reset_new_mapdata
     ## 旧マップデータの移管
     for data in @map_data
@@ -87,10 +87,10 @@ class Game_Mapkit
       x = data[0] / 100 % 100
       y = data[0] % 100
       @map_table[x, y, floor] = 1
-      DEBUG.write(c_m, "変換 x:#{x} y:#{y} floor:#{floor}")
+      Debug.write(c_m, "変換 x:#{x} y:#{y} floor:#{floor}")
     end
     @map_data.clear
-    DEBUG.write(c_m, "***************マップデータ変換完了 ID:#{@id}**********")
+    Debug.write(c_m, "***************マップデータ変換完了 ID:#{@id}**********")
   end
   #--------------------------------------------------------------------------
   # ● マップデータのマージ　＊マップ閲覧時
@@ -102,7 +102,7 @@ class Game_Mapkit
       @map_table[data[0], data[1], data[2]] = 1
     end
     @map_data_t2.clear        # テンポラリはクリア
-    # DEBUG.write(c_m, "MAP Data Merged, use=>:#{use}")
+    # Debug.write(c_m, "MAP Data Merged, use=>:#{use}")
   end
   #--------------------------------------------------------------------------
   # ● 一度訪れた座標の情報を記憶
@@ -114,14 +114,14 @@ class Game_Mapkit
   #--------------------------------------------------------------------------
   def remember_visit_place            # 記憶を更新
     actor = $game_actors[@actor_id]   # 冒険者のオブジェクトを取得
-    sv = MISC.skill_value(SKILLID::MAPPING, actor)  # マッピング 特性値補正後のスキル値
-    diff = Constant_Table::DIFF_70[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::MAPPING, actor)  # マッピング 特性値補正後のスキル値
+    diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if actor.tired?
-    actor.chance_skill_increase(SKILLID::MAPPING)   # スキル上昇チャンス
+    actor.chance_skill_increase(SkillId::MAPPING)   # スキル上昇チャンス
     ## 距離による補正
-    c_dis = Constant_Table::CLOSERANGEMAPUPDATE
-    l_dis = Constant_Table::LONGRANGEMAPUPDATE
+    c_dis = ConstantTable::CLOSERANGEMAPUPDATE
+    l_dis = ConstantTable::LONGRANGEMAPUPDATE
     case $game_player.direction
     when 8; # 北向き
       if $threedmap.check_seeing_place( 0,  0)
@@ -236,10 +236,10 @@ class Game_Mapkit
         update_map_data(ratio * l_dis, -2, 2)
       end
     end
-    ratio = Constant_Table::FORGET_MAP_RATIO
+    ratio = ConstantTable::FORGET_MAP_RATIO
     if ratio > rand(100)
       drop_tempdata
-      DEBUG::write(c_m,"MAP#{@id}データ忘却(#{ratio}%) SIZE:#{map_data_t2.size}")
+      Debug::write(c_m,"MAP#{@id}データ忘却(#{ratio}%) SIZE:#{map_data_t2.size}")
     end
   end
   #--------------------------------------------------------------------------
@@ -291,9 +291,9 @@ class Game_Mapkit
     price = 0
     while floor < 10
       candidate, got, ratio = check_mapkit_completion(floor)
-      price += (ratio * Constant_Table::MAP_PRICE_LIST[floor] / 100).truncate
+      price += (ratio * ConstantTable::MAP_PRICE_LIST[floor] / 100).truncate
       price *= 2 if ratio >= 100
-      DEBUG.write(c_m, "階数:B#{floor}F 踏破率:#{ratio}% 価値:#{price}")
+      Debug.write(c_m, "階数:B#{floor}F 踏破率:#{ratio}% 価値:#{price}")
       floor += 1
     end
     return price

@@ -4,7 +4,7 @@
 # # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 # #==============================================================================
 
-# class Window_Peddler < Window_Selectable
+# class Window_Peddler < WindowSelectable
 #   #--------------------------------------------------------------------------
 #   # ● オブジェクト初期化
 #   #     x : ウィンドウの X 座標
@@ -67,7 +67,7 @@
 #   # ● 選択中のアイテムオブジェクトを取得
 #   #--------------------------------------------------------------------------
 #   def item_obj
-#     item = MISC.item(@data[index][0], @data[index][1])
+#     item = Misc.item(@data[index][0], @data[index][1])
 #   end
 #   #--------------------------------------------------------------------------
 #   # ● リフレッシュ
@@ -91,7 +91,7 @@
 #       end
 #     else # 各防具の場合
 #       for id in $game_party.get_sorted_items(2)
-#         item_data = MISC.item(2, id)
+#         item_data = Misc.item(2, id)
 #         if item_data.kind == @pre_kind
 #           @data.push([2, id]) unless $game_party.shop_armors[id] == 0
 #         end
@@ -124,7 +124,7 @@
 #   def draw_item(index)
 #     kind = @data[index][0]
 #     id = @data[index][1]
-#     item = MISC.item(kind, id)
+#     item = Misc.item(kind, id)
 #     rect = item_rect(index)
 #     price = if item.price == 0 then " " else item.price end # 値段が0はブランク
 #     draw_item_name(0, rect.y, item, @actor.equippable?(item))

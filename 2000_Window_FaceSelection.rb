@@ -4,7 +4,7 @@
 # 　顔の選択
 #==============================================================================
 
-class Window_FaceSelection < Window_Selectable
+class Window_FaceSelection < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class Window_FaceSelection < Window_Selectable
     index = 0
     @face_list = []
     count = 0
-    FACE::FACE.each_line do |face|
+    Portrait::FACE.each_line do |face|
       count += 1
       rect = item_rect(index)
       bitmap = Cache.face(face.chomp)

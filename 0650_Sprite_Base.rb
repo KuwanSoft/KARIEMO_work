@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Sprite_Base
+# ■ SpriteBase
 #------------------------------------------------------------------------------
 # 　アニメーションの表示処理を追加したスプライトのクラスです。
 #==============================================================================
 
-class Sprite_Base < Sprite
+class SpriteBase < Sprite
   #--------------------------------------------------------------------------
   # ● クラス変数
   #--------------------------------------------------------------------------
@@ -198,7 +198,7 @@ class Sprite_Base < Sprite
   #     timing : タイミングデータ (RPG::Animation::Timing)
   #--------------------------------------------------------------------------
   def animation_process_timing(timing)
-    # timing.se.volume = Constant_Table::MASTER_SE_VOLUME
+    # timing.se.volume = ConstantTable::MASTER_SE_VOLUME
     timing.se.volume = $master_se_volume
     timing.se.play
     case timing.flash_scope

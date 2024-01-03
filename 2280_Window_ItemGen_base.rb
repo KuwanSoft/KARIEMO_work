@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　アイテム合成のバックグラウンド
 #==============================================================================
-class Window_ItemGen_base < Window_Base
+class Window_ItemGen_base < WindowBase
   #--------------------------------------------------------------------------
   # ● 初期化処理
   #--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ class Window_ItemGen_base < Window_Base
     change_font_to_v
     self.contents.font.color = earth_color
     self.contents.draw_text(0, 0, self.width-32, BLH, "-さくせいかのうアイテム-", 1)
-    sv = MISC.skill_value(SKILLID::HERB, actor)
+    sv = Misc.skill_value(SkillId::HERB, actor)
     self.contents.font.color = normal_color
     self.contents.draw_text(0, BLH*1, self.width-32, BLH, "スキルじっこうち:#{sv}")
     self.contents.font.color = earth_color

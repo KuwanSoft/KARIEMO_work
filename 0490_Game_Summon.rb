@@ -1,12 +1,12 @@
 #==============================================================================
-# ■ Game_Summon
+# ■ GameSummon
 #------------------------------------------------------------------------------
 # 　精霊および戦闘に関するデータを扱うクラスです。バトルイベントの処理も
 # 行います。このクラスのインスタンスは $game_summon で参照されます。
 # troopやpartyと同列の扱い。
 #==============================================================================
 
-class Game_Summon < Game_Unit
+class GameSummon < GameUnit
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Game_Summon < Game_Unit
   #--------------------------------------------------------------------------
   def initialize
     super
-    @screen = Game_Screen.new
+    @screen = GameScreen.new
     @spirits = []
     clear
   end
@@ -44,15 +44,15 @@ class Game_Summon < Game_Unit
     a = $data_monsters[spirit_id].num.scan(/(\S+)d/)[0][0].to_i
     b = $data_monsters[spirit_id].num.scan(/d(\d)/)[0][0].to_i
     c = $data_monsters[spirit_id].num.scan(/\+(\d)/)[0][0].to_i
-    number_max = MISC.dice(a,b,c)
-    DEBUG::write(c_m,"#{$data_monsters[spirit_id].name} 出現数:#{number_max}体 <#{a}D#{b}+#{c}>") # debug
-    index = Constant_Table::SUMMON_INDEX_START
+    number_max = Misc.dice(a,b,c)
+    Debug::write(c_m,"#{$data_monsters[spirit_id].name} 出現数:#{number_max}体 <#{a}D#{b}+#{c}>") # debug
+    index = ConstantTable::SUMMON_INDEX_START
     for e in 1..number_max
-      DEBUG::write(c_m,"ENEMY_ID:#{spirit_id} SPIRIT_INDEX:#{index}")
-      spirit = Game_Enemy.new(index, spirit_id, 5) # 精霊はグループ6
+      Debug::write(c_m,"ENEMY_ID:#{spirit_id} SPIRIT_INDEX:#{index}")
+      spirit = GameEnemy.new(index, spirit_id, 5) # 精霊はグループ6
       spirit.summon = true  # 召喚フラグ
-      DEBUG::write(c_m,"INDEX:#{index} Group:#{spirit.group_id+1}")         # debug
-      DEBUG::write(c_m,"精霊の名前:#{spirit.original_name} MAXHP:#{spirit.maxhp}") # debug
+      Debug::write(c_m,"INDEX:#{index} Group:#{spirit.group_id+1}")         # debug
+      Debug::write(c_m,"精霊の名前:#{spirit.original_name} MAXHP:#{spirit.maxhp}") # debug
       @spirits.push(spirit)
       index += 1
     end

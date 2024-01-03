@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_REG
+# ■ SceneRegistration
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_REG < Scene_Base
+class SceneRegistration < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -39,7 +39,7 @@ class Scene_REG < Scene_Base
     @used = [0, 0, 0, 0, 0, 0, 0, 0]
 
     @actor.principle = rand(2) == 0 ? -1 : 1
-    DEBUG::write(c_m,"Principle    :#{@actor.principle}")
+    Debug::write(c_m,"Principle    :#{@actor.principle}")
   end
   #--------------------------------------------------------------------------
   # ● Actorの年齢とボーナスポイント追加値を設定する
@@ -61,7 +61,7 @@ class Scene_REG < Scene_Base
       @b_array[index] = 8
     end
     @b_array = [8,8,8,8,8,8,8,8] if @actor.name == "TEST" and $TEST # テストキャラクタの場合
-    DEBUG.write(c_m, "#{@b_array}")
+    Debug.write(c_m, "#{@b_array}")
   end
   #--------------------------------------------------------------------------
   # ● Actorの初期HPを設定する
@@ -78,7 +78,7 @@ class Scene_REG < Scene_Base
     when 8; @actor.maxhp = rand(6)+4 # 聖職者：初期HPの設定 4～10
     when 9; @actor.maxhp = rand(6)+4 # 従士：初期HPの設定 4～10
     end
-    DEBUG::write(c_m,"初期HP:#{@actor.maxhp}") # debug
+    Debug::write(c_m,"初期HP:#{@actor.maxhp}") # debug
   end
   #--------------------------------------------------------------------------
   # ● Actorの初期習得呪文を設定する
@@ -87,14 +87,14 @@ class Scene_REG < Scene_Base
     class_id = @actor.class.id
     return unless [3,8,9].include?(class_id) # 呪術師と聖職者以外はスキップ
     case class_id
-    when 3; table = Constant_Table::SOR_INIT_MAGIC
-    when 8; table = Constant_Table::CLE_INIT_MAGIC
-    when 9; table = Constant_Table::SOR_INIT_MAGIC + Constant_Table::CLE_INIT_MAGIC
+    when 3; table = ConstantTable::SOR_INIT_MAGIC
+    when 8; table = ConstantTable::CLE_INIT_MAGIC
+    when 9; table = ConstantTable::SOR_INIT_MAGIC + ConstantTable::CLE_INIT_MAGIC
     end
     id = table[rand(table.size)]
     @actor.get_magic(id)  # 呪文の習得
     @actor.recover_mp     # MPの回復
-    DEBUG::write(c_m,"初期習得呪文:#{$data_magics[id].name}")
+    Debug::write(c_m,"初期習得呪文:#{$data_magics[id].name}")
   end
   #--------------------------------------------------------------------------
   # ● window類の初期準備
@@ -106,7 +106,7 @@ class Scene_REG < Scene_Base
 
     s1 = "はい"
     s2 = "いいえ"
-    @command_window = Window_Command.new(100, [s1, s2])
+    @command_window = WindowCommand.new(100, [s1, s2])
     @command_window.x = (512-100)/2
     @command_window.y = WLH*22
     @command_window.active = false
@@ -318,7 +318,7 @@ class Scene_REG < Scene_Base
   def update_face_window
     if Input.trigger?(Input::C)
       @actor.set_face(@face_window.get_face_name) # 顔グラの設定
-      DEBUG::write(c_m,"(#{@actor.name})顔グラの設定:#{@face_window.get_face_name}")
+      Debug::write(c_m,"(#{@actor.name})顔グラの設定:#{@face_window.get_face_name}")
       @face_window.visible = false  # faceウィンドウの消去
       @face_window.active = false   # faceウィンドウの消去
       start_skill_selection
@@ -338,16 +338,16 @@ class Scene_REG < Scene_Base
         if @actor.name == "TEST" and $TEST  # テストキャラクタの場合
           initial_gold = 1000000
         elsif @actor.personality_n == :Hobbyist
-          initial_gold = Constant_Table::HOBBYIST_MONEY
+          initial_gold = ConstantTable::HOBBYIST_MONEY
         else
           initial_gold = rand(101) + 50       # 財布
         end
         @actor.gain_gold(initial_gold)
-        $scene = Scene_OFFICE.new
-        SAVE::do_save("#{self.class.name}") # セーブ
+        $scene = SceneGuild.new
+        Save::do_save("#{self.class.name}") # セーブ
       when 1;
         @actor.setup($game_temp.name_actor_id)
-        $scene = Scene_OFFICE.new
+        $scene = SceneGuild.new
       end
     end
   end

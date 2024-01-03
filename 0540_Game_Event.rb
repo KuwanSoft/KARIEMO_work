@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Event
+# ■ GameEvent
 #------------------------------------------------------------------------------
 # 　イベントを扱うクラスです。条件判定によるイベントページ切り替えや、並列処理
 # イベント実行などの機能を持っており、Game_Map クラスの内部で使用されます。
 #==============================================================================
 
-class Game_Event < Game_Character
+class GameEvent < GameCharacter
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -36,8 +36,8 @@ class Game_Event < Game_Character
   # ● イベントID上書き
   #--------------------------------------------------------------------------
   def id
-    return @id + Constant_Table::RG_EVENTID_OFFSET if @random
-    return @id + Constant_Table::FIXED_EVENTID_OFFSET if @fixed
+    return @id + ConstantTable::RG_EVENTID_OFFSET if @random
+    return @id + ConstantTable::FIXED_EVENTID_OFFSET if @fixed
     return @id
   end
   #--------------------------------------------------------------------------
@@ -136,9 +136,9 @@ class Game_Event < Game_Character
     ## アイテム名で判定する？
     if c.item_valid         # アイテム
       case c.item_id
-      when 1; name = Constant_Table::EVENT_ITEMNAME1
-      when 2; name = Constant_Table::EVENT_ITEMNAME2
-      when 3; name = Constant_Table::EVENT_ITEMNAME3
+      when 1; name = ConstantTable::EVENT_ITEMNAME1
+      when 2; name = ConstantTable::EVENT_ITEMNAME2
+      when 3; name = ConstantTable::EVENT_ITEMNAME3
       end
       return false unless $game_party.has_itemname?(name)
     end
@@ -190,7 +190,7 @@ class Game_Event < Game_Character
       @list = @page.list
       @interpreter = nil
       if @trigger == 4                       # トリガーが [並列処理] の場合
-        @interpreter = Game_Interpreter.new  # 並列処理用インタプリタを作成
+        @interpreter = GameInterpreter.new  # 並列処理用インタプリタを作成
       end
     end
     update_bush_depth

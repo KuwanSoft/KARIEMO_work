@@ -1,4 +1,4 @@
-class Window_Arrange < Window_Selectable
+class Window_Arrange < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標

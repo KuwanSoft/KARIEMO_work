@@ -4,7 +4,7 @@
 # 　セーブ画面およびロード画面で表示する、セーブファイルのウィンドウです。
 #==============================================================================
 
-class Window_Lock < Window_Base
+class Window_Lock < WindowBase
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -31,16 +31,16 @@ class Window_Lock < Window_Base
   # ● 開錠能力の計算
   #--------------------------------------------------------------------------
   def calc_unlock(actor)
-    @unlock = MISC.skill_value(SKILLID::PICKLOCK, actor)  # スキル値を取得
-    DEBUG::write(c_m, "開錠能力: #{@unlock}")
+    @unlock = Misc.skill_value(SkillId::PICKLOCK, actor)  # スキル値を取得
+    Debug::write(c_m, "開錠能力: #{@unlock}")
     @actor = actor
   end
   #--------------------------------------------------------------------------
   # ● 開錠能力の計算
   #--------------------------------------------------------------------------
   def calc_unlock_magic(actor)
-    @unlock = MISC.skill_value(SKILLID::RATIONAL, actor)  # スキル値を取得
-    DEBUG::write(c_m, "呪文開錠能力: #{@unlock}")
+    @unlock = Misc.skill_value(SkillId::RATIONAL, actor)  # スキル値を取得
+    Debug::write(c_m, "呪文開錠能力: #{@unlock}")
     @actor = actor
   end
   #--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class Window_Lock < Window_Base
   def estimate_unlock_rate(lock_num, lock_diff)
     skill = @unlock
     @ratio = ([(skill - lock_diff), 0].max / skill.to_f) ** lock_num
-    # DEBUG.write(c_m, "skill:#{skill} lock_diff:#{lock_diff} lock_num:#{lock_num} ratio:#{@ratio}")
+    # Debug.write(c_m, "skill:#{skill} lock_diff:#{lock_diff} lock_num:#{lock_num} ratio:#{@ratio}")
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ
@@ -150,12 +150,12 @@ class Window_Lock < Window_Base
       $threedmap.input_unlock
     else
       $music.se_play("うまくいかない")
-      bratio = Constant_Table::BROKEN_RATIO
+      bratio = ConstantTable::BROKEN_RATIO
       ## 鍵穴を壊す判定
       if bratio > rand(100)
         ## 壊した場合：フォーリーブスをチェック
-        sv = MISC.skill_value(SKILLID::FOURLEAVES, @actor)
-        diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+        sv = Misc.skill_value(SkillId::FOURLEAVES, @actor)
+        diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
         ratio = Integer([sv * diff, 95].min)
         ratio /= 2 if @actor.tired?
         unless ratio > rand(100)

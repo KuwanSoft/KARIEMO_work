@@ -4,7 +4,7 @@
 # 　呪文MP画面
 #==============================================================================
 
-class Window_SkillBase < Window_Base
+class Window_SkillBase < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -53,7 +53,7 @@ class Window_SkillBase < Window_Base
     change_font_to_v
     self.contents.draw_text(0, 24*13, WLW*10, 24, "[←→]で")
     self.contents.draw_text(0, 24*14, WLW*10, 24, "Pageのきりかえ")
-    unless $scene.is_a?(Scene_CAMP)
+    unless $scene.is_a?(SceneCamp)
       self.contents.draw_text(0, 24*15, WLW*10, 24, "[LR]で")
       self.contents.draw_text(0, 24*16, WLW*10, 24, "スキルのわりふり")
     else

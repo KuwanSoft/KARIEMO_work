@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneTreasure
 #------------------------------------------------------------------------------
 # 　メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Treasure < Scene_Base
+class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -160,76 +160,76 @@ class Scene_Treasure < Scene_Base
     @box = Window_Treasure_Box.new  # 宝箱のwindowを作成
     case @trap_id
     when 1;
-      @trap_name = Constant_Table::TRAP_NAME1
-      @devices = Constant_Table::TRAP1_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME1
+      @devices = ConstantTable::TRAP1_DEVICES
     when 2;
-      @trap_name = Constant_Table::TRAP_NAME2
-      @devices = Constant_Table::TRAP2_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME2
+      @devices = ConstantTable::TRAP2_DEVICES
     when 3;
-      @trap_name = Constant_Table::TRAP_NAME3
-      @devices = Constant_Table::TRAP3_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME3
+      @devices = ConstantTable::TRAP3_DEVICES
     when 4;
-      @trap_name = Constant_Table::TRAP_NAME4
-      @devices = Constant_Table::TRAP4_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME4
+      @devices = ConstantTable::TRAP4_DEVICES
     when 5;
-      @trap_name = Constant_Table::TRAP_NAME5
-      @devices = Constant_Table::TRAP5_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME5
+      @devices = ConstantTable::TRAP5_DEVICES
     when 6;
-      @trap_name = Constant_Table::TRAP_NAME6
-      @devices = Constant_Table::TRAP6_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME6
+      @devices = ConstantTable::TRAP6_DEVICES
     when 7;
-      @trap_name = Constant_Table::TRAP_NAME7
-      @devices = Constant_Table::TRAP7_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME7
+      @devices = ConstantTable::TRAP7_DEVICES
     when 8;
-      @trap_name = Constant_Table::TRAP_NAME8
-      @devices = Constant_Table::TRAP8_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME8
+      @devices = ConstantTable::TRAP8_DEVICES
     when 9;
-      @trap_name = Constant_Table::TRAP_NAME9
-      @devices = Constant_Table::TRAP9_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME9
+      @devices = ConstantTable::TRAP9_DEVICES
     when 10;
-      @trap_name = Constant_Table::TRAP_NAME10
-      @devices = Constant_Table::TRAP10_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME10
+      @devices = ConstantTable::TRAP10_DEVICES
     when 11;
-      @trap_name = Constant_Table::TRAP_NAME11
-      @devices = Constant_Table::TRAP11_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME11
+      @devices = ConstantTable::TRAP11_DEVICES
     when 12;
-      @trap_name = Constant_Table::TRAP_NAME12
-      @devices = Constant_Table::TRAP12_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME12
+      @devices = ConstantTable::TRAP12_DEVICES
     when 13;
-      @trap_name = Constant_Table::TRAP_NAME13
-      @devices = Constant_Table::TRAP13_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME13
+      @devices = ConstantTable::TRAP13_DEVICES
     when 14;
-      @trap_name = Constant_Table::TRAP_NAME14
-      @devices = Constant_Table::TRAP14_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME14
+      @devices = ConstantTable::TRAP14_DEVICES
     when 15;
-      @trap_name = Constant_Table::TRAP_NAME15
-      @devices = Constant_Table::TRAP15_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME15
+      @devices = ConstantTable::TRAP15_DEVICES
     when 16;
-      @trap_name = Constant_Table::TRAP_NAME16
-      @devices = Constant_Table::TRAP16_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME16
+      @devices = ConstantTable::TRAP16_DEVICES
     when 17;
-      @trap_name = Constant_Table::TRAP_NAME17
-      @devices = Constant_Table::TRAP17_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME17
+      @devices = ConstantTable::TRAP17_DEVICES
     when 18;
-      @trap_name = Constant_Table::TRAP_NAME18
-      @devices = Constant_Table::TRAP18_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME18
+      @devices = ConstantTable::TRAP18_DEVICES
     when 19;
-      @trap_name = Constant_Table::TRAP_NAME19
-      @devices = Constant_Table::TRAP19_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME19
+      @devices = ConstantTable::TRAP19_DEVICES
     when 20;
-      @trap_name = Constant_Table::TRAP_NAME20
-      @devices = Constant_Table::TRAP20_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME20
+      @devices = ConstantTable::TRAP20_DEVICES
     when 21;
-      @trap_name = Constant_Table::TRAP_NAME21
-      @devices = Constant_Table::TRAP21_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME21
+      @devices = ConstantTable::TRAP21_DEVICES
     when 22;
-      @trap_name = Constant_Table::TRAP_NAME22
-      @devices = Constant_Table::TRAP22_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME22
+      @devices = ConstantTable::TRAP22_DEVICES
     when 23;
-      @trap_name = Constant_Table::TRAP_NAME23
-      @devices = Constant_Table::TRAP23_DEVICES
+      @trap_name = ConstantTable::TRAP_NAME23
+      @devices = ConstantTable::TRAP23_DEVICES
     end
-    DEBUG.write(c_m,"罠:#{@trap_name} デバイス:#{@devices}")
+    Debug.write(c_m,"罠:#{@trap_name} デバイス:#{@devices}")
   end
   #--------------------------------------------------------------------------
   # ● 罠の決定 現在の階層によって選択される
@@ -296,7 +296,7 @@ class Scene_Treasure < Scene_Base
         @ps.index = 0
       when 3; # 諦めて立ち去る
         RPG::BGM.fade(300)
-        $scene = Scene_Map.new
+        $scene = SceneMap.new
         Graphics.fadeout(10)
       end
     end
@@ -306,7 +306,7 @@ class Scene_Treasure < Scene_Base
   #--------------------------------------------------------------------------
   def can_check?(actor)
     actor.attempts ||= 0
-    return true if actor.attempts < Constant_Table::MAX_ATTEMPTS
+    return true if actor.attempts < ConstantTable::MAX_ATTEMPTS
     return false
   end
   #--------------------------------------------------------------------------
@@ -443,7 +443,7 @@ class Scene_Treasure < Scene_Base
       text = sprintf("パーティはぜんめつした。")
       $game_message.texts.push(text)
       wait_for_message
-      $scene = Scene_Gameover.new
+      $scene = SceneGameover.new
     elsif @skip_item
       treasure_end                  # そのままシーン終了
     else
@@ -462,9 +462,9 @@ class Scene_Treasure < Scene_Base
   def trap_1_effect
     $music.se_play("仕掛け弓")
     floor = $game_map.map_id
-    damage = MISC.dice(floor, 16, 0)
-    sv = MISC.skill_value(SKILLID::REFLEXES, @ps.actor)
-    diff = Constant_Table::DIFF_30[floor] # フロア係数
+    damage = Misc.dice(floor, 16, 0)
+    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
+    diff = ConstantTable::DIFF_30[floor] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -489,8 +489,8 @@ class Scene_Treasure < Scene_Base
     members.push($game_party.existing_members[rand($game_party.existing_members.size)])
     members.push($game_party.existing_members[rand($game_party.existing_members.size)])
     for member in members
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_30[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_30[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -514,14 +514,14 @@ class Scene_Treasure < Scene_Base
     $music.se_play("毒霧")
     floor = $game_map.map_id
     members = $game_party.existing_members
-    state_id = STATEID::POISON  # 毒
+    state_id = StateId::POISON  # 毒
     for member in members
-      damage = MISC.dice(floor, 8, 0)
+      damage = Misc.dice(floor, 8, 0)
       member.hp -= damage
       text = sprintf("%sは %dのダメージを うけた。", member.name, damage)
       $game_message.texts.push(text)
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_50[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_50[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -550,9 +550,9 @@ class Scene_Treasure < Scene_Base
     members.push $game_party.existing_members[rand($game_party.existing_members.size)]
     members.push $game_party.existing_members[rand($game_party.existing_members.size)]
     for member in members
-      damage = MISC.dice($game_map.map_id, 24, 0)
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_50[floor] # フロア係数
+      damage = Misc.dice($game_map.map_id, 24, 0)
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_50[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -573,12 +573,12 @@ class Scene_Treasure < Scene_Base
   def trap_5_effect
     $music.se_play("爆弾")
     floor = $game_map.map_id
-    damage = MISC.dice($game_map.map_id, 24, 0)
+    damage = Misc.dice($game_map.map_id, 24, 0)
     members = $game_party.existing_members
     for member in members
-      damage = MISC.dice($game_map.map_id, 24, 0)
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_75[floor] # フロア係数
+      damage = Misc.dice($game_map.map_id, 24, 0)
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_75[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -608,18 +608,18 @@ class Scene_Treasure < Scene_Base
     floor = $game_map.map_id
     members = $game_party.existing_members
     for member in members
-      damage = MISC.dice($game_map.map_id, 12, 0)
+      damage = Misc.dice($game_map.map_id, 12, 0)
       member.hp -= damage
       text = sprintf("%sは %dのダメージを うけた。", member.name, damage)
       $game_message.texts.push(text)
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_75[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_75[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       ## 状態異常判定#1
       resist = ratio > rand(100) ? true : false # 抵抗判定
       unless resist
-        state_id = STATEID::POISON  # 毒
+        state_id = StateId::POISON  # 毒
         depth = $game_map.map_id * 10 # 深度を設定
         member.add_state(state_id, depth)  # 毒を付加
         text = member.name + $data_states[state_id].message1
@@ -628,7 +628,7 @@ class Scene_Treasure < Scene_Base
       ## 状態異常判定#2
       resist = ratio > rand(100) ? true : false # 抵抗判定
       unless resist
-        state_id = STATEID::SICKNESS  # 病気
+        state_id = StateId::SICKNESS  # 病気
         depth = $game_map.map_id * 10 # 深度を設定
         member.add_state(state_id, depth)  # 病気を付加
         text = member.name + $data_states[state_id].message1
@@ -637,7 +637,7 @@ class Scene_Treasure < Scene_Base
       ## 状態異常判定#3
       resist = ratio > rand(100) ? true : false # 抵抗判定
       unless resist
-        state_id = STATEID::STONE  # 石化
+        state_id = StateId::STONE  # 石化
         depth = $game_map.map_id * 10 # 深度を設定
         member.add_state(state_id, depth)  # 異常を付加
         text = member.name + $data_states[state_id].message1
@@ -659,9 +659,9 @@ class Scene_Treasure < Scene_Base
   def trap_7_effect
     $music.se_play("大電流")
     floor = $game_map.map_id
-    damage = MISC.dice(floor, 100, 0)
-    sv = MISC.skill_value(SKILLID::REFLEXES, @ps.actor)
-    diff = Constant_Table::DIFF_50[floor] # フロア係数
+    damage = Misc.dice(floor, 100, 0)
+    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
+    diff = ConstantTable::DIFF_50[floor] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -688,7 +688,7 @@ class Scene_Treasure < Scene_Base
     for member in members
       ## 呪いもしくはステータス異常の場合
       if member.being_cursed? or not member.good_condition?
-        member.add_state(STATEID::DEATH, 0)
+        member.add_state(StateId::DEATH, 0)
         member.perform_collapse
         text = sprintf("%sは たましいを もっていかれた!", member.name)
         $game_message.texts.push(text)
@@ -734,8 +734,8 @@ class Scene_Treasure < Scene_Base
   def trap_11_effect
     $music.se_play("神の瞬き")
     floor = $game_map.map_id
-    sv = MISC.skill_value(SKILLID::REFLEXES, @ps.actor)
-    diff = Constant_Table::DIFF_75[floor] # フロア係数
+    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
+    diff = ConstantTable::DIFF_75[floor] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -768,10 +768,10 @@ class Scene_Treasure < Scene_Base
     $music.se_play("謎の瘴気")
     floor = $game_map.map_id
     members = $game_party.existing_members
-    state_id = STATEID::SICKNESS
+    state_id = StateId::SICKNESS
     for member in members
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_50[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_50[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -793,8 +793,8 @@ class Scene_Treasure < Scene_Base
   def trap_19_effect
     $music.se_play("玉手箱")
     floor = $game_map.map_id
-    sv = MISC.skill_value(SKILLID::REFLEXES, @ps.actor)
-    diff = Constant_Table::DIFF_75[floor] # フロア係数
+    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
+    diff = ConstantTable::DIFF_75[floor] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     resist = ratio > rand(100) ? true : false # 抵抗判定
@@ -818,8 +818,8 @@ class Scene_Treasure < Scene_Base
     floor = $game_map.map_id
     members = $game_party.existing_members
     for member in members
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_30[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_30[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       ## 抵抗判定
@@ -843,14 +843,14 @@ class Scene_Treasure < Scene_Base
     floor = $game_map.map_id
     members = $game_party.existing_members
     for member in members
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_30[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_30[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       ## 状態異常判定
       resist = ratio > rand(100) ? true : false # 抵抗判定
       unless resist
-        state_id = STATEID::STINK  # 悪臭
+        state_id = StateId::STINK  # 悪臭
         depth = $game_map.map_id * 10 # 深度を設定
         member.add_state(state_id, depth)  # 悪臭を付加
         text = member.name + $data_states[state_id].message1
@@ -885,14 +885,14 @@ class Scene_Treasure < Scene_Base
     floor = $game_map.map_id
     members = $game_party.existing_members
     for member in members
-      sv = MISC.skill_value(SKILLID::REFLEXES, member)
-      diff = Constant_Table::DIFF_30[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::REFLEXES, member)
+      diff = ConstantTable::DIFF_30[floor] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if member.tired?
       ## 抵抗判定
       resist = ratio > rand(100) ? true : false # 抵抗判定
       unless resist
-        state_id = STATEID::SUFFOCATION  # 窒息
+        state_id = StateId::SUFFOCATION  # 窒息
         depth = 0
         member.add_state(state_id, depth)  # 窒息を付加
         text = member.name + $data_states[state_id].message1
@@ -916,13 +916,13 @@ class Scene_Treasure < Scene_Base
       ## 道具武器防具か？=>全不確定化
       identified = false
       ## ガイドのとりぶん判定
-      if rand(100) < Constant_Table::SHARE_RATIO and $game_mercenary.active?
-        item_name = "?" + MISC.item(item[0], item[1]).name2
+      if rand(100) < ConstantTable::SHARE_RATIO and $game_mercenary.active?
+        item_name = "?" + Misc.item(item[0], item[1]).name2
         $game_message.texts.push("#{$game_mercenary.name}は #{item_name}をうけとった。")
         next
       end
       member = $game_party.gain_item(item, identified)
-      item_name = "?" + MISC.item(item[0], item[1]).name2
+      item_name = "?" + Misc.item(item[0], item[1]).name2
       $game_message.texts.push("#{member.name}は #{item_name}をてにいれた。")
     end
     $game_message.texts.push("パーティは #{remain} G.P.をてにいれた。")
@@ -937,7 +937,7 @@ class Scene_Treasure < Scene_Base
   #--------------------------------------------------------------------------
   def treasure_end
     RPG::BGM.fade(300)
-    $scene = Scene_Map.new
+    $scene = SceneMap.new
     Graphics.fadeout(10)
   end
   #--------------------------------------------------------------------------
@@ -959,7 +959,7 @@ class Scene_Treasure < Scene_Base
         @inspect_window.reset_search_result
         @timer = 0
         @inspect_window.refresh(@ps.actor)
-        @ps.actor.chance_skill_increase(SKILLID::TRAP)
+        @ps.actor.chance_skill_increase(SkillId::TRAP)
         wait_for_inspection
       when 1; ## 罠表示切り替え（上）
         @inspect_window.refresh(@ps.actor, "", 1)
@@ -990,13 +990,32 @@ class Scene_Treasure < Scene_Base
   #--------------------------------------------------------------------------
   def wait_for_inspection
     @bar.visible = true
+    ## チェックのタイミング
+    t1 = 26
+    t2 = 50
+    t3 = 76
+    t4 = 100
+    t5 = 126
+    t6 = 150
+    t7 = 176
+    t8 = 200
+    u1 = 2
+    u2 = 82
+    u3 = 102
+    u4 = 162
+    case @ps.actor.search_ratio
+    when 90..100
+      speed = 2
+    when 0..89
+      speed = 1
+    end
     while true
       i = 0
       good = 0
       result = "?"
       value = @ps.actor.search_ratio
       case @timer
-      when 25,50,75,100,125,150,175,200
+      when t1, t2, t3, t4, t5, t6, t7, t8
         good = 0
         while i < 3
           if value > rand(100)
@@ -1016,39 +1035,39 @@ class Scene_Treasure < Scene_Base
           result = "?"    # 罠は発動しない
         when 2  # */-
           case @timer
-          when 200; result = "*" if @devices[7] != "-"
-          when 175; result = "*" if @devices[6] != "-"
-          when 150; result = "*" if @devices[5] != "-"
-          when 125; result = "*" if @devices[4] != "-"
-          when 100; result = "*" if @devices[3] != "-"
-          when 75; result = "*" if @devices[2] != "-"
-          when 50; result = "*" if @devices[1] != "-"
-          when 25; result = "*" if @devices[0] != "-"
+          when t8; result = "*" if @devices[7] != "-"
+          when t7; result = "*" if @devices[6] != "-"
+          when t6; result = "*" if @devices[5] != "-"
+          when t5; result = "*" if @devices[4] != "-"
+          when t4; result = "*" if @devices[3] != "-"
+          when t3; result = "*" if @devices[2] != "-"
+          when t2; result = "*" if @devices[1] != "-"
+          when t1; result = "*" if @devices[0] != "-"
           end
         when 3  # 1..3
           case @timer
-          when 200; result = @devices[7]
-          when 175; result = @devices[6]
-          when 150; result = @devices[5]
-          when 125; result = @devices[4]
-          when 100; result = @devices[3]
-          when 75; result = @devices[2]
-          when 50; result = @devices[1]
-          when 25; result = @devices[0]
+          when t8; result = @devices[7]
+          when t7; result = @devices[6]
+          when t6; result = @devices[5]
+          when t5; result = @devices[4]
+          when t4; result = @devices[3]
+          when t3; result = @devices[2]
+          when t2; result = @devices[1]
+          when t1; result = @devices[0]
           end
         end
-        DEBUG.write(c_m, "調査GOOD数:#{good} TIMER:#{@timer}")
+        Debug.write(c_m, "調査GOOD数:#{good} TIMER:#{@timer}")
         @inspect_window.refresh(@ps.actor, result)
-      when 1; $music.se_play("罠調査")
-      when 81; $music.se_play("罠調査")
-      when 101; $music.se_play("解錠")
-      when 161; $music.se_play("罠調査")
+      when u1; $music.se_play("罠調査")
+      when u2; $music.se_play("罠調査")
+      when u3; $music.se_play("解錠")
+      when u4; $music.se_play("罠調査")
       end
       bar = "progress_bar_" + (@timer/2).to_s
       @bar.bitmap = Cache.system(bar)
-      @timer += 1
+      @timer += speed
       ## タイマーをリセット
-      if @timer > 200
+      if @timer > t8
         @timer = 0
         break
       end
@@ -1093,6 +1112,12 @@ class Scene_Treasure < Scene_Base
   #--------------------------------------------------------------------------
   def wait_for_disarm(mischoice = false)
     @timer = 0
+    case @ps.actor.disarm_ratio
+    when 90..100
+      speed = 2
+    when 0..89
+      speed = 1
+    end
     @bar.visible = true
     while @timer < 200
       case @timer
@@ -1102,14 +1127,14 @@ class Scene_Treasure < Scene_Base
           trap_effect
           break
         end
-      when 199
+      when 198
         ## うまくはずせた
         value = @ps.actor.disarm_ratio
         if value > rand(100)
           $music.se_play("たからばこ")
           @inspect_window.device_array[@device_window.index] = true
           @inspect_window.refresh(@ps.actor)
-          @ps.actor.chance_skill_increase(SKILLID::PICKLOCK)
+          @ps.actor.chance_skill_increase(SkillId::PICKLOCK)
           if @device_order == 2
             ## 全部取り外し完了
             $music.se_play("宝箱：開")
@@ -1134,14 +1159,14 @@ class Scene_Treasure < Scene_Base
           $music.se_play("うまくいかない")
           break
         end
-      when 1; $music.se_play("罠調査")
-      when 81; $music.se_play("罠調査")
-      when 101; $music.se_play("解錠")
-      when 161; $music.se_play("罠調査")
+      when 2; $music.se_play("罠調査")
+      when 82; $music.se_play("罠調査")
+      when 102; $music.se_play("解錠")
+      when 162; $music.se_play("罠調査")
       end
       bar = "progress_bar_" + (@timer/2).to_s
       @bar.bitmap = Cache.system(bar)
-      @timer += 1
+      @timer += speed
       Graphics.update                 # ゲーム画面を更新
       Input.update                    # 入力情報を更新
       @bar.update                     # ウィンドウを更新

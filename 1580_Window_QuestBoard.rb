@@ -4,7 +4,7 @@
 # クエストボード
 #==============================================================================
 
-class Window_QuestBoard < Window_Selectable
+class Window_QuestBoard < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class Window_QuestBoard < Window_Selectable
   def draw_item(idx)
     rect = item_rect(idx)
     id = @data[idx].id
-    io = MISC.item(@data[idx].r_item_kind, @data[idx].r_item_id)
+    io = Misc.item(@data[idx].r_item_kind, @data[idx].r_item_id)
     name = io.name
     case @data[idx].type
     when "collect"; str = "をあつめる"
@@ -128,7 +128,7 @@ class Window_QuestBoard < Window_Selectable
     if tr > 0
       for actor in $game_party.existing_members
         ## キャラクタ1人に対してのオーブTRとの差分で経験値を算出
-        case MISC.get_diff(actor.expected_level, tr.to_f)
+        case Misc.get_diff(actor.expected_level, tr.to_f)
         when -99..-4; m = 0.0625
         when -3; m = 0.125
         when -2; m = 0.25
@@ -138,8 +138,8 @@ class Window_QuestBoard < Window_Selectable
         when 2;  m = 3
         when 3..99; m = 4
         end
-        exp = Constant_Table::BASE_EXP * m
-        DEBUG.write(c_m, "オーブによるEXP=>#{actor.name} 脅威度倍率:x#{m} 獲得経験値:#{exp}")
+        exp = ConstantTable::BASE_EXP * m
+        Debug.write(c_m, "オーブによるEXP=>#{actor.name} 脅威度倍率:x#{m} 獲得経験値:#{exp}")
         actor.gain_exp(exp)
         $game_message.texts.push("#{actor.name}は #{exp}E.P.をえた。")
       end
@@ -154,7 +154,7 @@ class Window_QuestBoard < Window_Selectable
       r_kind = $data_quests[id].reward_item_kind
       r_id = $data_quests[id].reward_item_id
       member = $game_party.gain_item([r_kind, r_id], true)
-      $game_message.texts.push("#{member.name}は #{MISC.item(r_kind, r_id).name} をえた。")
+      $game_message.texts.push("#{member.name}は #{Misc.item(r_kind, r_id).name} をえた。")
     end
     ## クエストをDeactivate
     $game_quest.deactivate(id)

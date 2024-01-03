@@ -4,7 +4,7 @@
 #
 #==============================================================================
 
-class Window_INN_Menu < Window_Selectable
+class Window_INN_Menu < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class Window_INN_Menu < Window_Selectable
     days += 1 if @actor.fatigue % recover > 0  # 余る場合は1日足す
     days = [days, 1].max                     # 最低１日必要とする
     total = days * fee
-    DEBUG::write(c_m,"#{@actor.name} 疲労度:#{@actor.fatigue} 回復度:#{recover} 日数:#{days} 料金:#{total}")
+    Debug::write(c_m,"#{@actor.name} 疲労度:#{@actor.fatigue} 回復度:#{recover} 日数:#{days} 料金:#{total}")
     return total,days
   end
   #--------------------------------------------------------------------------
@@ -42,10 +42,10 @@ class Window_INN_Menu < Window_Selectable
   def refresh(actor)
     @page = 1
     @actor = actor
-    fee1 = Constant_Table::INN1_FEE
-    fee2 = Constant_Table::INN2_FEE
-    fee3 = Constant_Table::INN3_FEE
-    fee4 = Constant_Table::INN4_FEE
+    fee1 = ConstantTable::INN1_FEE
+    fee2 = ConstantTable::INN2_FEE
+    fee3 = ConstantTable::INN3_FEE
+    fee4 = ConstantTable::INN4_FEE
     str = "おかえりなさい #{actor.name}"
     str2 = "どこにとまりますか?"
     self.contents.clear
@@ -83,17 +83,17 @@ class Window_INN_Menu < Window_Selectable
       fee = 0
       rec = 0
     when 1; room = "2とうしんだい"
-      fee = Constant_Table::INN1_FEE
-      rec = Constant_Table::INN1_RECOVER
+      fee = ConstantTable::INN1_FEE
+      rec = ConstantTable::INN1_RECOVER
     when 2; room = "スタンダード"
-      fee = Constant_Table::INN2_FEE
-      rec = Constant_Table::INN2_RECOVER
+      fee = ConstantTable::INN2_FEE
+      rec = ConstantTable::INN2_RECOVER
     when 3; room = "デラックス"
-      fee = Constant_Table::INN3_FEE
-      rec = Constant_Table::INN3_RECOVER
+      fee = ConstantTable::INN3_FEE
+      rec = ConstantTable::INN3_RECOVER
     when 4; room = "スイート"
-      fee = Constant_Table::INN4_FEE
-      rec = Constant_Table::INN4_RECOVER
+      fee = ConstantTable::INN4_FEE
+      rec = ConstantTable::INN4_RECOVER
     end
     str = "#{room}でよろしいか?"
     self.contents.draw_text(0, 0, self.width-32, WLH, str)
@@ -102,7 +102,7 @@ class Window_INN_Menu < Window_Selectable
     case @grade
     when 1
       str3 = "りょうきんは むりょうです。"
-      str2 = "#{Constant_Table::STABLE_DAYS} にち きゅうそくします。"
+      str2 = "#{ConstantTable::STABLE_DAYS} にち きゅうそくします。"
       str1 = "げんざいのひろう: #{@actor.fatigue}"
     else
       str3 = "りょうきんは #{@cost}G.P."

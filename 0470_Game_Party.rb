@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Party
+# ■ GameParty
 #------------------------------------------------------------------------------
 # 　パーティを扱うクラスです。ゴールドやアイテムなどの情報が含まれます。このク
 # ラスのインスタンスは $game_party で参照されます。
 #==============================================================================
 
-class Game_Party < Game_Unit
+class GameParty < GameUnit
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -225,7 +225,7 @@ class Game_Party < Game_Unit
   #     item : アイテム
   #--------------------------------------------------------------------------
   def item_stock_number(kind, id)
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     case item
     when Items2
       number = @shop_items[item.id]
@@ -257,7 +257,7 @@ class Game_Party < Game_Unit
       next if member == nil
       for member_item in member.bag
         if member_item[0] == item_index
-          item_obj = MISC.item(member_item[0][0], member_item[0][1])
+          item_obj = Misc.item(member_item[0][0], member_item[0][1])
           if identified and member_item[1]  # 鑑定済みが必要？
             if item_obj.stackable?
               count += member_item[4]
@@ -269,16 +269,16 @@ class Game_Party < Game_Unit
           else
             count += 1
           end
-          # DEBUG.write(c_m, "#{member.name}がアイテムを保持:#{item_index}")
+          # Debug.write(c_m, "#{member.name}がアイテムを保持:#{item_index}")
         end
       end
     end
-    # DEBUG.write(c_m, "#{MISC.item(item_index[0],item_index[1]).name}を#{count}個保持")
+    # Debug.write(c_m, "#{Misc.item(item_index[0],item_index[1]).name}を#{count}個保持")
     return (count >= qty), count if need_qty  # 個数も必要な場合
     return true if (count >= qty)
     return false if party         # パーティのみチェックの場合
     if item_stock_number(item_index[0], item_index[1]) > 0
-      DEBUG.write(c_m, "ショップ在庫に該当アイテムあり:#{item_index}")
+      Debug.write(c_m, "ショップ在庫に該当アイテムあり:#{item_index}")
       return true
     end
     return false
@@ -293,7 +293,7 @@ class Game_Party < Game_Unit
     for member in $game_party.existing_members
       for member_item in member.bag
         next if member_item == nil
-        item_obj = MISC.item(member_item[0][0], member_item[0][1])
+        item_obj = Misc.item(member_item[0][0], member_item[0][1])
         ## 識別済み？
         next unless member_item[1]
         if item_obj.name == name
@@ -515,7 +515,7 @@ class Game_Party < Game_Unit
   def all_dead?
     return false if $scene.is_a?(Scene_Continue)
     return false if $scene.is_a?(Scene_PRESENTS)
-    return false if $scene.is_a?(Scene_Gameover)
+    return false if $scene.is_a?(SceneGameover)
     if @actors.size == 0 and not $game_temp.in_battle
       return false
     end
@@ -617,11 +617,11 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def chance_skillgain_packing
     for member in existing_members
-      next unless member.carry_ratio > Constant_Table::PACK_SG_THRES
-      DEBUG.write(c_m, "#{member.name} c_ratio#{member.carry_ratio}")
+      next unless member.carry_ratio > ConstantTable::PACK_SG_THRES
+      Debug.write(c_m, "#{member.name} c_ratio#{member.carry_ratio}")
       if member.carry_ratio > rand(100)
-        member.chance_skill_increase(SKILLID::PACKING)  # パッキング
-        member.chance_skill_increase(SKILLID::STAMINA)  # スタミナ
+        member.chance_skill_increase(SkillId::PACKING)  # パッキング
+        member.chance_skill_increase(SkillId::STAMINA)  # スタミナ
       end
     end
   end
@@ -693,8 +693,8 @@ class Game_Party < Game_Unit
   def sell_shop_stack_item( item_info, stack)
     kind = item_info[0]
     id = item_info[1]
-    item = MISC.item(kind, id)
-    DEBUG.write(c_m, "#{item.name} 売却数:#{stack} 在庫:#{@shop_stack_item[[kind, id]]}")
+    item = Misc.item(kind, id)
+    Debug.write(c_m, "#{item.name} 売却数:#{stack} 在庫:#{@shop_stack_item[[kind, id]]}")
     ## 既に定義がある？
     if @shop_stack_item[[kind, id]] != nil
       @shop_stack_item[[kind, id]] += stack
@@ -702,14 +702,14 @@ class Game_Party < Game_Unit
     else
       @shop_stack_item[[kind, id]] = stack
     end
-    DEBUG.write(c_m, "#{item.name} 新在庫:#{@shop_stack_item[[kind, id]]} ")
+    Debug.write(c_m, "#{item.name} 新在庫:#{@shop_stack_item[[kind, id]]} ")
     ## 在庫をスタック数で割る
     n = @shop_stack_item[[kind, id]] / item.stack
     if n > 0
       modify_shop_item([kind, id], n)             # 在庫を増やす
       @shop_stack_item[[kind, id]] %= item.stack  # あまりを在庫へ
     end
-    DEBUG.write(c_m, "#{item.name} 増加スタック数:#{n} 新在庫:#{@shop_stack_item[[kind, id]]}")
+    Debug.write(c_m, "#{item.name} 増加スタック数:#{n} 新在庫:#{@shop_stack_item[[kind, id]]}")
   end
   #--------------------------------------------------------------------------
   # ● shopアイテムの増減
@@ -719,22 +719,22 @@ class Game_Party < Game_Unit
   def modify_shop_item(item, n)
     kind = item[0]
     id = item[1]
-    item_data = MISC.item(kind, id)
+    item_data = Misc.item(kind, id)
     case kind
     when 0; # アイテム種類
       @shop_items[id] = 0 if @shop_items[id] == nil # 定義が無ければゼロを入れる
       @shop_items[id] += n
-      DEBUG.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(Scene_Title)
+      Debug.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(SceneTitle)
       return true if @shop_items[id] < 1 # 在庫が尽きた場合
     when 1; # 武器種類
       @shop_weapons[id] = 0 if @shop_weapons[id] == nil # 定義が無ければゼロを入れる
       @shop_weapons[id] += n
-      DEBUG.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(Scene_Title)
+      Debug.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(SceneTitle)
       return true if @shop_weapons[id] < 1 # 在庫が尽きた場合
     when 2 # 防具種類
       @shop_armors[id] = 0 if @shop_armors[id] == nil # 定義が無ければゼロを入れる
       @shop_armors[id] += n
-      DEBUG.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(Scene_Title)
+      Debug.write(c_m, "#{item_data.name} 個数:#{n}") unless $scene.is_a?(SceneTitle)
       return true if @shop_armors[id] < 1 # 在庫が尽きた場合
     end
     return false
@@ -750,17 +750,17 @@ class Game_Party < Game_Unit
     when 1
       for id in @shop_weapons.keys
         next if id == 0
-        result.push([id, MISC.item(kind, id).sort])
+        result.push([id, Misc.item(kind, id).sort])
       end
     when 2
       for id in @shop_armors.keys
         next if id == 0
-        result.push([id, MISC.item(kind, id).sort])
+        result.push([id, Misc.item(kind, id).sort])
       end
     when 0
       for id in @shop_items.keys
         next if id == 0
-        result.push([id, MISC.item(kind, id).sort])
+        result.push([id, Misc.item(kind, id).sort])
       end
     end
     ## sort順に並べ替え
@@ -771,7 +771,7 @@ class Game_Party < Game_Unit
     for array in result
       ids.push(array[0])
     end
-    DEBUG.write(c_m, "kind:#{kind} ids:#{ids}")
+    Debug.write(c_m, "kind:#{kind} ids:#{ids}")
     return ids
   end
   #--------------------------------------------------------------------------
@@ -921,39 +921,39 @@ class Game_Party < Game_Unit
       when 1
         @shop_npc1 = []
         @shop_npc1_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC1_SHOP
+        ranks = ConstantTable::NPC1_SHOP
       when 2
         @shop_npc2 = []
         @shop_npc2_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC2_SHOP
+        ranks = ConstantTable::NPC2_SHOP
       when 3
         @shop_npc3 = []
         @shop_npc3_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC3_SHOP
+        ranks = ConstantTable::NPC3_SHOP
       when 4
         @shop_npc4 = []
         @shop_npc4_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC4_SHOP
+        ranks = ConstantTable::NPC4_SHOP
       when 5
         @shop_npc5 = []
         @shop_npc5_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC5_SHOP
+        ranks = ConstantTable::NPC5_SHOP
       when 6
         @shop_npc6 = []
         @shop_npc6_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC6_SHOP
+        ranks = ConstantTable::NPC6_SHOP
       when 7
         @shop_npc7 = []
         @shop_npc7_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC7_SHOP
+        ranks = ConstantTable::NPC7_SHOP
       when 8
         @shop_npc8 = []
         @shop_npc8_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC8_SHOP
+        ranks = ConstantTable::NPC8_SHOP
       when 9
         @shop_npc9 = []
         @shop_npc9_bought = {}  # 購入済みフラグハッシュ
-        ranks = Constant_Table::NPC9_SHOP
+        ranks = ConstantTable::NPC9_SHOP
       end
       ## ランダムアイテムの定義
       array = []
@@ -1029,14 +1029,14 @@ class Game_Party < Game_Unit
           end
         end
         if item_id != 0 # 固定アイテムあり
-          obj = MISC.item(item_kind, item_id)
+          obj = Misc.item(item_kind, item_id)
           item = [item_kind, item_id]
         else            # 固定アイテムなし
           item = array[rand(array.size)]    # ランダムアイテムの抽出
-          obj = MISC.item(item[0], item[1]) # ランダムアイテムオブジェクト
+          obj = Misc.item(item[0], item[1]) # ランダムアイテムオブジェクト
         end
         multipiler = rand(0)+rand(0)
-        DEBUG::write(c_m,"obj.price:#{obj.price} multipiler:#{multipiler}")
+        Debug::write(c_m,"obj.price:#{obj.price} multipiler:#{multipiler}")
         price = Integer(obj.price * multipiler)  # 値段は0～0.9x2まで
         price = 1 if price == 0
         case npc_id
@@ -1050,7 +1050,7 @@ class Game_Party < Game_Unit
         when 8; @shop_npc8.push [ item, price]
         when 9; @shop_npc9.push [ item, price]
         end
-        DEBUG::write(c_m,"NPC_ID:#{npc_id} [#{obj.name}(ID:#{obj.id})] #{price}Gold(x#{multipiler})")
+        Debug::write(c_m,"NPC_ID:#{npc_id} [#{obj.name}(ID:#{obj.id})] #{price}Gold(x#{multipiler})")
       end
     end
   end
@@ -1114,19 +1114,19 @@ class Game_Party < Game_Unit
   # ● アイテムを捨てる
   #--------------------------------------------------------------------------
   def trash(item)
-    item_obj = MISC.item(item[0], item[1])
+    item_obj = Misc.item(item[0], item[1])
     @trash.push(item)
-    DEBUG.write(c_m,"#{item_obj.name} を捨てた。ARRAY:#{@trash}")
+    Debug.write(c_m,"#{item_obj.name} を捨てた。ARRAY:#{@trash}")
   end
   #--------------------------------------------------------------------------
   # ● アイテムをひろう
   #--------------------------------------------------------------------------
   def pickup_trash
     ## 一旦ガラクタは削除
-    @trash.delete(Constant_Table::GARBAGE)
-    while not @trash.size >= Constant_Table::TRASH_SIZE
-      DEBUG.write(c_m,"捨てたアイテムリストが小さいのでガラクタで埋める @trash.size:#{@trash.size}")
-      @trash.push(Constant_Table::GARBAGE)
+    @trash.delete(ConstantTable::GARBAGE)
+    while not @trash.size >= ConstantTable::TRASH_SIZE
+      Debug.write(c_m,"捨てたアイテムリストが小さいのでガラクタで埋める @trash.size:#{@trash.size}")
+      @trash.push(ConstantTable::GARBAGE)
     end
     items = []
     3.times do
@@ -1135,9 +1135,9 @@ class Game_Party < Game_Unit
       @trash.delete_at r    # 拾ったアイテムの削除
     end
     get_event_item(items, identified = false)
-    DEBUG.write(c_m, "捨てたアイテムリスト:")
+    Debug.write(c_m, "捨てたアイテムリスト:")
     for i in @trash
-      DEBUG.write(c_m, "#{MISC.item(i[0], i[1]).name}")
+      Debug.write(c_m, "#{Misc.item(i[0], i[1]).name}")
     end
   end
   #--------------------------------------------------------------------------
@@ -1270,7 +1270,7 @@ class Game_Party < Game_Unit
       @pm_detect -= [reduce, @pm_detect].min
       ring = true if @pm_detect == 0
     end
-    # DEBUG.write(c_m,"PartyMagic歩数消費:#{reduce} 鎧:#{@pm_armor} 浮:#{@pm_float} 剣:#{@pm_sword} 霧:#{@pm_fog} 光:#{@pm_light} 目:#{@pm_detect} 鳴る?:#{ring}")
+    # Debug.write(c_m,"PartyMagic歩数消費:#{reduce} 鎧:#{@pm_armor} 浮:#{@pm_float} 剣:#{@pm_sword} 霧:#{@pm_fog} 光:#{@pm_light} 目:#{@pm_detect} 鳴る?:#{ring}")
     $music.se_play("PM_Expire") if ring
   end
   #--------------------------------------------------------------------------
@@ -1295,13 +1295,13 @@ class Game_Party < Game_Unit
   #   従士で増加可能
   #--------------------------------------------------------------------------
   def setup_light
-    @light = Constant_Table::INITIAL_LIGHT
-    @light += Constant_Table::LIGHT_BONUS if sarvant_avail?
-    DEBUG.write(c_m, "@light:#{@light}")
+    @light = ConstantTable::INITIAL_LIGHT
+    @light += ConstantTable::LIGHT_BONUS if sarvant_avail?
+    Debug.write(c_m, "@light:#{@light}")
     @light_time = 0
-    @save_ticket = Constant_Table::INITIAL_TICKET
-    @save_ticket += Constant_Table::TICKET_BONUS if sarvant_avail?
-    @food = Constant_Table::INITIAL_FOOD
+    @save_ticket = ConstantTable::INITIAL_TICKET
+    @save_ticket += ConstantTable::TICKET_BONUS if sarvant_avail?
+    @food = ConstantTable::INITIAL_FOOD
     if check_survival_skill > 0 # 野営の知識があると食料増加
       @food += 15
     end
@@ -1310,13 +1310,13 @@ class Game_Party < Game_Unit
   # ● パーティの灯りを再補充（ランダムグリッドイベントにて）
   #--------------------------------------------------------------------------
   def refill
-    @light += Constant_Table::REFILL_LIGHT
+    @light += ConstantTable::REFILL_LIGHT
   end
   #--------------------------------------------------------------------------
   # ● マップ閲覧時の灯りペナルティ
   #--------------------------------------------------------------------------
   def viewmap
-    @light_time += Constant_Table::VIEWMAPLIGHT
+    @light_time += ConstantTable::VIEWMAPLIGHT
     increase_light_time
   end
   #--------------------------------------------------------------------------
@@ -1325,11 +1325,11 @@ class Game_Party < Game_Unit
   def update_light
     return if @light < 1
     ratio = @pm_light > 0 ? 50 : 75
-    ratio -= $game_mercenary.skill_check("light") * Constant_Table::GUIDE_LIGHT_BONUS
+    ratio -= $game_mercenary.skill_check("light") * ConstantTable::GUIDE_LIGHT_BONUS
     if rand(100) < ratio
-      # DEBUG.write(c_m, "ろうそく減少判定に入る確率値:#{ratio}(標準:75 呪文:50 ガイド:-15)")
+      # Debug.write(c_m, "ろうそく減少判定に入る確率値:#{ratio}(標準:75 呪文:50 ガイド:-15)")
       @light_time += 1
-      if @light_time > Constant_Table::LIGHT_THRES
+      if @light_time > ConstantTable::LIGHT_THRES
         @light -= 1
         @light_time = 0
       end
@@ -1340,19 +1340,19 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def increase_light_time
     @light_time += 1
-    if @light_time > Constant_Table::LIGHT_THRES
+    if @light_time > ConstantTable::LIGHT_THRES
       @light -= 1
       @light_time = 0
       $game_temp.need_sub_refresh = true
     end
-    DEBUG::write(c_m,"ランタンの自然減少 残り#{@light}(#{@light_time})")
+    Debug::write(c_m,"ランタンの自然減少 残り#{@light}(#{@light_time})")
   end
   #--------------------------------------------------------------------------
   # ● ランタンの灯りの半減
   #--------------------------------------------------------------------------
   def halved_light
     @light /= 2
-    DEBUG::write(c_m,"ランタンの半減 残り#{@light}(#{@light_time})")
+    Debug::write(c_m,"ランタンの半減 残り#{@light}(#{@light_time})")
   end
   #--------------------------------------------------------------------------
   # ● アイテムの使用後、効果ありの為、消費
@@ -1360,10 +1360,10 @@ class Game_Party < Game_Unit
   def consume_previous_item
     kind = $game_temp.previous_actor.bag[$game_temp.previous_inv_index][0][0]
     id = $game_temp.previous_actor.bag[$game_temp.previous_inv_index][0][1]
-    item_obj = MISC.item(kind, id)
+    item_obj = Misc.item(kind, id)
     ## 再利用をチェック
-    sv = MISC.skill_value(SKILLID::REUSE, $game_temp.previous_actor)
-    diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::REUSE, $game_temp.previous_actor)
+    diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if $game_temp.previous_actor.tired?
     ratio /= 2 unless $game_temp.in_battle  # バトル以外は半減
@@ -1373,10 +1373,10 @@ class Game_Party < Game_Unit
       consume = false
       if item_obj.key > 0
         consume = true
-        DEBUG.write(c_m, "KEYアイテム消費:#{item_obj.name} ==================")
+        Debug.write(c_m, "KEYアイテム消費:#{item_obj.name} ==================")
       elsif item_can_use?(item_obj)
         consume = true
-        DEBUG.write(c_m, "アイテム消費:#{item_obj.name}")
+        Debug.write(c_m, "アイテム消費:#{item_obj.name}")
       end
       if consume
         $game_temp.previous_actor.bag[$game_temp.previous_inv_index][4] -= 1
@@ -1384,8 +1384,8 @@ class Game_Party < Game_Unit
       end
     else
       ## 消費回避ルーチン
-      DEBUG.write(c_m, "アイテム消費回避:(#{ratio}%) ITEM:#{item_obj.name}")
-      $game_temp.previous_actor.chance_skill_increase(SKILLID::REUSE)
+      Debug.write(c_m, "アイテム消費回避:(#{ratio}%) ITEM:#{item_obj.name}")
+      $game_temp.previous_actor.chance_skill_increase(SkillId::REUSE)
     end
     $game_temp.previous_actor = nil
     $game_temp.previous_inv_index = nil
@@ -1395,27 +1395,27 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def trap(trap_name)
     case trap_name
-    when Constant_Table::TRAP_NAME14
+    when ConstantTable::TRAP_NAME14
       return true if $game_party.pm_float > 0  # 浮遊状態の場合
       $music.se_play("ピット")
       for member in existing_members
         member.trap_effect(trap_name)
       end
       return false
-    when Constant_Table::TRAP_NAME15
+    when ConstantTable::TRAP_NAME15
       return true if $game_party.pm_float > 0  # 浮遊状態の場合
       $music.se_play("ベアトラップ")
       member = existing_members[rand(existing_members.size)]
       member.trap_effect(trap_name)
       return false
-    when Constant_Table::TRAP_NAME16
+    when ConstantTable::TRAP_NAME16
       return true if $game_party.pm_float > 0  # 浮遊状態の場合
       $music.se_play("毒の矢")
       for member in existing_members
         member.trap_effect(trap_name)
       end
       return false
-    when Constant_Table::TRAP_NAME17
+    when ConstantTable::TRAP_NAME17
       $music.se_play("落盤")
       for member in existing_members
         member.trap_effect(trap_name)
@@ -1478,36 +1478,36 @@ class Game_Party < Game_Unit
     when "protect";   @pm_protect = 1       # 魔除けの聖水
     when "firefly"                          # 蛍の灯り
       $game_party.light += 1
-      DEBUG::write(c_m,"灯り+1")
+      Debug::write(c_m,"灯り+1")
     when "warp";
-      DEBUG::write(c_m,"ワープ呪文の詠唱検知")
+      Debug::write(c_m,"ワープ呪文の詠唱検知")
       $game_temp.next_scene = "warp"
       $game_temp.warp_power = magic_level
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
       return
     when "home"
-      DEBUG::write(c_m,"帰還呪文の詠唱検知")
+      Debug::write(c_m,"帰還呪文の詠唱検知")
       $game_temp.next_scene = "home"
       $game_temp.home_power = magic_level
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
       return
     when "locate"
-      DEBUG::write(c_m,"KANDI呪文の詠唱検知")
+      Debug::write(c_m,"KANDI呪文の詠唱検知")
       $game_temp.next_scene = "locate"
       $game_temp.locate_power = magic_level
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
       return
     when "food"
-      DEBUG::write(c_m,"アイテム使用による食料の増加")
-      @food += Constant_Table::FOOD1
+      Debug::write(c_m,"アイテム使用による食料の増加")
+      @food += ConstantTable::FOOD1
     end
-    DEBUG::write(c_m,"@pm_float:#{@pm_float}") # debug
-    DEBUG::write(c_m,"@pm_light:#{@pm_light}") # debug
-    DEBUG::write(c_m,"@pm_armor:#{@pm_armor}") # debug
-    DEBUG::write(c_m,"@pm_detect:#{@pm_detect}") # debug
-    DEBUG::write(c_m,"@pm_sword:#{@pm_sword}") # debug
-    DEBUG::write(c_m,"@pm_fog:#{@pm_fog}") # debug
-    DEBUG::write(c_m,"@pm_protect:#{@pm_protect}") # debug
+    Debug::write(c_m,"@pm_float:#{@pm_float}") # debug
+    Debug::write(c_m,"@pm_light:#{@pm_light}") # debug
+    Debug::write(c_m,"@pm_armor:#{@pm_armor}") # debug
+    Debug::write(c_m,"@pm_detect:#{@pm_detect}") # debug
+    Debug::write(c_m,"@pm_sword:#{@pm_sword}") # debug
+    Debug::write(c_m,"@pm_fog:#{@pm_fog}") # debug
+    Debug::write(c_m,"@pm_protect:#{@pm_protect}") # debug
     $game_temp.need_sub_refresh = true    # リフレッシュ
   end
   #--------------------------------------------------------------------------
@@ -1530,7 +1530,7 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def clean_poison_nausea
     for member in members
-      for state_id in[STATEID::POISON, STATEID::NAUSEA]  # 毒と吐き気
+      for state_id in[StateId::POISON, StateId::NAUSEA]  # 毒と吐き気
         member.remove_state(state_id)
       end
     end
@@ -1559,7 +1559,7 @@ class Game_Party < Game_Unit
       end
     end
     return injured, false if survivor.empty? # 行方不明者無し
-    DEBUG.write(c_m, "行方不明者帰還検知=>処理開始")
+    Debug.write(c_m, "行方不明者帰還検知=>処理開始")
     ## 負傷者の中から行方不明者を検索
     for i_member in survivor
       case i_member.level
@@ -1575,16 +1575,16 @@ class Game_Party < Game_Unit
       end
       kind = 3
       case score
-      when 1; id = Constant_Table::SURVIVOR_MARK_RANK1
-      when 2; id = Constant_Table::SURVIVOR_MARK_RANK2
-      when 3; id = Constant_Table::SURVIVOR_MARK_RANK3
-      when 4; id = Constant_Table::SURVIVOR_MARK_RANK4
-      when 5; id = Constant_Table::SURVIVOR_MARK_RANK5
+      when 1; id = ConstantTable::SURVIVOR_MARK_RANK1
+      when 2; id = ConstantTable::SURVIVOR_MARK_RANK2
+      when 3; id = ConstantTable::SURVIVOR_MARK_RANK3
+      when 4; id = ConstantTable::SURVIVOR_MARK_RANK4
+      when 5; id = ConstantTable::SURVIVOR_MARK_RANK5
       end
       gain_item([kind, id], true)       # 残ったパーティの誰かがアイテムを得る
       i_member.out = false              # 迷宮外フラグ
       i_member.rescue = true            # 救出フラグオン
-      DEBUG.write(c_m, "行方不明者帰還検知=>処理完了 ID:#{i_member.id}")
+      Debug.write(c_m, "行方不明者帰還検知=>処理完了 ID:#{i_member.id}")
     end
     return injured, true  # 削除したメンバーを返す
   end
@@ -1704,25 +1704,26 @@ class Game_Party < Game_Unit
   # ● 休息の1ターン
   # MAXHPの1%を回復。回復量が1HPに満たない場合は50%で1HP
   # 毒の場合は逆にHPが減る　なおかつ　回復は疲労度で変動　呪いはスキップ
+  # rateは現在疲労度%、5%以上の疲労がある場合に5%分の疲労度除去判定が毎ターン入るということ。
   #--------------------------------------------------------------------------
   def resting
     fountain = $game_temp.drawing_fountain
     case check_survival_skill
-    when 0;  val = 100; multiplier = 0.01; rest = 0.95
-    when 1;  val = 50;  multiplier = 0.02; rest = 0.95
-    when 2;  val = 25;  multiplier = 0.02; rest = 0.85
-    when 3;  val = 20;  multiplier = 0.03; rest = 0.75
-    when 4;  val = 15;  multiplier = 0.03; rest = 0.65
-    when 5;  val = 10;  multiplier = 0.04; rest = 0.55
-    when 6;  val =  9;  multiplier = 0.04; rest = 0.45
-    when 7;  val =  8;  multiplier = 0.05; rest = 0.35
-    when 8;  val =  7;  multiplier = 0.05; rest = 0.25
+    when 0;  val = 100; multiplier = 0.01; rate = 0.05
+    when 1;  val = 50;  multiplier = 0.02; rate = 0.05
+    when 2;  val = 25;  multiplier = 0.02; rate = 0.05
+    when 3;  val = 20;  multiplier = 0.03; rate = 0.05
+    when 4;  val = 15;  multiplier = 0.03; rate = 0.05
+    when 5;  val = 10;  multiplier = 0.04; rate = 0.05
+    when 6;  val =  9;  multiplier = 0.04; rate = 0.05
+    when 7;  val =  8;  multiplier = 0.05; rate = 0.05
+    when 8;  val =  7;  multiplier = 0.05; rate = 0.05
     end
     ## 魔法の水汲み場フラグ
     if fountain
-      rest = 0.05
-      # val /= 2
-      # multiplier *= 2
+      rate = 0.05
+      val /= 2
+      multiplier *= 2
     end
     for member in existing_members
       recover = [member.maxhp/val, rand(2)].max
@@ -1742,12 +1743,12 @@ class Game_Party < Game_Unit
           recover = Integer(recover*1.1)
         end
         member.hp += recover                    # HPの回復
-        DEBUG.write(c_m, "休息: #{member.name} HP回復量:+#{recover} 割る数:#{val} MP回復%:#{multiplier} 魔法の水汲み場?:#{fountain}")
+        Debug.write(c_m, "休息: #{member.name} HP回復量:+#{recover} 割る数:#{val} MP回復%:#{multiplier} 魔法の水汲み場?:#{fountain}")
       end
       ## MP回復
       member.recover_1_mp(multiplier)         # MPの1%回復
       ## 疲労回復
-      member.recover_fatigue_to_in_rest(rest) # 疲労回復
+      member.recover_fatigue_to_in_rest(rate) # 疲労回復
     end
   end
   #--------------------------------------------------------------------------
@@ -1757,8 +1758,8 @@ class Game_Party < Game_Unit
   def check_survival_skill
     value = 0
     for member in existing_members
-      if MISC.skill_value(SKILLID::SURVIVALIST, member) > value
-        value = MISC.skill_value(SKILLID::SURVIVALIST, member)
+      if Misc.skill_value(SkillId::SURVIVALIST, member) > value
+        value = Misc.skill_value(SkillId::SURVIVALIST, member)
       end
     end
     case value
@@ -1833,9 +1834,9 @@ class Game_Party < Game_Unit
   def add_keyword(keyword)
     @keywords.push(keyword)
     @keywords.uniq!
-    DEBUG::write(c_m,"キーワードリスト更新--------")
-    for word in @keywords do DEBUG::write(c_m,"  #{word}") end
-    DEBUG::write(c_m,"----------------------------")
+    Debug::write(c_m,"キーワードリスト更新--------")
+    for word in @keywords do Debug::write(c_m,"  #{word}") end
+    Debug::write(c_m,"----------------------------")
   end
   #--------------------------------------------------------------------------
   # ● パーティ全体の盗伐数を取得
@@ -1881,10 +1882,10 @@ class Game_Party < Game_Unit
     return nil if m.empty?      # パーティが空の場合
     ## リーダーシップでのソート
     m.sort! do |a,b|
-      MISC.skill_value(SKILLID::LEADERSHIP, b) <=> MISC.skill_value(SKILLID::LEADERSHIP, a)
+      Misc.skill_value(SkillId::LEADERSHIP, b) <=> Misc.skill_value(SkillId::LEADERSHIP, a)
     end
     ##> 最大値と最小値が同値の場合はリーダー無し
-    if MISC.skill_value(SKILLID::LEADERSHIP, m.first) == MISC.skill_value(SKILLID::LEADERSHIP, m.last)
+    if Misc.skill_value(SkillId::LEADERSHIP, m.first) == Misc.skill_value(SkillId::LEADERSHIP, m.last)
       return nil
     ##> 最大値のリーダーオブジェクトを返す
     else
@@ -1898,7 +1899,7 @@ class Game_Party < Game_Unit
     return 0 if get_leader == nil
     tfs = get_total_friendship / 100.0
     x = [tfs / 12, 0.1].max  # 最低値を0.1に
-    bonus = 30.0 * Math.log10(x) * MISC.skill_value(SKILLID::LEADERSHIP, get_leader) / 100
+    bonus = 30.0 * Math.log10(x) * Misc.skill_value(SkillId::LEADERSHIP, get_leader) / 100
     bonus = [bonus, 0].max
     return bonus
   end
@@ -1907,15 +1908,15 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def increase_leader_skill
     return if get_leader == nil
-    get_leader.chance_skill_increase(SKILLID::LEADERSHIP)  # リーダーシップ
+    get_leader.chance_skill_increase(SkillId::LEADERSHIP)  # リーダーシップ
   end
   #--------------------------------------------------------------------------
   # ● パーティ全員の戦闘終了時スキル成長判定
   #--------------------------------------------------------------------------
   def increase_skills_after_battle
     for member in existing_members
-      member.chance_skill_increase(SKILLID::BUSHIDO)    # 武士道
-      member.chance_skill_increase(SKILLID::CHIVALRY)   # 騎士道
+      member.chance_skill_increase(SkillId::BUSHIDO)    # 武士道
+      member.chance_skill_increase(SkillId::CHIVALRY)   # 騎士道
       member.rune_skillup                               # ルーンの知識
     end
   end
@@ -1924,7 +1925,7 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def increase_skills_per_turn
     for member in existing_members
-      member.chance_skill_increase(SKILLID::TACTICS)  # 戦術
+      member.chance_skill_increase(SkillId::TACTICS)  # 戦術
     end
   end
   #--------------------------------------------------------------------------
@@ -1959,16 +1960,16 @@ class Game_Party < Game_Unit
   def treasure_hunting?
     result = 0
     for member in existing_members
-      diff = Constant_Table::DIFF_70[$game_map.map_id] # フロア係数
-      sv = MISC.skill_value(SKILLID::TREASUREHUNT, member)
+      diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::TreasureHUNT, member)
       ratio = Integer(sv * diff)
       if ratio > rand(100)
         result += 1
-        DEBUG.write(c_m, "TreasureHunting Check: #{member.name}")
-        member.chance_skill_increase(SKILLID::TREASUREHUNT)
+        Debug.write(c_m, "TreasureHunting Check: #{member.name}")
+        member.chance_skill_increase(SkillId::TreasureHUNT)
       end
     end
-    DEBUG.write(c_m, "TreasureHunting Check: --> +#{result}") unless result == 0
+    Debug.write(c_m, "TreasureHunting Check: --> +#{result}") unless result == 0
     return result
   end
   #--------------------------------------------------------------------------
@@ -2060,7 +2061,7 @@ class Game_Party < Game_Unit
   # ● パーティ全員のスキル上昇チャンス
   #--------------------------------------------------------------------------
   def skill_update_chance(id = 0)
-    DEBUG.write(c_m, "パーティのスキル上昇チャンス ID:#{id}")
+    Debug.write(c_m, "パーティのスキル上昇チャンス ID:#{id}")
     return if id== 0
     for member in existing_members
       member.chance_skill_increase(id)
@@ -2071,24 +2072,24 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def treasure_finding
     return if party_scout_result == 0
-    table = MISC.mapid_2_tr(party_scout_result)
-    drop_items = TREASURE::lottery_treasure(table)
-    gold = TREASURE::calc_gp(table)
-    $scene = Scene_Treasure.new(drop_items, gold)
+    table = Misc.mapid_2_tr(party_scout_result)
+    drop_items = Treasure::lottery_treasure(table)
+    gold = Treasure::calc_gp(table)
+    $scene = SceneTreasure.new(drop_items, gold)
   end
   #--------------------------------------------------------------------------
   # ● 食糧の減退
   #--------------------------------------------------------------------------
   def reduce_food
     @food = 0
-    DEBUG.write(c_m, "食糧減=>#{@food}")
+    Debug.write(c_m, "食糧減=>#{@food}")
   end
   #--------------------------------------------------------------------------
   # ● 食糧の発見
   #--------------------------------------------------------------------------
   def find_food
     @food += 30
-    DEBUG.write(c_m, "食糧の増加=>#{@food}")
+    Debug.write(c_m, "食糧の増加=>#{@food}")
   end
   #--------------------------------------------------------------------------
   # ● 性格ボーナスでバックアタック確率減少
@@ -2097,7 +2098,7 @@ class Game_Party < Game_Unit
     for member in existing_members
       if member.personality_n == :Timid
         ratio *= 0.8
-        DEBUG.write(c_m, "臆病者の検知=>#{ratio}%")
+        Debug.write(c_m, "臆病者の検知=>#{ratio}%")
       end
     end
     return ratio
@@ -2118,14 +2119,14 @@ class Game_Party < Game_Unit
     check = 0
     floor = $game_map.map_id
     for member in existing_members
-      sv = MISC.skill_value(SKILLID::PREDICTION, member)
-      diff = Constant_Table::DIFF_35[floor] # フロア係数
+      sv = Misc.skill_value(SkillId::PREDICTION, member)
+      diff = ConstantTable::DIFF_35[floor] # フロア係数
       ratio = [sv * diff, 95].min
       ratio = Integer(ratio)
       ratio /= 2 if member.tired?
       if ratio > rand(100)
         check += 1
-        member.chance_skill_increase(SKILLID::PREDICTION) # 危険予知
+        member.chance_skill_increase(SkillId::PREDICTION) # 危険予知
       end
     end
     return check
@@ -2161,7 +2162,7 @@ class Game_Party < Game_Unit
     names = []
     for item in items
       gain_item(item, identified)
-      item_obj = MISC.item(item[0],item[1])
+      item_obj = Misc.item(item[0],item[1])
       case identified
       when true; names.push("#{item_obj.name}")
       when false;names.push("?#{item_obj.name2}")
@@ -2219,7 +2220,7 @@ class Game_Party < Game_Unit
       p.unshift(member_id)
     end
     @actors = p
-    DEBUG.write(c_m, "発狂による隊列変更:#{@actors}")
+    Debug.write(c_m, "発狂による隊列変更:#{@actors}")
     return true
   end
   #--------------------------------------------------------------------------
@@ -2238,7 +2239,7 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def get_rune_skill
     for member in existing_members
-      member.skill_setting(SKILLID::RUNE)
+      member.skill_setting(SkillId::RUNE)
     end
   end
   #--------------------------------------------------------------------------
@@ -2250,18 +2251,18 @@ class Game_Party < Game_Unit
       next if members[idx] == nil
       ## 感染している
       if members[idx].miasma?
-        ratio = Constant_Table::INFECTION_RATIO
+        ratio = ConstantTable::INFECTION_RATIO
         ## 前のメンバーへ感染判定
         if ratio > rand(400) and members[idx-1] != nil
           if not members[idx-1].miasma?
-            members[idx-1].add_state(STATEID::SICKNESS, rand(10)+10)
+            members[idx-1].add_state(StateId::SICKNESS, rand(10)+10)
             return
           end
         end
         ## 後ろのメンバーへ感染判定
         if ratio > rand(200) and members[idx+1] != nil
           if not members[idx+1].miasma?
-            members[idx+1].add_state(STATEID::SICKNESS, rand(10)+10)
+            members[idx+1].add_state(StateId::SICKNESS, rand(10)+10)
             return
           end
         end
@@ -2274,7 +2275,7 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def check_quest_progress(asking_ratio = false)
     @q_progress ||= 0
-    DEBUG.write(c_m, "クエスト進捗PROGRESS:#{@q_progress}")
+    Debug.write(c_m, "クエスト進捗PROGRESS:#{@q_progress}")
     ## QUESTのDBをprogressでフィルターし、全Questのreward_gpの総量を出す
     ## 75%進捗で次を出すか？
     ratio = 0.75
@@ -2287,7 +2288,7 @@ class Game_Party < Game_Unit
     else;                  prog = 3 # RANK5~6
     end
 
-    DEBUG.write(c_m, "progress: #{prog}")
+    Debug.write(c_m, "progress: #{prog}")
     return prog unless asking_ratio
     ## 割合を知りたい場合
     case prog
@@ -2329,7 +2330,7 @@ class Game_Party < Game_Unit
     # end
     # @memo_store[key].push(new_mes)
     # rc = @memo_store[key].uniq!
-    DEBUG.write(c_m, "npc_id:#{id} keyword:#{keyword} uniq?:#{rc != nil}")
+    Debug.write(c_m, "npc_id:#{id} keyword:#{keyword} uniq?:#{rc != nil}")
   end
   #--------------------------------------------------------------------------
   # ● 1歩毎のMPヒーリングガイドスキル
@@ -2343,13 +2344,13 @@ class Game_Party < Game_Unit
   # ● 合成材料の消費
   #--------------------------------------------------------------------------
   def consume_ingredient(item_info)
-    DEBUG.write(c_m, "合成材料の消費: KIND:#{item_info[0]} ID:#{item_info[1]}")
+    Debug.write(c_m, "合成材料の消費: KIND:#{item_info[0]} ID:#{item_info[1]}")
     for member in members
       for item in member.bag
         next unless item[0][0] == item_info[0]
         next unless item[0][1] == item_info[1]
         item[4] -= 1
-        DEBUG.write(c_m, "同一検知=>個数削除 item_info:#{item} #{member.name}")
+        Debug.write(c_m, "同一検知=>個数削除 item_info:#{item} #{member.name}")
         if (item[4] == 0) # なくなればソート2
           member.sort_bag_2
         end
@@ -2363,7 +2364,7 @@ class Game_Party < Game_Unit
   def get_total_prediction
     value = 0
     for member in existing_members
-      value += MISC.skill_value(SKILLID::PREDICTION, member)
+      value += Misc.skill_value(SkillId::PREDICTION, member)
     end
     return value
   end
@@ -2371,14 +2372,14 @@ class Game_Party < Game_Unit
   # ● 危険予知によるルームガード検知結果
   #--------------------------------------------------------------------------
   def check_can_see_rg
-    return ($game_map.map_id * Constant_Table::PRED_RG) < get_total_prediction
+    return ($game_map.map_id * ConstantTable::PRED_RG) < get_total_prediction
   end
   #--------------------------------------------------------------------------
   # ● 危険予知に上昇チャンス
   #--------------------------------------------------------------------------
   def chance_prediction_up
     for member in existing_members
-      member.chance_skill_increase(SKILLID::PREDICTION)
+      member.chance_skill_increase(SkillId::PREDICTION)
     end
   end
   #--------------------------------------------------------------------------
@@ -2396,8 +2397,8 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def calc_deadbody_weight_for_member
     return 0 if existing_members.size == 0
-    # DEBUG.write(c_m, "死者の重さを計算:#{calc_deadbody_weight}")
-    # DEBUG.write(c_m, "一人あたまにかかる死者の重さを計算:#{calc_deadbody_weight / existing_members.size}")
+    # Debug.write(c_m, "死者の重さを計算:#{calc_deadbody_weight}")
+    # Debug.write(c_m, "一人あたまにかかる死者の重さを計算:#{calc_deadbody_weight / existing_members.size}")
     return calc_deadbody_weight / existing_members.size
   end
   #--------------------------------------------------------------------------
@@ -2408,25 +2409,25 @@ class Game_Party < Game_Unit
     for member in members         # 死んでいてもカウントしている
       result += member.level
     end
-    DEBUG.write(c_m, "平均レベル:#{result / members.size}")
+    Debug.write(c_m, "平均レベル:#{result / members.size}")
     return result / members.size
   end
   #--------------------------------------------------------------------------
-  # ● DEBUG:: 全呪文を覚える
+  # ● Debug:: 全呪文を覚える
   #--------------------------------------------------------------------------
   def get_all_magic
     for member in members
       next unless member.magic_user?
       member.get_all_magic
     end
-    DEBUG.write(c_m, "全呪文習得")
+    Debug.write(c_m, "全呪文習得")
   end
   #--------------------------------------------------------------------------
   # ● 休息時の強制入眠
   #--------------------------------------------------------------------------
   def force_sleep
     for member in existing_members
-      member.add_state(STATEID::SLEEP)
+      member.add_state(StateId::SLEEP)
     end
   end
   #--------------------------------------------------------------------------
@@ -2434,7 +2435,7 @@ class Game_Party < Game_Unit
   #--------------------------------------------------------------------------
   def getup
     for member in existing_members
-      member.remove_state(STATEID::SLEEP)
+      member.remove_state(StateId::SLEEP)
     end
   end
 end

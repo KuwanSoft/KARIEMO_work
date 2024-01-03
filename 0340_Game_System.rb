@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_System
+# ■ GameSystem
 #------------------------------------------------------------------------------
 # 　システム周りのデータを扱うクラスです。乗り物や BGM などの管理も行います。
 # このクラスのインスタンスは $game_system で参照されます。
 #==============================================================================
 
-class Game_System
+class GameSystem
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -98,11 +98,11 @@ class Game_System
     else
       @assigned_unique_id.delete(id)
     end
-    # DEBUG.write(c_m, "@assigned_unique_id:#{@assigned_unique_id}")
+    # Debug.write(c_m, "@assigned_unique_id:#{@assigned_unique_id}")
     refresh_unique_id
   end
   #--------------------------------------------------------------------------
-  # ● 未使用ユニークIDデータのクリーンアップ *SAVEデータサイズ削減
+  # ● 未使用ユニークIDデータのクリーンアップ *Saveデータサイズ削減
   #--------------------------------------------------------------------------
   def refresh_unique_id
     for deleted_id in check_unassigned_id
@@ -137,7 +137,7 @@ class Game_System
       end
       active_ids.push(unique_id) if any_active
     end
-    # DEBUG.write(c_m, "冒険中のユニークIDリスト:#{active_ids}")
+    # Debug.write(c_m, "冒険中のユニークIDリスト:#{active_ids}")
     return active_ids
   end
   #--------------------------------------------------------------------------
@@ -172,15 +172,15 @@ class Game_System
     @party_ticket[unique_id] = $game_party.save_ticket
     @party_food[unique_id] = $game_party.food
     @party_pm[unique_id] = $game_party.get_pm_data        # パーティマジックのハッシュデータ
-    DEBUG::write(c_m,"ユニークID:#{unique_id} パーティメンバーリスト:#{@party_member[unique_id].join(',')}")
+    Debug::write(c_m,"ユニークID:#{unique_id} パーティメンバーリスト:#{@party_member[unique_id].join(',')}")
   end
   #--------------------------------------------------------------------------
   # ● 行方不明者の再配置
   #--------------------------------------------------------------------------
   def respawn_survivor
-    array = Constant_Table.get_survivor_ids
+    array = ConstantTable.get_survivor_ids
     for s_id in array
-      DEBUG.write(c_m,"s_id:#{s_id}")
+      Debug.write(c_m,"s_id:#{s_id}")
       next if $game_actors[s_id].rescue == false        # 未救出ならばスキップ
       $game_actors.make_random_survivor(s_id)           # ランダムパラメータで再作成
       input_survivor_location(s_id)                     # 行方不明パーティとして登録
@@ -229,7 +229,7 @@ class Game_System
       @party_y_loc[unique_id] = y
       break                                                 # 座標が得られたらループから出る
     end
-    DEBUG::write(c_m,"行方不明者ID:#{unique_id} MAP:#{@party_mapid[unique_id]} X:#{@party_x_loc[unique_id]} Y:#{@party_x_loc[unique_id]}")
+    Debug::write(c_m,"行方不明者ID:#{unique_id} MAP:#{@party_mapid[unique_id]} X:#{@party_x_loc[unique_id]} Y:#{@party_x_loc[unique_id]}")
   end
   #--------------------------------------------------------------------------
   # ● パーティロケーションをロード
@@ -254,7 +254,7 @@ class Game_System
     RPG::BGM.fade(1500)
     Graphics.fadeout(60)
     Graphics.wait(40)
-    $scene = Scene_Map.new
+    $scene = SceneMap.new
   end
   #--------------------------------------------------------------------------
   # ● 現在位置と同じ位置に別のパーティがいる？
@@ -316,14 +316,14 @@ class Game_System
         return @party_mapid[unique_id], @party_x_loc[unique_id], @party_y_loc[unique_id]
       end
     end
-    DEBUG.write(c_m, "EXCEPTION:D/Oメンバーが見つからない")
+    Debug.write(c_m, "EXCEPTION:D/Oメンバーが見つからない")
   end
   #--------------------------------------------------------------------------
   # ● パーティをクリアして、村へ
   #--------------------------------------------------------------------------
   def go_home
     $game_party.reset_party # パーティメンバーをリセット
-    $scene = Scene_Village.new
+    $scene = SceneVillage.new
   end
   #--------------------------------------------------------------------------
   # ● バトル BGM の取得
@@ -385,18 +385,18 @@ class Game_System
     end
     ## 1分毎
     if (@timer % 3600 == 0)
-      DEBUG.write(c_m, "=====================1分毎処理")
+      Debug.write(c_m, "=====================1分毎処理")
       $game_quest.check_quest_update_for_1_min
       $game_temp.refresh_mood_decrease
     end
     ## 3分毎
     if (@timer % (3600*3) == 0)
-      DEBUG.write(c_m, "=====================3分毎処理")
+      Debug.write(c_m, "=====================3分毎処理")
       $game_self_switches.reset_switches
     end
     ## 30分毎
     if (@timer % (3600*30) == 0)
-      DEBUG.write(c_m, "====================30分毎処理")
+      Debug.write(c_m, "====================30分毎処理")
     end
     ## 60分毎
     if (@timer % (3600*60) == 0)
@@ -447,7 +447,7 @@ class Game_System
       prev_type = next_type
       kind = roulette2[rand(roulette2.size)]
       @evil_statue_kind[floor] = kind
-      DEBUG::write(c_m,"邪神像定義:B#{floor}F 種類:#{kind} 側面:#{next_type}")
+      Debug::write(c_m,"邪神像定義:B#{floor}F 種類:#{kind} 側面:#{next_type}")
     end
   end
   #--------------------------------------------------------------------------
@@ -455,7 +455,7 @@ class Game_System
   #     1秒間60tick,1分3600tick,2分7200tick
   #--------------------------------------------------------------------------
   def convergence_light
-    return if Constant_Table::SKIP_CONVERGENCE  # パフォーマンステスト用
+    return if ConstantTable::SKIP_CONVERGENCE  # パフォーマンステスト用
     rate = 1
     return unless rate > rand(3600)
     $game_party.increase_light_time
@@ -487,11 +487,11 @@ class Game_System
       for cood in @roomguard_grids[$game_map.map_id]
         str += "(x:#{cood[0]} y:#{cood[1]})"
       end
-      DEBUG::write(c_m, str)
+      Debug::write(c_m, str)
       return
     end
     array = get_all_genshitsu($game_map.map_id) # 玄室座標を取得
-    # number = Constant_Table::FLOOR_ENEMY[$game_map.map_id]  # ENEMY数を取得
+    # number = ConstantTable::FLOOR_ENEMY[$game_map.map_id]  # ENEMY数を取得
     # ## ENEMY数より現行玄室が多い場合
     # if array.size > number
     #   diff = array.size - number          # 差分を求める
@@ -504,7 +504,7 @@ class Game_System
     for cood in @roomguard_grids[$game_map.map_id]
       str += "(x:#{cood[0]} y:#{cood[1]})"
     end
-    DEBUG::write(c_m, str)
+    Debug::write(c_m, str)
   end
   #--------------------------------------------------------------------------
   # ● 【新】玄室チェック
@@ -555,7 +555,7 @@ class Game_System
     array = []
     @random_events ||= {}   # なければ定義 xx?
     if @random_events[$game_map.map_id] != nil # 定義済みの場合はSKIP
-      DEBUG::write(c_m,"ﾗﾝﾀﾞﾑｲﾍﾞﾝﾄ配置SKIP(MAP_ID:#{$game_map.map_id})")
+      Debug::write(c_m,"ﾗﾝﾀﾞﾑｲﾍﾞﾝﾄ配置SKIP(MAP_ID:#{$game_map.map_id})")
       return
     end
     for y in 0..49
@@ -587,7 +587,7 @@ class Game_System
             kind = 0
           end
           array.push([x, y, kind])  # REの座標と種類をPUSH
-          DEBUG::write(c_m,"X:#{x} Y:#{y} MAP_ID:#{$game_map.map_id} 種:#{kind}")
+          Debug::write(c_m,"X:#{x} Y:#{y} MAP_ID:#{$game_map.map_id} 種:#{kind}")
         end
       end
     end
@@ -598,7 +598,7 @@ class Game_System
   #--------------------------------------------------------------------------
   def check_randomevent(map_id, x, y)
     for array in @random_events[map_id]
-      DEBUG::write(c_m,"ARRAY:#{array} MAP_ID:#{map_id}")
+      Debug::write(c_m,"ARRAY:#{array} MAP_ID:#{map_id}")
       next if array[0] != x
       next if array[1] != y
       return array[2]
@@ -613,22 +613,22 @@ class Game_System
       next if array[0] != x
       next if array[1] != y
       @random_events[map_id].delete(array)
-      DEBUG::write(c_m,"ランダムイベントクリア X:#{array[0]} Y:#{array[1]} 種:#{array[2]}")
+      Debug::write(c_m,"ランダムイベントクリア X:#{array[0]} Y:#{array[1]} 種:#{array[2]}")
     end
   end
   #--------------------------------------------------------------------------
   # ● 村で一定時間を過ごしたことで復活する玄室モンスターの算出
   #--------------------------------------------------------------------------
   def calc_respawn_roomguard_number(spent_days)
-    DEBUG.write(c_m, "宿屋での宿泊(#{spent_days})日")
+    Debug.write(c_m, "宿屋での宿泊(#{spent_days})日")
     spent_days.times do
       for floor in [1,2,3,4,5,6,7,8,9]
         if @roomguard_grids[floor] == nil  # 未定義の場合
           next
         end
-        ratio = Constant_Table::RESPAWN_RATIO[floor]
+        ratio = ConstantTable::RESPAWN_RATIO[floor]
         if ratio > rand(1000) # 1%付近
-          DEBUG.write(c_m, "⇒フロア:#{floor} 再ポップ 徘徊と玄室")
+          Debug.write(c_m, "⇒フロア:#{floor} 再ポップ 徘徊と玄室")
           respawn_roomguard(floor)
           $game_wandering.respawn_wandering(floor)
         end
@@ -643,7 +643,7 @@ class Game_System
     genshitsu_array = get_all_genshitsu(floor)  # 玄室箇所の座標取得
     diff = genshitsu_array.size - (genshitsu_array.size - @roomguard_grids[floor].size) # 踏破済み玄室との差分を取得
     if diff > rand(genshitsu_array.size)
-      DEBUG.write(c_m, "復活スキップ RATIO:#{diff}/#{genshitsu_array.size} ストア数:#{@roomguard_grids[floor].size}")
+      Debug.write(c_m, "復活スキップ RATIO:#{diff}/#{genshitsu_array.size} ストア数:#{@roomguard_grids[floor].size}")
       return
     end
     while (@roomguard_grids[floor].size < genshitsu_array.size)
@@ -651,13 +651,13 @@ class Game_System
       if @roomguard_grids[floor].include?(cood)
         next
       else
-        DEBUG.write(c_m, "復活前 玄室GRID SIZE:#{@roomguard_grids[floor].size}")
+        Debug.write(c_m, "復活前 玄室GRID SIZE:#{@roomguard_grids[floor].size}")
         @roomguard_grids[floor].push(cood)
-        DEBUG.write(c_m, "玄室部屋復活 B#{floor}F X:#{cood[0]} Y:#{cood[1]}")
+        Debug.write(c_m, "玄室部屋復活 B#{floor}F X:#{cood[0]} Y:#{cood[1]}")
         break
       end
     end
-    DEBUG.write(c_m, "復活後 玄室GRID SIZE:#{@roomguard_grids[floor].size}")
+    Debug.write(c_m, "復活後 玄室GRID SIZE:#{@roomguard_grids[floor].size}")
   end
   #--------------------------------------------------------------------------
   # ● 【新】玄室とランダムイベントの配置をクリア
@@ -670,9 +670,9 @@ class Game_System
     stay_array = []
     all_array = [1,2,3,4,5,6,7,8,9]  # 全マップ
     for pid in avaID
-      # DEBUG::write(c_m,"party_id:#{pid}")
+      # Debug::write(c_m,"party_id:#{pid}")
       members_id = check_party_member(pid)
-      # DEBUG::write(c_m,"members_id:#{members_id}")
+      # Debug::write(c_m,"members_id:#{members_id}")
       ## 死者の数の算出
       num = 0
       for id in members_id
@@ -682,7 +682,7 @@ class Game_System
       unless members_id.size == num # 死者とパーティ人数が同値じゃない
         mid = $game_system.check_party_map_id(pid)  # マップIDを取得
         stay_array.push(mid)
-        # DEBUG::write(c_m,"パーティ存命マップ:#{stay_array}")
+        # Debug::write(c_m,"パーティ存命マップ:#{stay_array}")
       end
     end
     all_array = all_array - stay_array  # 存命パーティマップはリセットしない
@@ -692,7 +692,7 @@ class Game_System
       # @roomguard_grids[id] = nil                 # delete
       str += ",#{id}"
     end
-    DEBUG::write(c_m, str)
+    Debug::write(c_m, str)
   end
   #--------------------------------------------------------------------------
   # ● 村で使用した（売買）ゴールドの加算
@@ -700,14 +700,14 @@ class Game_System
   def gain_consumed_gold(n)
     @village_gold ||= 0
     @village_gold += n
-    DEBUG::write(c_m,"村のお金:#{@village_gold}(+#{n})")
+    Debug::write(c_m,"村のお金:#{@village_gold}(+#{n})")
   end
   #--------------------------------------------------------------------------
   # ● キューに追加
   #--------------------------------------------------------------------------
   def queuing(message)
     @skill_gain_queue.push(message)
-    if @skill_gain_queue.size > Constant_Table::QUEUE_SIZE
+    if @skill_gain_queue.size > ConstantTable::QUEUE_SIZE
       # merge_queue   # 多くなれば重複排除()
     end
   end
@@ -752,7 +752,7 @@ class Game_System
     @highest = {}
     @highest_date = {}
     @alert_reset_date = "#{Time.now.strftime("%Y%m%d %H:%M:%S")}"
-    DEBUG.write(c_m, "プロセスアラートのキューリセット")
+    Debug.write(c_m, "プロセスアラートのキューリセット")
   end
   #--------------------------------------------------------------------------
   # ● 遅延プロセス監視のログを吐き出す
@@ -760,13 +760,13 @@ class Game_System
   def dump_alert
     begin
       @alert_reset_date ||= ""
-      DEBUG.write(c_m, "Last Alert Reset Date: #{@alert_reset_date}")  # 最終リセット日
+      Debug.write(c_m, "Last Alert Reset Date: #{@alert_reset_date}")  # 最終リセット日
       for key, value in @alert.sort_by{ |_, v| -v }  # hashをvalueを基準に降順でソート
         str = sprintf("%60s x%4d", key, value)
-        DEBUG::write(c_m, str)
-        DEBUG.perfd_write(str)
+        Debug::write(c_m, str)
+        Debug.perfd_write(str)
       end
-      DEBUG::write(c_m,sprintf("%60s", "===========================================Process Stats==="))
+      Debug::write(c_m,sprintf("%60s", "===========================================Process Stats==="))
       @highest ||= {}
       @average ||= {}
       keys = (@highest.keys + @average.keys).uniq
@@ -774,15 +774,15 @@ class Game_System
         value = @highest[key] || 0    # nilだったら0
         average = @average[key] || 0
         str = sprintf("%60s High:%6.4f Ave:%6.4f Date:%s", key, value, average, @highest_date[key])
-        DEBUG.write(c_m, str)
-        DEBUG.perfd_write(str)
+        Debug.write(c_m, str)
+        Debug.perfd_write(str)
       end
-      DEBUG.write(c_m,sprintf("%60s", "===========================================Process StatsEnd"))
+      Debug.write(c_m,sprintf("%60s", "===========================================Process StatsEnd"))
     rescue StandardError => e
-      DEBUG::write(c_m,"err:#{e}")
-      DEBUG::write(c_m,"err:#{e.message}")
+      Debug::write(c_m,"err:#{e}")
+      Debug::write(c_m,"err:#{e.message}")
     end
-    DEBUG::write(c_m,sprintf("%60s", "dump alert End"))
+    Debug::write(c_m,sprintf("%60s", "dump alert End"))
   end
   #--------------------------------------------------------------------------
   # ● プロセス毎の最大遅延記録を更新
@@ -793,8 +793,10 @@ class Game_System
     return if result == 0
     if @highest[name] != nil
       if @highest[name] < result
-        DEBUG.write(c_m, "最大遅延更新:#{name} =>#{result}")
-        @highest_date[name] = "#{Time.now.strftime("%j %H:%M:%S")} Ver:#{load_data("Data/Version.rvdata").get_version_string}"
+        Debug.write(c_m, "最大遅延更新:#{name} =>#{result}")
+        version_hash = load_data("Data/Version.rvdata")
+
+        @highest_date[name] = "#{Time.now.strftime("%j %H:%M:%S")} Ver:#{version_hash[:ver]}"+"."+"#{version_hash[:date]}"+"-"+"#{version_hash[:build]}"
       end
       @highest[name] = [@highest[name], result].max
     else
@@ -833,8 +835,8 @@ class Game_System
       total += @guide_usage[id]
     end
     fee_rate = @guide_usage[guide_id] / total.to_f
-    fee_rate *= Constant_Table::FEE_C # 料金の係数をかける
-    DEBUG.write(c_m, "ガイドID:#{guide_id} 料金係数:x#{fee_rate}")
+    fee_rate *= ConstantTable::FEE_C # 料金の係数をかける
+    Debug.write(c_m, "ガイドID:#{guide_id} 料金係数:x#{fee_rate}")
     return fee_rate
   end
   #--------------------------------------------------------------------------
@@ -846,7 +848,7 @@ class Game_System
     y = $game_player.y * 1
     m = $game_map.map_id * 10000
     @sum[m+x+y] = monster_id
-    DEBUG.write(c_m, "イベントバトルを記憶 mapid:#{m/10000} x:#{x/100} y:#{y} 敵ID:#{monster_id}")
+    Debug.write(c_m, "イベントバトルを記憶 mapid:#{m/10000} x:#{x/100} y:#{y} 敵ID:#{monster_id}")
   end
   #--------------------------------------------------------------------------
   # ● 未討伐のイベントバトルの確認
@@ -857,7 +859,7 @@ class Game_System
     y = $game_player.y * 1
     m = $game_map.map_id * 10000
     result = @sum[m+x+y] == nil ? 0 : @sum[m+x+y]
-    DEBUG.write(c_m, "@sum.keys:#{@sum.keys}") unless result == 0
+    Debug.write(c_m, "@sum.keys:#{@sum.keys}") unless result == 0
     return result
   end
   #--------------------------------------------------------------------------
@@ -891,7 +893,7 @@ class Game_System
       rank = table
       rank += 1 if 5 > rand(100)                # 5%でランクアップ
       num = $game_party.party_scout_result      # スカウトチェックの数で総量が決定
-      num.times do items.push(TREASURE.pickup(kind, rank)) end
+      num.times do items.push(Treasure.pickup(kind, rank)) end
     end
     $game_party.get_event_item(items, t)
   end

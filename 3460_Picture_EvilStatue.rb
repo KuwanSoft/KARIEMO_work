@@ -4,7 +4,7 @@
 # NPCのポートレートを表示
 #==============================================================================
 
-class Picture_EvilStatue < Window_Base
+class Picture_EvilStatue < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Picture_EvilStatue < Window_Base
   # ● 画像の表示
   #--------------------------------------------------------------------------
   def set_picture
-    bitmap = Cache.battler($data_monsters[Constant_Table::EVILSTATUE].name, 0)
+    bitmap = Cache.battler($data_monsters[ConstantTable::EVILSTATUE].name, 0)
     self.contents.clear
     self.contents.blt(0, 0, bitmap, bitmap.rect, 255)
   end

@@ -4,23 +4,36 @@
 # ポップアップメッセージ
 #==============================================================================
 
-class Window_InjuredMembers < Window_Base
+class Window_InjuredMembers < WindowBase
+  attr_reader  :confirmed
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    super((512-(WLW*23+32+STA*2))/2, 48, WLW*23+32+STA*2, WLH*9+32)
+    super((512-(WLW*21+32+STA*2))/2, 48, WLW*21+32+STA*2, WLH*9+32)
     self.visible = false
     self.z = 254
     self.openness = 0
     create_picture
+    @confirmed = false
   end
+  #--------------------------------------------------------------------------
+  # ● 確認フラグ
+  #--------------------------------------------------------------------------
+  def set_confirm
+    @confirmed = true
+  end
+  #--------------------------------------------------------------------------
+  # ● ウインドウ開度
+  #--------------------------------------------------------------------------
   def openness=(new)
     super
-    return unless @picture
-    if self.openness == 255 and self.visible
+    return if @picture == nil
+    if self.openness == 255 && self.visible
       @picture.visible = true
-    else
+    elsif @confirmed && self.openness == 0
+      self.visible = false
+    elsif @confirmed
       @picture.visible = false
     end
   end
@@ -50,9 +63,9 @@ class Window_InjuredMembers < Window_Base
   #--------------------------------------------------------------------------
   def create_picture
     @picture = Sprite.new
-    @picture.bitmap = Bitmap.new("Graphics/System/guard2.png")
-    @picture.x = self.x + 16
-    @picture.y = self.y + 16
+    @picture.bitmap = Bitmap.new("Graphics/System/guard.png")
+    @picture.x = self.x + 32
+    @picture.y = self.y + 32
     @picture.z = self.z + 1
     @picture.visible = false
   end

@@ -4,7 +4,7 @@
 # 　宝箱メニュー
 #==============================================================================
 
-class Window_Treasure < Window_Selectable
+class Window_Treasure < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -16,7 +16,7 @@ class Window_Treasure < Window_Selectable
     @column_max = 1
     @adjust_x = WLW
     @adjust_y = 0
-    @top = Window_Base.new(0,0,512,WLH+32)
+    @top = WindowBase.new(0,0,512,WLH+32)
     @top.z = self.z
     refresh
   end

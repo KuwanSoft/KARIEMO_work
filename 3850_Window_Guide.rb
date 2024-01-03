@@ -1,4 +1,4 @@
-class Window_Guide < Window_Base
+class Window_Guide < WindowBase
   LEFT = WLW*7
   RIGHT = 268
   #--------------------------------------------------------------------------
@@ -77,79 +77,79 @@ class Window_Guide < Window_Base
     ## 食料増加スキル判定
     if @guide.enemy.skill.include?("食")
       num = @guide.enemy.skill.scan(/食(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_FOOD}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_FOOD}+#{num}", nil])
     end
     ## スキル判定
     if @guide.enemy.skill.include?("宝")
       num = @guide.enemy.skill.scan(/宝(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_TRE}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_TRE}+#{num}", nil])
     end
     ## 灯りスキル判定
     if @guide.enemy.skill.include?("灯")
-      skill.push(["#{Constant_Table::GUIDESKILL_LIGHT}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_LIGHT}", nil])
     end
     ## 観察眼スキル判定
     if @guide.enemy.skill.include?("眼")
       num = @guide.enemy.skill.scan(/眼(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_EYE}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_EYE}+#{num}", nil])
     end
     ## 罠回避スキル判定
     if @guide.enemy.skill.include?("罠")
       num = @guide.enemy.skill.scan(/罠(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_TRAP}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_TRAP}+#{num}", nil])
     end
     ## 盾スキル判定
     if @guide.enemy.skill.include?("盾")
-      skill.push(["#{Constant_Table::GUIDESKILL_SHIELD}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_SHIELD}", nil])
     end
     ## 反撃スキル判定
     if @guide.enemy.skill.include?("反")
-      skill.push(["#{Constant_Table::GUIDESKILL_COUNTER}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_COUNTER}", nil])
     end
     ## 経験値スキル判定
     if @guide.enemy.skill.include?("経")
       num = @guide.enemy.skill.scan(/経(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_EXP}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_EXP}+#{num}", nil])
     end
     ## 勤勉スキル判定
     if @guide.enemy.skill.include?("勤")
       num = @guide.enemy.skill.scan(/勤(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_LEARN}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_LEARN}+#{num}", nil])
     end
     ## MPヒーリングスキル判定
     if @guide.enemy.skill.include?("M")
       num = @guide.enemy.skill.scan(/M(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_MP}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_MP}+#{num}", nil])
     end
     ## ダブルアタックスキル判定
     if @guide.enemy.skill.include?("ダ")
-      skill.push(["#{Constant_Table::GUIDESKILL_DOUBLE}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_DOUBLE}", nil])
     end
     ## クリティカルスキル判定
     if @guide.enemy.skill.include?("首")
-      skill.push(["#{Constant_Table::GUIDESKILL_CRIT}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_CRIT}", nil])
     end
     ## 初期気力ボーナス判定
     if @guide.enemy.skill.include?("気")
       num = @guide.enemy.skill.scan(/気(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_MOTIV}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_MOTIV}+#{num}", nil])
     end
     ## 後列攻撃ボーナス判定
     if @guide.enemy.skill.include?("後")
-      skill.push(["#{Constant_Table::GUIDESKILL_BACK}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_BACK}", nil])
     end
     ## 奇襲無効判定
     if @guide.enemy.skill.include?("奇")
-      skill.push(["#{Constant_Table::GUIDESKILL_ALERT}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_ALERT}", nil])
     end
     ## 危険予知ボーナス判定
     if @guide.enemy.skill.include?("危")
       num = @guide.enemy.skill.scan(/危(\d+)/)[0][0]
-      skill.push(["#{Constant_Table::GUIDESKILL_PRE}+#{num}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_PRE}+#{num}", nil])
     end
     ## 挑発スキル判定
     if @guide.enemy.skill.include?("狙")
-      skill.push(["#{Constant_Table::GUIDESKILL_PROVOKE}", nil])
+      skill.push(["#{ConstantTable::GUIDESKILL_PROVOKE}", nil])
     end
     index = 0
     for m in skill
@@ -198,7 +198,7 @@ class Window_Guide < Window_Base
   # ● ウインドウで使用するフォントの変更
   #--------------------------------------------------------------------------
   def change_font_to_skill
-    self.contents.font.name = Constant_Table::Font_skill    # 美咲フォント
+    self.contents.font.name = ConstantTable::Font_skill    # 美咲フォント
     self.contents.font.size = 16
   end
 end

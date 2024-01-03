@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Battler
+# ■ GameBattler
 #------------------------------------------------------------------------------
-# 　バトラーを扱うクラスです。このクラスは Game_Actor クラスと Game_Enemy クラ
+# 　バトラーを扱うクラスです。このクラスは GameActor クラスと GameEnemy クラ
 # スのスーパークラスとして使用されます。
 #==============================================================================
 
-class Game_Battler
+class GameBattler
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -46,7 +46,6 @@ class Game_Battler
   attr_reader   :element_damage           # 行動結果: 属性 ダメージ
   attr_reader   :element_subdamage        # 行動結果: 属性 ダメージ
   attr_reader   :damage_element_type      # 行動結果: 属性 タイプ
-  attr_reader   :poison_damage            # 行動結果: 毒 ダメージ
   attr_reader   :mp_damage                # 行動結果: MP ダメージ
   attr_reader   :hp_healing               # 行動結果: HPヒーリング
   attr_reader   :hits                     # 攻撃が命中した回数
@@ -163,7 +162,7 @@ class Game_Battler
     @maxmp_water = 0
     @maxmp_air = 0
     @maxmp_earth = 0
-    @action = Game_BattleAction.new(self)
+    @action = GameBattleAction.new(self)
     @state_depth = {}                     # ステートの深度(Hash)
     @hidden = false
     @immortal = false
@@ -314,7 +313,6 @@ class Game_Battler
     @element_subdamage = 0
     @damage_element_type = 0
     @mp_damage = 0
-    @poison_damage = 0
     @hp_healing = 0
     @hits = 0
     @subhits = 0
@@ -356,9 +354,9 @@ class Game_Battler
     result = []
     for i in @added_states
       result.push($data_states[i])
-      DEBUG.write(c_m, "result.push(#{$data_states[i].name})")
+      Debug.write(c_m, "result.push(#{$data_states[i].name})")
     end
-    DEBUG.write(c_m, "result:#{result}")
+    Debug.write(c_m, "result:#{result}")
     ## STATEの並び替え
     result.sort! do |a,b|
       b.priority <=> a.priority
@@ -421,7 +419,7 @@ class Game_Battler
   def dr_head=(new_dr)
     @dr_head_plus ||= 0
     @dr_head_plus += new_dr - self.dr_head
-    DEBUG::write(c_m,"DR(頭)値変動=>#{new_dr} 補正値:#{@dr_head_plus}")
+    Debug::write(c_m,"DR(頭)値変動=>#{new_dr} 補正値:#{@dr_head_plus}")
   end
   #--------------------------------------------------------------------------
   # ● D.R.(鎧)の取得
@@ -437,7 +435,7 @@ class Game_Battler
   def dr_body=(new_dr)
     @dr_body_plus ||= 0
     @dr_body_plus += new_dr - self.dr_body
-    DEBUG::write(c_m,"DR(鎧)値変動=>#{new_dr} 補正値:#{@dr_body_plus}")
+    Debug::write(c_m,"DR(鎧)値変動=>#{new_dr} 補正値:#{@dr_body_plus}")
   end
   #--------------------------------------------------------------------------
   # ● D.R.(腕)の取得
@@ -453,7 +451,7 @@ class Game_Battler
   def dr_arm=(new_dr)
     @dr_arm_plus ||= 0
     @dr_arm_plus += new_dr - self.dr_arm
-    DEBUG::write(c_m,"DR(腕)値変動=>#{new_dr} 補正値:#{@dr_arm_plus}")
+    Debug::write(c_m,"DR(腕)値変動=>#{new_dr} 補正値:#{@dr_arm_plus}")
   end
   #--------------------------------------------------------------------------
   # ● D.R.(脚)の取得
@@ -469,7 +467,7 @@ class Game_Battler
   def dr_leg=(new_dr)
     @dr_leg_plus ||= 0
     @dr_leg_plus += new_dr - self.dr_leg
-    DEBUG::write(c_m,"DR(脚)値変動=>#{new_dr} 補正値:#{@dr_leg_plus}")
+    Debug::write(c_m,"DR(脚)値変動=>#{new_dr} 補正値:#{@dr_leg_plus}")
   end
   #--------------------------------------------------------------------------
   # ● resistの取得：呪文抵抗
@@ -484,7 +482,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def armor=(new_armor)
     @armor_plus += new_armor - self.armor
-    DEBUG::write(c_m,"アーマー値変動=>#{new_armor} 補正値:#{@armor_plus}")
+    Debug::write(c_m,"アーマー値変動=>#{new_armor} 補正値:#{@armor_plus}")
   end
   #--------------------------------------------------------------------------
   # ● resistの設定
@@ -499,15 +497,15 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def hp=(hp)
     return if self.survivor? and (hp > 0)                 # 行方不明者は回復不能
-    if state?(STATEID::DEATH) or state?(STATEID::ROTTEN)  # 死亡・腐敗の場合は無視
-      DEBUG::write(c_m,"すでに死亡・腐敗状態である")
+    if state?(StateId::DEATH) or state?(StateId::ROTTEN)  # 死亡・腐敗の場合は無視
+      Debug::write(c_m,"すでに死亡・腐敗状態である")
       @hp = 0
       return
     end
     ## HP回復
     if @hp < hp
       if burn?
-        DEBUG::write(c_m,"火傷状態の為HP回復しない")
+        Debug::write(c_m,"火傷状態の為HP回復しない")
         return
       end
     end
@@ -517,23 +515,23 @@ class Game_Battler
     ## 一撃死かつアクターの場合(行方不明者は除く)
     if hp < 1 and self.actor? and not self.survivor?
       ## フォーリーブスをチェック
-      sv = MISC.skill_value(SKILLID::FOURLEAVES, self)
-      diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::FOURLEAVES, self)
+      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
         @hp = 1
         $music.se_play("フォーリーブス")
-        DEBUG::write(c_m,"<< フォーリーブスにより救済検知 >>")
-        chance_skill_increase(SKILLID::FOURLEAVES)
+        Debug::write(c_m,"<< フォーリーブスにより救済検知 >>")
+        chance_skill_increase(SkillId::FOURLEAVES)
         return
       end
     end
     @hp = [[hp, maxhp].min, 0].max  # 最大値以上は回復させない
-    if @hp < 1 and not state?(STATEID::DEATH)   # HPが0以下の場合
+    if @hp < 1 and not state?(StateId::DEATH)   # HPが0以下の場合
       # self.tired_death                          # 死亡疲労
-      add_state(STATEID::DEATH)                 # 戦闘不能 (ステート 1 番) を付加
-      @added_states.push(STATEID::DEATH)
+      add_state(StateId::DEATH)                 # 戦闘不能 (ステート 1 番) を付加
+      @added_states.push(StateId::DEATH)
       # countup_rip                                   # キャラのripをカウント
       perform_collapse unless $game_temp.in_battle  # 戦闘時以外で断末魔
     end
@@ -543,28 +541,28 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def mp_fire=(mp_fire)
     @mp_fire = [[mp_fire, maxmp_fire].min, 0].max
-    DEBUG.write(c_m, "#{@mp_fire}")
+    Debug.write(c_m, "#{@mp_fire}")
   end
   #--------------------------------------------------------------------------
   # ● MP の変更
   #--------------------------------------------------------------------------
   def mp_water=(mp_water)
     @mp_water = [[mp_water, maxmp_water].min, 0].max
-    DEBUG.write(c_m, "#{@mp_water}")
+    Debug.write(c_m, "#{@mp_water}")
   end
   #--------------------------------------------------------------------------
   # ● MP の変更
   #--------------------------------------------------------------------------
   def mp_air=(mp_air)
     @mp_air = [[mp_air, maxmp_air].min, 0].max
-    DEBUG.write(c_m, "#{@mp_air}")
+    Debug.write(c_m, "#{@mp_air}")
   end
   #--------------------------------------------------------------------------
   # ● MP の変更
   #--------------------------------------------------------------------------
   def mp_earth=(mp_earth)
     @mp_earth = [[mp_earth, maxmp_earth].min, 0].max
-    DEBUG.write(c_m, "#{@mp_earth}")
+    Debug.write(c_m, "#{@mp_earth}")
   end
   #--------------------------------------------------------------------------
   # ● 全回復
@@ -576,9 +574,9 @@ class Game_Battler
       recover_mp
     end
     for i in @state_depth.keys
-      if i == STATEID::DEATH and miracle == true   # 奇跡での復活
+      if i == StateId::DEATH and miracle == true   # 奇跡での復活
         remove_state(i, 9)
-      elsif i == STATEID::DEATH                    # 教会での復活
+      elsif i == StateId::DEATH                    # 教会での復活
         result = remove_state(i)
       else
         remove_state(i)
@@ -630,13 +628,13 @@ class Game_Battler
   # ● 魔封じ中判定
   #--------------------------------------------------------------------------
   def silence?
-    return state?(STATEID::CONTAINMENT) # 魔封じか？
+    return state?(StateId::CONTAINMENT) # 魔封じか？
   end
   #--------------------------------------------------------------------------
   # ● 暴走状態判定
   #--------------------------------------------------------------------------
   def muppet?
-    return state?(STATEID::MUPPET)
+    return state?(StateId::MUPPET)
   end
   #--------------------------------------------------------------------------
   # ● 混乱状態判定
@@ -660,115 +658,115 @@ class Game_Battler
   # ● 疲労判定
   #--------------------------------------------------------------------------
   def tired?
-    return state?(STATEID::TIRED) # 疲労か？
+    return state?(StateId::TIRED) # 疲労か？
   end
   #--------------------------------------------------------------------------
   # ● 隠密中判定
   #--------------------------------------------------------------------------
   def onmitsu?
-    return state?(STATEID::HIDING) # 隠密中?
+    return state?(StateId::HIDING) # 隠密中?
   end
   #--------------------------------------------------------------------------
   # ● 発狂判定
   #--------------------------------------------------------------------------
   def mad?
-    return state?(STATEID::MADNESS)
+    return state?(StateId::MADNESS)
   end
   #--------------------------------------------------------------------------
   # ● 睡眠中判定
   #--------------------------------------------------------------------------
   def sleep?
-    return state?(STATEID::SLEEP)
+    return state?(StateId::SLEEP)
   end
   #--------------------------------------------------------------------------
   # ● 暗闇中判定
   #--------------------------------------------------------------------------
   def blind?
-    return state?(STATEID::BLIND)
+    return state?(StateId::BLIND)
   end
   #--------------------------------------------------------------------------
   # ● 毒判定
   #--------------------------------------------------------------------------
   def poison?
-    return state?(STATEID::POISON)
+    return state?(StateId::POISON)
   end
   #--------------------------------------------------------------------------
   # ● 出血判定
   #--------------------------------------------------------------------------
   def bleeding?
-    return state?(STATEID::BLEEDING)
+    return state?(StateId::BLEEDING)
   end
   #--------------------------------------------------------------------------
   # ● 吐き気判定
   #--------------------------------------------------------------------------
   def nausea?
-    return state?(STATEID::NAUSEA)
+    return state?(StateId::NAUSEA)
   end
   #--------------------------------------------------------------------------
   # ● 重症判定
   #--------------------------------------------------------------------------
   def severe?
-    return state?(STATEID::SEVERE)
+    return state?(StateId::SEVERE)
   end
   #--------------------------------------------------------------------------
   # ● マヒ中判定
   #--------------------------------------------------------------------------
   def paralysis?
-    return state?(STATEID::PARALYSIS)
+    return state?(StateId::PARALYSIS)
   end
   #--------------------------------------------------------------------------
   # ● 石化中判定
   #--------------------------------------------------------------------------
   def stone?
-    return state?(STATEID::STONE)
+    return state?(StateId::STONE)
   end
   #--------------------------------------------------------------------------
   # ● 病気中判定
   #--------------------------------------------------------------------------
   def miasma?
-    return state?(STATEID::SICKNESS)
+    return state?(StateId::SICKNESS)
   end
   #--------------------------------------------------------------------------
   # ● 恐怖判定
   #--------------------------------------------------------------------------
   def fear?
-    return state?(STATEID::FEAR)
+    return state?(StateId::FEAR)
   end
   #--------------------------------------------------------------------------
   # ● 骨折判定
   #--------------------------------------------------------------------------
   def fracture?
-    return state?(STATEID::FRACTURE)
+    return state?(StateId::FRACTURE)
   end
   #--------------------------------------------------------------------------
   # ● 火傷判定
   #--------------------------------------------------------------------------
   def burn?
-    return state?(STATEID::BURN)
+    return state?(StateId::BURN)
   end
   #--------------------------------------------------------------------------
   # ● 凍結判定
   #--------------------------------------------------------------------------
   def freeze?
-    return state?(STATEID::FREEZE)
+    return state?(StateId::FREEZE)
   end
   #--------------------------------------------------------------------------
   # ● 感電判定
   #--------------------------------------------------------------------------
   def shock?
-    return state?(STATEID::SHOCK)
+    return state?(StateId::SHOCK)
   end
   #--------------------------------------------------------------------------
   # ● 悪臭判定
   #--------------------------------------------------------------------------
   def stink?
-    return state?(STATEID::STINK)
+    return state?(StateId::STINK)
   end
   #--------------------------------------------------------------------------
   # ● 腐敗判定
   #--------------------------------------------------------------------------
   def rotten?
-    return state?(STATEID::ROTTEN)
+    return state?(StateId::ROTTEN)
   end
   #--------------------------------------------------------------------------
   # ● 属性修正値の取得
@@ -810,6 +808,7 @@ class Game_Battler
   def state?(state_id)
     return @state_depth.keys.include?(state_id)
   end
+
   #--------------------------------------------------------------------------
   # ● ステートがフルかどうかの判定
   #     state_id : ステート ID
@@ -882,76 +881,76 @@ class Game_Battler
     return if state_ignore?(state_id)     # 無視するべきステート？
     if @state_depth[state_id] != nil      # 既にこの状態の場合
       @state_depth[state_id] += depth     # 深度の半分を追加
-      DEBUG::write(c_m,"#{self.name} #{$data_states[state_id].name} 深度追加:#{@state_depth[state_id]}")
+      Debug::write(c_m,"#{self.name} #{$data_states[state_id].name} 深度追加:#{@state_depth[state_id]}")
     else
       @state_depth[state_id] = depth      # 状態異常を付加
-      DEBUG::write(c_m,"#{self.name} #{$data_states[state_id].name} 新規深度:#{@state_depth[state_id]}")
+      Debug::write(c_m,"#{self.name} #{$data_states[state_id].name} 新規深度:#{@state_depth[state_id]}")
     end
-    if state_id == STATEID::DEATH       # 戦闘不能 (ステート 1 番) なら
+    if state_id == StateId::DEATH       # 戦闘不能 (ステート 1 番) なら
       @hp = 0                           # HP を 0 に変更する
       dp = true
     end
-    if state_id == STATEID::CRITICAL    # くびはね (ステート 2 番) なら
+    if state_id == StateId::CRITICAL    # くびはね (ステート 2 番) なら
       @hp = 0                           # HP を 0 に変更する
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::BROKEN      # 破砕 (ステート 18 番) なら
+    if state_id == StateId::BROKEN      # 破砕 (ステート 18 番) なら
       @hp = 0                           # HP を 0 に変更する
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::PURIFY      # ターンアンデッド（16番）なら
+    if state_id == StateId::PURIFY      # ターンアンデッド（16番）なら
       @hp = 0                           # HP を 0 に変更する
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::EXORCIST    # 悪魔祓い（26番）なら
+    if state_id == StateId::EXORCIST    # 悪魔祓い（26番）なら
       @hp = 0                           # HP を 0 に変更する
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::SUFFOCATION # 窒息
+    if state_id == StateId::SUFFOCATION # 窒息
       @hp = 0
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::F_BLOW      # フィニッシュブロー
+    if state_id == StateId::F_BLOW      # フィニッシュブロー
       @hp = 0
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
-    if state_id == STATEID::NIGHTMARE   # 悪夢
-      DEBUG::write(c_m,"#{self.name} 悪夢検知")
+    if state_id == StateId::NIGHTMARE   # 悪夢
+      Debug::write(c_m,"#{self.name} 悪夢検知")
       @hp = 0
-      @state_depth[STATEID::DEATH] = 0  # state_id = 1を付加
+      @state_depth[StateId::DEATH] = 0  # state_id = 1を付加
       dp = true
     end
     if dp
-      DEBUG.write(c_m, "DEATH PENALTY検知")
+      Debug.write(c_m, "DEATH PENALTY検知")
       self.tired_death                  # 死亡疲労
       countup_rip                       # キャラのripをカウント
     end
-    if state_id == STATEID::DRAIN_AGE   # ドレイン：老化
-      DEBUG::write(c_m,"#{self.name} ドレイン：老化")
+    if state_id == StateId::DRAIN_AGE   # ドレイン：老化
+      Debug::write(c_m,"#{self.name} ドレイン：老化")
       self.aged(365) if self.actor?
       @drain = true
     end
-    if state_id == STATEID::DRAIN_EXP   # ドレイン：忘却
-      DEBUG::write(c_m,"#{self.name} ドレイン：経験値ロスト")
+    if state_id == StateId::DRAIN_EXP   # ドレイン：忘却
+      Debug::write(c_m,"#{self.name} ドレイン：経験値ロスト")
       self.back_exp if self.actor?
       @drain = true
     end
-    if state_id == STATEID::RUST        # 錆び
-      DEBUG::write(c_m,"#{self.name} 鎧破壊（装備無しも含む）")
+    if state_id == StateId::RUST        # 錆び
+      Debug::write(c_m,"#{self.name} 鎧破壊（装備無しも含む）")
       self.rust_armor if self.actor?
     end
-    if state_id == STATEID::FEAR        # 恐怖の場合
-      DEBUG::write(c_m,"#{self.name} 恐怖状態：アクションキャンセル")
+    if state_id == StateId::FEAR        # 恐怖の場合
+      Debug::write(c_m,"#{self.name} 恐怖状態：アクションキャンセル")
       @action.clear                     # 戦闘行動をクリアする
     end
-    if state_id == STATEID::STUN        # スタンの場合
-      DEBUG::write(c_m,"#{self.name} スタン：アクションキャンセル")
+    if state_id == StateId::STUN        # スタンの場合
+      Debug::write(c_m,"#{self.name} スタン：アクションキャンセル")
       @action.clear                     # 戦闘行動をクリアする
       @vulnerable = true                # 脆弱化フラグ
     end
@@ -1013,31 +1012,31 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def remove_state(state_id, cp = 0)
     return 0 unless state?(state_id)      # このステートが付加されていない？
-    return 0 if state_id == STATEID::ROTTEN # 腐敗については単独で解除しない
-    if state_id == STATEID::DEATH and @hp == 0         # 戦闘不能 (ステート 1 番) なら
-      unless state?(STATEID::ROTTEN)      # 腐敗状態？
+    return 0 if state_id == StateId::ROTTEN # 腐敗については単独で解除しない
+    if state_id == StateId::DEATH and @hp == 0         # 戦闘不能 (ステート 1 番) なら
+      unless state?(StateId::ROTTEN)      # 腐敗状態？
         if judge_comeback(cp)             # 復活判定
-          DEBUG::write(c_m," 死亡より復活成功")
+          Debug::write(c_m," 死亡より復活成功")
           @hp = 1                         # HP を 1 に変更する
           self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth.delete(STATEID::DEATH) # 配列から削除
+          @state_depth.delete(StateId::DEATH) # 配列から削除
           return 0
         else
-          DEBUG::write(c_m," 死亡より復活失敗=>腐敗")
+          Debug::write(c_m," 死亡より復活失敗=>腐敗")
           self.aged(365,false)				    # 年齢上昇
-          add_state(STATEID::ROTTEN)      # 腐敗を付加
+          add_state(StateId::ROTTEN)      # 腐敗を付加
           return 1
         end
       else                                # 腐敗からの復活
         if judge_comeback(cp)             # 復活判定
-          DEBUG::write(c_m," 腐敗より復活成功")
+          Debug::write(c_m," 腐敗より復活成功")
           @hp = 1                         # HP を 1 に変更する くさる時を除く
           self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth.delete(STATEID::ROTTEN)  # 配列から削除
+          @state_depth.delete(StateId::ROTTEN)  # 配列から削除
           @state_depth.delete(1)          # 配列から削除
           return 0
         else                              # LOST処理
-          DEBUG::write(c_m,"腐敗より復活失敗=>ロスト")
+          Debug::write(c_m,"腐敗より復活失敗=>ロスト")
           $game_party.remove_actor(self.id)
           self.lost                       # ロスト処理
           return 2
@@ -1072,7 +1071,7 @@ class Game_Battler
       rate = 100
     end
     rate = [[rate, 95].min, 5].max unless rate == 100 # 5%～95%の範囲での判定
-    DEBUG::write(c_m,"復活判定開始:#{self.name} 成功確率:#{rate}%")
+    Debug::write(c_m,"復活判定開始:#{self.name} 成功確率:#{rate}%")
     return true if rate > rand(100)
     return false
   end
@@ -1175,22 +1174,22 @@ class Game_Battler
   def remove_states_auto
     clear_action_results
     for i in @state_depth.keys.clone
-      next if i == STATEID::HIDING    # 隠密についてはスルー
+      next if i == StateId::HIDING    # 隠密についてはスルー
       next unless $data_states[i].battle_only if self.actor? # 戦闘時のみ以外のステートは自然回復しない
-      DEBUG::write(c_m,"ステート自然解除判定開始(#{self.name}) ID#{i} 異常深度:#{@state_depth[i]}")
+      Debug::write(c_m,"ステート自然解除判定開始(#{self.name}) ID#{i} 異常深度:#{@state_depth[i]}")
 
       ## 回復値の算出
       obj = $data_states[i]
       d1 = obj.recover_value.scan(/(\S+)d/)[0][0].to_i
       d2 = obj.recover_value.scan(/.*d(\d+)[+-]/)[0][0].to_i
       d3 = obj.recover_value.scan(/.*([+-]\d+)/)[0][0].to_i
-      rec_depth = MISC.dice(d1, d2, d3)
+      rec_depth = Misc.dice(d1, d2, d3)
       small = d1+d3
       big = d1*d2+d3
       value = "#{d1}D#{d2}"
       value += "+#{d3}" if d3 > 0
       value += "#{d3}" if d3 < 0
-      DEBUG::write(c_m,"回復値:#{value} #{rec_depth}")
+      Debug::write(c_m,"回復値:#{value} #{rec_depth}")
 
       ## 新・自然回復判定
       @state_depth[i] -= rec_depth
@@ -1199,14 +1198,14 @@ class Game_Battler
         @state_depth[i] = 0 # リセット
         remove_state(i)
         @removed_states.push(i)
-        DEBUG::write(c_m,"【自然回復】ステート自然解除成功 ID#{i}")
+        Debug::write(c_m,"【自然回復】ステート自然解除成功 ID#{i}")
       ## 5%で絶対回復される
       elsif 5 > rand(100)
         remove_state(i)
         @removed_states.push(i)
-        DEBUG::write(c_m,"【5%絶対回復】ステート自然解除成功 ID#{i}")
+        Debug::write(c_m,"【5%絶対回復】ステート自然解除成功 ID#{i}")
       else
-        DEBUG::write(c_m,"【自然回復】ステート自然回復 ID#{i} 現在異常深度:#{@state_depth[i]}")
+        Debug::write(c_m,"【自然回復】ステート自然回復 ID#{i} 現在異常深度:#{@state_depth[i]}")
       end
     end
   end
@@ -1227,9 +1226,9 @@ class Game_Battler
   def break_stone
     return unless stone?        # 石化でなければ終了
     return unless 5 > rand(100) # 5%で破砕
-    add_state(STATEID::BROKEN)
-    @added_states.push(STATEID::BROKEN)
-    DEBUG::write(c_m,"ダメージにより破砕!:#{self.name}")
+    add_state(StateId::BROKEN)
+    @added_states.push(StateId::BROKEN)
+    Debug::write(c_m,"ダメージにより破砕!:#{self.name}")
   end
   #--------------------------------------------------------------------------
   # ● スキルの使用可能判定
@@ -1399,8 +1398,8 @@ class Game_Battler
   # ● 反射神経回避判定
   #--------------------------------------------------------------------------
   def check_reflexes
-    sv = MISC.skill_value(SKILLID::REFLEXES, self)
-    diff = Constant_Table::DIFF_15[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::REFLEXES, self)
+    diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     return ratio > rand(100)
@@ -1410,20 +1409,20 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def check_fumble_number(attacker)
     if attacker.t_hand?
-      case MISC.skill_value(SKILLID::TWOHANDED, attacker)
+      case Misc.skill_value(SkillId::TWOHANDED, attacker)
       when 100..999;  val = 0 # ファンブル無効
       when 25..99;  val = 1   # ファンブル5%
       else;         val = 2   # ファンブル10%
       end
     elsif attacker.dual_wield?
-      case MISC.skill_value(SKILLID::DUAL, attacker)
+      case Misc.skill_value(SkillId::DUAL, attacker)
       when 75..999; val = 0   # ファンブル無効
       else;         val = 1   # ファンブル5%
       end
     else
       val = 1                 # ファンブル5%
     end
-    DEBUG.write(c_m, "ファンブルダイス値:#{val}")
+    Debug.write(c_m, "ファンブルダイス値:#{val}")
     return val
   end
   #--------------------------------------------------------------------------
@@ -1440,12 +1439,12 @@ class Game_Battler
     if armor > 0
       if @vulnerable
         armor /= 2
-        DEBUG.write(c_m, "#{self.name} 脆弱化フラグ確認")
+        Debug.write(c_m, "#{self.name} 脆弱化フラグ確認")
       elsif guarding?                              # ガードしていればARMOR2倍
         armor += self.armor
       elsif check_reflexes                      # 反射神経ボーナス
         armor += self.armor
-        DEBUG::write(c_m,"#{self.name} 反射神経ボーナス検知 Armor*2")
+        Debug::write(c_m,"#{self.name} 反射神経ボーナス検知 Armor*2")
       end
     end
     sh = shield_activate?                     # シールドブロックフラグ
@@ -1462,7 +1461,7 @@ class Game_Battler
     t_hand = attacker.t_hand?                 # 両手持ちか
     dw = attacker.dual_wield?                 # 二刀流か
     fn = check_fumble_number(attacker)        # ファンブル閾値取得
-    DEBUG::write(c_m,"初期AP:#{ap} 最大ヒット数:#{swing}")
+    Debug::write(c_m,"初期AP:#{ap} 最大ヒット数:#{swing}")
 
     swing.times do
       sc += 1
@@ -1471,16 +1470,16 @@ class Game_Battler
       nod.times do array.push(rand(20)+1) end
       ## 0(=無効),1(=5%),2(=10%)以下を検知
       if array[0] <= fn and movable?
-        DEBUG::write(c_m,"【#{sc}】ファンブル検知 DICE出目:#{array[0]} #{hit}回以降スキップ")
+        Debug::write(c_m,"【#{sc}】ファンブル検知 DICE出目:#{array[0]} #{hit}回以降スキップ")
         break
       else
         dice = array.max                      # 最大値
-        fl = armor + Constant_Table::BASE_ARMOR - ap                  # ファイトレベル
-        flmax = Constant_Table::HITCAP[sc]
+        fl = armor + ConstantTable::BASE_ARMOR - ap                  # ファイトレベル
+        flmax = ConstantTable::HITCAP[sc]
         if dice > [[fl, 1].max, flmax].min       # 最小・最大の制限 1~19
           result = true
         else
-          DEBUG::write(c_m,"【#{sc}】ミス！ FL:#{fl} > DICE:#{dice}")
+          Debug::write(c_m,"【#{sc}】ミス！ FL:#{fl} > DICE:#{dice}")
           result = false
         end
       end
@@ -1490,7 +1489,7 @@ class Game_Battler
       dn = sub ? attacker.sub_dice_number : attacker.dice_number
       dm = sub ? attacker.sub_dice_max : attacker.dice_max
       dp = sub ? attacker.sub_dice_plus : attacker.dice_plus
-      d1 = MISC.dice(dn, dm, dp)
+      d1 = Misc.dice(dn, dm, dp)
       d2 = attacker.use_mindpower
       d3 = 1                                            # 気力によるダメージ調整だったが削除
       d4 = self.get_Damage_Reduction(sh, attacker, sub) # DRでダメージを減らす
@@ -1504,26 +1503,26 @@ class Game_Battler
         e_dn = sub ? attacker.sub_dice_number(true) : attacker.dice_number(true)
         e_dm = sub ? attacker.sub_dice_max(true) : attacker.dice_max(true)
         e_dp = sub ? attacker.sub_dice_plus(true) : attacker.dice_plus(true)
-        e_d1 = MISC.dice(e_dn, e_dm, e_dp)
+        e_d1 = Misc.dice(e_dn, e_dm, e_dp)
         e_d = self.calc_element_damage(@damage_element_type, e_d1)
         e_d = [Integer(e_d), 0].max                           # 最低値の補正
         e_damage += e_d
       end
-      DEBUG::write(c_m,"【スイング:#{sc}】--------------------------------------------------")
-      DEBUG::write(c_m,"FightLV:#{fl}=>命中#{(20-[[fl, 1].max, flmax].min)*5}% NoD:#{nod} Dice[0]:#{array[0]} MAXDice:#{dice} HitCap:#{flmax*5}%")
-      DEBUG::write(c_m,"Dmg:#{dn}D#{dm}+#{dp} DR:#{d4} 精神刃:#{d2} 気力##{d3} SUB?:#{sub}")
-      DEBUG::write(c_m,"HIT##{hit} DMG:#{d} Armor:#{armor} Swing:#{swing} Movable?#{movable?}")
-      DEBUG::write(c_m,"属性DMG:#{e_d} 属性:#{attacker.equip_element_weapon?(sub)}")
+      Debug::write(c_m,"【スイング:#{sc}】--------------------------------------------------")
+      Debug::write(c_m,"FightLV:#{fl}=>命中#{(20-[[fl, 1].max, flmax].min)*5}% NoD:#{nod} Dice[0]:#{array[0]} MAXDice:#{dice} HitCap:#{flmax*5}%")
+      Debug::write(c_m,"Dmg:#{dn}D#{dm}+#{dp} DR:#{d4} 精神刃:#{d2} 気力##{d3} SUB?:#{sub}")
+      Debug::write(c_m,"HIT##{hit} DMG:#{d} Armor:#{armor} Swing:#{swing} Movable?#{movable?}")
+      Debug::write(c_m,"属性DMG:#{e_d} 属性:#{attacker.equip_element_weapon?(sub)}")
     end
 
     ## 霊体への判定
     if self.undead? && self.be_spirit?          # 不死者かつ霊体？
-      DEBUG::write(c_m,"#{self.name} →不死者かつ霊体を検知")
+      Debug::write(c_m,"#{self.name} →不死者かつ霊体を検知")
       unless check_double(attacker.double(sub))   # 不死特効でない？
-        DEBUG::write(c_m,"#{attacker.name} →不死特効を持たない")
+        Debug::write(c_m,"#{attacker.name} →不死特効を持たない")
         damage = 0
       else
-        DEBUG::write(c_m,"#{attacker.name} →不死特効装備を検知!!")
+        Debug::write(c_m,"#{attacker.name} →不死特効装備を検知!!")
       end
     end
 
@@ -1531,21 +1530,21 @@ class Game_Battler
     double = 1
     # 種族による2倍撃判定
     if check_double(attacker.double(sub))
-      DEBUG::write(c_m,"#{self.name} モンスター種族一致：被2倍撃") # debug
+      Debug::write(c_m,"#{self.name} モンスター種族一致：被2倍撃") # debug
       double += 1
     end
     # 睡眠・弱点暴露は 物理ダメージ2倍
     if double_damage?
-      DEBUG::write(c_m,"#{self.name} ステートチェック：被2倍撃") # debug
+      Debug::write(c_m,"#{self.name} ステートチェック：被2倍撃") # debug
       double += 1
     end
     # エクソシストチェック
     if exorcist_check(attacker)
-      DEBUG::write(c_m,"#{self.name} 悪魔族＆エクソシスト：被2倍撃") # debug
+      Debug::write(c_m,"#{self.name} 悪魔族＆エクソシスト：被2倍撃") # debug
       double += 1
     end
     damage *= double
-    DEBUG::write(c_m,"#{self.name} 総合 被#{double}倍撃") if double != 1
+    Debug::write(c_m,"#{self.name} 総合 被#{double}倍撃") if double != 1
 
     ## サブ攻撃が物理・属性ともに0ダメージ以下の場合
     if damage <= 0 && e_damage <= 0 && sub  # 0以下であれば0へ
@@ -1563,11 +1562,11 @@ class Game_Battler
       @element_subdamage += e_damage
     end
 
-    DEBUG.write(c_m, "--------------------------------------------------------------")
+    Debug.write(c_m, "--------------------------------------------------------------")
     s = sub ? "サブ" : "通常"
-    DEBUG::write(c_m,"[#{attacker.name} ⇒⇒#{s}攻撃⇒⇒ #{self.name}]")
-    DEBUG::write(c_m,"ヒット数:#{hit} 物理ダメージ:#{damage} 属性ダメージ:#{e_damage} ")
-    DEBUG.write(c_m, "--------------------------------------------------------------")
+    Debug::write(c_m,"[#{attacker.name} ⇒⇒#{s}攻撃⇒⇒ #{self.name}]")
+    Debug::write(c_m,"ヒット数:#{hit} 物理ダメージ:#{damage} 属性ダメージ:#{e_damage} ")
+    Debug.write(c_m, "--------------------------------------------------------------")
 
     unless sub  # 物理・属性両方のダメージが無ければサブ攻撃はスキップ
       if damage == 0 && e_damage == 0
@@ -1580,11 +1579,11 @@ class Game_Battler
       attacker.chance_weapon_skill_increase(sub)  # スキル：メイン
     end
     if sub
-      attacker.chance_skill_increase(SKILLID::DUAL)
+      attacker.chance_skill_increase(SkillId::DUAL)
     elsif t_hand
-      attacker.chance_skill_increase(SKILLID::TWOHANDED)
+      attacker.chance_skill_increase(SkillId::TWOHANDED)
     end
-    self.chance_skill_increase(SKILLID::REFLEXES)  # 反射神経
+    self.chance_skill_increase(SkillId::REFLEXES)  # 反射神経
     return true # サブがあればサブへ
   end
   #--------------------------------------------------------------------------
@@ -1595,21 +1594,21 @@ class Game_Battler
   #    結果は @hp_damage または @mp_damage に代入する。
   #--------------------------------------------------------------------------
   def make_obj_damage_value(user, obj, magic_lv = 1, e_number = 9, drain_power = 0)
-    DEBUG::write(c_m,"[#{user.name} ⇒⇒呪文⇒⇒ #{self.name}]") # debug
-    DEBUG::write(c_m,"[呪文名:#{obj.name} C.P.#{magic_lv}]") # debug
+    Debug::write(c_m,"[#{user.name} ⇒⇒呪文⇒⇒ #{self.name}]") # debug
+    Debug::write(c_m,"[呪文名:#{obj.name} C.P.#{magic_lv}]") # debug
     # オブジェクトの種類情報を取得
     purpose = obj.purpose
     damage = 0  # ダメージ総計
     hit = 0     # ステート変化内部計算用　何回適用判定するか
     ## コンセントレート倍率
-    sv = MISC.skill_value(SKILLID::CONCENTRATE, user)
-    diff = Constant_Table::DIFF_75[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::CONCENTRATE, user)
+    diff = ConstantTable::DIFF_75[$game_map.map_id] # フロア係数
     ratio_1 = Integer([sv * diff, 95].min)
-    diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+    diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
     ratio_2 = Integer([sv * diff, 95].min)
-    diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
     ratio_3 = Integer([sv * diff, 95].min)
-    diff = Constant_Table::DIFF_05[$game_map.map_id] # フロア係数
+    diff = ConstantTable::DIFF_05[$game_map.map_id] # フロア係数
     ratio_4 = Integer([sv * diff, 95].min)
     if tired?
       ratio_1 /= 2
@@ -1620,22 +1619,22 @@ class Game_Battler
     multipiler = 1
     c = user.magic_damage_multipiler
     if ratio_1 > rand(100)
-      DEBUG.write(c_m, "ダメージUP1(基本75%)成功:#{ratio_1}%")
+      Debug.write(c_m, "ダメージUP1(基本75%)成功:#{ratio_1}%")
       multipiler *= c
       if ratio_2 > rand(100)
-        DEBUG.write(c_m, "ダメージUP2(基本50%)成功:#{ratio_2}%")
+        Debug.write(c_m, "ダメージUP2(基本50%)成功:#{ratio_2}%")
         multipiler *= c
         if ratio_3 > rand(100)
-          DEBUG.write(c_m, "ダメージUP3(基本25%)成功:#{ratio_3}%")
+          Debug.write(c_m, "ダメージUP3(基本25%)成功:#{ratio_3}%")
           multipiler *= c
           if ratio_4 > rand(100)
-            DEBUG.write(c_m, "ダメージUP4(基本5%)成功:#{ratio_4}%")
+            Debug.write(c_m, "ダメージUP4(基本5%)成功:#{ratio_4}%")
             multipiler *= c
           end
         end
       end
     end
-    DEBUG.write(c_m, "コンセントレート:#{sv} 最終倍率:x#{multipiler} 個別倍率:x#{c}")
+    Debug.write(c_m, "コンセントレート:#{sv} 最終倍率:x#{multipiler} 個別倍率:x#{c}")
     m_dice_num = obj.damage.scan(/(\S+)d/)[0][0].to_i
     m_dice_max = obj.damage.scan(/d(\d+)[+-]/)[0][0].to_i
     m_dice_plus = obj.damage.scan(/([+-]\d+)/)[0][0].to_i
@@ -1645,34 +1644,34 @@ class Game_Battler
     magic_lv.times do
       hit += 1 if user.get_max_magic_dice_throw > mfl
     end
-    DEBUG.write(c_m, "RESIST計算 hits:#{hit} 詠唱CP:#{magic_lv} Resist:#{self.resist} 浸透:#{user.permeation}")
+    Debug.write(c_m, "RESIST計算 hits:#{hit} 詠唱CP:#{magic_lv} Resist:#{self.resist} 浸透:#{user.permeation}")
 
     case purpose  # 用途によって分岐
     ######### 回復系呪文処理(レジスト無し) ##########
     when "heal"   # "痛みよ消えろ"の呪文のみ
       magic_lv.times do
         next if burn?
-        damage -= MISC.dice( 1, self.vit, 0) # 体力ｘ1を最大値としたダイス
+        damage -= Misc.dice( 1, self.vit, 0) # 体力ｘ1を最大値としたダイス
       end
       damage *= multipiler
       damage = Integer(damage)
-      DEBUG::write(c_m,"痛みよ消えろ VIT:#{self.vit} 回復量:#{damage}pts")
+      Debug::write(c_m,"痛みよ消えろ VIT:#{self.vit} 回復量:#{damage}pts")
     when "greatheal"
       magic_lv.times do
         next if burn?
-        damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        damage -= Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       damage *= multipiler
       damage = Integer(damage)
-      DEBUG::write(c_m,"GreatHeal 回復量:#{damage}")
+      Debug::write(c_m,"GreatHeal 回復量:#{damage}")
     when "healall"  # 祈りよ届けの呪文のみ
       magic_lv.times do
         next if burn?
-        damage -= MISC.dice( 1, user.luk, 0) # 運を最大値としたダイス
+        damage -= Misc.dice( 1, user.luk, 0) # 運を最大値としたダイス
       end
       damage *= multipiler
       damage = Integer(damage)
-      DEBUG::write(c_m,"祈りよ届け 詠唱者運:#{user.luk} 回復量:#{damage}")
+      Debug::write(c_m,"祈りよ届け 詠唱者運:#{user.luk} 回復量:#{damage}")
     when "regeneration" # 傷よ塞がれの呪文
       rege = magic_lv * 2
       rege *= multipiler
@@ -1681,21 +1680,21 @@ class Game_Battler
     ######### 攻撃系呪文処理(レジストあり) ##########
     # -- 計算には代入済みのhitを使用する。
     when "damage","earthquake" # 攻撃呪文or攻撃アイテム
-      DEBUG::write(c_m,"ダメージ呪文 #{m_dice_num}D#{m_dice_max}+#{m_dice_plus}")
+      Debug::write(c_m,"ダメージ呪文 #{m_dice_num}D#{m_dice_max}+#{m_dice_plus}")
       hit.times do
-        damage += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        damage += Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       damage *= multipiler
       ## 属性抵抗判定（フラグも同時にセットする）
       @damage_element_type = obj.element_type # 呪文の属性IDをセット
       damage = self.calc_element_damage(@damage_element_type, damage)
       damage = Integer(damage)
-      DEBUG::write(c_m,"攻撃呪文ダメージ倍率 x#{multipiler} SKILL値:#{MISC.skill_value(SKILLID::CONCENTRATE,user)}")
+      Debug::write(c_m,"攻撃呪文ダメージ倍率 x#{multipiler} SKILL値:#{Misc.skill_value(SkillId::CONCENTRATE,user)}")
       @hits = hit
       damage = 0 if damage < 0                      # マイナスなら 0 に
       damage = 0 if (purpose == "earthquake" && self.ignore_earthquake?)
       self.nodamage_flag = true if @hits == 0       # 一度もヒットしなければ
-      DEBUG::write(c_m,"ダメージ呪文 HIT:#{hit} ダメージ:#{damage}")
+      Debug::write(c_m,"ダメージ呪文 HIT:#{hit} ダメージ:#{damage}")
     ######### 異常系呪文処理(レジストあり) ##########
     when "status" # ステート変化
       @hits = hit
@@ -1706,34 +1705,34 @@ class Game_Battler
       damage = 0
       return unless hit > 0                               # 命中しなければリターン
       if self.undead? && self.identified                  # アンデッドかつ確定済み
-        a = user.mnd * Constant_Table::BURY
-        damage = MISC.dice(user.level, a, 0) * multipiler
+        a = user.mnd * ConstantTable::BURY
+        damage = Misc.dice(user.level, a, 0) * multipiler
         damage = Integer(damage)
       else
         damage = 0
       end
       @hits = hit
-      DEBUG::write(c_m,"特殊ダメージ呪文 Dice=#{user.level}D#{a} ジルワン")
-      DEBUG::write(c_m,"特殊ダメージ呪文 ダメージ:#{damage}")
+      Debug::write(c_m,"特殊ダメージ呪文 Dice=#{user.level}D#{a} ジルワン")
+      Debug::write(c_m,"特殊ダメージ呪文 ダメージ:#{damage}")
     ######### 特殊攻撃呪文処理(レジスト無) #########
     when "fascinate"  # 我が声を聞け
       ## 交渉術をチェック
-      sv = MISC.skill_value(SKILLID::NEGOTIATION, user)
-      user.chance_skill_increase(SKILLID::NEGOTIATION)
+      sv = Misc.skill_value(SkillId::NEGOTIATION, user)
+      user.chance_skill_increase(SkillId::NEGOTIATION)
       case magic_lv
-      when 1; diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
-      when 2; diff = Constant_Table::DIFF_55[$game_map.map_id] # フロア係数
-      when 3; diff = Constant_Table::DIFF_65[$game_map.map_id] # フロア係数
-      when 4; diff = Constant_Table::DIFF_75[$game_map.map_id] # フロア係数
-      when 5; diff = Constant_Table::DIFF_85[$game_map.map_id] # フロア係数
-      when 6; diff = Constant_Table::DIFF_95[$game_map.map_id] # フロア係数
+      when 1; diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
+      when 2; diff = ConstantTable::DIFF_55[$game_map.map_id] # フロア係数
+      when 3; diff = ConstantTable::DIFF_65[$game_map.map_id] # フロア係数
+      when 4; diff = ConstantTable::DIFF_75[$game_map.map_id] # フロア係数
+      when 5; diff = ConstantTable::DIFF_85[$game_map.map_id] # フロア係数
+      when 6; diff = ConstantTable::DIFF_95[$game_map.map_id] # フロア係数
       end
       ratio = Integer([sv * diff, 95].min)
       if ratio > rand(100) and self.humanoid?
         self.action.set_escape
         add_fascinate(ratio)
         @fascinate_flag = true
-        DEBUG::write(c_m,"特殊呪文 #{self.name} 我が声を聴け 成功率#{ratio}%")
+        Debug::write(c_m,"特殊呪文 #{self.name} 我が声を聴け 成功率#{ratio}%")
       end
     when "drain"  # ドレイン吸収
       ## 基礎吸収呪文威力を倍率計算する
@@ -1741,7 +1740,7 @@ class Game_Battler
       damage = drain_power / e_number
       damage = Integer([1, damage].max)
       damage = 0 if self.undead?  # アンデッドには無効
-      DEBUG::write(c_m,"特殊ダメージ呪文 吸収:#{damage}HP d_power:#{drain_power} CP:#{magic_lv} 対象:#{e_number}体")
+      Debug::write(c_m,"特殊ダメージ呪文 吸収:#{damage}HP d_power:#{drain_power} CP:#{magic_lv} 対象:#{e_number}体")
     when "identify" # 姿を暴け
       power = magic_lv * 3
       $game_troop.identified_change_by_magic(power)
@@ -1753,15 +1752,15 @@ class Game_Battler
         dice = [user.level * 2, 2].max
       end
       magic_lv.times do
-        d = MISC.dice( 1, dice, 0)
+        d = Misc.dice( 1, dice, 0)
         damage += d
       end
       damage *= multipiler
       damage = Integer(damage)
-      DEBUG::write(c_m,"特殊ダメージ呪文 1D#{dice}+#{0} レジスト:しない")
-      DEBUG::write(c_m,"特殊ダメージ呪文 ダメージ:#{damage} 活性倍率:#{multipiler}")
+      Debug::write(c_m,"特殊ダメージ呪文 1D#{dice}+#{0} レジスト:しない")
+      Debug::write(c_m,"特殊ダメージ呪文 ダメージ:#{damage} 活性倍率:#{multipiler}")
     # when "tornade"  # 竜巻呪文
-    #   rate = Constant_Table::TORNADE_HIT_RATIO
+    #   rate = ConstantTable::TORNADE_HIT_RATIO
     #   unless rate > rand(100)     # ヒットせず
     #     @hp_damage = 0
     #     return
@@ -1775,22 +1774,22 @@ class Game_Battler
     #   end
     #   damage = [d, @tornade_dmg_upper].min      # 最大値の制限
     #   damage = Integer(damage)
-    #   DEBUG::write(c_m,"割合ダメージ呪文 #{ratio*100}%=>#{d}ダメージ レジスト:しない")
-    #   DEBUG::write(c_m,"割合ダメージ呪文 最終ダメージ:#{damage}")
+    #   Debug::write(c_m,"割合ダメージ呪文 #{ratio*100}%=>#{d}ダメージ レジスト:しない")
+    #   Debug::write(c_m,"割合ダメージ呪文 最終ダメージ:#{damage}")
     when "wound"    # 傷よ広がれ
-      upper = Constant_Table::WOUND_DMG
+      upper = ConstantTable::WOUND_DMG
       damage = [maxhp - @hp, magic_lv * upper].min
       damage = 0 if @wound        # すでにやられているか
       @wound = true               # 傷は一度のみ
-      DEBUG::write(c_m,"差分ダメージ呪文 最終ダメージ:#{damage} Wound?#{@wound}")
+      Debug::write(c_m,"差分ダメージ呪文 最終ダメージ:#{damage} Wound?#{@wound}")
     when "fizzlefield"  # 空気よ澱め
-      @fizzle_field = Constant_Table::FF_A[magic_lv]
-      DEBUG::write(c_m,"#{self.name} Fizzle Field:#{@fizzle_field}")
+      @fizzle_field = ConstantTable::FF_A[magic_lv]
+      Debug::write(c_m,"#{self.name} Fizzle Field:#{@fizzle_field}")
       @disturbance_flag = true
     when "mitigate" # 息吹を打ち消せ
       @breath_barrier ||= 0       # 初期化
-      @breath_barrier += Constant_Table::MITIGATE_POWER * magic_lv
-      DEBUG::write(c_m,"ブレス防御:#{@breath_barrier}")
+      @breath_barrier += ConstantTable::MITIGATE_POWER * magic_lv
+      Debug::write(c_m,"ブレス防御:#{@breath_barrier}")
       @mitigate_flag = true
     when "encourage"  # きりょくをあげろ
       value = 0
@@ -1798,7 +1797,7 @@ class Game_Battler
 #~       m_dice_max = obj.damage.scan(/\S+d(\S+)+/)[0][0].to_i
 #~       m_dice_plus = obj.damage.scan(/\+(\d+)/)[0][0].to_i
       magic_lv.times do
-        value += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        value += Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       value *= multipiler
       value = Integer(value)
@@ -1816,7 +1815,7 @@ class Game_Battler
       base = 2 * magic_lv
 #~       base *= multipiler
       value = Integer(base)
-      DEBUG::write(c_m,"アーマー減退 基礎値:#{base}")
+      Debug::write(c_m,"アーマー減退 基礎値:#{base}")
       self.armor -= value
       @armor_down = true
       damage = 0
@@ -1825,7 +1824,7 @@ class Game_Battler
       base = 2 * magic_lv
 #~       base *= multipiler
       value = Integer(base)
-      DEBUG::write(c_m,"アーマー増加 基礎値:#{base}")
+      Debug::write(c_m,"アーマー増加 基礎値:#{base}")
       self.armor += value
       @armor_up = true
       damage = 0
@@ -1833,11 +1832,11 @@ class Game_Battler
     when "armor++"
       value = 0
       magic_lv.times do
-        value += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        value += Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
 #~       base = 2 * magic_lv
 #~       value = Integer(base)
-      DEBUG::write(c_m,"D.R.増加 基礎値:#{base}")
+      Debug::write(c_m,"D.R.増加 基礎値:#{base}")
       self.dr_head += value
       self.dr_body += value
       self.dr_arm += value
@@ -1870,49 +1869,49 @@ class Game_Battler
       @initiative_up = true
       @swing_bonus = 1
       damage = 0
-      DEBUG::write(c_m,"Swift呪文 initiative_bonus:#{@initiative_bonus} swing_bonus:#{@swing_bonus}")
+      Debug::write(c_m,"Swift呪文 initiative_bonus:#{@initiative_bonus} swing_bonus:#{@swing_bonus}")
     # 疲労許容値増加
     when "refresh"
-      ratio = Constant_Table::TIREDPLUSRATIO * magic_lv
-      value = (maxhp * Constant_Table::TIRED_RATIO) * ratio / 100
+      ratio = ConstantTable::TIREDPLUSRATIO * magic_lv
+      value = (maxhp * ConstantTable::TIRED_RATIO) * ratio / 100
       self.add_thres(value)
       damage = 0
-      DEBUG::write(c_m,"疲労許容値追加:#{value} ratio:#{ratio}")
+      Debug::write(c_m,"疲労許容値追加:#{value} ratio:#{ratio}")
     # コンバート
     when "convert"
       if convert(magic_lv)
         @convert_flag = true
       else
-        DEBUG::write(c_m,"コンバート失敗!")
+        Debug::write(c_m,"コンバート失敗!")
       end
       damage = 0
     # 身代わり
     when "sacrifice"
-      @sacrifice_hp = MISC.dice(magic_lv, 12, 10) * multipiler
+      @sacrifice_hp = Misc.dice(magic_lv, 12, 10) * multipiler
       @sacrifice_flag = true
       damage = 0
-      DEBUG::write(c_m,"Sacrifice呪文 sacrifice_hp:#{@sacrifice_hp}")
+      Debug::write(c_m,"Sacrifice呪文 sacrifice_hp:#{@sacrifice_hp}")
     # 隠れる
     when "hide"
       case self.index
-      when 0; limit = Constant_Table::HIDE_0  # 先頭だと0%が上限に制限（先頭は隠れられない）
-      when 1; limit = Constant_Table::HIDE_1
-      when 2; limit = Constant_Table::HIDE_2
-      when 3; limit = Constant_Table::HIDE_3
-      when 4; limit = Constant_Table::HIDE_4
-      when 5; limit = Constant_Table::HIDE_5
+      when 0; limit = ConstantTable::HIDE_0  # 先頭だと0%が上限に制限（先頭は隠れられない）
+      when 1; limit = ConstantTable::HIDE_1
+      when 2; limit = ConstantTable::HIDE_2
+      when 3; limit = ConstantTable::HIDE_3
+      when 4; limit = ConstantTable::HIDE_4
+      when 5; limit = ConstantTable::HIDE_5
       end
-      ratio = Constant_Table::HIDE_MAGIC[magic_lv]
-      penalty = $game_troop.get_sharp_eye * Constant_Table::HIDE_MAGIC_SHARP_EYE_P
+      ratio = ConstantTable::HIDE_MAGIC[magic_lv]
+      penalty = $game_troop.get_sharp_eye * ConstantTable::HIDE_MAGIC_SHARP_EYE_P
       rate = [ratio, limit - penalty].min
       if rate > rand(100)
-        unless state?(STATEID::HIDING)              # すでに付加されている？
-          add_state(STATEID::HIDING)                # ステートを付加
-          @added_states.push(STATEID::HIDING)       # 付加したステートを記録
+        unless state?(StateId::HIDING)              # すでに付加されている？
+          add_state(StateId::HIDING)                # ステートを付加
+          @added_states.push(StateId::HIDING)       # 付加したステートを記録
         end
-      DEBUG::write(c_m,"#{self.name} Hide呪文:成功 隠れる成功率:#{ratio}%")
+      Debug::write(c_m,"#{self.name} Hide呪文:成功 隠れる成功率:#{ratio}%")
       end
-      DEBUG::write(c_m,"#{self.name} Hide呪文:失敗 隠れる成功率:#{ratio}%")
+      Debug::write(c_m,"#{self.name} Hide呪文:失敗 隠れる成功率:#{ratio}%")
     when "summon"
       magic_lv += 1 if 5 > rand(100)
       case magic_lv
@@ -1962,16 +1961,16 @@ class Game_Battler
       @stop_flag = true
       damage = 0
     when "antimagic"
-      ratio = Constant_Table::ANTIMAGIC_RATIO[magic_lv]
+      ratio = ConstantTable::ANTIMAGIC_RATIO[magic_lv]
       if ratio > rand(100)
-        DEBUG.write(c_m, "呪文効果消去 :#{ratio}%")
+        Debug.write(c_m, "呪文効果消去 :#{ratio}%")
         clear_plus_value
         @antimagic_flag = true
       end
       damage = 0
     ## 帰還呪文プロセス
     when "home"
-      DEBUG::write(c_m,"帰還呪文の詠唱検知 戦闘中?:#{$game_temp.in_battle}")
+      Debug::write(c_m,"帰還呪文の詠唱検知 戦闘中?:#{$game_temp.in_battle}")
       $scene.call_home(magic_lv, user)
       @callhome_flag = true
     else
@@ -1987,8 +1986,8 @@ class Game_Battler
   #    結果は @hp_damage または @mp_damage に代入する。
   #--------------------------------------------------------------------------
   def make_item_damage_value(user, item, cp = 1)
-    DEBUG::write(c_m,"[#{user.name} ⇒⇒アイテム使用⇒⇒ #{self.name}]") # debug
-    DEBUG::write(c_m,"[アイテム名：#{item.name}] CP:#{cp}") # debug
+    Debug::write(c_m,"[#{user.name} ⇒⇒アイテム使用⇒⇒ #{self.name}]") # debug
+    Debug::write(c_m,"[アイテム名：#{item.name}] CP:#{cp}") # debug
     # オブジェクトの種類情報を取得
     purpose = item.purpose
     damage = 0  # ダメージ総計
@@ -2000,57 +1999,57 @@ class Game_Battler
       m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
       m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
       cp.times do
-        damage += MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        damage += Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       ## 属性抵抗判定（フラグも同時にセットする）
       @damage_element_type = item.element_type # 呪文の属性IDをセット
       damage = self.calc_element_damage(@damage_element_type, damage)
       damage = Integer(damage)
-      DEBUG::write(c_m,"ダメージアイテム Dmg:#{damage}")
+      Debug::write(c_m,"ダメージアイテム Dmg:#{damage}")
     when "heal"
       m_dice_num = item.damage.scan(/(\S+)d/)[0][0].to_i
       m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
       m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
       cp.times do
-        damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        damage -= Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
-      DEBUG::write(c_m,"回復アイテム Dmg:#{damage}")
+      Debug::write(c_m,"回復アイテム Dmg:#{damage}")
     ######### 瓶系回復アイテム処理 ##########
     when "potion","a_potion"
-      user.chance_skill_increase(SKILLID::ANATOMY) # 解剖学
-      user.chance_skill_increase(SKILLID::HERB)    # 薬草学
+      user.chance_skill_increase(SkillId::ANATOMY) # 解剖学
+      user.chance_skill_increase(SkillId::HERB)    # 薬草学
       ## 回復Lvを算出（(解剖学+薬草学)÷10）
-      potion_lv = MISC.skill_value(SKILLID::ANATOMY, user)
-      potion_lv += MISC.skill_value(SKILLID::HERB, user)
+      potion_lv = Misc.skill_value(SkillId::ANATOMY, user)
+      potion_lv += Misc.skill_value(SkillId::HERB, user)
       potion_lv /= 10
       potion_lv = [potion_lv, 1].max
       a = potion_lv
       case purpose
-      when "potion"; b = c = Constant_Table::POTION_B_1
-      when "a_potion"; b = c = Constant_Table::POTION_B_2
+      when "potion"; b = c = ConstantTable::POTION_B_1
+      when "a_potion"; b = c = ConstantTable::POTION_B_2
       end
       c /= 2
       c *= potion_lv
-      damage = MISC.dice(a, b, c)
+      damage = Misc.dice(a, b, c)
       damage = -Integer(damage)
-      DEBUG::write(c_m,"回復アイテム 回復量:#{damage} 値:#{a}D#{b}+#{c} 回復Lv:#{potion_lv}")
+      Debug::write(c_m,"回復アイテム 回復量:#{damage} 値:#{a}D#{b}+#{c} 回復Lv:#{potion_lv}")
     ######### ワインアイテム処理 ##########
     when "wine1","wine2"
       m_dice_num = item.damage.scan(/(\S+)d/)[0][0].to_i
       m_dice_max = item.damage.scan(/\S+d(\S+)+/)[0][0].to_i
       m_dice_plus = item.damage.scan(/\+(\d+)/)[0][0].to_i
       cp.times do
-        damage -= MISC.dice(m_dice_num, m_dice_max, m_dice_plus)
+        damage -= Misc.dice(m_dice_num, m_dice_max, m_dice_plus)
       end
       case purpose
       when "wine1"; ratio = 15   # やすワインは15%の疲労許容度上昇
       when "wine2"; ratio = 30   # 古酒は30%
       end
-      value = (maxhp * Constant_Table::TIRED_RATIO) * ratio / 100
+      value = (maxhp * ConstantTable::TIRED_RATIO) * ratio / 100
       self.add_thres(value)
     ######### 毒アイテム処理 ##########
     when "poison"
-      user.chance_skill_increase(SKILLID::POISONING) # ポイゾニング
+      user.chance_skill_increase(SkillId::POISONING) # ポイゾニング
       user.add_poison_weapon
     ######### 異常系アイテム処理 ##########
     when "status" # ステート変化
@@ -2100,7 +2099,7 @@ class Game_Battler
     when "age"
       self.aged(-365)
     else
-      DEBUG.write(c_m, "no purpose specified for the item:#{item.name}")
+      Debug.write(c_m, "no purpose specified for the item:#{item.name}")
     end
     @hp_damage = damage                           # HP にダメージ
   end
@@ -2109,36 +2108,36 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def make_breath_damage_value(user, obj)
     reduce = 0
-    times = Constant_Table::BREATH_REDUCE_TIME  # 判定数
+    times = ConstantTable::BREATH_REDUCE_TIME  # 判定数
     @breath_barrier ||= 0                       # 未定義の場合
     times += @breath_barrier
-    DEBUG.write(c_m, "#{self.name} ブレス防御チャレンジ回数:#{times}")
-    @breath_barrier *= Constant_Table::BB_REDU_RATE
+    Debug.write(c_m, "#{self.name} ブレス防御チャレンジ回数:#{times}")
+    @breath_barrier *= ConstantTable::BB_REDU_RATE
     @breath_barrier = Integer(@breath_barrier)
-    DEBUG.write(c_m, "#{self.name} 次回用ブレス防御チャレンジボーナス減少:#{@breath_barrier}")
+    Debug.write(c_m, "#{self.name} 次回用ブレス防御チャレンジボーナス減少:#{@breath_barrier}")
     base_dmg = user.breath_dmg                  # 現HPの1/4を代入済み
     for i in 1..times
       if luk > rand(100)                        # 運%でダメージ軽減
-        DEBUG.write(c_m, "ブレスダメージ:#{base_dmg}")
+        Debug.write(c_m, "ブレスダメージ:#{base_dmg}")
         base_dmg *= 0.75
         reduce += 1
-        DEBUG.write(c_m, "┗ブレスダメージ減退:→#{base_dmg} 抵抗回数:#{reduce}")
+        Debug.write(c_m, "┗ブレスダメージ減退:→#{base_dmg} 抵抗回数:#{reduce}")
       end
     end
     ## 性格判定
     if self.actor?
       if self.personality_p == :Faithful # 誠実
         base_dmg *= 0.90
-        DEBUG.write(c_m, "性格ボーナス ブレスダメージ減少:#{base_dmg}")
+        Debug.write(c_m, "性格ボーナス ブレスダメージ減少:#{base_dmg}")
       end
     end
     ## 属性抵抗判定（冒険者のみ）
     if self.elemental_resist?(obj.element)  # 属性抵抗ありの場合はダイス値が1/2倍
       base_dmg /= 2
-      DEBUG.write(c_m, "属性一致 ブレスダメージ減少:#{base_dmg}")
+      Debug.write(c_m, "属性一致 ブレスダメージ減少:#{base_dmg}")
     end
     @hp_damage = Integer(base_dmg)          # HP にダメージ
-    DEBUG::write(c_m,"最終ブレスダメージ:#{@hp_damage} 属性修正:#{self.elemental_resist?(obj.element)} #{reduce}回軽減")
+    Debug::write(c_m,"最終ブレスダメージ:#{@hp_damage} 属性修正:#{self.elemental_resist?(obj.element)} #{reduce}回軽減")
   end
   #--------------------------------------------------------------------------
   # ● 吸収効果の計算
@@ -2164,7 +2163,7 @@ class Game_Battler
       ## 痛みをそらせチェック(モンスターも使用する)
       if @protection_times > 0
         @protection_times -= 1
-        DEBUG::write(c_m,"痛みをそらせでダメージ回避 元ダメ:#{@hp_damage} 残り回数:#{@protection_times}")
+        Debug::write(c_m,"痛みをそらせでダメージ回避 元ダメ:#{@hp_damage} 残り回数:#{@protection_times}")
         @hp_damage = 0
         @hp_subdamage = 0
         @element_damage = 0
@@ -2173,40 +2172,29 @@ class Game_Battler
       elsif @sacrifice_hp == 0 # 身代わりが存在しない場合は処理なし
       ## 身代わりの呪文効果(モンスターは使用しない)
       elsif @sacrifice_hp >= (@hp_damage + @element_damage)
-        DEBUG::write(c_m,"身代わりでダメージ吸収 元ダメ:#{@hp_damage+@element_damage} 身代:#{@sacrifice_hp}")
+        Debug::write(c_m,"身代わりでダメージ吸収 元ダメ:#{@hp_damage+@element_damage} 身代:#{@sacrifice_hp}")
         @sacrifice_hp -= (@hp_damage+@element_damage)
         @hp_damage = 0
         @element_damage = 0
         if @hp_subdamage > 0 || @element_subdamage > 0
           @hp_subdamage = 0
           @element_subdamage = 0
-          DEBUG::write(c_m,"Mainダメージ吸収の為、Subダメージは0に変更")
+          Debug::write(c_m,"Mainダメージ吸収の為、Subダメージは0に変更")
         end
       else
-        DEBUG::write(c_m,"身代わりでダメージ軽減 元ダメ:#{@hp_damage} 身代:#{@sacrifice_hp}")
+        Debug::write(c_m,"身代わりでダメージ軽減 元ダメ:#{@hp_damage} 身代:#{@sacrifice_hp}")
         @hp_damage -= @sacrifice_hp
         @sacrifice_hp = 0
       end
     end
-    ## ダメージが正の数
-    # if @hp_damage > 0 || @element_damage > 0
-    #   remove_states_shock   # 衝撃によるステート解除
-    #   judge_spell_break     # スペルブレイク判定
-    #   judge_bone_crash      # 骨折判定
-    #   judge_severe          # 重症判定
-    # end
-    ## サブダメージが正の数
-    # if @hp_subdamage > 0 || @element_subdamage > 0
-    #   remove_states_shock
-    # end
     ##> 吸収の場合
-    if @absorbed
+    if @absorbed && (user != nil)
       user.hp += (@hp_damage + @element_damage)
     end
     ##> スキル：ダメージレジストによるダメージ軽減
     if self.actor? && (@hp_damage > 0 || @element_damage > 0)
-      sv = MISC.skill_value(SKILLID::D_RESIST, self)
-      diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::D_RESIST, self)
+      diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if tired?
       if ratio > rand(100)
@@ -2214,10 +2202,10 @@ class Game_Battler
         @element_damage = [@element_damage *= 0.75, 1].max
         @hp_subdamage = [@hp_subdamage *= 0.75, 1].max if @hp_subdamage > 0
         @element_subdamage = [@element_subdamage *= 0.75, 1].max if @element_subdamage > 0
-        DEBUG::write(c_m,"ダメージレジスト発動 x0.75 @hp_damage=>#{@hp_damage} @hp_subdamage=>#{@hp_subdamage}")
-        DEBUG::write(c_m,"ダメージレジスト発動 x0.75 @element_damage=>#{@element_damage} @element_subdamage=>#{@element_subdamage}")
+        Debug::write(c_m,"ダメージレジスト発動 x0.75 @hp_damage=>#{@hp_damage} @hp_subdamage=>#{@hp_subdamage}")
+        Debug::write(c_m,"ダメージレジスト発動 x0.75 @element_damage=>#{@element_damage} @element_subdamage=>#{@element_subdamage}")
       end
-      self.chance_skill_increase(SKILLID::D_RESIST)    # ダメージレジスト
+      self.chance_skill_increase(SkillId::D_RESIST)    # ダメージレジスト
     end
     ## いずれかのダメージが正の数
     if @hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0
@@ -2231,7 +2219,8 @@ class Game_Battler
     self.hp -= Integer(@element_damage)
     self.hp -= Integer(@element_subdamage)
     ## 破砕判定
-    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0)
+    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0) &&
+      (user != nil)
       break_stone
     end
   end
@@ -2247,7 +2236,7 @@ class Game_Battler
     if ratio > rand(100)
       @spell_break = true   # スペルブレイクフラグ
       @interruption = true  # 中断フラグ（ターン終了時にリセット）
-      DEBUG::write(c_m,"SPELL BREAK!! Dmg:#{damage_amount} 確率:#{ratio}%")
+      Debug::write(c_m,"SPELL BREAK!! Dmg:#{damage_amount} 確率:#{ratio}%")
     end
   end
   #--------------------------------------------------------------------------
@@ -2268,14 +2257,14 @@ class Game_Battler
     damage_amount = @hp_damage + @hp_subdamage + @element_damage + @element_subdamage
     return if damage_amount < 1
     ratio = 100 * damage_amount / maxhp
-    if ratio > Constant_Table::SEVERE_THRES
+    if ratio > ConstantTable::SEVERE_THRES
       ## フォーリーブスで重症化を回避
-      sv = MISC.skill_value(SKILLID::FOURLEAVES, self)
-      diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::FOURLEAVES, self)
+      diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
       ratio_f = Integer([sv * diff, 95].min)
       ratio_f /= 2 if tired?
       if ratio_f > rand(100)
-        DEBUG.write(c_m, "フォーリーブスで重症化を回避")
+        Debug.write(c_m, "フォーリーブスで重症化を回避")
         return
       end
       @severe = true   # 重症化される可能性フラグオン
@@ -2293,143 +2282,143 @@ class Game_Battler
 
     ### 特殊異常判定
     ## メイスによる骨折追加,物理鈍器攻撃中？
-    if @weakened && obj.is_a?(Game_Battler) && obj.attacking_with_club?
+    if @weakened && obj.is_a?(GameBattler) && obj.attacking_with_club?
       plus += "骨"  unless plus.include?("骨")
-      DEBUG.write(c_m, "#{obj.name} ボーンクラッシュ発動検知")
+      Debug.write(c_m, "#{obj.name} ボーンクラッシュ発動検知")
     end
     @weakened = false
     ## 重症化追加
-    if @severe and obj.is_a?(Game_Battler)
+    if @severe and obj.is_a?(GameBattler)
       plus += "重"  unless plus.include?("重")
-      DEBUG.write(c_m, "#{obj.name} 重症化フラグ検知")
+      Debug.write(c_m, "#{obj.name} 重症化フラグ検知")
     end
     @severe = false
     ###-------------------
 
     return if (plus + minus).empty?
-    DEBUG::write(c_m,"Battler名:#{self.name}")
-    DEBUG::write(c_m,"異常配列:#{plus}") if plus.size != 0
-    DEBUG::write(c_m,"回復配列:#{minus}") if minus.size != 0
+    Debug::write(c_m,"Battler名:#{self.name}")
+    Debug::write(c_m,"異常配列:#{plus}") if plus.size != 0
+    Debug::write(c_m,"回復配列:#{minus}") if minus.size != 0
 
     loop do
       state = plus.slice!(/./)            # 次の文字を取得
       case state
-      when "首"; state_id = STATEID::CRITICAL
-      when "石"; state_id = STATEID::STONE
-      when "痺"; state_id = STATEID::PARALYSIS
-      when "封"; state_id = STATEID::CONTAINMENT
-      when "毒"; state_id = STATEID::POISON
-      when "眠"; state_id = STATEID::SLEEP
-      when "暗"; state_id = STATEID::BLIND
-      when "怖"; state_id = STATEID::FEAR
-      when "鎧"; state_id = STATEID::RUST
-      when "老"; state_id = STATEID::DRAIN_AGE
-      when "経"; state_id = STATEID::DRAIN_EXP
-      when "窒"; state_id = STATEID::SUFFOCATION
-      when "浄"; state_id = STATEID::PURIFY
-      when "病"; state_id = STATEID::SICKNESS
-      when "火"; state_id = STATEID::BURN
-      when "狂"; state_id = STATEID::MADNESS
-      when "骨"; state_id = STATEID::FRACTURE
-      when "電"; state_id = STATEID::SHOCK
-      when "凍"; state_id = STATEID::FREEZE
-      when "祓"; state_id = STATEID::EXORCIST
-      when "止"; state_id = STATEID::F_BLOW
-      when "夢"; state_id = STATEID::NIGHTMARE
-      when "屍"; state_id = STATEID::KABANE
-      when "弱"; state_id = STATEID::EXPOSURE
-      when "ス"; state_id = STATEID::STUN
-      when "魅"; state_id = STATEID::MUPPET
-      when "吐"; state_id = STATEID::NAUSEA
-      when "出"; state_id = STATEID::BLEEDING
-      when "重"; state_id = STATEID::SEVERE
+      when "首"; state_id = StateId::CRITICAL
+      when "石"; state_id = StateId::STONE
+      when "痺"; state_id = StateId::PARALYSIS
+      when "封"; state_id = StateId::CONTAINMENT
+      when "毒"; state_id = StateId::POISON
+      when "眠"; state_id = StateId::SLEEP
+      when "暗"; state_id = StateId::BLIND
+      when "怖"; state_id = StateId::FEAR
+      when "鎧"; state_id = StateId::RUST
+      when "老"; state_id = StateId::DRAIN_AGE
+      when "経"; state_id = StateId::DRAIN_EXP
+      when "窒"; state_id = StateId::SUFFOCATION
+      when "浄"; state_id = StateId::PURIFY
+      when "病"; state_id = StateId::SICKNESS
+      when "火"; state_id = StateId::BURN
+      when "狂"; state_id = StateId::MADNESS
+      when "骨"; state_id = StateId::FRACTURE
+      when "電"; state_id = StateId::SHOCK
+      when "凍"; state_id = StateId::FREEZE
+      when "祓"; state_id = StateId::EXORCIST
+      when "止"; state_id = StateId::F_BLOW
+      when "夢"; state_id = StateId::NIGHTMARE
+      when "屍"; state_id = StateId::KABANE
+      when "弱"; state_id = StateId::EXPOSURE
+      when "ス"; state_id = StateId::STUN
+      when "魅"; state_id = StateId::MUPPET
+      when "吐"; state_id = StateId::NAUSEA
+      when "出"; state_id = StateId::BLEEDING
+      when "重"; state_id = StateId::SEVERE
       when "無"; return
       when "後"; next
       when nil;  break          # リストの最後
       else;      next           # 他のスキルの場合
       end
       next if dead? # 戦闘不能？
-      next if state_id == STATEID::DRAIN_AGE && @drain == true      # ドレインは二度受けない
-      next if state_id == STATEID::DRAIN_EXP && @drain == true      # ドレインは二度受けない
-      DEBUG::write(c_m,"異常判定処理開始【#{state}】 CP:#{cp}")
+      next if state_id == StateId::DRAIN_AGE && @drain == true      # ドレインは二度受けない
+      next if state_id == StateId::DRAIN_EXP && @drain == true      # ドレインは二度受けない
+      Debug::write(c_m,"異常判定処理開始【#{state}】 CP:#{cp}")
       ##========================================================================
       ## 無効化判定(一部モンスターは窒息や悪夢、病気の無効化)
       ## 悪意よ退けは一定確率で異常を無効化する
       if state_resist?(state)
         @resisted_states.push(state_id) # 無効化リストにPUSH
-        DEBUG.write(c_m, "無効化検知【#{state}】")
+        Debug.write(c_m, "無効化検知【#{state}】")
         modify_motivation(14)           # 気力上昇:状態異常を無効化
         next
-      elsif @prevent_drain > 0 and Constant_Table::IMMUNE_RATIO > rand(100)
+      elsif @prevent_drain > 0 and ConstantTable::IMMUNE_RATIO > rand(100)
         @resisted_states.push(state_id) # 無効化リストにPUSH
-        DEBUG.write(c_m, "悪意よ退けによる異常無効化成功 【#{state}】")
+        Debug.write(c_m, "悪意よ退けによる異常無効化成功 【#{state}】")
         modify_motivation(14)           # 気力上昇:状態異常を無効化
         next
       end
       ##========================================================================
       ## ドレイン防御判定
-      if (state_id == STATEID::DRAIN_AGE || state_id == STATEID::DRAIN_EXP) && @prevent_drain > 0 # ドレイン防御あり
+      if (state_id == StateId::DRAIN_AGE || state_id == StateId::DRAIN_EXP) && @prevent_drain > 0 # ドレイン防御あり
         @prevent_drain_success = true
-        DEBUG::write(c_m,"<< #{self.name} ドレイン防御検知 >>")
+        Debug::write(c_m,"<< #{self.name} ドレイン防御検知 >>")
         next
       end
       ##========================================================================
-      if state_id == STATEID::PURIFY  # ターンアンデッド（浄化ID:16）判定
+      if state_id == StateId::PURIFY  # ターンアンデッド（浄化ID:16）判定
         next unless self.undead?     # アンデッドでなければスキップ
         next unless self.identified  # 識別状態でなければスキップ
         resistance = self.level # 浄化の場合はレベル
         apply = user.level      # 浄化のパワー
-        DEBUG::write(c_m,"TURN UNDEAD判定 詠唱者LV:#{apply} 対象LV:#{resistance}")
+        Debug::write(c_m,"TURN UNDEAD判定 詠唱者LV:#{apply} 対象LV:#{resistance}")
         if rand(apply) > rand(resistance) # 浄化判定
           add_state(state_id)             # ステートを付加
           @added_states.push(state_id)    # 付加したステートを記録
         elsif user.check_special_attr("turnundead") # ロザリオ持ち
           ## 麻痺の累積値の算出
-          add_depth = $data_states[STATEID::PARALYSIS].get_accumlative_value
-          add_state(STATEID::PARALYSIS, add_depth)         # 麻痺を付加
-          @added_states.push(STATEID::PARALYSIS)    # 付加したステートを記録
-          DEBUG::write(c_m,"スペシャル:turnundeadの為、麻痺を付加")
+          add_depth = $data_states[StateId::PARALYSIS].get_accumlative_value
+          add_state(StateId::PARALYSIS, add_depth)         # 麻痺を付加
+          @added_states.push(StateId::PARALYSIS)    # 付加したステートを記録
+          Debug::write(c_m,"スペシャル:turnundeadの為、麻痺を付加")
         end
         next
       end
       ##========================================================================
       ##> クリティカル判定はobjがattackerオブジェクトとなる
-      if state_id == STATEID::CRITICAL or state_id == STATEID::KABANE # 首または屍
+      if state_id == StateId::CRITICAL or state_id == StateId::KABANE # 首または屍
         ## モンスターの攻撃
         if self.actor?
           if rand(self.level) == 0        # 1/lvの確率
             add_state(state_id)           # ステートを付加
             @added_states.push(state_id)  # 付加したステートを記録
           end
-          DEBUG::write(c_m,"クリティカル判定 #{(1.0/self.level)*100}%")
+          Debug::write(c_m,"クリティカル判定 #{(1.0/self.level)*100}%")
         ## アクターの攻撃
         else
           avoidance = state_avoidance(state_id)  # 回避値の代入
-          DEBUG::write(c_m,"クリティカル判定 回避値(#{avoidance}) 総ヒット数:#{cp}")
+          Debug::write(c_m,"クリティカル判定 回避値(#{avoidance}) 総ヒット数:#{cp}")
           ## 屍ならばポイゾニングスキル、首はねならクリティカルスキルを取得
-          sv = state_id == STATEID::KABANE ? MISC.skill_value(SKILLID::POISONING, obj) : MISC.skill_value(SKILLID::CRITICAL, obj)
-          if state_id == STATEID::CRITICAL
+          sv = state_id == StateId::KABANE ? Misc.skill_value(SkillId::POISONING, obj) : Misc.skill_value(SkillId::CRITICAL, obj)
+          if state_id == StateId::CRITICAL
             case obj.class_id
             when 5,10 # 忍者・侍
-              diff = Constant_Table::DIFF_25[$game_map.map_id]  # フロア係数
+              diff = ConstantTable::DIFF_25[$game_map.map_id]  # フロア係数
             else
-              diff = Constant_Table::DIFF_10[$game_map.map_id]  # フロア係数
+              diff = ConstantTable::DIFF_10[$game_map.map_id]  # フロア係数
             end
           else
-            diff = Constant_Table::DIFF_15[$game_map.map_id]    # 屍はDIFF15で固定
+            diff = ConstantTable::DIFF_15[$game_map.map_id]    # 屍はDIFF15で固定
           end
           ratio = Integer([sv * diff, 95].min)
           ratio /= 2 if tired?
           cp.times do
             ## 回避判定
             next if avoidance > rand(100)               # 回避値での回避
-            DEBUG::write(c_m,"クリティカル判定 回避失敗=>ヒット判定へ")
+            Debug::write(c_m,"クリティカル判定 回避失敗=>ヒット判定へ")
             ## ヒット判定
             if ratio > rand(100)
-              DEBUG::write(c_m,"クリティカル判定 ヒット成功 ratio:#{ratio}%")
+              Debug::write(c_m,"クリティカル判定 ヒット成功 ratio:#{ratio}%")
               add_state(state_id)           # ステートを付加
               @added_states.push(state_id)  # 付加したステートを記録
-              obj.chance_skill_increase(SKILLID::CRITICAL) if state_id == STATEID::CRITICAL
+              obj.chance_skill_increase(SkillId::CRITICAL) if state_id == StateId::CRITICAL
               break
             end
           end
@@ -2438,26 +2427,26 @@ class Game_Battler
       end
       ##========================================================================
       ## 聖職者のエクソシスト判定
-      if state_id == STATEID::EXORCIST
+      if state_id == StateId::EXORCIST
         next unless self.devil?  # 悪魔にのみ効果あり
         next unless self.identified  # 識別状態でなければスキップ
-        sv = MISC.skill_value(SKILLID::EXORCIST, obj)
+        sv = Misc.skill_value(SkillId::EXORCIST, obj)
         case obj.class_id
-        when 8; diff = Constant_Table::DIFF_25[$game_map.map_id]
-        else;   diff = Constant_Table::DIFF_15[$game_map.map_id]
+        when 8; diff = ConstantTable::DIFF_25[$game_map.map_id]
+        else;   diff = ConstantTable::DIFF_15[$game_map.map_id]
         end
         ratio = Integer([sv * diff, 95].min)
         ratio /= 2 if tired?
         if ratio > rand(100)
           add_state(state_id)           # ステートを付加
           @added_states.push(state_id)  # 付加したステートを記録
-          obj.chance_skill_increase(SKILLID::EXORCIST) # クリティカル
+          obj.chance_skill_increase(SkillId::EXORCIST) # クリティカル
         end
         next
       end
       ##========================================================================
       ## 悪夢判定
-      if state_id == STATEID::NIGHTMARE
+      if state_id == StateId::NIGHTMARE
         next unless sleep?  # 睡眠ならば？
         add_depth = 0
         add_state(state_id, add_depth)      # ステートを付加
@@ -2466,22 +2455,22 @@ class Game_Battler
       end
       ##========================================================================
       ## 地震による怯えの判定
-      if (state_id == STATEID::FEAR && purpose == "earthquake")
+      if (state_id == StateId::FEAR && purpose == "earthquake")
         if self.ignore_earthquake? # 浮遊か？
-          DEBUG::write(c_m,"浮遊状態の為 地震による怯え無効")
+          Debug::write(c_m,"浮遊状態の為 地震による怯え無効")
           next
         end
       end
       ##========================================================================
       ## フィニッシュブローの判定
-      if state_id == STATEID::F_BLOW
+      if state_id == StateId::F_BLOW
         add_depth = 0
         hp_rate = @hp * 100.0 / maxhp
-        threshold = Constant_Table::FBLOW_THRESHOLD
+        threshold = ConstantTable::FBLOW_THRESHOLD
         if hp_rate <= threshold
           add_state(state_id, add_depth)      # ステートを付加
           @added_states.push(state_id)        # 付加したステートを記録
-          DEBUG.write(c_m, "フィニッシュブロー発生 RATIO:#{hp_rate}%")
+          Debug.write(c_m, "フィニッシュブロー発生 RATIO:#{hp_rate}%")
         end
         next
       end
@@ -2490,26 +2479,26 @@ class Game_Battler
       ## アイテム攻撃は回避値1/2倍
       ## 物理攻撃は回避値2倍
       ## 恐怖判定
-      if state_id == STATEID::FEAR
+      if state_id == StateId::FEAR
         next if self.undead?     # アンデッドならば恐怖無効
         ## レベル差チェック
         if self.level < user.level
-          avoidance = 100 - Constant_Table::FEAR_APPLY_BELOW
+          avoidance = 100 - ConstantTable::FEAR_APPLY_BELOW
         else
-          avoidance = 100 - Constant_Table::FEAR_APPLY_ABOVE
+          avoidance = 100 - ConstantTable::FEAR_APPLY_ABOVE
         end
-        DEBUG.write(c_m, "恐怖適用率:#{avoidance}% 詠唱者LV#{user.level} 対象者LV#{self.level}")
+        Debug.write(c_m, "恐怖適用率:#{avoidance}% 詠唱者LV#{user.level} 対象者LV#{self.level}")
       ##========================================================================
       ## 弱点暴露判定
-      elsif state_id == STATEID::EXPOSURE
+      elsif state_id == StateId::EXPOSURE
         next unless self.identified                     # 識別状態でなければスキップ
-        avoidance = 100 - Constant_Table::EXPOSURE_RATE # 弱点暴露回避値
+        avoidance = 100 - ConstantTable::EXPOSURE_RATE # 弱点暴露回避値
       ## その他の異常判定
       else
         avoidance = state_avoidance(state_id)  # 回避値の代入
       end
       if @veil_element.include?(state) and self.actor?
-        DEBUG.write(c_m, "ベール属性:#{state}と一致,状態回避率95%")
+        Debug.write(c_m, "ベール属性:#{state}と一致,状態回避率95%")
         avoidance = 95
       end
       ## すでに深度がある？
@@ -2517,55 +2506,55 @@ class Game_Battler
         unless @state_depth[state_id] == 0
           ## 深度が0かnilで無い場合は抵抗確率が倍化
           avoidance *= 2
-          DEBUG.write(c_m, "すでに深度あり状態回避率倍化=>#{avoidance}%")
+          Debug.write(c_m, "すでに深度あり状態回避率倍化=>#{avoidance}%")
         end
       end
       method = nil
       ## アイテム
       if obj.is_a?(Items2)
-        DEBUG::write(c_m,"アイテム攻撃")
+        Debug::write(c_m,"アイテム攻撃")
         method = "item"
         # avoidance /= 2
-        # DEBUG::write(c_m,"アイテム攻撃→回避値1/2倍 ヒット数:#{cp}")
+        # Debug::write(c_m,"アイテム攻撃→回避値1/2倍 ヒット数:#{cp}")
       ## 呪文
       elsif obj.is_a?(Magics)
         if user.action.breath?
-          DEBUG::write(c_m,"ブレス攻撃")
+          Debug::write(c_m,"ブレス攻撃")
           method = "breath"
         else
-          DEBUG::write(c_m,"呪文攻撃")
+          Debug::write(c_m,"呪文攻撃")
           method = "magic"
         end
       ## 物理攻撃
-      elsif obj.is_a?(Game_Battler)
+      elsif obj.is_a?(GameBattler)
         avoidance *= 2
         method = "attack"
-        DEBUG::write(c_m,"物理攻撃→回避値2倍 ヒット数:#{cp}")
+        Debug::write(c_m,"物理攻撃→回避値2倍 ヒット数:#{cp}")
       end
 
       ## 状態回避判定
-      DEBUG::write(c_m,"状態回避判定開始 pre-avoidance:#{avoidance}")
+      Debug::write(c_m,"状態回避判定開始 pre-avoidance:#{avoidance}")
       hit = 0                         # 異常ヒット数
-      avoidance = [avoidance, 95].min # 最高値設定
+      avoidance = [avoidance, 99].min # 最高値設定
       cp.times do hit += 1 unless avoidance > rand(100) end # ヒット数を算出
-      DEBUG::write(c_m,"CP:#{cp} hit:#{hit} avoidance:#{avoidance}%")
+      Debug::write(c_m,"CP:#{cp} hit:#{hit} avoidance:#{avoidance}%")
 
       ## 累積値の算出
       add_depth = $data_states[state_id].get_accumlative_value
       ## 呪文の場合
-      if method == "magic"; DEBUG::write(c_m,"method = #{method}")
+      if method == "magic"; Debug::write(c_m,"method = #{method}")
       ## ブレスの場合
-      elsif method == "breath"; DEBUG::write(c_m,"method = #{method}")
+      elsif method == "breath"; Debug::write(c_m,"method = #{method}")
       ## アイテムや装備品の場合
-      elsif method == "item"; DEBUG::write(c_m,"method = #{method}")
+      elsif method == "item"; Debug::write(c_m,"method = #{method}")
       end
-      DEBUG::write(c_m,"回避値(#{avoidance}%) CP(#{cp}) 異常ヒット数(#{hit}回) 追加深度(+#{add_depth})")
+      Debug::write(c_m,"回避値(#{avoidance}%) CP(#{cp}) 異常ヒット数(#{hit}回) 追加深度(+#{add_depth})")
       ## hitが0でなければ
       unless hit == 0
         ## ステート異常付与
         add_state(state_id, add_depth)      # ステートを付加
         @added_states.push(state_id)        # 付加したステートを記録
-        DEBUG::write(c_m,"状態異常適用成功 ID:#{state_id}")
+        Debug::write(c_m,"状態異常適用成功 ID:#{state_id}")
         modify_motivation(7)                # 気力減退:状態異常にかかる
       end
     end
@@ -2574,28 +2563,35 @@ class Game_Battler
     loop do
       state = minus.slice!(/./)            # 次の文字を取得
       case state
-      when "死"; state_id = STATEID::DEATH
-      when "首"; state_id = STATEID::CRITICAL
-      when "石"; state_id = STATEID::STONE
-      when "痺"; state_id = STATEID::PARALYSIS
-      when "封"; state_id = STATEID::CONTAINMENT
-      when "毒"; state_id = STATEID::POISON
-      when "眠"; state_id = STATEID::SLEEP
-      when "暗"; state_id = STATEID::BLIND
-      when "怯"; state_id = STATEID::FEAR
-      when "錆"; state_id = STATEID::RUST
-      when "老"; state_id = STATEID::DRAIN_AGE
-      when "経"; state_id = STATEID::DRAIN_EXP
-      when "窒"; state_id = STATEID::SUFFOCATION
-      when "浄"; state_id = STATEID::PURIFY
-      when "腐"; state_id = STATEID::ROTTEN
-      when "病"; state_id = STATEID::SICKNESS
-      when "狂"; state_id = STATEID::MADNESS
-      when "火"; state_id = STATEID::BURN
-      when "骨"; state_id = STATEID::FRACTURE
-      when "電"; state_id = STATEID::SHOCK
-      when "凍"; state_id = STATEID::FREEZE
-      when "臭"; state_id = STATEID::STINK
+      when "首"; state_id = StateId::CRITICAL
+      when "石"; state_id = StateId::STONE
+      when "痺"; state_id = StateId::PARALYSIS
+      when "封"; state_id = StateId::CONTAINMENT
+      when "毒"; state_id = StateId::POISON
+      when "眠"; state_id = StateId::SLEEP
+      when "暗"; state_id = StateId::BLIND
+      when "怖"; state_id = StateId::FEAR
+      when "鎧"; state_id = StateId::RUST
+      when "老"; state_id = StateId::DRAIN_AGE
+      when "経"; state_id = StateId::DRAIN_EXP
+      when "窒"; state_id = StateId::SUFFOCATION
+      when "浄"; state_id = StateId::PURIFY
+      when "病"; state_id = StateId::SICKNESS
+      when "火"; state_id = StateId::BURN
+      when "狂"; state_id = StateId::MADNESS
+      when "骨"; state_id = StateId::FRACTURE
+      when "電"; state_id = StateId::SHOCK
+      when "凍"; state_id = StateId::FREEZE
+      when "祓"; state_id = StateId::EXORCIST
+      when "止"; state_id = StateId::F_BLOW
+      when "夢"; state_id = StateId::NIGHTMARE
+      when "屍"; state_id = StateId::KABANE
+      when "弱"; state_id = StateId::EXPOSURE
+      when "ス"; state_id = StateId::STUN
+      when "魅"; state_id = StateId::MUPPET
+      when "吐"; state_id = StateId::NAUSEA
+      when "出"; state_id = StateId::BLEEDING
+      when "重"; state_id = StateId::SEVERE
       when "無"; return
       when "後"; next
       when nil; break
@@ -2604,30 +2600,30 @@ class Game_Battler
       next unless state?(state_id)                # 付加されていない？
       ## 呪文回復か？
       if obj.is_a?(Magics)
-        DEBUG::write(c_m,"呪文回復")
-        rate = cp * Constant_Table::CRITICAL_HEAL # クリティカルヒール
+        Debug::write(c_m,"呪文回復")
+        rate = cp * ConstantTable::CRITICAL_HEAL # クリティカルヒール
         ## 戦闘中のみクリティカルヒールが発生する
         if rate > rand(100) and $game_temp.in_battle
-          DEBUG::write(c_m,"┗クリティカルヒール!!")
+          Debug::write(c_m,"┗クリティカルヒール!!")
           value = 999
         else
           value = 0             # 初期値
           d1, d2, d3 = 1, 6, 0  # 状態異常回復値は1D6固定
           cp.times do
-            value += MISC.dice(d1, d2, d3)
+            value += Misc.dice(d1, d2, d3)
           end
-          DEBUG::write(c_m,"異常回復値:#{value}")
+          Debug::write(c_m,"異常回復値:#{value}")
         end
         @state_depth[state_id] -= value             # 深度を減退
-        DEBUG::write(c_m,"深度#{value}P回復=>#{@state_depth[state_id]}")
+        Debug::write(c_m,"深度#{value}P回復=>#{@state_depth[state_id]}")
       else
-        DEBUG::write(c_m,"アイテム回復")
+        Debug::write(c_m,"アイテム回復")
         @state_depth[state_id] -= 999           # 深度を減退
       end
       ## 異常回復判定
       if @state_depth[state_id] <= 0              # 深度が0以下
         @state_depth[state_id] = 0
-        DEBUG::write(c_m,"state_id:#{state_id} #{state} depth:#{@state_depth[state_id]}") # debug
+        Debug::write(c_m,"state_id:#{state_id} #{state} depth:#{@state_depth[state_id]}") # debug
         remove_state(state_id, cp)                # 呪文でのステートを解除
         @removed_states.push(state_id)            # 解除したステートを記録する
         modify_motivation(8)                      # 気力増加状態異常から回復
@@ -2727,7 +2723,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def encourage_effect
     clear_action_results
-    value = Constant_Table::ENC_MOTI_ADD
+    value = ConstantTable::ENC_MOTI_ADD
     modify_motivation(98, value)
     @hits = 1
     @encouraged_flag = true
@@ -2760,7 +2756,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def channeling_effect
     clear_action_results
-    sv = MISC.skill_value(SKILLID::CHANNELING, self)
+    sv = Misc.skill_value(SkillId::CHANNELING, self)
     power = 1
     6.times do
       if sv > rand(100)
@@ -2787,57 +2783,57 @@ class Game_Battler
   def trap_effect(trap_name)
     clear_action_results
     floor = $game_map.map_id  # 強度の取得
-    sv = MISC.skill_value(SKILLID::PREDICTION, self) # 危険予知
-    diff = Constant_Table::DIFF_35[floor]           # フロア係数
+    sv = Misc.skill_value(SkillId::PREDICTION, self) # 危険予知
+    diff = ConstantTable::DIFF_35[floor]           # フロア係数
     add = $game_mercenary.skill_check("trap")       # ガイドの回避スキル取得
     ratio = Integer([(sv * diff) + add, 95].min)
     ratio /= 2 if tired?
     ## 罠の種類
     case trap_name
-    when Constant_Table::TRAP_NAME14 # ピット
+    when ConstantTable::TRAP_NAME14 # ピット
       unless ratio > rand(100)
         ## 保持重量でダメージ
         damage = maxhp * self.carry_ratio / 100
         self.hp -= damage
-        DEBUG::write(c_m,"トラップダメージ（ピット）:#{damage} [#{self.name}] 回避率:#{ratio}% C.C.:#{self.carry_ratio}")
+        Debug::write(c_m,"トラップダメージ（ピット）:#{damage} [#{self.name}] 回避率:#{ratio}% C.C.:#{self.carry_ratio}")
       else
-        self.chance_skill_increase(SKILLID::PREDICTION)
-        DEBUG::write(c_m,"トラップ回避!（ピット）[#{self.name}]")
+        self.chance_skill_increase(SkillId::PREDICTION)
+        Debug::write(c_m,"トラップ回避!（ピット）[#{self.name}]")
       end
-    when Constant_Table::TRAP_NAME15 # ベアトラップ
+    when ConstantTable::TRAP_NAME15 # ベアトラップ
       unless ratio > rand(100)
         damage = 0
         floor.times do
-          damage += MISC.dice(1, 32, 0)
+          damage += Misc.dice(1, 32, 0)
           damage -= dr_leg
         end
         self.hp -= [damage, 0].max
-        DEBUG::write(c_m,"トラップダメージ（ベアトラップ）:#{damage} [#{self.name}] 回避率:#{ratio}%")
+        Debug::write(c_m,"トラップダメージ（ベアトラップ）:#{damage} [#{self.name}] 回避率:#{ratio}%")
       else
-        self.chance_skill_increase(SKILLID::PREDICTION)
-        DEBUG::write(c_m,"トラップ回避!（ベアトラップ）[#{self.name}]")
+        self.chance_skill_increase(SkillId::PREDICTION)
+        Debug::write(c_m,"トラップ回避!（ベアトラップ）[#{self.name}]")
       end
-    when Constant_Table::TRAP_NAME16 # 毒の矢
+    when ConstantTable::TRAP_NAME16 # 毒の矢
       unless ratio > rand(100)
-        damage = MISC.dice(floor, 6, 0)
+        damage = Misc.dice(floor, 6, 0)
         self.hp -= damage
-        add_state(STATEID::POISON, (floor * MISC.dice(1,2,0)))
-        DEBUG::write(c_m,"トラップダメージ（毒の矢）:#{damage} [#{self.name}] 回避率:#{ratio}%")
+        add_state(StateId::POISON, (floor * Misc.dice(1,2,0)))
+        Debug::write(c_m,"トラップダメージ（毒の矢）:#{damage} [#{self.name}] 回避率:#{ratio}%")
       else
-        self.chance_skill_increase(SKILLID::PREDICTION)
-        DEBUG::write(c_m,"トラップ回避!（毒の矢）[#{self.name}]")
+        self.chance_skill_increase(SkillId::PREDICTION)
+        Debug::write(c_m,"トラップ回避!（毒の矢）[#{self.name}]")
       end
-    when Constant_Table::TRAP_NAME17 # 落盤
+    when ConstantTable::TRAP_NAME17 # 落盤
       unless ratio > rand(100)
-        damage = MISC.dice(floor, 24, 0)
+        damage = Misc.dice(floor, 24, 0)
         self.hp -= damage
-        DEBUG::write(c_m,"トラップダメージ（落盤）:#{damage} [#{self.name}] 回避率:#{ratio}%")
+        Debug::write(c_m,"トラップダメージ（落盤）:#{damage} [#{self.name}] 回避率:#{ratio}%")
         if 5 > rand(100)
-          add_state(STATEID::DEATH)
+          add_state(StateId::DEATH)
         end
       else
-        self.chance_skill_increase(SKILLID::PREDICTION)
-        DEBUG::write(c_m,"トラップ回避!（落盤）[#{self.name}]")
+        self.chance_skill_increase(SkillId::PREDICTION)
+        Debug::write(c_m,"トラップ回避!（落盤）[#{self.name}]")
       end
     end
     $game_temp.need_ps_refresh = true
@@ -2846,38 +2842,43 @@ class Game_Battler
   # ● 戦闘中のスリップダメージ（毒と毒霧と出血）の効果適用
   #--------------------------------------------------------------------------
   def slip_damage_effect(kind)
-    case kind
-    when 1; strength = poison_strength    # 毒と毒霧床
-    when 2; strength = bleeding_strength  # 出血
-    end
-    return if strength == 0
     clear_action_results
     case kind
-    when 1; damage = @poison_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
-    when 2; damage = @bleeding_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
+    when 1
+      strength = poison_strength    # 毒と毒霧床
+      @damage_element_type = 4
+    when 2
+      strength = bleeding_strength  # 出血
+      @damage_element_type = 9
     end
-    self.hp -= damage   # スリップダメージ適用
-    DEBUG::write(c_m,"スリップダメージ:#{damage} 強度:#{strength} [#{self.name}]")
+    return if strength == 0
+    case kind
+    when 1; base_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
+    when 2; base_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
+    end
+    @element_damage = self.calc_element_damage(@damage_element_type, base_damage)
+    execute_damage(nil)                             # ダメージ反映
   end
   #--------------------------------------------------------------------------
-  # ● 迷宮内での1歩歩行時の毒ダメージの効果適用(毒霧含む)
+  # ● 迷宮内での1歩歩行時の毒ダメージの効果適用(毒霧含む、毒ダメージ)
   #--------------------------------------------------------------------------
   def poison_damage_effect
-    damage = [@hp * poison_strength / 100, 1].max # 現在HPの1%をもっていかれる。
-    self.hp -= damage
-    DEBUG::write(c_m,"毒ダメージ(強度):#{damage}(#{poison_strength}) [#{self.name}]")
-    return damage
+    damage = [@hp * poison_strength / 100, 1].max   # 現在HPの1%をもっていかれる。
+    element_type = 4                                # 毒
+    @element_damage = self.calc_element_damage(element_type, damage)  # actor class内部のmethodを呼び出す
+    execute_damage(nil)                             # ダメージ反映
   end
   #--------------------------------------------------------------------------
-  # ● 爆弾ダメージ
+  # ● 爆弾ダメージ(爆発属性ダメージ)
   #--------------------------------------------------------------------------
   def bomb_damage_effect
     a = $game_map.map_id
     b = 24
     c = 20
-    damage = MISC.dice(a,b,c)
-    damage = [damage, 1].max # 現在HPの1%をもっていかれる。
-    self.hp -= damage
+    damage = Misc.dice(a,b,c)
+    element_type = 7                                # 爆発
+    @element_damage = self.calc_element_damage(element_type, damage)  # actor class内部のmethodを呼び出す
+    execute_damage(nil)                             # ダメージ反映
   end
   #--------------------------------------------------------------------------
   # ● 呪文障壁強度の計算
@@ -2890,7 +2891,7 @@ class Game_Battler
     end
     result = 1 - result # 1からひいて無効化率を計算
     result *= 100
-    DEBUG::write(c_m,"障壁強度:#{result}") # debug
+    Debug::write(c_m,"障壁強度:#{result}") # debug
     return Integer(result)
   end
   #--------------------------------------------------------------------------
@@ -2906,12 +2907,12 @@ class Game_Battler
   # ● 呪文障壁の増強
   #--------------------------------------------------------------------------
   def add_barrier(barrier_power)
-    DEBUG::write(c_m,"#{self.name} 障壁強化前:#{@barrier} 追加:#{barrier_power}")
+    Debug::write(c_m,"#{self.name} 障壁強化前:#{@barrier} 追加:#{barrier_power}")
     @barrier.push(barrier_power)
     if @barrier.size > 3 # 3個までしかスタックしないので一番少ない値を消去
       @barrier.delete_at(@barrier.index(@barrier.min))
     end
-    DEBUG::write(c_m,"#{self.name} 障壁強化後:#{@barrier}") # debug
+    Debug::write(c_m,"#{self.name} 障壁強化後:#{@barrier}") # debug
   end
   #--------------------------------------------------------------------------
   # ● 呪文障壁の弱体
@@ -2920,7 +2921,7 @@ class Game_Battler
   def reduce_barrier
     return false if @barrier.empty?         # 障壁が空であれば無視
     @barrier.map! {|barrier| barrier /= 2}  # 全障壁を半減
-    DEBUG::write(c_m,"#{self.name} 障壁弱体後:#{@barrier}") # debug
+    Debug::write(c_m,"#{self.name} 障壁弱体後:#{@barrier}") # debug
     return true
   end
   #--------------------------------------------------------------------------
@@ -2935,16 +2936,16 @@ class Game_Battler
 #~       end
 #~     }
 #~     @barrier.compact!               # nilを削除
-#~     DEBUG::write(c_m,"#{self.name} 障壁弱体後(ターン経過):#{@barrier}") # debug
+#~     Debug::write(c_m,"#{self.name} 障壁弱体後(ターン経過):#{@barrier}") # debug
   end
   #--------------------------------------------------------------------------
   # ● FizzleFieldの自然劣化
   #--------------------------------------------------------------------------
   def deteriorate_ff
     return if @fizzle_field == 0
-    @fizzle_field *= (100 - Constant_Table::FF_DETERIORATE)
+    @fizzle_field *= (100 - ConstantTable::FF_DETERIORATE)
     @fizzle_field /= 100
-    DEBUG::write(c_m,"#{self.name} フィールド自然劣化後:#{@fizzle_field}")
+    Debug::write(c_m,"#{self.name} フィールド自然劣化後:#{@fizzle_field}")
   end
   #--------------------------------------------------------------------------
   # ● 徐々にPLUS値を戻す（ターン終了時）
@@ -2955,7 +2956,7 @@ class Game_Battler
       ratio = (100 * @armor_plus / [base_armor, 1].max).abs  # 差分の割合
       fix = ratio / 100                             # 固定変動分
       add = (ratio % 100)                           # 残り１の変動確率
-      DEBUG::write(c_m,"#{self.name} base_armor:#{base_armor} @armor_plus:#{@armor_plus} 差分割合:#{ratio}% 固定変動分:#{fix} 残り１の変動確率:#{add}")
+      Debug::write(c_m,"#{self.name} base_armor:#{base_armor} @armor_plus:#{@armor_plus} 差分割合:#{ratio}% 固定変動分:#{fix} 残り１の変動確率:#{add}")
       @armor_plus -= fix if @armor_plus > 0
       @armor_plus += fix if @armor_plus < 0
       if add > rand(100)
@@ -2969,7 +2970,7 @@ class Game_Battler
       ratio = (100 * @resist_adj / [base_resist, 1].max).abs  # 差分の割合
       fix = ratio / 100                             # 固定変動分
       add = (ratio % 100)                           # 残り１の変動確率
-      DEBUG::write(c_m,"#{self.name} base_resist:#{base_resist} @resist_adj:#{@resist_adj} 差分割合:#{ratio}% 固定変動分:#{fix} 残り１の変動確率:#{add}")
+      Debug::write(c_m,"#{self.name} base_resist:#{base_resist} @resist_adj:#{@resist_adj} 差分割合:#{ratio}% 固定変動分:#{fix} 残り１の変動確率:#{add}")
       @resist_adj -= fix if @resist_adj > 0
       @resist_adj += fix if @resist_adj < 0
       if add > rand(100)
@@ -3006,9 +3007,9 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def converge_lucky
     return if @lucky_bonus == 0
-    ratio = Constant_Table::CONVERGE_RATIO_LUCKY
+    ratio = ConstantTable::CONVERGE_RATIO_LUCKY
     @lucky_bonus -= 1 if ratio > rand(100)
-    DEBUG.write(c_m, "加護を与えよ 収束:#{@lucky_bonus} #{@name}")
+    Debug.write(c_m, "加護を与えよ 収束:#{@lucky_bonus} #{@name}")
   end
   #--------------------------------------------------------------------------
   # ● ポーションの効果
@@ -3023,9 +3024,9 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def check_potion_effect_remain
     return if @potion_effect == nil
-    ratio = Constant_Table::RATIO_CLEAR_POTION_EFFECT
+    ratio = ConstantTable::RATIO_CLEAR_POTION_EFFECT
     if ratio > rand(100)
-      DEBUG.write(c_m, "薬:#{@potion_effect}の効果が切れた。")
+      Debug.write(c_m, "薬:#{@potion_effect}の効果が切れた。")
       @potion_effect = nil
     end
   end
@@ -3044,10 +3045,10 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def regeneration_effect
     return unless @regeneration > 0
-    value = MISC.dice( 1, self.vit, 0)
+    value = Misc.dice( 1, self.vit, 0)
     self.hp += value
     @regeneration -= 1
-    DEBUG::write(c_m,"#{self.name} 傷よ塞がれにて回復 +HP:#{value}") # debug
+    Debug::write(c_m,"#{self.name} 傷よ塞がれにて回復 +HP:#{value}") # debug
   end
   #--------------------------------------------------------------------------
   # ● オートヒーリング
@@ -3059,7 +3060,7 @@ class Game_Battler
     return if burn?                           # 火傷は回復しない
     @hp_healing = [maxhp * heal / 100, 1].max      # 現在HPの強度%が回復
     self.hp += @hp_healing
-    DEBUG::write(c_m,"#{self.name} ヒーリングにて回復 +HP:#{@hp_healing} HP:#{self.hp}")
+    Debug::write(c_m,"#{self.name} ヒーリングにて回復 +HP:#{@hp_healing} HP:#{self.hp}")
   end
   #--------------------------------------------------------------------------
   # ● コンバートの処理
@@ -3076,29 +3077,29 @@ class Game_Battler
     when 5; rate = 80
     when 6; rate = 90
     end
-    DEBUG::write(c_m,"コンバート開始 回復量:#{rate}% 繰り返し:#{power}回")
+    Debug::write(c_m,"コンバート開始 回復量:#{rate}% 繰り返し:#{power}回")
     power.times do
       case rand(4)
       when 0
         return if @maxmp_fire == 0
         return if @mp_fire >= @maxmp_fire
         self.mp_fire += @maxmp_fire * rate / 100
-        DEBUG::write(c_m,"コンバート回復(火):#{@mp_fire}/#{@maxmp_fire}")
+        Debug::write(c_m,"コンバート回復(火):#{@mp_fire}/#{@maxmp_fire}")
       when 1
         return if @maxmp_water == 0
         return if @mp_water >= @maxmp_water
         self.mp_water += @maxmp_water * rate / 100
-        DEBUG::write(c_m,"コンバート回復(水):#{@mp_water}/#{@maxmp_water}")
+        Debug::write(c_m,"コンバート回復(水):#{@mp_water}/#{@maxmp_water}")
       when 2
         return if @maxmp_air == 0
         return if @mp_air >= @maxmp_air
         self.mp_air += @maxmp_air * rate / 100
-        DEBUG::write(c_m,"コンバート回復(気):#{@mp_air}/#{@maxmp_air}")
+        Debug::write(c_m,"コンバート回復(気):#{@mp_air}/#{@maxmp_air}")
       when 3
         return if @maxmp_earth == 0
         return if @mp_earth >= @maxmp_earth
         self.mp_earth += @maxmp_earth * rate / 100
-        DEBUG::write(c_m,"コンバート回復(土):#{@mp_earth}/#{@maxmp_earth}")
+        Debug::write(c_m,"コンバート回復(土):#{@mp_earth}/#{@maxmp_earth}")
       end
     end
     return true                               # 成功時はTRUEを返す
@@ -3111,12 +3112,12 @@ class Game_Battler
   def state_avoidance(state_id)
     state_info = $data_states[state_id]
     ## ドレイン防御は一律95%とする
-    # if (state_id == STATEID::DRAIN_AGE || state_id == STATEID::DRAIN_EXP)
+    # if (state_id == StateId::DRAIN_AGE || state_id == StateId::DRAIN_EXP)
     #   return 95
     if state_info.nonresistance
-      DEBUG.write(c_m,"抵抗無し STATE:#{state_info.name}")
+      Debug.write(c_m,"抵抗無し STATE:#{state_info.name}")
       if state_info.attribute == "none"
-        DEBUG.write(c_m,"======>抵抗無しで対応特性値無し STATE:#{state_info.name}")
+        Debug.write(c_m,"======>抵抗無しで対応特性値無し STATE:#{state_info.name}")
       end
       return 0 # 抵抗ゼロは0
     else
@@ -3129,36 +3130,36 @@ class Game_Battler
         when "all"; value = self.all_evade  # 特殊異常：ドレイン・装備破壊
         end
         ## 異常回避による回避値ボーナス判定
-        sv = MISC.skill_value(SKILLID::AVOIDSICK, self)
-        diff = Constant_Table::DIFF_30[$game_map.map_id] # フロア係数
+        sv = Misc.skill_value(SkillId::AVOIDSICK, self)
+        diff = ConstantTable::DIFF_30[$game_map.map_id] # フロア係数
         ratio = Integer([sv * diff, 95].min)
         ratio /= 2 if tired?
         if ratio > rand(100)
           value *= 2
-          self.chance_skill_increase(SKILLID::AVOIDSICK)
-          DEBUG::write(c_m,"異常回避スキルボーナス発生 ID#{state_id} 確率:#{ratio}% 回避値:#{value}")
+          self.chance_skill_increase(SkillId::AVOIDSICK)
+          Debug::write(c_m,"異常回避スキルボーナス発生 ID#{state_id} 確率:#{ratio}% 回避値:#{value}")
         end
       ## モンスター側
       else
         case state_id
-        when STATEID::PARALYSIS;    value = self.enemy.sr6    # 麻痺
-        when STATEID::CONTAINMENT;  value = self.enemy.sr5    # 呪文封じ
-        when STATEID::POISON;       value = self.enemy.sr4    # 毒
-        when STATEID::SLEEP;        value = self.enemy.sr3    # 睡眠
-        when STATEID::BLIND;        value = self.enemy.sr2    # 暗闇
-        when STATEID::CRITICAL;     value = self.enemy.sr1    # 首はね
-        when STATEID::SUFFOCATION ; value = self.enemy.sr9    # 窒息
-        when STATEID::BURN;         value = self.enemy.sr7    # 火傷
-        when STATEID::MADNESS;      value = self.enemy.sr8    # 発狂
-        when STATEID::FRACTURE;     value = self.enemy.sr10   # 骨折
-        when STATEID::SHOCK;        value = self.enemy.sr11   # 感電
-        when STATEID::FREEZE;       value = self.enemy.sr12   # 凍結
-        when STATEID::MUPPET;       value = self.enemy.sr13   # 魅了
-        when STATEID::KABANE;       value = self.enemy.sr1    # 屍は首はねと同様
-        when STATEID::STUN;         value = Constant_Table::STUN_EVISON # 固定値
-        when STATEID::NAUSEA;       value = self.enemy.sr14   # 吐き気
-        when STATEID::BLEEDING;     value = self.enemy.sr15   # 出血
-        when STATEID::SEVERE;       value = 100               # 敵は重症化しない
+        when StateId::PARALYSIS;    value = self.enemy.sr6    # 麻痺
+        when StateId::CONTAINMENT;  value = self.enemy.sr5    # 呪文封じ
+        when StateId::POISON;       value = self.enemy.sr4    # 毒
+        when StateId::SLEEP;        value = self.enemy.sr3    # 睡眠
+        when StateId::BLIND;        value = self.enemy.sr2    # 暗闇
+        when StateId::CRITICAL;     value = self.enemy.sr1    # 首はね
+        when StateId::SUFFOCATION ; value = self.enemy.sr9    # 窒息
+        when StateId::BURN;         value = self.enemy.sr7    # 火傷
+        when StateId::MADNESS;      value = self.enemy.sr8    # 発狂
+        when StateId::FRACTURE;     value = self.enemy.sr10   # 骨折
+        when StateId::SHOCK;        value = self.enemy.sr11   # 感電
+        when StateId::FREEZE;       value = self.enemy.sr12   # 凍結
+        when StateId::MUPPET;       value = self.enemy.sr13   # 魅了
+        when StateId::KABANE;       value = self.enemy.sr1    # 屍は首はねと同様
+        when StateId::STUN;         value = ConstantTable::STUN_EVISON # 固定値
+        when StateId::NAUSEA;       value = self.enemy.sr14   # 吐き気
+        when StateId::BLEEDING;     value = self.enemy.sr15   # 出血
+        when StateId::SEVERE;       value = 100               # 敵は重症化しない
         else
           value = 0
         end
@@ -3171,7 +3172,7 @@ class Game_Battler
   # ● エクソシストチェック
   #--------------------------------------------------------------------------
   def exorcist_check(attacker)
-    return false if MISC.skill_value(SKILLID::EXORCIST, self) < 1
+    return false if Misc.skill_value(SkillId::EXORCIST, self) < 1
     unless self.actor?                                  # モンスターの場合
       return true if self.enemy.kind.include?("悪魔")   # 悪魔族か？
     end
@@ -3189,22 +3190,23 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def reserve_cast(magic, magic_lv)
     return unless self.actor? # モンスターはスキップ
-    sv = MISC.skill_value(SKILLID::R_CAST, self)
+    sv = Misc.skill_value(SkillId::R_CAST, self)
     case self.class_id
     when 3,6,8  # 魔・賢・聖
-      diff = Constant_Table::DIFF_50[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
     else
-      diff = Constant_Table::DIFF_35[$game_map.map_id] # フロア係数
+      diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
     end
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if tired?
     if ratio > rand(100)
-      self.chance_skill_increase(SKILLID::R_CAST) # リザーブキャスト
-      DEBUG::write(c_m,"消費MPリカバリー発生検知 確率#{ratio}%")
-      self.consume_mp(magic, magic_lv, true)
+      self.chance_skill_increase(SkillId::R_CAST) # リザーブキャスト
+      Debug::write(c_m,"消費MPリカバリー発生検知 確率#{ratio}%")
+      cost = self.consume_mp(magic, magic_lv, true)
       return true
     end
-    self.consume_mp(magic, magic_lv)
+    cost = self.consume_mp(magic, magic_lv)
+    self.tired_casting(cost)                # 呪文詠唱による疲労増加
     return false
   end
   #--------------------------------------------------------------------------
@@ -3221,7 +3223,7 @@ class Game_Battler
       pwr = @mind_power
       @mind_power = 0
     end
-    DEBUG::write(c_m,"魔力の刃 威力:#{pwr}, 残り魔力:#{@mind_power}") unless pwr == 0
+    Debug::write(c_m,"魔力の刃 威力:#{pwr}, 残り魔力:#{@mind_power}") unless pwr == 0
     return pwr
   end
   #--------------------------------------------------------------------------
@@ -3239,10 +3241,10 @@ class Game_Battler
   def poison_strength
     strength = 0  # 初期値
     if $threedmap.check_poison_floor            # 毒霧床の上にいる
-      strength = Constant_Table::POISON_GAS_DAMAGE_RATIO
+      strength = ConstantTable::POISON_GAS_DAMAGE_RATIO
     end
     return strength unless poison?
-    strength += @state_depth[STATEID::POISON]
+    strength += @state_depth[StateId::POISON]
     strength = [strength, 1].max
     return strength
   end
@@ -3252,7 +3254,7 @@ class Game_Battler
   def bleeding_strength
     strength = 0  # 初期値
     return strength unless bleeding?
-    strength += @state_depth[STATEID::BLEEDING]
+    strength += @state_depth[StateId::BLEEDING]
     strength = [strength, 1].max
     return strength
   end
@@ -3315,7 +3317,7 @@ class Game_Battler
       when 1..10;   value = -15     # カルマ正
       end
       if self.personality_n == :Composure
-        DEBUG::write(c_m,"#{self.name} 原因:#{event_kind} 性格で気力変化せず")
+        Debug::write(c_m,"#{self.name} 原因:#{event_kind} 性格で気力変化せず")
         return
       end
     when 11  # ダメージを受ける
@@ -3326,7 +3328,7 @@ class Game_Battler
       ## 性格ボーナス
       if self.personality_n == :Impatient
         value = 1
-        DEBUG::write(c_m,"#{self.name} 原因:#{event_kind} 短気で気力+1")
+        Debug::write(c_m,"#{self.name} 原因:#{event_kind} 短気で気力+1")
       end
     when 12 # 隠れるのに失敗する
       case self.principle
@@ -3359,17 +3361,17 @@ class Game_Battler
     @motivation += value.to_i
     if self.class_id == 10
       @motivation = 0 if @motivation < 0
-      DEBUG.write(c_m, "侍の為、気力マイナス回避")
+      Debug.write(c_m, "侍の為、気力マイナス回避")
     end
     ## 気力の最大値を設定
     case self.class_id
     when 2..10
-      mmax = Constant_Table::MAX_MOTIVATION_NORMAL
+      mmax = ConstantTable::MAX_MOTIVATION_NORMAL
     when 1
-      mmax = Constant_Table::MAX_MOTIVATION_WAR
+      mmax = ConstantTable::MAX_MOTIVATION_WAR
     end
     @motivation = [[@motivation, 50].max, mmax].min  # 最大値最小値
-    DEBUG::write(c_m,"#{self.name} 原因:#{event_kind} 変動値:#{value}, 気力:#{@motivation}")
+    Debug::write(c_m,"#{self.name} 原因:#{event_kind} 変動値:#{value}, 気力:#{@motivation}")
   end
   #--------------------------------------------------------------------------
   # ● カウンターフラグをセット
@@ -3411,7 +3413,7 @@ class Game_Battler
   def add_veil(element)
     @veil_turn = 10            # ベールの残りターン
     @veil_element = element    # ベールの属性
-    DEBUG.write(c_m, "#{self.name} ベール効果:#{@veil_element}")
+    Debug.write(c_m, "#{self.name} ベール効果:#{@veil_element}")
   end
   #--------------------------------------------------------------------------
   # ● ベールのターン経過
@@ -3422,11 +3424,11 @@ class Game_Battler
     if @veil_turn < 1
       @veil_element = ""
     end
-    DEBUG.write(c_m, "#{self.name} ベール残り:#{@veil_turn}")
+    Debug.write(c_m, "#{self.name} ベール残り:#{@veil_turn}")
   end
   #--------------------------------------------------------------------------
   # ● コンセントレートによるダメージ上昇倍率の取得
-  # Game_Actorに定義
+  # GameActorに定義
   #--------------------------------------------------------------------------
   def magic_damage_multipiler
     return 1.0
@@ -3445,7 +3447,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def redraw=(new)
     @redraw = new
-    DEBUG.write(c_m, "name:#{@battler_name} redraw flag changed to #{@redraw}") if new == true
+    Debug.write(c_m, "name:#{@battler_name} redraw flag changed to #{@redraw}") if new == true
   end
   #--------------------------------------------------------------------------
   # ● カウンター食らったフラグ

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_SHOP
+# ■ SceneShop
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_SHOP < Scene_Base
+class SceneShop < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -38,9 +38,9 @@ class Scene_SHOP < Scene_Base
     @menu_window = Window_SHOP_Menu.new    # メインメニュー
     @menu_window.change_page(1, @is.actor)  # 初期ページ１
     @locname = Window_LOCNAME.new
-    @locname.set_text(Constant_Table::NAME_SHOP)
+    @locname.set_text(ConstantTable::NAME_SHOP)
     @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/armory", "TradingPost")
+    @window_picture.create_picture("Graphics/System/armory", ConstantTable::NAME_SHOP)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -133,7 +133,7 @@ class Scene_SHOP < Scene_Base
         @is.refresh
       end
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Village.new  # 村に戻る
+      $scene = SceneVillage.new  # 村に戻る
     elsif Input.trigger?(Input::R)
       next_actor
     elsif Input.trigger?(Input::L)
@@ -248,7 +248,7 @@ class Scene_SHOP < Scene_Base
     if Input.trigger?(Input::C)
       kind = @window_buy.item[0]
       id = @window_buy.item[1]
-      item = MISC.item(kind, id)
+      item = Misc.item(kind, id)
       if item.price > @is.actor.get_amount_of_money
         @attention_window.set_text("おかねが たりません")
         wait_for_attention
@@ -264,9 +264,9 @@ class Scene_SHOP < Scene_Base
         @is.actor.gain_item(kind, id, true)    # 鑑定済み
         ## --------------------------------------------------------------
         if oos
-          text3 = Constant_Table::OOS_MESSAGE
+          text3 = ConstantTable::OOS_MESSAGE
         else
-          buy_message = Constant_Table::BUY_MESSAGE
+          buy_message = ConstantTable::BUY_MESSAGE
           text3 = buy_message[rand(buy_message.size)]
         end
         @attention_window.set_text(text3)
@@ -303,7 +303,7 @@ class Scene_SHOP < Scene_Base
       ## 選択中のアイテムの詳細を取得------------
       kind = @window_sell.item[0][0]
       id = @window_sell.item[0][1]
-      item_data = MISC.item(kind, id) # itemのオブジェクト
+      item_data = Misc.item(kind, id) # itemのオブジェクト
       item = @window_sell.item # itemのオブジェクトと装備・鑑定ステータス
       stack = item[4] # スタック数
       ## ----------------------------------------
@@ -320,14 +320,14 @@ class Scene_SHOP < Scene_Base
         cant_sell
         return
       end
-      DEBUG.write(c_m, "[0]:#{item[0]} [1]#{item[1]} [2]:#{item[2]} [3]:#{item[3]} [4]:#{item[4]}")
+      Debug.write(c_m, "[0]:#{item[0]} [1]#{item[1]} [2]:#{item[2]} [3]:#{item[3]} [4]:#{item[4]}")
       ## スタックアイテムの場合
       if stack > 0
         $game_party.sell_shop_stack_item( [kind, id], stack)
         ratio = stack / item_data.stack.to_f
         price = Integer(item_data.price / 2 * ratio)
-        DEBUG.write(c_m,"売却スタック数:#{stack} 基準スタック:#{item_data.stack}")
-        DEBUG.write(c_m,"比率:#{ratio} 値段:#{price}")
+        Debug.write(c_m,"売却スタック数:#{stack} 基準スタック:#{item_data.stack}")
+        Debug.write(c_m,"比率:#{ratio} 値段:#{price}")
       ## 通常アイテムの場合
       else
         $game_party.modify_shop_item( [kind, id], 1)
@@ -369,7 +369,7 @@ class Scene_SHOP < Scene_Base
       ## 選択中のアイテムの詳細を取得------------
       kind = @window_det.item[0][0]
       id = @window_det.item[0][1]
-      item_data = MISC.item(kind, id) # itemのオブジェクト
+      item_data = Misc.item(kind, id) # itemのオブジェクト
       item = @window_det.item # itemのオブジェクトと装備・鑑定ステータス
       ## ----------------------------------------
       unless item == nil or item[1] == true or item[2] > 0 # 鑑定済もしくは装備品
@@ -403,7 +403,7 @@ class Scene_SHOP < Scene_Base
       ## 選択中のアイテムの詳細を取得------------
       kind = @window_cur.item[0][0]
       id = @window_cur.item[0][1]
-      item_data = MISC.item(kind, id) # itemのオブジェクト
+      item_data = Misc.item(kind, id) # itemのオブジェクト
       item = @window_cur.item
       ## ----------------------------------------
       unless item == nil or item[3] == false # 呪われていない品

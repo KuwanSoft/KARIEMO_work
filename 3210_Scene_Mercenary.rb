@@ -4,7 +4,7 @@
 # B6Fのフルムーン亭で傭兵を雇う画面
 #==============================================================================
 
-class Scene_Mercenary < Scene_Base
+class Scene_Mercenary < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -77,7 +77,7 @@ class Scene_Mercenary < Scene_Base
       @attention_window.set_text("おかねをあつめた")
       wait_for_attention
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
 end

@@ -4,7 +4,7 @@
 # マスタースキルのウインドウ
 #==============================================================================
 
-class Window_MasterSlot < Window_Selectable
+class Window_MasterSlot < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -32,7 +32,7 @@ class Window_MasterSlot < Window_Selectable
   #     index : 項目番号
   #--------------------------------------------------------------------------
   def draw_item(index)
-    command = Constant_Table::MASTER_SKILL[@data[index]]
+    command = ConstantTable::MASTER_SKILL[@data[index]]
     rect = item_rect(index)
     self.contents.clear_rect(rect)
     self.contents.draw_text(rect.x+STA, rect.y, rect.width-(STA*2), WLH, command)

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneTreasure
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_INN < Scene_Base
+class SceneInn < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -61,12 +61,12 @@ class Scene_INN < Scene_Base
     @menu_window.refresh(@is.actor)
     @back_s = Window_ShopBack_Small.new   # メッセージ枠小
     @locname = Window_LOCNAME.new
-    @locname.set_text(Constant_Table::NAME_INN)
+    @locname.set_text(ConstantTable::NAME_INN)
     @skill_selection = Window_Skill.new      # スキルウインドウ
     @fee = Window_INN_Fee.new
     @fee.refresh(0, @is.actor, @menu_window.index)
     @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/inn", "INN")
+    @window_picture.create_picture("Graphics/System/inn", ConstantTable::NAME_INN)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -144,7 +144,7 @@ class Scene_INN < Scene_Base
     elsif Input.repeat?(Input::UP) or Input.repeat?(Input::DOWN)
       @fee.refresh(@fee.page, @is.actor, @menu_window.index)
     elsif Input.trigger?(Input::B) # キャンセル
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
     elsif Input.trigger?(Input::R)
       next_actor
     elsif Input.trigger?(Input::L)
@@ -232,11 +232,11 @@ class Scene_INN < Scene_Base
       ## HP,MPの回復
       actor.hp = actor.maxhp
       actor.recover_mp
-      actor.remove_state(STATEID::STINK)  # 悪臭を解除
+      actor.remove_state(StateId::STINK)  # 悪臭を解除
       before_age = actor.age
       actor.aged(@menu_window.days)       # 疲労分の歳をとる
       actor.fatigue = 0                   # 疲労度のリセット
-      actor.remove_state(STATEID::TIRED)  # 疲労状態を解除
+      actor.remove_state(StateId::TIRED)  # 疲労状態を解除
       actor.skill_setting                 # スキルの再設定
       $game_system.calc_respawn_roomguard_number(@menu_window.days) # 玄室モンスターの復活判定
     ## 馬小屋である
@@ -245,11 +245,11 @@ class Scene_INN < Scene_Base
       actor.hp = actor.maxhp
       actor.recover_mp(5) ## 馬小屋でMP5%回復
       before_age = actor.age
-      actor.aged(Constant_Table::STABLE_DAYS) # 馬小屋の歳をとる
-      $game_system.calc_respawn_roomguard_number(Constant_Table::STABLE_DAYS) # 玄室モンスターの復活判定
-      if Constant_Table::STINKRATIO > rand(100)
+      actor.aged(ConstantTable::STABLE_DAYS) # 馬小屋の歳をとる
+      $game_system.calc_respawn_roomguard_number(ConstantTable::STABLE_DAYS) # 玄室モンスターの復活判定
+      if ConstantTable::STINKRATIO > rand(100)
         @lvupmsg.push("あくしゅうが からだにこびりついて とれない。")
-        actor.add_state(STATEID::STINK)
+        actor.add_state(StateId::STINK)
       end
     end
     ## 年齢があがった場合
@@ -273,7 +273,7 @@ class Scene_INN < Scene_Base
       @lvupmsg.push("きずが かいふくした。")
     end
     @lvupmsg.compact! # nilは削除
-    SAVE::do_save("#{self.class.name}") # セーブの実行
+    Save::do_save("#{self.class.name}") # セーブの実行
   end
   #--------------------------------------------------------------------------
   # ● 事前睡眠処理の更新
@@ -339,7 +339,7 @@ class Scene_INN < Scene_Base
     @candidate2 = nil
     @candidate3 = nil
     ## LearningPointの増加
-    # lp = Constant_Table::CLASS_LP[@is.actor.class_id]
+    # lp = ConstantTable::CLASS_LP[@is.actor.class_id]
     lp = @is.actor.class.lp
     lp += @is.actor.level
     case @is.actor.int(true)
@@ -354,7 +354,7 @@ class Scene_INN < Scene_Base
     @is.actor.lp += lp
     @is.actor.lp = [@is.actor.lp, 100].min  # 100で上限
     @message.push("LPを #{lp} えて #{@is.actor.lp} になった。")
-    DEBUG::write(c_m,"LP:#{@is.actor.lp}")
+    Debug::write(c_m,"LP:#{@is.actor.lp}")
 
     ## 候補呪文ID配列の作成
     for magic_id in 1...$data_magics.size
@@ -365,14 +365,14 @@ class Scene_INN < Scene_Base
       @is.actor.recover_mp  # MPの回復
       return @message
     end
-    DEBUG::write(c_m,"候補呪文配列#1:#{learn}")
+    Debug::write(c_m,"候補呪文配列#1:#{learn}")
     @candidate1 = learn[rand(learn.size)]
     learn.delete(@candidate1)
-    DEBUG::write(c_m,"候補呪文配列#2:#{learn}")
+    Debug::write(c_m,"候補呪文配列#2:#{learn}")
     unless learn.empty?
       @candidate2 = learn[rand(learn.size)]
       learn.delete(@candidate2)
-      DEBUG::write(c_m,"候補呪文配列#3:#{learn}")
+      Debug::write(c_m,"候補呪文配列#3:#{learn}")
       unless learn.empty?
         @candidate3 = learn[rand(learn.size)]
       end

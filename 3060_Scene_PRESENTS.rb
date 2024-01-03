@@ -4,7 +4,7 @@
 # タイトル画面の前のプレゼンツ処理を行うクラス
 #==============================================================================
 
-class Scene_PRESENTS < Scene_Base
+class Scene_PRESENTS < SceneBase
   def initialize
     @time = 0
     @everard = Window_Everard.new
@@ -20,7 +20,7 @@ class Scene_PRESENTS < Scene_Base
   # ● ロゴの表示
   #--------------------------------------------------------------------------
   def presents
-    vol = IniFile.read("Game.ini", "Settings", "MASTER_ME_VOLUME", Constant_Table::MASTER_ME_VOLUME)
+    vol = IniFile.read("Game.ini", "Settings", "MASTER_ME_VOLUME", ConstantTable::MASTER_ME_VOLUME)
     RPG::ME.new("jingle-logo01-wav",vol,100).play
     @pre = Window_PRESENTS.new
     @pre.visible = true
@@ -57,7 +57,7 @@ class Scene_PRESENTS < Scene_Base
     elsif @time == 320
       Graphics.fadeout(50)
     elsif @time == 350
-      $scene = Scene_Title.new
+      $scene = SceneTitle.new
     end
     @time += 1
   end

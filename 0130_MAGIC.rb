@@ -15,19 +15,19 @@ module MAGIC
     rank = item.rank
     ## マジックハッシュの定義
     # 定義を増やしたらget_magic_attrのposition数を増やすこと
-    ap =          Constant_Table::MAGIC_HASH_AP             #1
-    swing =       Constant_Table::MAGIC_HASH_SWING          #2
-    damage =      Constant_Table::MAGIC_HASH_DAMAGE         #3
-    double =      Constant_Table::MAGIC_HASH_DOUBLE         #4
-    cc_up =       Constant_Table::MAGIC_HASH_CAPACITY_UP    #5
-    range =       Constant_Table::MAGIC_HASH_RANGE          #6
-    initiative =  Constant_Table::MAGIC_HASH_INITIATIVE     #7
-    s_tactics =   Constant_Table::MAGIC_HASH_SKILL_TACTICS  #8
-    a_element =   Constant_Table::MAGIC_HASH_A_ELEMENT      #9
-    dr =          Constant_Table::MAGIC_HASH_DR             #10
-    armor =       Constant_Table::MAGIC_HASH_ARMOR          #11
-    s_dr =        Constant_Table::MAGIC_HASH_DAMAGERESIST   #12
-    s_shield =    Constant_Table::MAGIC_HASH_SKILL_SHIELD   #13
+    ap =          ConstantTable::MAGIC_HASH_AP             #1
+    swing =       ConstantTable::MAGIC_HASH_SWING          #2
+    damage =      ConstantTable::MAGIC_HASH_DAMAGE         #3
+    double =      ConstantTable::MAGIC_HASH_DOUBLE         #4
+    cc_up =       ConstantTable::MAGIC_HASH_CAPACITY_UP    #5
+    range =       ConstantTable::MAGIC_HASH_RANGE          #6
+    initiative =  ConstantTable::MAGIC_HASH_INITIATIVE     #7
+    s_tactics =   ConstantTable::MAGIC_HASH_SKILL_TACTICS  #8
+    a_element =   ConstantTable::MAGIC_HASH_A_ELEMENT      #9
+    dr =          ConstantTable::MAGIC_HASH_DR             #10
+    armor =       ConstantTable::MAGIC_HASH_ARMOR          #11
+    s_dr =        ConstantTable::MAGIC_HASH_DAMAGERESIST   #12
+    s_shield =    ConstantTable::MAGIC_HASH_SKILL_SHIELD   #13
     ## 武器？
     if item.is_a?(Weapons2)
       case rand(8)

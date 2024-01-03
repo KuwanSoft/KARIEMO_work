@@ -4,7 +4,7 @@
 # 出張道具屋の福引券
 #==============================================================================
 
-class Window_ToolShop < Window_Selectable
+class Window_ToolShop < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class Window_ToolShop < Window_Selectable
   #     index : 項目番号
   #--------------------------------------------------------------------------
   def draw_item(index)
-    item = MISC.item(@data[index][0][0], @data[index][0][1])
+    item = Misc.item(@data[index][0][0], @data[index][0][1])
     probability = "#{(@data[index][1] * 100 * 1000).round / 1000.0}%"
     rect = item_rect(index)
     self.contents.draw_text(rect.x+CUR, WLH*2+rect.y, self.width-(32+CUR*2), WLH, item.name)

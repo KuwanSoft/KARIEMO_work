@@ -4,7 +4,7 @@
 # 　戦闘時の呪文クラス選択画面
 #==============================================================================
 
-class Window_MagicDetail < Window_Base
+class Window_MagicDetail < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -33,7 +33,7 @@ class Window_MagicDetail < Window_Base
   # ● リフレッシュ
   #--------------------------------------------------------------------------
   def refresh(actor, magic, magic_lv)
-    max = MISC.get_max_cp(actor, magic)   # 最大詠唱CP
+    max = Misc.get_max_cp(actor, magic)   # 最大詠唱CP
     @actor = actor
     @magic = magic
     @magic_lv += magic_lv

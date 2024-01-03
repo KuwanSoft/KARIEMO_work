@@ -1,5 +1,5 @@
 # 村で使用
-# class Window_LOC_Picture < Window_Base
+# class Window_LOC_Picture < WindowBase
 #   #--------------------------------------------------------------------------
 #   # ● オブジェクト初期化
 #   #--------------------------------------------------------------------------
@@ -12,15 +12,15 @@
 #   #--------------------------------------------------------------------------
 #   def set_text(text)
 #     case text
-#     when Constant_Table::NAME_PUB
+#     when ConstantTable::NAME_PUB
 #       bitmap = Cache.picture("vil_icon_pub")
-#     when Constant_Table::NAME_INN
+#     when ConstantTable::NAME_INN
 #       bitmap = Cache.picture("vil_icon_inn")
-#     when Constant_Table::NAME_SHOP
+#     when ConstantTable::NAME_SHOP
 #       bitmap = Cache.picture("vil_icon_shop")
-#     when Constant_Table::NAME_CHURCH
+#     when ConstantTable::NAME_CHURCH
 #       bitmap = Cache.picture("vil_icon_church")
-#     when Constant_Table::NAME_GUILD
+#     when ConstantTable::NAME_GUILD
 #       bitmap = Cache.picture("vil_icon_guild")
 #     end
 #     return if bitmap == nil

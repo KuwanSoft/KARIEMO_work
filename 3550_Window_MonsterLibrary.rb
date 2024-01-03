@@ -1,4 +1,4 @@
-class Window_MonsterLibrary < Window_Base
+class Window_MonsterLibrary < WindowBase
   LEFT = 0   # 左描画の座標
   RIGHT = 240 # 右描画の座標
   #--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class Window_MonsterLibrary < Window_Base
     @index += change
     @index = @id_array.size - 1 if @index > @id_array.size - 1
     @index = 0 if @index < 0
-    @enemy = Game_Enemy.new(1, @id_array[@index], 1)  # Game_Enemyで作成
+    @enemy = GameEnemy.new(1, @id_array[@index], 1)  # GameEnemyで作成
     self.contents.clear
     draw_enemy
     draw_graphic(false)
@@ -75,7 +75,7 @@ class Window_MonsterLibrary < Window_Base
       begin
         @graphic.bitmap = Cache.blind_battler(@enemy.enemy.name2, @enemy.enemy.hue)
       rescue Errno::ENOENT
-        DEBUG.write(c_m, "EXCEPTION:不確定画像無し")
+        Debug.write(c_m, "EXCEPTION:不確定画像無し")
         @graphic.bitmap = Cache.battler(@enemy.enemy.name2, @enemy.enemy.hue)
       end
     end
@@ -255,7 +255,7 @@ class Window_MonsterLibrary < Window_Base
   # ● ウインドウで使用するフォントの変更
   #--------------------------------------------------------------------------
   def change_font_to_skill
-    self.contents.font.name = Constant_Table::Font_skill    # 美咲フォント
+    self.contents.font.name = ConstantTable::Font_skill    # 美咲フォント
     self.contents.font.size = 16
   end
 end

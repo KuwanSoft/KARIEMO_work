@@ -4,7 +4,7 @@
 # ギルドの待機キャラ一覧。
 #==============================================================================
 
-class Window_WAIT < Window_Selectable
+class Window_WAIT < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -30,7 +30,7 @@ class Window_WAIT < Window_Selectable
   def delete
     actor.clear_bag       # バッグの中身をすべて店の在庫へ移管
     actor.setup(actor.id) # setupすることで初期化
-    DEBUG.write(c_m, "キャラクタの削除 ID:#{actor.id}")
+    Debug.write(c_m, "キャラクタの削除 ID:#{actor.id}")
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ

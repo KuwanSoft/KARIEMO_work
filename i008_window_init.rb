@@ -1,4 +1,4 @@
-class Window_Init2 < Window
+class WindowInit < Window
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x      : ウィンドウの X 座標
@@ -24,7 +24,7 @@ class Window_Init2 < Window
     self.contents.font.name = ['ＭＳ ゴシック']
     self.contents.font.shadow = false
     self.contents.font.bold = false
-    self.contents.font.size = 14
+    self.contents.font.size = 13
   end
   #--------------------------------------------------------------------------
   # ● 解放

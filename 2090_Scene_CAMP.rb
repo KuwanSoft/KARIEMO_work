@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneTreasure
 #------------------------------------------------------------------------------
 # 　メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_CAMP < Scene_Base
+class SceneCamp < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -250,11 +250,11 @@ class Scene_CAMP < Scene_Base
         @back_s.visible = true
       when "quick_save"
         return if $game_party.save_ticket < 1
-        SAVE.write_stats_data               # STAT DATAの保存
+        Save.write_stats_data               # STAT DATAの保存
         $game_party.save_ticket -= 1
         $music.se_play("セーブ")
         $game_system.input_party_location   # パーティの場所とメンバーを記憶
-        SAVE::do_save("#{self.class.name}") # セーブの実行
+        Save::do_save("#{self.class.name}") # セーブの実行
         @attention_window.set_text("きろく しました")
         wait_for_attention
         @camp.drawing # リフレッシュ
@@ -295,7 +295,7 @@ class Scene_CAMP < Scene_Base
   # ● モンスターミュージアムへ
   #--------------------------------------------------------------------------
   def start_museum
-    $scene = Scene_MonsterLibrary.new(true)
+    $scene = SceneMonsterLibrary.new(true)
   end
   #--------------------------------------------------------------------------
   # ● キャンプの終了
@@ -305,7 +305,7 @@ class Scene_CAMP < Scene_Base
     @camp.visible = false
     @camp.active = false
     @pm.visible = false
-    $scene = Scene_Map.new
+    $scene = SceneMap.new
   end
   #--------------------------------------------------------------------------
   # ● キャラクタ選択画面
@@ -518,7 +518,7 @@ class Scene_CAMP < Scene_Base
     end
     @target_ps.index = -1
     if $game_party.all_dead?
-      $scene = Scene_Gameover.new
+      $scene = SceneGameover.new
     end
     ##> シーンチェンジが呼び出し済みであれば行わない
     if $scene == self
@@ -534,22 +534,22 @@ class Scene_CAMP < Scene_Base
     case magic.domain
     when 0;
       magic_level.times do
-        actor.chance_skill_increase(SKILLID::RATIONAL) # スキル：呪文の知識(-)
+        actor.chance_skill_increase(SkillId::RATIONAL) # スキル：呪文の知識(-)
       end
     when 1;
       magic_level.times do
-        actor.chance_skill_increase(SKILLID::MYSTIC) # スキル：呪文の知識(+)
+        actor.chance_skill_increase(SkillId::MYSTIC) # スキル：呪文の知識(+)
       end
     end
     ##> 四大元素スキルの上昇
     if magic.fire > 0
-      skill = SKILLID::FIRE
+      skill = SkillId::FIRE
     elsif magic.water > 0
-      skill = SKILLID::WATER
+      skill = SkillId::WATER
     elsif magic.air > 0
-      skill = SKILLID::AIR
+      skill = SkillId::AIR
     elsif magic.earth > 0
-      skill = SKILLID::EARTH
+      skill = SkillId::EARTH
     end
     magic_level.times do actor.chance_skill_increase(skill) end
   end
@@ -939,13 +939,13 @@ class Scene_CAMP < Scene_Base
     return if @bag_window.item[1] == true # 未鑑定品
     kind = @bag_window.item[0][0]
     id = @bag_window.item[0][1]
-    item_obj = MISC.item(kind, id)
+    item_obj = Misc.item(kind, id)
     # 鑑定力の算出
-    sv = MISC.skill_value(SKILLID::APPRAISAL, @ps.actor)
-    diff = Constant_Table::DIFF_ITEM_IDENTIFY[item_obj.rank]
+    sv = Misc.skill_value(SkillId::APPRAISAL, @ps.actor)
+    diff = ConstantTable::DIFF_ITEM_IDENTIFY[item_obj.rank]
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
-    DEBUG::write(c_m,"アイテムランク:#{item_obj.rank} 鑑定力:#{ratio}%")
+    Debug::write(c_m,"アイテムランク:#{item_obj.rank} 鑑定力:#{ratio}%")
     if ratio > rand(100)
       @attention_window.set_text("なにか わかった!")
       @bag_window.item[1] = true
@@ -1142,7 +1142,7 @@ class Scene_CAMP < Scene_Base
         $game_temp.map_bgs = RPG::BGS.last    # 戦闘用に先にBGM保管
         $game_temp.resting = true             # 休息フラグ
         $music.play("休息中")
-        @rest_counter = Constant_Table::REST_COUNTER  # スリープ設定
+        @rest_counter = ConstantTable::REST_COUNTER  # スリープ設定
         @ps.refresh
         turn_on_face                          # 顔の表示
       when 1  # いいえ
@@ -1161,9 +1161,9 @@ class Scene_CAMP < Scene_Base
     update_encounter
     @rest_counter -= 1
     if @rest_counter == 0
-      DEBUG.write(c_m, "休息中... ノイズレベル:#{$game_wandering.check_noise_level}")
-      @rest_counter = Constant_Table::REST_COUNTER
-      $game_party.chance_skill_increase(SKILLID::SURVIVALIST) # スキル：野営の知識
+      Debug.write(c_m, "休息中... ノイズレベル:#{$game_wandering.check_noise_level}")
+      @rest_counter = ConstantTable::REST_COUNTER
+      $game_party.chance_skill_increase(SkillId::SURVIVALIST) # スキル：野営の知識
       $game_party.resting               # パーティ休息１ターン
       $game_party.food -= 1             # 食糧の消費
       @ps.refresh
@@ -1181,8 +1181,8 @@ class Scene_CAMP < Scene_Base
   def update_encounter
     return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
     return unless $game_wandering.check_encount
-    ratio = Constant_Table::NM
-    DEBUG::write(c_m,"***********【ENCOUNT type:休息中】***********")
+    ratio = ConstantTable::NM
+    Debug::write(c_m,"***********【ENCOUNT type:休息中】***********")
     $game_troop.setup($game_map.map_id, (ratio > rand(100))) # マップIDを与える
     $game_temp.battle_proc = nil
     $game_temp.next_scene = "battle"
@@ -1218,8 +1218,8 @@ class Scene_CAMP < Scene_Base
     RPG::BGM.stop
     RPG::BGS.stop
     $music.se_play("戦闘開始")
-    MISC.battle_bgm  # 戦闘音楽演奏
-    $scene = Scene_Battle.new
+    Misc.battle_bgm  # 戦闘音楽演奏
+    $scene = SceneBattle.new
   end
   #--------------------------------------------------------------------------
   # ● スキルウインドウの閲覧
@@ -1272,11 +1272,11 @@ class Scene_CAMP < Scene_Base
     map_id = $game_map.map_id
     pow = rand(10) + 1 + cp
     result = (pow > map_id) ? true : false
-    DEBUG.write(c_m, "帰還呪文 強さ:#{pow} CP:#{cp} #{map_id}階層")
+    Debug.write(c_m, "帰還呪文 強さ:#{pow} CP:#{cp} #{map_id}階層")
     case result
-    when true; DEBUG::write(c_m,"ESCAPE成功")
+    when true; Debug::write(c_m,"ESCAPE成功")
     when false;
-      DEBUG::write(c_m,"ESCAPE失敗")
+      Debug::write(c_m,"ESCAPE失敗")
       $game_temp.magic_not_working = true
     end
     return unless result
@@ -1284,7 +1284,7 @@ class Scene_CAMP < Scene_Base
     $game_party.in_party                        # 迷宮に残るフラグオフ
     $game_system.remove_unique_id               # ユニークIDの削除
     caster.forget_home_magic                    # 呪文を忘れる
-    $scene = Scene_Village.new                  # 村へ
+    $scene = SceneVillage.new                  # 村へ
   end
   #--------------------------------------------------------------------------
   # ● メモウインドウの閲覧
@@ -1348,9 +1348,9 @@ class Scene_CAMP < Scene_Base
           wait_for_compose
           $music.se_play("合成失敗")
           ## 失敗作を渡す
-          kind = Constant_Table::FAILURE_KIND_ID[0]
-          id = Constant_Table::FAILURE_KIND_ID[1]
-          item = MISC.item(kind, id)
+          kind = ConstantTable::FAILURE_KIND_ID[0]
+          id = ConstantTable::FAILURE_KIND_ID[1]
+          item = Misc.item(kind, id)
         end
         ## 合成結果の表示
         @bar.bitmap = nil       # バーを消す

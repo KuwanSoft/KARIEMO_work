@@ -4,7 +4,7 @@
 # マスタースキルのウインドウ
 #==============================================================================
 
-class Window_MasterSkill < Window_Selectable
+class Window_MasterSkill < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -32,10 +32,10 @@ class Window_MasterSkill < Window_Selectable
     when 8;skill1_id = 13;skill2_id = 14
     when 9;skill1_id = 15;skill2_id = 16
     end
-    skill1 = Constant_Table::MASTER_SKILL[skill1_id]
-    desc1 = Constant_Table::SKILL_DESC[skill1_id]
-    skill2 = Constant_Table::MASTER_SKILL[skill2_id]
-    desc2 = Constant_Table::SKILL_DESC[skill2_id]
+    skill1 = ConstantTable::MASTER_SKILL[skill1_id]
+    desc1 = ConstantTable::SKILL_DESC[skill1_id]
+    skill2 = ConstantTable::MASTER_SKILL[skill2_id]
+    desc2 = ConstantTable::SKILL_DESC[skill2_id]
     @item_max = 2
     self.contents.font.color.alpha = @actor.already_have(skill1_id) ? 128 : 255
     self.contents.draw_text(STA, 0, self.width-(32+STA*2), WLH, skill1)

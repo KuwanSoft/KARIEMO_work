@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Game_WanderingList
+# ■ GameWanderingList
 #------------------------------------------------------------------------------
 # 　$game_wanderingを配列で持つ
 #==============================================================================
 
-class Game_WanderingList
+class GameWanderingList
   attr_reader   :seeing
   attr_reader   :loc_array
   #--------------------------------------------------------------------------
@@ -13,8 +13,8 @@ class Game_WanderingList
   def initialize
     @data = []
     @timer = 0
-    @move_frequency = Constant_Table::MOVE_FREQ
-    @see_frequency = Constant_Table::SEE_FREQ
+    @move_frequency = ConstantTable::MOVE_FREQ
+    @see_frequency = ConstantTable::SEE_FREQ
     @seeing = false
     @respawn = false
   end
@@ -35,22 +35,22 @@ class Game_WanderingList
       self[i]
     end
     $game_system.number_store[map_id] = number  # 徘徊数の保存
-    DEBUG.write(c_m, "MAPID:#{map_id} ワンダリング数:#{number} ストア数:#{$game_system.number_store[map_id]}")
+    Debug.write(c_m, "MAPID:#{map_id} ワンダリング数:#{number} ストア数:#{$game_system.number_store[map_id]}")
   end
   #--------------------------------------------------------------------------
   # ● 初期徘徊数の取得
   #--------------------------------------------------------------------------
   def get_predefined_wandering_number(floor)
     case floor
-    when 1; return Constant_Table::WANDERING_B1F
-    when 2; return Constant_Table::WANDERING_B2F
-    when 3; return Constant_Table::WANDERING_B3F
-    when 4; return Constant_Table::WANDERING_B4F
-    when 5; return Constant_Table::WANDERING_B5F
-    when 6; return Constant_Table::WANDERING_B6F
-    when 7; return Constant_Table::WANDERING_B7F
-    when 8; return Constant_Table::WANDERING_B8F
-    when 9; return Constant_Table::WANDERING_B9F
+    when 1; return ConstantTable::WANDERING_B1F
+    when 2; return ConstantTable::WANDERING_B2F
+    when 3; return ConstantTable::WANDERING_B3F
+    when 4; return ConstantTable::WANDERING_B4F
+    when 5; return ConstantTable::WANDERING_B5F
+    when 6; return ConstantTable::WANDERING_B6F
+    when 7; return ConstantTable::WANDERING_B7F
+    when 8; return ConstantTable::WANDERING_B8F
+    when 9; return ConstantTable::WANDERING_B9F
     end
   end
   #--------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class Game_WanderingList
   def respawn_wandering(floor)
     return if $game_system.number_store[floor] >= get_predefined_wandering_number(floor)
     $game_system.number_store[floor] += 1  # 徘徊の復活
-    DEBUG.write(c_m, "休息時間経過によるワンダリングの復活 ストア数:#{$game_system.number_store[floor]}")
+    Debug.write(c_m, "休息時間経過によるワンダリングの復活 ストア数:#{$game_system.number_store[floor]}")
   end
   #--------------------------------------------------------------------------
   # ● 固定ワンダリングの場所をマップから取得
@@ -82,7 +82,7 @@ class Game_WanderingList
         @respawn = true   # リスポーンフラグありで再度初期化
         self[id]
         $game_system.number_store[$game_map.map_id] += 1  # 徘徊の復活
-        DEBUG.write(c_m, "逃亡による再度ワンダリング発生 群ID:#{id} ストア数:#{$game_system.number_store[$game_map.map_id]}")
+        Debug.write(c_m, "逃亡による再度ワンダリング発生 群ID:#{id} ストア数:#{$game_system.number_store[$game_map.map_id]}")
         break
       end
     end
@@ -103,7 +103,7 @@ class Game_WanderingList
   #--------------------------------------------------------------------------
   def [](wandering_id)
     if @data[wandering_id] == nil
-      @data[wandering_id] = Game_Wandering.new(wandering_id, @respawn)
+      @data[wandering_id] = GameWandering.new(wandering_id, @respawn)
       @respawn = false
     end
     return @data[wandering_id]
@@ -126,7 +126,7 @@ class Game_WanderingList
     for wandering in @data
       next if wandering == nil
       @seeing = true if wandering.can_see_party?
-#~       DEBUG.write(c_m, "ID:#{wandering.id} Seeing?:#{@seeing}")
+#~       Debug.write(c_m, "ID:#{wandering.id} Seeing?:#{@seeing}")
     end
     ## 群が存在しない場合
     @seeing = false if @data.size == 0
@@ -158,7 +158,7 @@ class Game_WanderingList
     when 5; return 1
     else;   return 0
     end
-    DEBUG.write(c_m, "ID:#{wandering.id} Noise:#{array.min}")
+    Debug.write(c_m, "ID:#{wandering.id} Noise:#{array.min}")
   end
   #--------------------------------------------------------------------------
   # ● エンカウントチェック
@@ -171,14 +171,14 @@ class Game_WanderingList
       next if wandering == nil
       next unless x == wandering.x
       next unless y == wandering.y
-      DEBUG.write(c_m, "wanderingID:#{wandering.id}")
+      Debug.write(c_m, "wanderingID:#{wandering.id}")
       remove_wandering(wandering.id)
       return true
     end
     ## 休息中に限り一番近いノイズの大きさ％で毎休息ターンに判定が入る
     ## updateルーチンの内部の判定なのでフレームレートをかけて確率の調整
     if $game_temp.resting && (check_noise_level > rand(100*Graphics.frame_rate))
-      DEBUG.write(c_m, "休息中のエンカウント判定 ノイズレベル:#{check_noise_level}")
+      Debug.write(c_m, "休息中のエンカウント判定 ノイズレベル:#{check_noise_level}")
       remove_most_closest_wandering
       return true
     end
@@ -208,7 +208,7 @@ class Game_WanderingList
   def remove_wandering(wandering_id)
     @data[wandering_id] = nil
     $game_system.number_store[$game_map.map_id] -= 1  # 徘徊の削除
-    DEBUG.write(c_m, "遭遇による徘徊モンスター ID:#{wandering_id} 削除 ストア数:#{$game_system.number_store[$game_map.map_id]}")
+    Debug.write(c_m, "遭遇による徘徊モンスター ID:#{wandering_id} 削除 ストア数:#{$game_system.number_store[$game_map.map_id]}")
   end
   #--------------------------------------------------------------------------
   # ● アップデート
@@ -250,7 +250,7 @@ class Game_WanderingList
           line += table[x,y].to_s
         end
       end
-      DEBUG.write(c_m, line)
+      Debug.write(c_m, line)
     end
   end
 end

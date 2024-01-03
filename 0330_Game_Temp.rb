@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Temp
+# ■ GameTemp
 #------------------------------------------------------------------------------
 # 　セーブデータに含まれない、一時的なデータを扱うクラスです。このクラスのイン
 # スタンスは $game_temp で参照されます。
 #==============================================================================
 
-class Game_Temp
+class GameTemp
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -143,7 +143,7 @@ class Game_Temp
   def add_mood_decrease(npc_id, new_value)
     @mood_npc ||= {}
     @mood_npc[npc_id] = new_value
-    DEBUG.write(c_m, "不機嫌度の記憶 NPCID:#{npc_id} 不機嫌度:#{new_value}")
+    Debug.write(c_m, "不機嫌度の記憶 NPCID:#{npc_id} 不機嫌度:#{new_value}")
   end
   #--------------------------------------------------------------------------
   # ● NPCの不機嫌度を徐々に減らす（1分毎に呼び出し）
@@ -153,7 +153,7 @@ class Game_Temp
       if @mood_npc[npc_id] != nil
         @mood_npc[npc_id] -= (rand(10) + 1)
         @mood_npc[npc_id] = 0 if @mood_npc[npc_id] < 0 # マイナス値の補正
-        DEBUG.write(c_m, "不機嫌度減少 NPCID:#{npc_id} 減少後:#{@mood_npc[npc_id]}")
+        Debug.write(c_m, "不機嫌度減少 NPCID:#{npc_id} 減少後:#{@mood_npc[npc_id]}")
       end
     end
   end
@@ -176,7 +176,7 @@ class Game_Temp
   #--------------------------------------------------------------------------
   def set_timer_bomb
     timer = rand(40) + rand(40) + 70
-    DEBUG.write(c_m, "可燃性ガス爆発検知 残り時間:#{timer}")
+    Debug.write(c_m, "可燃性ガス爆発検知 残り時間:#{timer}")
     @bomb = [$game_map.map_id, $game_player.x, $game_player.y, timer]
   end
 end

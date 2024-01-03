@@ -4,7 +4,7 @@
 #
 #==============================================================================
 
-class Window_INN_Fee < Window_Base
+class Window_INN_Fee < WindowBase
   attr_accessor :page
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -21,14 +21,14 @@ class Window_INN_Fee < Window_Base
     new_page %= 2 if new_page > 1
     @page = new_page
     @actor = actor
-    fee1 = Constant_Table::INN1_FEE
-    fee2 = Constant_Table::INN2_FEE
-    fee3 = Constant_Table::INN3_FEE
-    fee4 = Constant_Table::INN4_FEE
-    rec1 = Constant_Table::INN1_RECOVER
-    rec2 = Constant_Table::INN2_RECOVER
-    rec3 = Constant_Table::INN3_RECOVER
-    rec4 = Constant_Table::INN4_RECOVER
+    fee1 = ConstantTable::INN1_FEE
+    fee2 = ConstantTable::INN2_FEE
+    fee3 = ConstantTable::INN3_FEE
+    fee4 = ConstantTable::INN4_FEE
+    rec1 = ConstantTable::INN1_RECOVER
+    rec2 = ConstantTable::INN2_RECOVER
+    rec3 = ConstantTable::INN3_RECOVER
+    rec4 = ConstantTable::INN4_RECOVER
 
     self.contents.clear
     case @page

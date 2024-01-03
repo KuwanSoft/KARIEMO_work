@@ -4,7 +4,7 @@
 # ステータス画面の持ち物一覧
 #   店でのバッグ閲覧、キャンプでのバッグ閲覧
 #==============================================================================
-class Window_BagSelection < Window_Selectable
+class Window_BagSelection < WindowSelectable
   def initialize(scene, y)
     @scene = scene
     case scene
@@ -90,7 +90,7 @@ class Window_BagSelection < Window_Selectable
     kind = @data[index][0][0]
     id = @data[index][0][1]
     item_info = @data[index]
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     y_adj = 6
     ## スタック対象アイテム
     if item.stack > 0
@@ -109,7 +109,7 @@ class Window_BagSelection < Window_Selectable
     when "売る"
       sell = true
       ## お金の場合
-      if item_info[0] == Constant_Table::GOLD_ID
+      if item_info[0] == ConstantTable::GOLD_ID
         alpha = 128
         price = "**"
       ## 未鑑定品
@@ -143,7 +143,7 @@ class Window_BagSelection < Window_Selectable
     when "鑑定"
       sell = true
       ## お金の場合
-      if item_info[0] == Constant_Table::GOLD_ID
+      if item_info[0] == ConstantTable::GOLD_ID
         alpha = 128
         price = "**"
       elsif not item_info[1]
@@ -245,6 +245,6 @@ class Window_BagSelection < Window_Selectable
   def item_obj
     kind = @data[index][0][0]
     id = @data[index][0][1]
-    return MISC.item(kind, id)
+    return Misc.item(kind, id)
   end
 end

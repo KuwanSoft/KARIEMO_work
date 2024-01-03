@@ -4,7 +4,7 @@
 # みちよひらけの処理を行うクラスです。
 #==============================================================================
 
-class Scene_WARP < Scene_Base
+class Scene_WARP < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class Scene_WARP < Scene_Base
       else
         if $game_player.visit_place?(@depth, @x, @y)
           $game_player.reserve_transfer(@depth, @x, @y, $game_player.direction)
-          $scene = Scene_Map.new
+          $scene = SceneMap.new
           $music.se_play("呪文詠唱")
         else
           $popup.set_text("みとうたつです。")
@@ -81,7 +81,7 @@ class Scene_WARP < Scene_Base
       if $popup.visible == true
         $popup.visible = false
       else
-        $scene = Scene_Map.new
+        $scene = SceneMap.new
       end
     elsif Input.trigger?(Input::UP)
       $popup.visible = false

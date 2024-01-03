@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_PUB
+# ■ ScenePub
 #------------------------------------------------------------------------------
 # 酒場シーン
 #==============================================================================
 
-class Scene_PUB < Scene_Base
+class ScenePub < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -71,11 +71,11 @@ class Scene_PUB < Scene_Base
     @command_window.active = true
     @command_window.index = 0
     @locname = Window_LOCNAME.new
-    @locname.set_text(Constant_Table::NAME_PUB)
+    @locname.set_text(ConstantTable::NAME_PUB)
     @quest_window = Window_QuestBoard.new
     @map_list = Window_MapTrader_List.new
     @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/tavern4", "Pub")
+    @window_picture.create_picture("Graphics/System/tavern4", ConstantTable::NAME_PUB)
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新
@@ -212,10 +212,10 @@ class Scene_PUB < Scene_Base
           @command_window.index = 0
         end
       when 7 # 出る
-        $scene = Scene_Village.new
+        $scene = SceneVillage.new
       end
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
     end
   end
   #--------------------------------------------------------------------------

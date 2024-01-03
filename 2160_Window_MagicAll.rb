@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　呪文リスト
 #==============================================================================
-class Window_MagicAll < Window_Selectable
+class Window_MagicAll < WindowSelectable
   def initialize
     super(0, 0, 512, 448)
     @column_max = 3

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Game_Wandering
+# ■ GameWandering
 #------------------------------------------------------------------------------
 # 　各ワンダリングモンスターを定義
 #==============================================================================
 
-class Game_Wandering
+class GameWandering
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ class Game_Wandering
   # ● レポート
   #--------------------------------------------------------------------------
   def report_loc
-    DEBUG.write(c_m, "ID:#{wandering_id} X:#{@x} Y:#{@y}")
+    Debug.write(c_m, "ID:#{wandering_id} X:#{@x} Y:#{@y}")
   end
   #--------------------------------------------------------------------------
   # ● セットアップ
@@ -51,7 +51,7 @@ class Game_Wandering
       if $threedmap.block?(@x, @y)
         next
       else
-        DEBUG.write(c_m, "ワンダリングID:#{@id} 配置完了 x:#{@x} y:#{@y}")
+        Debug.write(c_m, "ワンダリングID:#{@id} 配置完了 x:#{@x} y:#{@y}")
         break
       end
     end
@@ -66,7 +66,7 @@ class Game_Wandering
     when 3; move_s
     when 4; move_w
     end
-#~     DEBUG.write(c_m, "ID:#{@id}")
+#~     Debug.write(c_m, "ID:#{@id}")
   end
   #--------------------------------------------------------------------------
   # ● 向きの変更
@@ -79,7 +79,7 @@ class Game_Wandering
     when 3; str = "南"
     when 4; str = "西"
     end
-#~     DEBUG.write(c_m, "ID:#{@id} 方向転換:#{str}")
+#~     Debug.write(c_m, "ID:#{@id} 方向転換:#{str}")
   end
   #--------------------------------------------------------------------------
   # ● ランダムに方向転換　現在と後ろを除く
@@ -95,7 +95,7 @@ class Game_Wandering
     array.delete(o)                       # 現在の真後ろの向きを削除
     array.delete(@direction)              # 現在の向きを削除
     direction = array[rand(array.size)]  # ランダムでピックアップ
-#~     DEBUG.write(c_m, "ID:#{@id}")
+#~     Debug.write(c_m, "ID:#{@id}")
   end
   #--------------------------------------------------------------------------
   # ● 目の前が壁？
@@ -152,7 +152,7 @@ class Game_Wandering
       when 8..9; turn_random_direction  # ランダムターン
       end
     end
-#~     DEBUG.write(c_m, "ID:#{@id} X:#{@x} Y:#{@y} DIRECTION:#{@direction}")
+#~     Debug.write(c_m, "ID:#{@id} X:#{@x} Y:#{@y} DIRECTION:#{@direction}")
   end
   #--------------------------------------------------------------------------
   # ● パーティが視認できる？
@@ -164,7 +164,7 @@ class Game_Wandering
     if @x == px
       ## 一定距離以上離れている
       distance = (@y - py).abs
-      return false unless distance < Constant_Table::SEE_LIMIT_DISTANCE
+      return false unless distance < ConstantTable::SEE_LIMIT_DISTANCE
       ## 群Y座標がプレイヤーより大きい（北にパーティ）
       if (@y - py) > 0
         for loc in 1..distance
@@ -186,7 +186,7 @@ class Game_Wandering
     elsif @y == py
       ## 一定距離以上離れている
       distance = (@x - px).abs
-      return false unless distance < Constant_Table::SEE_LIMIT_DISTANCE
+      return false unless distance < ConstantTable::SEE_LIMIT_DISTANCE
       ## 群X座標がプレイヤーより大きい（西にパーティ）
       if (@x - px) > 0
         for loc in 1..distance
@@ -252,6 +252,6 @@ class Game_Wandering
     ar = [-1,0,1]
     @x = px + ar[rand(3)]
     @y = py + ar[rand(3)]
-    DEBUG.write(c_m, "ID:#{@id} X:#{@x} Y:#{@y}")
+    Debug.write(c_m, "ID:#{@id} X:#{@x} Y:#{@y}")
   end
 end

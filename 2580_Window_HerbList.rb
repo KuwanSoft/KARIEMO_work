@@ -4,7 +4,7 @@
 # 　ハーブ選択画面
 #==============================================================================
 
-class Window_HerbList < Window_Selectable
+class Window_HerbList < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -52,7 +52,7 @@ class Window_HerbList < Window_Selectable
   def draw_item(index)
     kind = @data[index][0][0]
     id = @data[index][0][1]
-    item_data = MISC.item(kind, id)
+    item_data = Misc.item(kind, id)
     rect = item_rect(index)
     self.contents.clear_rect(rect)
     draw_item_name(rect.x, rect.y, item_data)

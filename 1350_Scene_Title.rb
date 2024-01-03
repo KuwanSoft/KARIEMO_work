@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Title
+# ■ SceneTitle
 #------------------------------------------------------------------------------
 # 　タイトル画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Title < Scene_Base
+class SceneTitle < SceneBase
   #--------------------------------------------------------------------------
   # ● メイン処理
   #--------------------------------------------------------------------------
@@ -109,7 +109,7 @@ class Scene_Title < Scene_Base
   def create_command_window(terminated = false)
     s1 = terminated ? "Continue" : "Start Game"
     s2 = "Option"
-    @command_window = Window_Command.new(180, [s1, s2])
+    @command_window = WindowCommand.new(180, [s1, s2])
     @command_window.x = (512-@command_window.width) / 2
     @command_window.y = WLH*20
     @command_window.opacity = 0
@@ -192,9 +192,9 @@ class Scene_Title < Scene_Base
       @graphic.oy = @graphic.bitmap.height / 2
       @graphic.x = 512 / 2
       @graphic.y = 448 / 2 + 40
-      DEBUG::write(c_m, "モンスターショー表示:#{name}")
+      Debug::write(c_m, "モンスターショー表示:#{name}")
     rescue Errno::ENOENT  # モンスター画像が見つからない場合
-      DEBUG::write(c_m, "モンスターショー表示失敗:#{name} => not found retry")
+      Debug::write(c_m, "モンスターショー表示失敗:#{name} => not found retry")
       retry
     end
   end
@@ -277,22 +277,22 @@ class Scene_Title < Scene_Base
       case @config_window.index
       ## モンスターミュージアム
       when 0;
-        $scene = Scene_MonsterLibrary.new
+        $scene = SceneMonsterLibrary.new
       ## バックアップデータのリセット
       when 3;
         @reset.visible = true
         @reset.active = true
-        MISC.write_vol_window           # INIファイルに書き込み
+        Misc.write_vol_window           # INIファイルに書き込み
         @config_window.visible = false
         @config_window.active = false
       when 4;
-        MISC.write_vol_window           # INIファイルに書き込み
+        Misc.write_vol_window           # INIファイルに書き込み
         @config_window.visible = false
         @config_window.active = false
         back_to_start
       end
     elsif Input.trigger?(Input::B)
-      MISC.write_vol_window             # INIファイルに書き込み
+      Misc.write_vol_window             # INIファイルに書き込み
       @config_window.visible = false
       @config_window.active = false
       back_to_start
@@ -320,7 +320,7 @@ class Scene_Title < Scene_Base
         @config_window.active = true
         @config_window.index = 0
       when 1;
-        case DEBUG::remove_save_data
+        case Debug::remove_save_data
         when 1
           $popup.set_text("さくじょかんりょう")
         when 0
@@ -337,7 +337,7 @@ class Scene_Title < Scene_Base
     ### original database ###
     # $data_actors        = load_data("Data/Actors.rvdata")
     $data_animations    = load_data("Data/Animations.rvdata")
-    $data_common_events = load_data("Data/CommonEvents.rvdata")
+    # $data_common_events = load_data("Data/CommonEvents.rvdata")
     $data_system        = load_data("Data/System.rvdata")
     $data_areas         = load_data("Data/Areas.rvdata")
     ### customized database ###
@@ -347,71 +347,69 @@ class Scene_Title < Scene_Base
     $data_armors        = load_data("Data/Armors2.rvdata")  # 追加
     $data_items         = load_data("Data/Items2.rvdata")   # 追加
     $data_skills        = load_data("Data/Skills2.rvdata")  # 追加
-    $data_npcs          = load_data("Data/NPC.rvdata")      # NPCリスト
+    $data_npcs          = load_data("Data/Npc.rvdata")      # NPCリスト
     $data_quests        = load_data("Data/Quests.rvdata")   # クエスト内容
     $data_drops         = load_data("Data/Drops.rvdata")    # 戦利品DB
     $data_talks         = load_data("Data/Talk.rvdata")     # NPC会話DB
-    $data_bbs           = load_data("Data/BBS.rvdata")      # 掲示板DB
+    $data_bbs           = load_data("Data/Bbs.rvdata")      # 掲示板DB
     $data_states        = load_data("Data/States2.rvdata")  # 追加
     $data_classes       = load_data("Data/Classes2.rvdata")
-
-    DEBUG.init_rcfile     # リセット管理用のファイルがなければ作成
 
     return unless $TEST
     ## 以下はテストのみでしか実行されない。
     ## 暗号化アーカイブでは動作できない
-    DEBUG.write(c_m, "Checking each database's created date:")
-    DEBUG::write(c_m, "Data/Monsters.rvdata: #{File.mtime("Data/Monsters.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Magics.rvdata:   #{File.mtime("Data/Magics.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Weapons2.rvdata: #{File.mtime("Data/Weapons2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Armors2.rvdata:  #{File.mtime("Data/Armors2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Items2.rvdata:   #{File.mtime("Data/Items2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Skills2.rvdata:  #{File.mtime("Data/Skills2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/NPC.rvdata:      #{File.mtime("Data/NPC.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Quests.rvdata:   #{File.mtime("Data/Quests.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Drops.rvdata:    #{File.mtime("Data/Drops.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "#{Constant_Table::MAIN_SCRIPT}:  #{File.mtime(Constant_Table::MAIN_SCRIPT).strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Talk.rvdata:     #{File.mtime("Data/Talk.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/BBS.rvdata:      #{File.mtime("Data/BBS.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/States2.rvdata:      #{File.mtime("Data/States2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
-    DEBUG::write(c_m, "Data/Classes2.rvdata:      #{File.mtime("Data/Classes2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug.write(c_m, "Checking each database's created date:")
+    Debug::write(c_m, "Data/Monsters.rvdata: #{File.mtime("Data/Monsters.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Magics.rvdata:   #{File.mtime("Data/Magics.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Weapons2.rvdata: #{File.mtime("Data/Weapons2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Armors2.rvdata:  #{File.mtime("Data/Armors2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Items2.rvdata:   #{File.mtime("Data/Items2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Skills2.rvdata:  #{File.mtime("Data/Skills2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/NPC.rvdata:      #{File.mtime("Data/Npc.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Quests.rvdata:   #{File.mtime("Data/Quests.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Drops.rvdata:    #{File.mtime("Data/Drops.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "#{ConstantTable::MAIN_SCRIPT}:  #{File.mtime(ConstantTable::MAIN_SCRIPT).strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Talk.rvdata:     #{File.mtime("Data/Talk.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/BBS.rvdata:      #{File.mtime("Data/Bbs.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/States2.rvdata:      #{File.mtime("Data/States2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
+    Debug::write(c_m, "Data/Classes2.rvdata:      #{File.mtime("Data/Classes2.rvdata").strftime("%y/%m/%d %H:%M:%S")}")
   end
   #--------------------------------------------------------------------------
   # ● 各種ゲームオブジェクトの作成
   #--------------------------------------------------------------------------
   def create_game_objects
-    $game_temp          = Game_Temp.new
-    $game_message       = Game_Message.new
-    $game_system        = Game_System.new
-    $game_switches      = Game_Switches.new
-    $game_variables     = Game_Variables.new
-    $game_self_switches = Game_SelfSwitches.new
-    $game_actors        = Game_Actors.new
-    $game_party         = Game_Party.new
-    $game_troop         = Game_Troop.new
-    $game_summon        = Game_Summon.new
-    $game_mercenary     = Game_Mercenary.new
-    $game_map           = Game_Map.new
-    $game_player        = Game_Player.new
-    $game_mapkits       = Game_Mapkits.new
-    $game_wandering     = Game_WanderingList.new
+    $game_temp          = GameTemp.new
+    $game_message       = GameMessage.new
+    $game_system        = GameSystem.new
+    $game_switches      = GameSwitches.new
+    $game_variables     = GameVariables.new
+    $game_self_switches = GameSelfSwitches.new
+    $game_actors        = GameActors.new
+    $game_party         = GameParty.new
+    $game_troop         = GameTroop.new
+    $game_summon        = GameSummon.new
+    $game_mercenary     = GameMercenary.new
+    $game_map           = GameMap.new
+    $game_player        = GamePlayer.new
+    $game_mapkits       = GameMapkits.new
+    $game_wandering     = GameWanderingList.new
     $threedmap          = ThreeDmap.new #modified
     # $event_swtich       = false # イベント起動のスイッチ
     $popup              = Window_POPUP.new
-    $music              = MUSIC.new
-    $game_quest         = Game_Quest.new
+    $music              = Music.new
+    $game_quest         = GameQuest.new
   end
   #--------------------------------------------------------------------------
   # ● コンティニュー有効判定
   #--------------------------------------------------------------------------
   def check_continue
-    return (Dir.glob(Constant_Table::FILE_NAME).size > 0)
+    return (Dir.glob(ConstantTable::FILE_NAME).size > 0)
   end
   #--------------------------------------------------------------------------
   # ● 中断ファイル有効判定
   #--------------------------------------------------------------------------
   def check_terminated
-    return (Dir.glob(Constant_Table::TERMINATED_FILE).size > 0)
+    return (Dir.glob(ConstantTable::TERMINATED_FILE).size > 0)
   end
   #--------------------------------------------------------------------------
   # ● モンスターグラフィックの解放
@@ -447,10 +445,10 @@ class Scene_Title < Scene_Base
       id = $game_system.terminated_party_id
       $game_system.load_party_location(id)
       $game_system.terminated_party_id = 0          # 中断パーティIDのリセット
-      File.delete(Constant_Table::TERMINATED_FILE)  # 一時ファイルの削除
+      File.delete(ConstantTable::TERMINATED_FILE)  # 一時ファイルの削除
     elsif check_continue                            # 通常のセーブファイル
       $game_party.reset_party                       # パーティのリセット
-      $scene = Scene_Village.new                    # 辺境の村へ
+      $scene = SceneVillage.new                    # 辺境の村へ
       RPG::BGM.fade(500)
       Graphics.fadeout(60)
       Graphics.wait(40)
@@ -458,7 +456,7 @@ class Scene_Title < Scene_Base
       $game_party.setup_starting_members            # 初期パーティ
       $game_map.setup($data_system.start_map_id)    # 初期位置のマップ
       $game_player.moveto($data_system.start_x, $data_system.start_y)
-      $scene = Scene_START.new # オープニングテロップ
+      $scene = SceneStart.new # オープニングテロップ
     end
   end
   #--------------------------------------------------------------------------
@@ -481,7 +479,7 @@ class Scene_Title < Scene_Base
   #     terminated: 中断データの場合
   #--------------------------------------------------------------------------
   def do_load(terminated = false)
-    SAVE::do_load(terminated)
+    Save::do_load(terminated)
     total_sec = Graphics.frame_count / Graphics.frame_rate
     get_play_time(total_sec)
   end
@@ -493,40 +491,41 @@ class Scene_Title < Scene_Base
     min = total_sec / 60 % 60
     sec = total_sec % 60
     @time_string = sprintf("%03d:%02d:%02d", hour, min, sec)
-    DEBUG::write(c_m,"TotalPlayTime[#{@time_string}]") # debug
+    Debug::write(c_m,"TotalPlayTime[#{@time_string}]") # debug
   end
   #--------------------------------------------------------------------------
   # ● バージョンの確認と修正
   #--------------------------------------------------------------------------
   def create_version
-    ## ゲームタイトルを書き換え
+    ## ゲームタイトルをiniへ書き込み
     str = $data_system.game_title
     IniFile.write("Game.ini", "Game", "Title", str) # INIファイル操作
-    DEBUG.write(c_m, "Game Title re-write in Game.ini :#{str}")
+    Debug.write(c_m, "Game Title re-write in Game.ini :#{str}")
     ## バージョンデータオブジェクトの取得
     # updateBuildIDXXXXXXXX.rvdataのファイルが存在すればそれが、新規のVersion_idとする。
     #-------------------------------------------------------------------------
-    @version = load_data("Data/Version.rvdata")
+    version_data = "Data/Version2.rvdata"
+    @version_hash = load_data(version_data)
     array = Dir.glob("updateBuildID*.rvdata")
     if array.size == 0
       ## build id 変更無し
-      DEBUG.write(c_m, "updateBuildID 無し=> UniqueID変更無し")
+      Debug.write(c_m, "updateBuildID 無し=> UniqueID変更無し")
       ## PUBLISH.batで起動
       ## version fileにMARKを入れるため
       if $BTEST and $TEST
-        DEBUG.write(c_m, "$BTEST+$TEST検知 => 公開Release")
+        Debug.write(c_m, "$BTEST+$TEST検知 => 公開Release")
         update_version_file(true)
       end
     elsif array.size == 1
       File.delete(array[0])
-      DEBUG.write(c_m, "updateBuildID File detected and deleted")
+      Debug.write(c_m, "updateBuildID File detected and deleted")
       ## build id 変更ルーチン
       new = array[0].scan(/updateBuildID(\d+).rvdata/)[0][0].to_i
-      @version.store_uniqueid(new)
-      DEBUG.write(c_m, "Version.rvdataのunique_id更新:#{new}")
+      @version_hash[:uniqueid] = new
+      Debug.write(c_m, "Version2.rvdataのunique_id更新:#{new}")
       ## 通常の開発
       if $TEST and not $BTEST
-        DEBUG.write(c_m, "$TEST検知")
+        Debug.write(c_m, "$TEST検知")
         update_version_file
       else
         ## update_buildファイルがありながら$TESTでない場合
@@ -546,7 +545,7 @@ class Scene_Title < Scene_Base
   #--------------------------------------------------------------------------
   def update_version_file(publish = false)
     ## 現在のメインバージョンをチェック
-    old_version = @version.ver
+    old_version = @version_hash[:ver]
     now_ver = $data_system.game_title.scan(/.*ver(\d+)\./)[0][0].to_i
     now_rel = $data_system.game_title.scan(/.*ver\d+\.(\d+)/)[0][0].to_i
     old_ver = old_version.to_s.scan(/(\d+)\./)[0][0].to_i
@@ -564,40 +563,40 @@ class Scene_Title < Scene_Base
       up = true
     else
       ## バージョンダウン検知
-      DEBUG.write(c_m, "VersionDown検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
+      Debug.write(c_m, "VersionDown検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
       raise VersionDown
     end
     ## バージョンorリリースアップ更新
     if up
-      DEBUG::write(c_m, "Version ID差異検知 updating ID")
-      DEBUG::write(c_m, "VersionUP検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
+      Debug::write(c_m, "Version ID差異検知 updating ID")
+      Debug::write(c_m, "VersionUP検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
       release_date = Time.now.strftime("%y%m%d")
       build = 1
-      @version.ver = "#{now_ver}.#{now_rel}"
-      @version.date = release_date
-      @version.build = build
+      @version_hash[:ver] = "#{now_ver}.#{now_rel}"
+      @version_hash[:date] = release_date
+      @version_hash[:build] = build
     ## 同じバージョン検知
     elsif up == false
-      DEBUG::write(c_m, "BUILD UP実行")
+      Debug::write(c_m, "BUILD UP実行")
       release_date = Time.now.strftime("%y%m%d")
-      build = @version.build + 1  # Increment
-      @version.ver = "#{now_ver}.#{now_rel}"
-      @version.date = release_date
-      @version.build = build
+      build = @version_hash[:build] + 1  # Increment
+      @version_hash[:ver] = "#{now_ver}.#{now_rel}"
+      @version_hash[:date] = release_date
+      @version_hash[:build] = build
     end
-    save_data(@version, "Data/Version.rvdata")
-    line_count = MISC.count_script_lines
+    save_data(@version_hash, "Data/Version2.rvdata")
+    line_count = Misc.count_script_lines
     ## Google Driveへversion_list.txtの更新を行う
-    DEBUG::write_version("#{now_ver}.#{now_rel}", release_date, build, line_count, publish, @version.read_uniqueid)
+    Debug::write_version("#{now_ver}.#{now_rel}", release_date, build, line_count, publish, @version_hash[:uniqueid])
   end
   #--------------------------------------------------------------------------
   # ● ユニークIDの書き出し
   #--------------------------------------------------------------------------
   def write_uniqueid
-    str = "UNIQUE ID:" + @version.read_uniqueid.to_s
-    DEBUG::write(c_m, "---------------------------------")
-    DEBUG::write(c_m, str)
-    DEBUG::write(c_m, "---------------------------------")
+    str = "UNIQUE ID:" + @version_hash[:uniqueid].to_s
+    Debug::write(c_m, "---------------------------------")
+    Debug::write(c_m, str)
+    Debug::write(c_m, "---------------------------------")
   end
   #--------------------------------------------------------------------------
   # ● CALLされないクラスを抽出する
@@ -636,7 +635,7 @@ class Scene_Title < Scene_Base
     ObjectSpace.each_object(Class) do |klass|
       if klass.method_defined?(:check_candidate?)
         setup_debugging(klass)
-        DEBUG.apend_definedklass(klass.name)        # 定義済みClassのストア
+        Debug.apend_definedklass(klass.name)        # 定義済みClassのストア
       end
     end
     $CLDDONE = true

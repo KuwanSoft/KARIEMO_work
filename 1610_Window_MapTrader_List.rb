@@ -4,7 +4,7 @@
 # クエストボード
 #==============================================================================
 
-class Window_MapTrader_List < Window_Selectable
+class Window_MapTrader_List < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class Window_MapTrader_List < Window_Selectable
     @data = []
     for member in $game_party.existing_members
       for item in member.bag
-        item_data = MISC.item(item[0][0], item[0][1])
+        item_data = Misc.item(item[0][0], item[0][1])
         if item_data.mapkit?
           ## 古いマップデータの場合は変換
           $game_mapkits[item_data.id].merge_old_maptype
@@ -58,7 +58,7 @@ class Window_MapTrader_List < Window_Selectable
   #--------------------------------------------------------------------------
   def draw_item(index)
     rect = item_rect(index)
-    item_data = MISC.item(@data[index][0][0][0], @data[index][0][0][1])
+    item_data = Misc.item(@data[index][0][0][0], @data[index][0][0][1])
     member = @data[index][1]
     price = $game_mapkits[@data[index][0][0][1]].calc_value
     equip = @data[index][0][2] > 0 ? true : false
@@ -85,7 +85,7 @@ class Window_MapTrader_List < Window_Selectable
     for index in 0...member.bag.size
       if @data[self.index][0] == member.bag[index]
         member.bag[index] = nil
-        DEBUG.write(c_m, "マップキットを削除:#{map_id}")
+        Debug.write(c_m, "マップキットを削除:#{map_id}")
         break
       end
     end

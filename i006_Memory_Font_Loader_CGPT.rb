@@ -38,7 +38,7 @@ class Font
 
   def self.remove_resource(f)
     i = 0
-    while i < Constant_Table::TIMEOUT_POSTPROCESS
+    while i < ConstantTable::TIMEOUT_POSTPROCESS
       rc = RemoveFontResource.call(f)
       break if rc > 0
       i += 1

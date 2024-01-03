@@ -1,4 +1,4 @@
-class Window_Memo < Window_Selectable
+class Window_Memo < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -31,7 +31,7 @@ class Window_Memo < Window_Selectable
   # ● 表示するNPC INDEXの増減
   #--------------------------------------------------------------------------
   def npc_change(num)
-    @npc_index = (@npc_index + num) % Constant_Table::NPC_NUM
+    @npc_index = (@npc_index + num) % ConstantTable::NPC_NUM
     drawing
   end
   #--------------------------------------------------------------------------

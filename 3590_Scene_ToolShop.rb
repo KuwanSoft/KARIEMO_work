@@ -4,7 +4,7 @@
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_ToolShop < Scene_Base
+class Scene_ToolShop < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -54,11 +54,11 @@ class Scene_ToolShop < Scene_Base
   # ● token数の逆数でoddsを出す
   #--------------------------------------------------------------------------
   def make_weighted_items
-    total_odds = @inventory.inject(0.0) { |sum, item| sum + (1.0 / MISC.item(item[0], item[1]).token) }
-    DEBUG.write(c_m, "Total Odds:#{total_odds}")
+    total_odds = @inventory.inject(0.0) { |sum, item| sum + (1.0 / Misc.item(item[0], item[1]).token) }
+    Debug.write(c_m, "Total Odds:#{total_odds}")
     @weighted_items = @inventory.map do |item|
-      probability = (1.0 / MISC.item(item[0], item[1]).token) / total_odds
-      DEBUG.write(c_m, "ITEM:#{MISC.item(item[0], item[1]).name} Probability:#{probability}")
+      probability = (1.0 / Misc.item(item[0], item[1]).token) / total_odds
+      Debug.write(c_m, "ITEM:#{Misc.item(item[0], item[1]).name} Probability:#{probability}")
       [item, probability]
     end
   end
@@ -123,11 +123,11 @@ class Scene_ToolShop < Scene_Base
         $game_party.gain_item(item, true)
         $game_party.combine_token
         @window_shop.refresh
-        @attention_window.set_text("#{MISC.item(item[0], item[1]).name} があたった!")
+        @attention_window.set_text("#{Misc.item(item[0], item[1]).name} があたった!")
         wait_for_attention
       end
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
 end

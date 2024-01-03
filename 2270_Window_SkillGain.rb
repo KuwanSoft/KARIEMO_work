@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　スキル上昇の表示を行うクラスです。
 #==============================================================================
-class Window_SkillGain < Window_Base
+class Window_SkillGain < WindowBase
   #--------------------------------------------------------------------------
   # ● 初期化処理
   #--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class Window_SkillGain < Window_Base
     super
     return if $game_message.busy
     @timer += 1
-    return unless @timer > Constant_Table::SKILLGTIMER
+    return unless @timer > ConstantTable::SKILLGTIMER
     @timer = 0
     ## 移動
     @y1 -= 1

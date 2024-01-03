@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_NameEdit
+# ■ WindowNameEdit
 #------------------------------------------------------------------------------
 # 　名前入力画面で、名前を編集するウィンドウです。
 #==============================================================================
 
-class Window_NameEdit < Window_Base
+class WindowNameEdit < WindowBase
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -20,14 +20,14 @@ class Window_NameEdit < Window_Base
     super((512-(WLW*10+32))/2, 120, WLW*10+32, WLH+32)
     @actor = actor
     @name = ""
-    max_char = Constant_Table::MAX_CHAR if max_char == 0
+    max_char = ConstantTable::MAX_CHAR if max_char == 0
     @max_char = max_char
     name_array = @name.split(//)[0...@max_char]   # 最大文字数に収める
     @name = "亜"
     for i in 0...name_array.size
       @name += name_array[i]
     end
-    @default_name = Constant_Table::NO_NAME # デフォルトの名前
+    @default_name = ConstantTable::NO_NAME # デフォルトの名前
     @index = name_array.size
     self.active = false
     refresh

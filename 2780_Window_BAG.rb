@@ -4,7 +4,7 @@
 # バッグの中身をアイコンで描画
 #==============================================================================
 
-class Window_BAG < Window_Selectable
+class Window_BAG < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -86,7 +86,7 @@ class Window_BAG < Window_Selectable
     @t_idx_compose = self.index
     ## 合成可能なアイテムのIDを取得
     @r1 = @r2 = 0
-    @r1,@r2 = RECIPE.check_recipe(MISC.item(@temp_compose[0][0],@temp_compose[0][1]).id)
+    @r1,@r2 = RECIPE.check_recipe(Misc.item(@temp_compose[0][0],@temp_compose[0][1]).id)
     return true
   end
   #--------------------------------------------------------------------------
@@ -101,8 +101,8 @@ class Window_BAG < Window_Selectable
     return 0 if @t_idx_compose == nil
     return 0 if @t_idx_compose == self.index
     i = @data3[self.index]
-    item_s = MISC.item(@temp_compose[0][0], @temp_compose[0][1])
-    item_t = MISC.item(i[0][0], i[0][1])
+    item_s = Misc.item(@temp_compose[0][0], @temp_compose[0][1])
+    item_t = Misc.item(i[0][0], i[0][1])
     item_id = 0
     if item_s.m1_id != 0 and item_t.m2_id != 0
       if item_s.m1_id == item_t.m2_id
@@ -116,15 +116,15 @@ class Window_BAG < Window_Selectable
     end
     if item_id != 0
       ## 合成可能ペア検知
-      @rank = MISC.item(0, item_id).rank
-      skill = MISC.skill_value(SKILLID::HERB ,actor)
+      @rank = Misc.item(0, item_id).rank
+      skill = Misc.skill_value(SkillId::HERB ,actor)
       ## 成功判定
       if skill > rand(@rank * 20)
         @result = true
-        DEBUG.write(c_m, "合成成功(Rank:#{@rank}/#{skill}) 1:#{item_s.name} 2:#{item_t.name}")
+        Debug.write(c_m, "合成成功(Rank:#{@rank}/#{skill}) 1:#{item_s.name} 2:#{item_t.name}")
       else
         @result = false
-        DEBUG.write(c_m, "合成失敗(Rank:#{@rank}/#{skill}) 1:#{item_s.name} 2:#{item_t.name}")
+        Debug.write(c_m, "合成失敗(Rank:#{@rank}/#{skill}) 1:#{item_s.name} 2:#{item_t.name}")
       end
       ## 結果表示用
       @item_s = item_s
@@ -134,7 +134,7 @@ class Window_BAG < Window_Selectable
       num_t = i[4]              # 個数を取得
       num = [num_s, num_t].min  # 少ない方の数を取得
       @num = num
-      DEBUG.write(c_m, "num_s:#{num_s} num_t:#{num_t} num:#{num}")
+      Debug.write(c_m, "num_s:#{num_s} num_t:#{num_t} num:#{num}")
       if num_s > num_t
         ## S側が多いのでT側を0に
         @data3[self.index][4] = 0
@@ -182,21 +182,21 @@ class Window_BAG < Window_Selectable
 
     case @result
     when true
-      item = MISC.item(0, @item_id)
+      item = Misc.item(0, @item_id)
       draw_item_icon(0, BLH*5, item)
       self.contents.draw_text(CUR*2, BLH*5, self.width-32, BLH, "#{item.name}")
       self.contents.draw_text(0, BLH*5, self.width-32, BLH, "x#{@num}" , 2)
     when false
       @rank = 1 # 失敗作なので
-      item = MISC.item(0, 32) # 失敗作
+      item = Misc.item(0, 32) # 失敗作
       draw_item_icon(0, BLH*5, item)
       self.contents.draw_text(CUR*2, BLH*5, self.width-32, BLH, "#{item.name}")
       self.contents.draw_text(0, BLH*5, self.width-32, BLH, "x#{@num}" , 2)
     end
     ## 薬草学スキル上昇ルーチン
-    DEBUG.write(c_m, "RANK:#{@rank} NUMBER:#{@num} 薬草学スキル上昇判定開始")
+    Debug.write(c_m, "RANK:#{@rank} NUMBER:#{@num} 薬草学スキル上昇判定開始")
     (@rank * @num).times do
-      @actor.chance_skill_increase(SKILLID::HERB)
+      @actor.chance_skill_increase(SkillId::HERB)
     end
     change_font_to_normal
   end
@@ -231,8 +231,8 @@ class Window_BAG < Window_Selectable
     when 2;i = @data2[self.index]
     when 3;i = @data3[self.index]
     end
-    item_s = MISC.item(@temp[0][0], @temp[0][1])
-    item_t = MISC.item(i[0][0], i[0][1])
+    item_s = Misc.item(@temp[0][0], @temp[0][1])
+    item_t = Misc.item(i[0][0], i[0][1])
     ## 選択済みと選択中のアイテムが同一？
     if item_s.equal? item_t
       ## 同種のアイテム選択の場合はスタック数のまとめ
@@ -241,11 +241,11 @@ class Window_BAG < Window_Selectable
         num_t = i[4]
         sum = num_s + num_t
         case @temp[0][0]
-        when 0; limit = Constant_Table::POTION_STACK
-        when 1; limit = Constant_Table::ARROW_STACK
-        when 3; limit = Constant_Table::DROP_STACK
+        when 0; limit = ConstantTable::POTION_STACK
+        when 1; limit = ConstantTable::ARROW_STACK
+        when 3; limit = ConstantTable::DROP_STACK
         end
-        limit = Constant_Table::GARBAGE_STACK if item_s.garbage?
+        limit = ConstantTable::GARBAGE_STACK if item_s.garbage?
         if sum <= limit
           t_sum = sum; s_sum = 0
         else
@@ -296,10 +296,10 @@ class Window_BAG < Window_Selectable
     ## バックの結合
     ## ゴールドの受け渡しをした時ように統合も入れておく
     source_actor.bag = @data1 + @data2 + @data3
-    source_actor.bag.push([Constant_Table::GOLD_ID, true, 0, false, 0, {}])
+    source_actor.bag.push([ConstantTable::GOLD_ID, true, 0, false, 0, {}])
     source_actor.combine_gold # ゴールドの統合
     ## 相手に渡す
-    DEBUG.write(c_m, "#{i}を#{target_actor.name}に渡す。")
+    Debug.write(c_m, "#{i}を#{target_actor.name}に渡す。")
     target_actor.bag.push(i)
     target_actor.combine_gold # ゴールドの統合
   end
@@ -315,7 +315,7 @@ class Window_BAG < Window_Selectable
     when 3
       i = @data3[self.index]
     end
-    item_data = MISC.item(i[0][0], i[0][1])
+    item_data = Misc.item(i[0][0], i[0][1])
     return unless item_data.stackable?
     return if i[1] == false # 未鑑定品は分割不可
     return if i[2] > 0      # 装備中は不可
@@ -374,7 +374,7 @@ class Window_BAG < Window_Selectable
     item_info = @data[index]
     kind = item_info[0][0]
     id = item_info[0][1]
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     eq = @actor.equippable?(item)
     if @t_idx != nil
       self.contents.font.color = air_color if @t_idx == index

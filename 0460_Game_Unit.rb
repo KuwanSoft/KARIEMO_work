@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Unit
+# ■ GameUnit
 #------------------------------------------------------------------------------
-# 　ユニットを扱うクラスです。このクラスは Game_Party クラスと Game_Troop クラ
+# 　ユニットを扱うクラスです。このクラスは GameParty クラスと GameTroop クラ
 # スのスーパークラスとして使用されます。
 #==============================================================================
 
-class Game_Unit
+class GameUnit
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -79,16 +79,16 @@ class Game_Unit
     target_candidates = []
     target_candidates += existing_members
     ## 対象がパーティで攻撃者がモンスターであり召喚獣で無く、ガイドでも無い--------
-    if self.is_a?(Game_Party) and !(battler.actor?) and !(battler.summon?) and !(battler.mercenary?)
+    if self.is_a?(GameParty) and !(battler.actor?) and !(battler.summon?) and !(battler.mercenary?)
       ## 攻撃対象にガイドを加える
       unless $game_mercenary.all_dead?
         target_candidates += $game_mercenary.existing_members
-        DEBUG.write(c_m, "被攻撃対象にガイドを加える #{$game_mercenary.existing_members}")
+        Debug.write(c_m, "被攻撃対象にガイドを加える #{$game_mercenary.existing_members}")
       end
       ## 攻撃対象に召喚獣を加える
       unless $game_summon.all_dead?
         target_candidates += $game_summon.existing_members
-        DEBUG.write(c_m, "被攻撃対象に召喚獣を加える #{$game_summon.existing_members}")
+        Debug.write(c_m, "被攻撃対象に召喚獣を加える #{$game_summon.existing_members}")
       end
     end
     ##-----------------------------------------------------------------------
@@ -102,7 +102,7 @@ class Game_Unit
       index += 1
     end
     result = roulette.size > 0 ? roulette[rand(roulette.size)] : nil
-    DEBUG.write(c_m, "ターゲット決定=>#{result.name}") if result != nil
+    Debug.write(c_m, "ターゲット決定=>#{result.name}") if result != nil
     return result
   end
   #--------------------------------------------------------------------------
@@ -120,14 +120,14 @@ class Game_Unit
   #     index : インデックス
   #--------------------------------------------------------------------------
   def smooth_target(index)
-    DEBUG.write(c_m, "index: #{index}")
+    Debug.write(c_m, "index: #{index}")
     case index
     ## ガイド対象攻撃
-    when Constant_Table::GUIDE_INDEX
-      member = $game_mercenary.members[index - Constant_Table::GUIDE_INDEX]
+    when ConstantTable::GUIDE_INDEX
+      member = $game_mercenary.members[index - ConstantTable::GUIDE_INDEX]
     ## 召喚獣対象攻撃
-    when Constant_Table::SUMMON_INDEX_START..Constant_Table::SUMMON_INDEX_END
-      member = $game_summon.members[index - Constant_Table::SUMMON_INDEX_START]
+    when ConstantTable::SUMMON_INDEX_START..ConstantTable::SUMMON_INDEX_END
+      member = $game_summon.members[index - ConstantTable::SUMMON_INDEX_START]
     ## パーティまたは敵パーティ対象攻撃
     else
       member = members[index]
@@ -138,14 +138,14 @@ class Game_Unit
     return existing_members[0] if member.actor?       # 敵の攻撃の場合はParty先頭キャラ
 
     ## 敵への攻撃の場合
-    if self.is_a?(Game_Troop)
+    if self.is_a?(GameTroop)
       while true
-        DEBUG::write(c_m,"Target smoothing!!")
+        Debug::write(c_m,"Target smoothing!!")
         adj_index += 1
         member = members[adj_index]
         adj_index = -1 if member == nil # memberが最後まできたらindexを先頭へ戻す
         if member != nil and member.exist?
-          DEBUG::write(c_m,"-> NextTarget:#{member.name}")
+          Debug::write(c_m,"-> NextTarget:#{member.name}")
           return member
         end
       end

@@ -4,7 +4,7 @@
 # クエストボード
 #==============================================================================
 
-class Window_QuestBoard_b < Window_Base
+class Window_QuestBoard_b < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class Window_QuestBoard_b < Window_Base
     self.contents.clear
     self.contents.draw_text(0, 0, self.width-32, BLH, "しゅるい:")
     self.contents.draw_text(0, 32*1, self.width-32, BLH, "ほうしゅう:")
-    DEBUG.write(c_m, "quest_data: #{quest_data}")
+    Debug.write(c_m, "quest_data: #{quest_data}")
     case quest_data.type.to_s
     when "collect";   str = "さいしゅう"
     when "delivery";  str = "ごうせい と のうひん"
@@ -32,27 +32,27 @@ class Window_QuestBoard_b < Window_Base
     ## 報酬の描画
     y_adj = 6
     if quest_data.reward_gp > 0
-      kind = Constant_Table::GOLD_ID[0]
-      id = Constant_Table::GOLD_ID[1]
-      draw_item_name(WLW*7, 32*1, MISC.item(kind, id))
+      kind = ConstantTable::GOLD_ID[0]
+      id = ConstantTable::GOLD_ID[1]
+      draw_item_name(WLW*7, 32*1, Misc.item(kind, id))
       change_font_to_v
       self.contents.draw_text(WLW*14, 32*1+y_adj, self.width-(32+WLW*7), BLH, "#{quest_data.reward_gp}")
     elsif quest_data.reward_exp_tr > 0
-      kind = Constant_Table::EXP_ID[0]
-      id = Constant_Table::EXP_ID[1]
-      draw_item_name(WLW*7, 32*1, MISC.item(kind, id))
+      kind = ConstantTable::EXP_ID[0]
+      id = ConstantTable::EXP_ID[1]
+      draw_item_name(WLW*7, 32*1, Misc.item(kind, id))
       change_font_to_v
       self.contents.draw_text(WLW*15, 32*1+y_adj, self.width-(32+WLW*7), BLH, "MonsterLV:#{quest_data.reward_exp_tr}")
     elsif quest_data.reward_item_id > 0
       kind = quest_data.reward_item_kind
       id = quest_data.reward_item_id
-      draw_item_name(WLW*7, 32*1, MISC.item(kind, id))
+      draw_item_name(WLW*7, 32*1, Misc.item(kind, id))
       change_font_to_v
     end
 
     ## 詳細
     string1 = string2 = string3 = ""
-    io = MISC.item(quest_data.r_item_kind, quest_data.r_item_id)
+    io = Misc.item(quest_data.r_item_kind, quest_data.r_item_id)
     item_name = io.name
     qty = quest_data.qty
     case quest_data.type

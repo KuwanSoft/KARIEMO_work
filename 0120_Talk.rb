@@ -10,7 +10,7 @@
 #     id = specific_id != 0 ? (specific_id-1) : id
 #     message = $data_bbs[id]
 #     total_mes = ""
-#     DEBUG.write(c_m, "選択されたメッセージID: #{id}")
+#     Debug.write(c_m, "選択されたメッセージID: #{id}")
 #     for mes in message
 #       $game_message.texts.push(mes)
 #       total_mes += mes

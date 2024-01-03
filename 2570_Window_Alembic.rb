@@ -4,7 +4,7 @@
 # 　錬金術の画面
 #==============================================================================
 
-class Window_Alembic < Window_Selectable
+class Window_Alembic < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -46,8 +46,8 @@ class Window_Alembic < Window_Selectable
     @actor = actor unless actor == nil
     self.contents.clear
     draw_back
-    h1 = MISC.item(3, herb1)
-    h2 = MISC.item(3, herb2)
+    h1 = Misc.item(3, herb1)
+    h2 = Misc.item(3, herb2)
     bitmap1_1 = h1.get_planets[0]
     bitmap1_2 = h1.get_planets[1]
     draw_item_name(0,0, h1)
@@ -61,6 +61,6 @@ class Window_Alembic < Window_Selectable
     self.contents.blt(WLW*10, 32, bitmap2_1, Rect.new(0,0,32,32))
     self.contents.blt(WLW*10+32, 32, bitmap2_2, Rect.new(0,0,32,32))
 
-    draw_item_name(40,32*2, MISC.item(0, 1), false, [nil,false,0,false])
+    draw_item_name(40,32*2, Misc.item(0, 1), false, [nil,false,0,false])
   end
 end

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Fountain
+# ■ SceneFountain
 #------------------------------------------------------------------------------
 # 泉イベントの処理
 #==============================================================================
 
-class Scene_Fountain < Scene_Base
+class SceneFountain < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -32,8 +32,8 @@ class Scene_Fountain < Scene_Base
   def set_depth
     case @fountain_id
     when 1;   @depth = 2  # B1F 最初の泉
-    when 2;   @depth = 2  # B2F
-    when 3;   @depth = 2  # B3F 温泉
+    when 2;   @depth = 2  # B2F 2階の泉
+    when 3;   @depth = 3  # B3F 温泉
     when 4;   @depth = 3  # B3F すえた臭いの泉
     when 5;   @depth = 3  # B3F 深緑の泉
     when 6;   @depth = 5  # B4F 赤泡
@@ -63,7 +63,7 @@ class Scene_Fountain < Scene_Base
   def start
     super
     create_menu_background
-    @top_window = Window_Base.new(2, 2, 512-4, Window_Base::BLH*4+32-4)
+    @top_window = WindowBase.new(2, 2, 512-4, WindowBase::BLH*4+32-4)
     @ps = Window_PartyStatus.new
     @fountain_window = Window_Fountain.new
     @depth_window = Window_Depth.new(@depth)
@@ -75,7 +75,7 @@ class Scene_Fountain < Scene_Base
     @ps.turn_on
     @ps.active = true
     @ps.index = 0
-    @ps.start_skill_view(SKILLID::SWIM)
+    @ps.start_skill_view(SkillId::SWIM)
   end
   #--------------------------------------------------------------------------
   # ● 最初のメッセージをセット
@@ -90,7 +90,7 @@ class Scene_Fountain < Scene_Base
     when 2  # B2F
       array.push("めのまえには しずかに みずをたたえる")
       array.push("いずみが わいている。")
-      array.push("みずは むしょくで かすかに なみうっている。")
+      array.push("みずは すきとおり しずまりかえっている。")
     when 3  # B3F
       array.push("めのまえには しずかに みずをたたえる")
       array.push("いずみが わいている。")
@@ -121,8 +121,8 @@ class Scene_Fountain < Scene_Base
     when 9  # B6F
       array.push("めのまえには しずかに みずをたたえる")
       array.push("いずみが わいている。")
-      array.push("しかし みずは ねずみいろで おくは みることが")
-      array.push("できない。")
+      array.push("しかし みずは ねずみいろで にごっており")
+      array.push("おくは みることが できない。")
     when 10 # B7F
       array.push("めのまえには しずかに みずをたたえる")
       array.push("いずみが わいている。")
@@ -132,7 +132,7 @@ class Scene_Fountain < Scene_Base
     index = 0
     @top_window.create_contents
     for mes in array
-      @top_window.contents.draw_text(0, Window_Base::BLH*index, @top_window.width-32, Window_Base::BLH, mes, 1)
+      @top_window.contents.draw_text(0, WindowBase::BLH*index, @top_window.width-32, WindowBase::BLH, mes, 1)
       index += 1
     end
   end
@@ -177,7 +177,7 @@ class Scene_Fountain < Scene_Base
       @depth_window.visible = true
       @ps.active = false
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
   #--------------------------------------------------------------------------
@@ -192,29 +192,29 @@ class Scene_Fountain < Scene_Base
     @back_s.set_text(text1, text2, 0, 2)
     @ps.turn_on
     @ps.active = true
-    @ps.start_skill_view(SKILLID::SWIM)
+    @ps.start_skill_view(SkillId::SWIM)
   end
   #--------------------------------------------------------------------------
   # ● 何かをみつける(Positive)
   #--------------------------------------------------------------------------
   def detect_something(difficulty)
     case difficulty
-    when 5;   diff = Constant_Table::DIFF_05[@current_d]
-    when 15;  diff = Constant_Table::DIFF_15[@current_d]
-    when 25;  diff = Constant_Table::DIFF_25[@current_d]
-    when 35;  diff = Constant_Table::DIFF_35[@current_d]
-    when 45;  diff = Constant_Table::DIFF_45[@current_d]
-    when 55;  diff = Constant_Table::DIFF_55[@current_d]
-    when 65;  diff = Constant_Table::DIFF_65[@current_d]
-    when 75;  diff = Constant_Table::DIFF_75[@current_d]
-    when 85;  diff = Constant_Table::DIFF_85[@current_d]
-    when 95;  diff = Constant_Table::DIFF_95[@current_d]
+    when 5;   diff = ConstantTable::DIFF_05[@current_d]
+    when 15;  diff = ConstantTable::DIFF_15[@current_d]
+    when 25;  diff = ConstantTable::DIFF_25[@current_d]
+    when 35;  diff = ConstantTable::DIFF_35[@current_d]
+    when 45;  diff = ConstantTable::DIFF_45[@current_d]
+    when 55;  diff = ConstantTable::DIFF_55[@current_d]
+    when 65;  diff = ConstantTable::DIFF_65[@current_d]
+    when 75;  diff = ConstantTable::DIFF_75[@current_d]
+    when 85;  diff = ConstantTable::DIFF_85[@current_d]
+    when 95;  diff = ConstantTable::DIFF_95[@current_d]
     end
-    sv = MISC.skill_value(SKILLID::EYE, @ps.actor)
+    sv = Misc.skill_value(SkillId::EYE, @ps.actor)
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     if ratio > rand(100)
-      @ps.actor.chance_skill_increase(SKILLID::EYE)
+      @ps.actor.chance_skill_increase(SkillId::EYE)
       return true
     end
     return false
@@ -224,22 +224,22 @@ class Scene_Fountain < Scene_Base
   #--------------------------------------------------------------------------
   def avoid_badthing(rate)
     case rate
-    when 5;   diff = Constant_Table::DIFF_05[@current_d]
-    when 15;  diff = Constant_Table::DIFF_15[@current_d]
-    when 25;  diff = Constant_Table::DIFF_25[@current_d]
-    when 35;  diff = Constant_Table::DIFF_35[@current_d]
-    when 45;  diff = Constant_Table::DIFF_45[@current_d]
-    when 55;  diff = Constant_Table::DIFF_55[@current_d]
-    when 65;  diff = Constant_Table::DIFF_65[@current_d]
-    when 75;  diff = Constant_Table::DIFF_75[@current_d]
-    when 85;  diff = Constant_Table::DIFF_85[@current_d]
-    when 95;  diff = Constant_Table::DIFF_95[@current_d]
+    when 5;   diff = ConstantTable::DIFF_05[@current_d]
+    when 15;  diff = ConstantTable::DIFF_15[@current_d]
+    when 25;  diff = ConstantTable::DIFF_25[@current_d]
+    when 35;  diff = ConstantTable::DIFF_35[@current_d]
+    when 45;  diff = ConstantTable::DIFF_45[@current_d]
+    when 55;  diff = ConstantTable::DIFF_55[@current_d]
+    when 65;  diff = ConstantTable::DIFF_65[@current_d]
+    when 75;  diff = ConstantTable::DIFF_75[@current_d]
+    when 85;  diff = ConstantTable::DIFF_85[@current_d]
+    when 95;  diff = ConstantTable::DIFF_95[@current_d]
     end
-    sv = MISC.skill_value(SKILLID::FOURLEAVES, @ps.actor)
+    sv = Misc.skill_value(SkillId::FOURLEAVES, @ps.actor)
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @ps.actor.tired?
     if ratio > rand(100)
-      @ps.actor.chance_skill_increase(SKILLID::FOURLEAVES)
+      @ps.actor.chance_skill_increase(SkillId::FOURLEAVES)
       return true
     end
     return false
@@ -266,7 +266,7 @@ class Scene_Fountain < Scene_Base
           break
         end
         @ps.actor.tired_swimming                        # 疲労
-        DEBUG.write(c_m, "現在の深さ: #{@current_d}")
+        Debug.write(c_m, "現在の深さ: #{@current_d}")
         @fountain_window.set_text("#{@ps.actor.name} は ふかさ#{@current_d}にもぐった")
         wait_for_fountain
         case @fountain_id
@@ -287,7 +287,7 @@ class Scene_Fountain < Scene_Base
             end
             recoverhp(10) if detect_something(75)
           when 2
-            addstate(STATEID::POISON) if 8 > rand(100)
+            addstate(StateId::POISON) if 8 > rand(100)
             finditem([0, 70]) if detect_something(25)         ## 銅の鍵
           end
         ## MP回復の泉-------------------------------------------------------------
@@ -302,7 +302,7 @@ class Scene_Fountain < Scene_Base
           when 1
             recovermp if detect_something(35)
             recoverhp(100) if detect_something(75)
-            addstate(STATEID::SICKNESS) if 4 > rand(100)
+            addstate(StateId::SICKNESS) if 4 > rand(100)
           when 2
             getmoney(100) if detect_something(15)
             aged if 1 > rand(100)
@@ -310,13 +310,18 @@ class Scene_Fountain < Scene_Base
           end
         ## B3F 温泉-------------------------------------------------------------------
         when 3;
-          # 95%  疲労回復 -25%
+          # 95%  疲労回復
           # 1%  老化
           case @current_d
           when 1
+            recoverfatigue(2) if 95 > rand(100)
             aged if 1 > rand(100)
           when 2
-            recoverfatigue if 95 > rand(100)
+            recoverfatigue(5) if 95 > rand(100)
+            aged if 1 > rand(100)
+          when 3
+            recoverfatigue(15) if 95 > rand(100)
+            aged if 1 > rand(100)
           end
         ## B3F 黄土色すえたにおいの泉-------------------------------------------------------
         when 4;
@@ -330,7 +335,7 @@ class Scene_Fountain < Scene_Base
             damagehp(30) if 25 > rand(100)
             aged if 1 > rand(100)
           when 2
-            addstate(STATEID::SICKNESS) if 1 > rand(100)
+            addstate(StateId::SICKNESS) if 1 > rand(100)
           when 3
             getitem([2, 47]) if detect_something(5)
             getitem([2, 40]) if detect_something(5)
@@ -347,7 +352,7 @@ class Scene_Fountain < Scene_Base
           case @current_d
           when 1
             damagehp(10) if 5 > rand(100)
-            addstate(STATEID::POISON) if 2 > rand(100)
+            addstate(StateId::POISON) if 2 > rand(100)
           when 2
             recovermp if detect_something(5)
             getmoney(1000) if detect_something(5)
@@ -361,7 +366,7 @@ class Scene_Fountain < Scene_Base
           case @current_d
           when 1,2,3,4
             damagehp(15) if 5 > rand(100)
-            addstate(STATEID::SICKNESS) if 1 > rand(100)
+            addstate(StateId::SICKNESS) if 1 > rand(100)
           when 5
             finditem([0, 76]) if detect_something(5)         ## 書庫の鍵
             encounter(77) if 25 > rand(100)
@@ -371,12 +376,14 @@ class Scene_Fountain < Scene_Base
           case @current_d
           when 1,2,3
             recoverhp(10) if detect_something(25)
-            addstate(STATEID::POISON) if 1 > rand(100)
+            addstate(StateId::POISON) if 1 > rand(100)
           when 4
             finditem([0, 75]) if detect_something(5)          ## 三又の鍵
           end
         ## B5F 金色の泉-------------------------------------------------------
         when 8
+          ## 小銭を落とす
+          ## ゴールドイーターの出現
           case @current_d
           when 1,2,3
             recoverhp(10) if detect_something(25)
@@ -385,20 +392,20 @@ class Scene_Fountain < Scene_Base
           when 4
             encounter(260) if 1 > rand(100)              ## Geaterと戦闘
           when 5
-            addstate(STATEID::STONE) if 1 > rand(100)
+            addstate(StateId::STONE) if 1 > rand(100)
             finditem([0, 68]) if detect_something(5)          ## 金塊
           end
         ## B6F 灰色の泉-------------------------------------------------------
         when 9
           case @current_d
           when 1
-            addstate(STATEID::STONE) if 1 > rand(100)
+            addstate(StateId::STONE) if 1 > rand(100)
           when 2,3
             recovermp if 5 > rand(100)
           when 4
             getmoney(1000) if detect_something(5)
           when 5
-            addstate(STATEID::STONE) if 1 > rand(100)
+            addstate(StateId::STONE) if 1 > rand(100)
           when 6
             getitem([0, 16]) if detect_something(5)          ## 蘇生薬
           end
@@ -406,13 +413,13 @@ class Scene_Fountain < Scene_Base
         when 10
           case @current_d
           when 1
-            addstate(STATEID::STONE) if 1 > rand(100)
+            addstate(StateId::STONE) if 1 > rand(100)
           when 2,3
             recovermp if detect_something(5)
           when 4
             getmoney(1000) if detect_something(5)
           when 5
-            addstate(STATEID::STONE) if 1 > rand(100)
+            addstate(StateId::STONE) if 1 > rand(100)
           when 6
             getitem([0, 16]) if detect_something(5)          ## 蘇生薬
           when 7
@@ -430,7 +437,7 @@ class Scene_Fountain < Scene_Base
         if @reserve_encount
           RPG::ME.stop  # MEの停止
           $game_temp.battle_proc = nil
-          $scene = Scene_Map.new  # フェードアウトはかけない
+          $scene = SceneMap.new  # フェードアウトはかけない
           break
         end
       end
@@ -442,14 +449,14 @@ class Scene_Fountain < Scene_Base
   # ● 溺れチェック
   #--------------------------------------------------------------------------
   def check_drown
-    sv = MISC.skill_value(SKILLID::SWIM, @ps.actor)
-    diff = Constant_Table::DIFF_95[@current_d]
+    sv = Misc.skill_value(SkillId::SWIM, @ps.actor)
+    diff = ConstantTable::DIFF_95[@current_d]
     ratio = Integer([sv * diff, 99].min)
     @current_d.times do
-      @ps.actor.chance_skill_increase(SKILLID::SWIM)
+      @ps.actor.chance_skill_increase(SkillId::SWIM)
     end
     ratio = 99 if @current_d == 1 # 一番の浅瀬は溺れない
-    DEBUG.write(c_m, "溺れる確率:#{100-ratio}% 深さ:#{@current_d}")
+    Debug.write(c_m, "溺れる確率:#{100-ratio}% 深さ:#{@current_d}")
     unless ratio > rand(100)
       drown
     end
@@ -503,7 +510,7 @@ class Scene_Fountain < Scene_Base
   #--------------------------------------------------------------------------
   def finditem(item)
     unless $game_party.has_item?(item)  # パーティがすでに所持していない
-      name = "?" + "#{MISC.item(item[0],item[1]).name2}"
+      name = "?" + "#{Misc.item(item[0],item[1]).name2}"
       @fountain_window.set_text("#{@ps.actor.name} は #{name}をみつけた")
       @ps.actor.gain_item(item[0], item[1], false)
       wait_for_fountain
@@ -513,7 +520,7 @@ class Scene_Fountain < Scene_Base
   # ● 各泉の効能
   #--------------------------------------------------------------------------
   def getitem(item)
-    name = "?" + "#{MISC.item(item[0],item[1]).name2}"
+    name = "?" + "#{Misc.item(item[0],item[1]).name2}"
     @fountain_window.set_text("#{@ps.actor.name} は #{name}をみつけた")
     @ps.actor.gain_item(item[0], item[1], false)
     wait_for_fountain
@@ -522,7 +529,7 @@ class Scene_Fountain < Scene_Base
   # ● モンスターと遭遇
   #--------------------------------------------------------------------------
   def encounter(enemy_id)
-    MISC.encount_event_battle(enemy_id)
+    Misc.encount_event_battle(enemy_id)
     @reserve_encount = true
   end
   #--------------------------------------------------------------------------
@@ -535,12 +542,12 @@ class Scene_Fountain < Scene_Base
     ## 無効化したステートを表示
     for state in @ps.actor.resisted_states
       n = state.state_name
-      text = target.name + "は " + n + " をむこうかした!"
+      text = @ps.actor.name + "は " + n + " をむこうかした!"
       @fountain_window.set_text(text)
     end
-    for state in target.added_states
+    for state in @ps.actor.added_states
       next if state.message1.empty?
-      text = target.name + state.message1
+      text = @ps.actor.name + state.message1
       @fountain_window.set_text(text)
     end
     wait_for_fountain
@@ -550,7 +557,7 @@ class Scene_Fountain < Scene_Base
   #--------------------------------------------------------------------------
   def drown
     @ps.actor.hp -= @ps.actor.maxhp # MAPHPを引く
-    unless @ps.actor.state?(STATEID::DEATH)
+    unless @ps.actor.state?(StateId::DEATH)
       @fountain_window.set_text("#{@ps.actor.name} は おぼれかけた")
     else
       @fountain_window.set_text("#{@ps.actor.name} は おぼれた")
@@ -569,9 +576,9 @@ class Scene_Fountain < Scene_Base
   #--------------------------------------------------------------------------
   # ● 各泉の効能
   #--------------------------------------------------------------------------
-  def recoverfatigue
+  def recoverfatigue(rate)
     @fountain_window.set_text("#{@ps.actor.name} の つかれがとれた")
-    @ps.actor.recover_fatigue(25)
+    @ps.actor.recover_fatigue(rate)
     wait_for_fountain
   end
 end

@@ -1,9 +1,9 @@
 #==============================================================================
-# ■ MUSIC
+# ■ Music
 #------------------------------------------------------------------------------
 # 　BGMを一括管理
 #==============================================================================
-class MUSIC
+class Music
   def play(scene)
     vol = $master_volume
     case scene
@@ -120,7 +120,7 @@ class MUSIC
 
   def me_play(scene)
     vol = $master_me_volume
-    adjust = Constant_Table::SE_VOL_ADJUST
+    adjust = ConstantTable::SE_VOL_ADJUST
     case scene
     when "レベルアップ";    RPG::ME.new("baroque29-cem",vol,100).play
     when "きょうかい";      RPG::ME.new("xp_inn1",vol,100).play
@@ -138,7 +138,7 @@ class MUSIC
 
   def se_play(scene)
     vol = $master_se_volume
-    adjust = Constant_Table::SE_VOL_ADJUST
+    adjust = ConstantTable::SE_VOL_ADJUST
     case scene
     when "カーソル"; RPG::SE.new("Cursor",vol-10,150).play
     when "決定"; RPG::SE.new("Decision1",vol-10,100).play

@@ -4,7 +4,7 @@
 # クエストボード
 #==============================================================================
 
-class Window_MapTrader_Detail < Window_Base
+class Window_MapTrader_Detail < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Window_MapTrader_Detail < Window_Base
   #--------------------------------------------------------------------------
   def refresh(data)
     return if data == nil
-    item_data = MISC.item(data[0][0][0], data[0][0][1])
+    item_data = Misc.item(data[0][0][0], data[0][0][1])
     self.contents.clear
     self.contents.draw_text(0, 24*0, self.width-32, 24, "B1F")
     self.contents.draw_text(0, 24*1, self.width-32, 24, "B2F")

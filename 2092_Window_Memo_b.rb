@@ -1,4 +1,4 @@
-class Window_Memo_b < Window_Base
+class Window_Memo_b < WindowBase
     #--------------------------------------------------------------------------
     # ● オブジェクト初期化
     #     x : ウィンドウの X 座標

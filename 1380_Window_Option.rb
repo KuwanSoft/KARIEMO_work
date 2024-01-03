@@ -4,7 +4,7 @@
 # オプション設定
 #==============================================================================
 
-class Window_Option < Window_Selectable
+class Window_Option < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -48,8 +48,8 @@ class Window_Option < Window_Selectable
   # ● リセットカウンタとビルド
   #--------------------------------------------------------------------------
   def show_reset_count_and_build
-    str = "BUILD:" + load_data("Data/Version.rvdata").read_uniqueid.to_s
-    self.contents.draw_text(0, WLH*11, self.width-32, WLH, "ResetCount:#{DEBUG.check_reset_count}", 2)
+    str = "BUILD:" + "#{load_data("Data/Version2.rvdata")[:uniqueid]}"
+    self.contents.draw_text(0, WLH*11, self.width-32, WLH, "ResetCount:#{Debug.check_reset_count}", 2)
     self.contents.draw_text(0, WLH*12, self.width-32, WLH, str, 2)
   end
 end

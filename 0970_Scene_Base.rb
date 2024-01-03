@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Base
+# ■ SceneBase
 #------------------------------------------------------------------------------
 # 　ゲーム中のすべてのシーンのスーパークラスです。
 #==============================================================================
 
-class Scene_Base
+class SceneBase
   #--------------------------------------------------------------------------
   # ● 無呼び出しメソッドチェック対象
   #--------------------------------------------------------------------------
@@ -28,8 +28,8 @@ class Scene_Base
       Graphics.update             # ゲーム画面を更新
       Input.update                # 入力情報を更新
       update                      # フレーム更新
-      DEBUG::update_timer         # デバッグタイマー更新
-      MISC::update_light_timer    # ランタンタイマーの更新
+      Debug::update_timer         # デバッグタイマー更新
+      Misc.update_light_timer    # ランタンタイマーの更新
       break if $scene != self     # 画面が切り替わったらループを中断
     end
     Graphics.update
@@ -52,8 +52,8 @@ class Scene_Base
   # ● フレームの作成
   #--------------------------------------------------------------------------
   def create_frame
-    if self.is_a?(Scene_Map) or self.is_a?(Scene_Battle) or self.is_a?(Scene_Treasure) or
-      self.is_a?(Scene_CAMP) or self.is_a?(Scene_Fountain) or self.is_a?(Scene_BBS) or
+    if self.is_a?(SceneMap) or self.is_a?(SceneBattle) or self.is_a?(SceneTreasure) or
+      self.is_a?(SceneCamp) or self.is_a?(SceneFountain) or self.is_a?(SceneBbs) or
       self.is_a?(Scene_NPC) or self.is_a?(Scene_ToolShop) then
       width = 432+4
       height = 360+4
@@ -69,7 +69,7 @@ class Scene_Base
       black_visible = true
       opacity = 0
     end
-    @frame = Window_Base.new(x, y, width, height)
+    @frame = WindowBase.new(x, y, width, height)
     @frame.back_opacity = 0
     @frame.opacity = opacity
     @frame.visible = true
@@ -80,8 +80,8 @@ class Scene_Base
     @frame_b.visible = black_visible
     @frame_b.z = @frame.z - 1
     @frame.visible = @frame_b.visible = false if self.is_a?(Scene_PRESENTS)
-    @frame.visible = @frame_b.visible = false if self.is_a?(Scene_Title)
-    @frame.visible = @frame_b.visible = false if self.is_a?(Scene_OFFICE)
+    @frame.visible = @frame_b.visible = false if self.is_a?(SceneTitle)
+    @frame.visible = @frame_b.visible = false if self.is_a?(SceneGuild)
   end
   #--------------------------------------------------------------------------
   # ● フレームのdispose
@@ -110,7 +110,7 @@ class Scene_Base
   # ● 開始処理
   #--------------------------------------------------------------------------
   def start
-    DEBUG::write(c_m, sprintf("---------------* %-20s *--------------",$scene.class))
+    Debug::write(c_m, sprintf("---------------* %-20s *--------------",$scene.class))
     @timer = 0
     create_frame
     @wait = Wait_for_push.new
@@ -134,7 +134,7 @@ class Scene_Base
       $music.se_play("SS")
       save_screen_shot
     elsif Input.press?(Input::L) && Input.press?(Input::R) && Input.press?(Input::Y) && Input.press?(Input::Z)
-      DEBUG::write(c_m, "*L R SELECT START DETECTED*")
+      Debug::write(c_m, "*L R SELECT START DETECTED*")
       raise LRSS   # リセットコマンド
     end
     check_all_dead
@@ -157,17 +157,17 @@ class Scene_Base
     make_directory
     filename = Time.now.strftime("%Y%m%d%H%M%S") + ".png"
     bitmap = Graphics.snap_to_bitmap
-    bitmap.save_png("#{Constant_Table::SCREENSHOT_DIR_NAME}/#{filename}")
+    bitmap.save_png("#{ConstantTable::SCREENSHOT_DIR_NAME}/#{filename}")
     bitmap.dispose
   end
   #--------------------------------------------------------------------------
   # ● スクリーンショットの保存フォルダを作成
   #--------------------------------------------------------------------------
   def make_directory
-    return if Constant_Table::SCREENSHOT_DIR_NAME.empty?
-    return if FileTest.directory?(Constant_Table::SCREENSHOT_DIR_NAME)
+    return if ConstantTable::SCREENSHOT_DIR_NAME.empty?
+    return if FileTest.directory?(ConstantTable::SCREENSHOT_DIR_NAME)
     dir_name = ""
-    for dn in Constant_Table::SCREENSHOT_DIR_NAME.split(/[\/\\]/)
+    for dn in ConstantTable::SCREENSHOT_DIR_NAME.split(/[\/\\]/)
       dir_name << dn
       Dir.mkdir(dir_name) unless FileTest.directory?(dir_name)
       dir_name << "/"
@@ -185,7 +185,7 @@ class Scene_Base
   def terminate
     @picture.dispose if @picture  # 村の画像がある場合は解放
     @wait.dispose
-    DEBUG::write(c_m, "---------------* Terminate <#{self.class}> *------------")
+    Debug::write(c_m, "---------------* Terminate <#{self.class}> *------------")
     dispose_frame
   end
   #--------------------------------------------------------------------------
@@ -234,7 +234,7 @@ class Scene_Base
   def check_all_dead
     return if $game_party == nil
     if $game_party.all_dead?
-      $scene = Scene_Gameover.new
+      $scene = SceneGameover.new
     end
   end
 end

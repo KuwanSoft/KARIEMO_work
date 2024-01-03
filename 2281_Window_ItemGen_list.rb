@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 　アイテム合成可能なアイテムリスト
 #==============================================================================
-class Window_ItemGen_list < Window_Selectable
+class Window_ItemGen_list < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 初期化処理
   #--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class Window_ItemGen_list < Window_Selectable
   #--------------------------------------------------------------------------
   def can_compose?
     id = @data[self.index]
-    item_obj = MISC.item(0, id)
+    item_obj = Misc.item(0, id)
     return false if item_obj == nil # 選択中がinvalidならばfalse
     return false unless $game_party.has_item?([3, item_obj.ing1_id], true, 1, true) if item_obj.ing1_id != 0
     return false unless $game_party.has_item?([3, item_obj.ing2_id], true, 1, true) if item_obj.ing2_id != 0
@@ -61,7 +61,7 @@ class Window_ItemGen_list < Window_Selectable
   def get_item
     id = @data[self.index]
     kind = 0
-    item_obj = MISC.item(kind, id)
+    item_obj = Misc.item(kind, id)
     return item_obj
   end
   #--------------------------------------------------------------------------
@@ -70,25 +70,25 @@ class Window_ItemGen_list < Window_Selectable
   def do_compose
     id = @data[self.index]
     kind = 0
-    item_obj = MISC.item(kind, id)
+    item_obj = Misc.item(kind, id)
     rank = item_obj.rank
     use_ingredient(item_obj)  # 材料の消費
     (rank*3).times do
-      @actor.chance_skill_increase(SKILLID::HERB)
+      @actor.chance_skill_increase(SkillId::HERB)
     end
-    sv = MISC.skill_value(SKILLID::HERB, @actor)
-    diff = Constant_Table::COMPOSE_RATIO[rank] # ランク係数
+    sv = Misc.skill_value(SkillId::HERB, @actor)
+    diff = ConstantTable::COMPOSE_RATIO[rank] # ランク係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @actor.tired?
     if ratio > rand(100)
       (rank*3).times do
-        @actor.chance_skill_increase(SKILLID::HERB)
+        @actor.chance_skill_increase(SkillId::HERB)
       end
       @actor.gain_item(kind, id, true)
       return 1  # 成功
     else
-      kind = Constant_Table::FAILURE_KIND_ID[0]
-      id = Constant_Table::FAILURE_KIND_ID[1]
+      kind = ConstantTable::FAILURE_KIND_ID[0]
+      id = ConstantTable::FAILURE_KIND_ID[1]
       @actor.gain_item(kind, id, true)
       return 2  # 失敗
     end
@@ -114,20 +114,20 @@ class Window_ItemGen_list < Window_Selectable
     list_drops = []
     for member in $game_party.members
       for item in member.bag
-        next unless MISC.item(item[0][0], item[0][1]).is_a?(Drops)
+        next unless Misc.item(item[0][0], item[0][1]).is_a?(Drops)
         list_drops.push(item[0][1]) # drop品のidのみpush
       end
     end
     list_drops.uniq!  # 重複排除
-    DEBUG.write(c_m, "list_drops: #{list_drops}")
+    Debug.write(c_m, "list_drops: #{list_drops}")
     makable_list = []
     for id in list_drops
       ## 作成可能なアイテムIDのみをpush
-      makable_list.push(MISC.item(3, id).m1_id) if MISC.item(3, id).m1_id != 0
-      makable_list.push(MISC.item(3, id).m2_id) if MISC.item(3, id).m2_id != 0
+      makable_list.push(Misc.item(3, id).m1_id) if Misc.item(3, id).m1_id != 0
+      makable_list.push(Misc.item(3, id).m2_id) if Misc.item(3, id).m2_id != 0
     end
     makable_list.uniq!
-    DEBUG.write(c_m, "makable_list: #{makable_list}")
+    Debug.write(c_m, "makable_list: #{makable_list}")
     return makable_list
   end
   #--------------------------------------------------------------------------
@@ -154,17 +154,17 @@ class Window_ItemGen_list < Window_Selectable
   def draw_item(index)
     id = @data[index]
     rect = item_rect(index)
-    item_obj = MISC.item(0, id)
+    item_obj = Misc.item(0, id)
     alpha = 255
     alpha = 128 unless $game_party.has_item?([3, item_obj.ing1_id], true, 1, true) if item_obj.ing1_id != 0
     alpha = 128 unless $game_party.has_item?([3, item_obj.ing2_id], true, 1, true) if item_obj.ing2_id != 0
     self.contents.font.color.alpha = alpha
     ## 合成可能ペア検知
     rank = item_obj.rank
-    skill = MISC.skill_value(SKILLID::HERB ,@actor)
+    skill = Misc.skill_value(SkillId::HERB ,@actor)
     ## 成功率算出
-    sv = MISC.skill_value(SKILLID::HERB, @actor)
-    diff = Constant_Table::COMPOSE_RATIO[rank] # ランク係数
+    sv = Misc.skill_value(SkillId::HERB, @actor)
+    diff = ConstantTable::COMPOSE_RATIO[rank] # ランク係数
     ratio = Integer([sv * diff, 95].min)
     ratio /= 2 if @actor.tired?
     ratio = "--" if alpha == 128
@@ -175,7 +175,7 @@ class Window_ItemGen_list < Window_Selectable
   #--------------------------------------------------------------------------
   def action_index_change
     id = @data[self.index]
-    item_obj = MISC.item(0, id)
+    item_obj = Misc.item(0, id)
     @info.refresh(item_obj)
   end
   #--------------------------------------------------------------------------

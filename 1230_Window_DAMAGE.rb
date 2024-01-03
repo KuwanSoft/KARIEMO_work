@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_DAMAGE
+# ■ WindowDamage
 #------------------------------------------------------------------------------
 # ダメージ表示用のビットマップ
 #==============================================================================
 
-class Window_DAMAGE < Window_Base
+class WindowDamage < WindowBase
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class Window_DAMAGE < Window_Base
   #--------------------------------------------------------------------------
   # ● 描画開始
   #--------------------------------------------------------------------------
-  def start_drawing(x, y, damage, ph = false, poison = false, heal = false, bleeding = false)
+  def start_drawing(x, y, damage, ph = false, heal = false)
     if @running
       clear
     end
@@ -50,8 +50,6 @@ class Window_DAMAGE < Window_Base
     self.y = @initial_y = y + 165 + 40 # 165もビューポートの始まり40は調整
     self.contents.font.color = normal_color
     self.contents.font.color = paralyze_color if ph
-    self.contents.font.color = poison_color if poison
-    self.contents.font.color = knockout_color if bleeding
     self.contents.font.color = system_color if heal
     self.contents.draw_text(0, 0, self.width-(32*2), WLH, @damage, 2)
     self.visible = true

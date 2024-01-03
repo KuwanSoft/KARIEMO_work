@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Name
+# ■ SceneName
 #------------------------------------------------------------------------------
 # 名前入力画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Name < Scene_Base
+class SceneName < SceneBase
   #--------------------------------------------------------------------------
   # ● 名前変更のみ？
   #--------------------------------------------------------------------------
@@ -20,8 +20,8 @@ class Scene_Name < Scene_Base
     create_menu_background if @riddle # リドルの場合はバックグラウンドをいれる
     create_window
     @actor = $game_actors[$game_temp.name_actor_id] unless @riddle
-    @edit_window = Window_NameEdit.new(@actor, $game_temp.name_max_char)
-    @input_window = Window_NameInput.new
+    @edit_window = WindowNameEdit.new(@actor, $game_temp.name_max_char)
+    @input_window = WindowNameInput.new
     @byte4_array = Array.new($game_temp.name_max_char) # 濁点をカウントする配列
   end
   #--------------------------------------------------------------------------
@@ -47,12 +47,12 @@ class Scene_Name < Scene_Base
   #--------------------------------------------------------------------------
   def return_scene
     if @change_name
-      $scene = Scene_OFFICE.new
+      $scene = SceneGuild.new
     elsif @riddle
       $game_temp.no_change_bgm = true
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     else
-      $scene = Scene_REG.new
+      $scene = SceneRegistration.new
     end
   end
   #--------------------------------------------------------------------------
@@ -89,10 +89,10 @@ class Scene_Name < Scene_Base
         unless @riddle
           return if check_duplication(name)   # 同名の存在チェック
           @actor.name = name                  # アクターの名前を変更
-          DEBUG::write(c_m,"名前の決定:#{name}") # debug
+          Debug::write(c_m,"名前の決定:#{name}") # debug
         else
           $game_temp.riddle_answer = name     # リドルの場合は回答を保存
-          DEBUG::write(c_m,"リドルの回答:#{name}") # debug
+          Debug::write(c_m,"リドルの回答:#{name}") # debug
         end
         return_scene
       elsif @input_window.character != ""   # 文字が空ではない場合

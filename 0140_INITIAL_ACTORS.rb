@@ -4,7 +4,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_1
     id = 1
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "せんし1"
     actor.age = 14
@@ -37,7 +37,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_2
     id = 2
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "とうぞく"
     actor.age = 14
@@ -69,7 +69,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_3
     id = 3
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "まほうつかい"
     actor.age = 16
@@ -104,7 +104,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_4
     id = 4
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "そうりょ"
     actor.age = 17
@@ -143,7 +143,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_5
     id = 5
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "かりうど"
     actor.age = 14
@@ -161,7 +161,7 @@ module INITIAL_ACTORS
     actor.set_face("face (85)")
     actor.skill_setting             # スキルの初期化
     actor.skill[6] += 75            # ボウ
-    actor.skill[SKILLID::REFLEXES] += 50           # 反射神経
+    actor.skill[SkillId::REFLEXES] += 50           # 反射神経
     actor.skill[19] += 50           # 魔物の知識
     actor.skill[40] += 50           # 野営の知識
     actor.skill[51] += 50           # 交渉術
@@ -175,7 +175,7 @@ module INITIAL_ACTORS
   #--------------------------------------------------------------------------
   def self.setup_6
     id = 6
-    DEBUG::write(c_m,"初期アクターセットアップ ID:#{id}")
+    Debug::write(c_m,"初期アクターセットアップ ID:#{id}")
     actor = $game_actors[id]
     actor.name = "じゅうし"
     actor.age = 14
@@ -209,30 +209,30 @@ module INITIAL_ACTORS
   def self.make_random_actor(id)
     random_actor = $game_actors[id]                   # オブジェクトの取得
     random_actor.setup(id)                            # 初期化
-    DEBUG::write(c_m,"ランダムアクターセットアップ開始")
+    Debug::write(c_m,"ランダムアクターセットアップ開始")
     random_actor.name = "ランダム#{id}"
     random_actor.age = 14 + rand(10)
     rand(20).times do random_actor.level_up end
 
-    random_actor.init_str = random_actor.str = MISC.gen_number(random_actor.level)
-    random_actor.init_int = random_actor.int = MISC.gen_number(random_actor.level)
-    random_actor.init_vit = random_actor.vit = MISC.gen_number(random_actor.level)
-    random_actor.init_spd = random_actor.spd = MISC.gen_number(random_actor.level)
-    random_actor.init_mnd = random_actor.mnd = MISC.gen_number(random_actor.level)
-    random_actor.init_luk = random_actor.luk = MISC.gen_number(random_actor.level)
-    random_actor.personality_p = Constant_Table::PERSONALITY_P_hash.keys[rand(12)]
-    random_actor.personality_n = Constant_Table::PERSONALITY_N_hash.keys[rand(12)]
+    random_actor.init_str = random_actor.str = Misc.gen_number(random_actor.level)
+    random_actor.init_int = random_actor.int = Misc.gen_number(random_actor.level)
+    random_actor.init_vit = random_actor.vit = Misc.gen_number(random_actor.level)
+    random_actor.init_spd = random_actor.spd = Misc.gen_number(random_actor.level)
+    random_actor.init_mnd = random_actor.mnd = Misc.gen_number(random_actor.level)
+    random_actor.init_luk = random_actor.luk = Misc.gen_number(random_actor.level)
+    random_actor.personality_p = ConstantTable::PERSONALITY_P_hash.keys[rand(12)]
+    random_actor.personality_n = ConstantTable::PERSONALITY_N_hash.keys[rand(12)]
     random_actor.class_id = rand(9) + 1
 
     # HPの上昇
     dice = $data_classes[random_actor.class_id].hp_base
     # case random_actor.class_id      # それぞれのCLASSで基本値を適用
-    # when 1;     dice = Constant_Table::WAR_HP    # 戦士
-    # when 4;     dice = Constant_Table::KGT_HP    # 騎士
-    # when 2,5,9; dice = Constant_Table::THF_HP    # 盗賊・忍者・従士
-    # when 3,6;   dice = Constant_Table::SOR_HP    # 呪術師・賢者
-    # when 7,10;  dice = Constant_Table::HUN_HP    # 狩人・侍
-    # when 8;     dice = Constant_Table::CLE_HP    # 聖職者
+    # when 1;     dice = ConstantTable::WAR_HP    # 戦士
+    # when 4;     dice = ConstantTable::KGT_HP    # 騎士
+    # when 2,5,9; dice = ConstantTable::THF_HP    # 盗賊・忍者・従士
+    # when 3,6;   dice = ConstantTable::SOR_HP    # 呪術師・賢者
+    # when 7,10;  dice = ConstantTable::HUN_HP    # 狩人・侍
+    # when 8;     dice = ConstantTable::CLE_HP    # 聖職者
     # end
 
     case random_actor.vit               # 通常特性値ボーナス

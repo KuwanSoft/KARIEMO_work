@@ -4,7 +4,7 @@
 # NPCのショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_NPCShop < Window_Selectable
+class Window_NPCShop < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class Window_NPCShop < Window_Selectable
     kind = @data[index][0][0]
     id = @data[index][0][1]
     price = item_price(index)
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     rect = item_rect(index)
     name = "?" + item.name2
     self.contents.font.color.alpha = $game_party.npc_item_bought?(@npc_id, index) ? 128 : 255
@@ -71,7 +71,7 @@ class Window_NPCShop < Window_Selectable
   #--------------------------------------------------------------------------
   def item_price(idx = @index)
     price = @data[idx][1] * (100 - @discount) / 100
-    DEBUG.write(c_m, "割引率:#{@discount}% 価格:#{price}")
+    Debug.write(c_m, "割引率:#{@discount}% 価格:#{price}")
     price
   end
   #--------------------------------------------------------------------------

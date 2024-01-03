@@ -140,7 +140,7 @@ ROW_HEIGHT = WLH*2-4
     self.contents.clear_rect(rect)
     self.contents.font.color = normal_color
     self.contents.draw_text(rect, @lines[index], 1) # 中央ぞろえ
-    DEBUG::write(c_m,"Message:#{@lines[index]}")
+    Debug::write(c_m,"Message:#{@lines[index]}")
   end
   #--------------------------------------------------------------------------
   # ● あたらしい行の描画方法

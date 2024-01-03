@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Window_elementDAMAGE
+# ■ WindowElementDamage
 #------------------------------------------------------------------------------
 # 属性ダメージ表示用のビットマップ
 # 多少のディレイを生じて発生する。
 #==============================================================================
 
-class Window_elementDAMAGE < Window_DAMAGE
+class WindowElementDamage < WindowDamage
   DELAY = 10
   #--------------------------------------------------------------------------
   # ● 初期化
@@ -42,6 +42,7 @@ class Window_elementDAMAGE < Window_DAMAGE
     when 6; self.contents.font.color = earth_color    # 地面
     when 7; self.contents.font.color = paralyze_color # 爆発
     when 8; self.contents.font.color = curse_color    # 呪い
+    when 9; self.contents.font.color = knockout_color # 出血
     end
     self.contents.draw_text(0, 0, self.width-(32*2), WLH, @element_damage, 2)
   end

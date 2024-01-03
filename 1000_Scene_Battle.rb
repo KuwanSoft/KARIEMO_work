@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Battle
+# ■ SceneBattle
 #------------------------------------------------------------------------------
 # バトル画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Battle < Scene_Base
+class SceneBattle < SceneBase
   #--------------------------------------------------------------------------
   # ● 開始処理
   #--------------------------------------------------------------------------
@@ -14,11 +14,11 @@ class Scene_Battle < Scene_Base
     $game_temp.lucky_role = false # ラッキーロールのリセット
     $game_temp.prediction = false # 危険予知キャンセル
     @message_window = Window_BattleMessage.new
-    @damage = Window_DAMAGE.new
-    @e_damage = Window_elementDAMAGE.new
+    @damage = WindowDamage.new
+    @e_damage = WindowElementDamage.new
     @action_battlers = []
     create_info_viewport
-    @screen1 = Game_Screen.new #メンバー用
+    @screen1 = GameScreen.new #メンバー用
     @adj_x = @message_window.x # メッセージウィンドウのx初期値
     $threedmap.start_drawing              # 3Dの描画
     # create_battle_back
@@ -48,7 +48,7 @@ class Scene_Battle < Scene_Base
   def post_start
     super
 #~     wait_for_back_moving
-    @spriteset = Spriteset_Battle.new
+    @spriteset = SpritesetBattle.new
     @spriteset.start_battlefloor
   end
   #--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class Scene_Battle < Scene_Base
     $threedmap.define_all_wall($game_map.map_id)
     # dispose_battle_back
     $game_temp.event_battle = false     # バトルイベントフラグ解除
-    unless $scene.is_a?(Scene_Gameover)
+    unless $scene.is_a?(SceneGameover)
       $scene = nil if $BTEST
     end
   end
@@ -85,7 +85,7 @@ class Scene_Battle < Scene_Base
     Graphics.update unless main     # ゲーム画面を更新
     Input.update unless main        # 入力情報を更新
     $game_system.update             # タイマーを更新
-    DEBUG::update_timer             # デバッグタイマー更新
+    Debug::update_timer             # デバッグタイマー更新
     $game_troop.update              # 敵グループを更新
     @spriteset.update               # スプライトセットを更新
     @message_window.update          # メッセージウィンドウを更新
@@ -105,7 +105,7 @@ class Scene_Battle < Scene_Base
   #    把握しにくくなるため、例外的にこのメソッドを使用する。
   #--------------------------------------------------------------------------
   def wait(duration, no_fast = false)
-    DEBUG::write(c_m,"--WAIT:#{duration}")
+    Debug::write(c_m,"--WAIT:#{duration}")
     for i in 0...duration
       update_basic
       break if not no_fast and i >= duration / 2 and show_fast?
@@ -191,7 +191,7 @@ class Scene_Battle < Scene_Base
       elsif (@started == false)
         update_post_start_ready
       elsif not @spriteset.all_redraw_complete?
-        DEBUG.write(c_m, "Waiting for monsters redraw...")
+        Debug.write(c_m, "Waiting for monsters redraw...")
       else
         process_battle_event              # バトルイベントの処理
         process_action                    # 戦闘行動
@@ -355,7 +355,7 @@ class Scene_Battle < Scene_Base
         end
         $game_temp.next_drop_box = false
         $game_party.tired_escape          # 逃走疲労
-        $scene = Scene_Map.new
+        $scene = SceneMap.new
       elsif $game_temp.next_drop_box      # 宝箱ドロップがある場合
         $game_party.tired_battle          # 戦闘疲労
         $game_temp.next_drop_box = false
@@ -363,7 +363,7 @@ class Scene_Battle < Scene_Base
         wait(10)
         RPG::ME.stop
         $music.play("たからばこ")
-        $scene = Scene_Treasure.new(@drop_items, @gold)
+        $scene = SceneTreasure.new(@drop_items, @gold)
       ## 玄室では無いが固有ドロップがあった場合 NM等
       elsif @drop_items.size != 0
         ## アイテムの分配
@@ -372,12 +372,12 @@ class Scene_Battle < Scene_Base
           ## 道具武器防具か？=>全不確定化
           identified = false
           member = $game_party.gain_item(item, identified)
-          item_name = "?" + MISC.item(item[0], item[1]).name2
+          item_name = "?" + Misc.item(item[0], item[1]).name2
           $game_message.texts.push("#{member.name}は #{item_name}をてにいれた。")
         end
         wait_for_message
         $game_party.tired_battle          # 戦闘疲労
-        $scene = Scene_Map.new
+        $scene = SceneMap.new
       elsif $game_temp.npc_battle != 0  # NPCバトルだった場合
         case $game_temp.npc_battle
         when 1; data = $game_party.shop_npc1
@@ -398,10 +398,10 @@ class Scene_Battle < Scene_Base
         wait(10)
         RPG::ME.stop
         $music.play("たからばこ")
-        $scene = Scene_Treasure.new(npc_drop, 0)
+        $scene = SceneTreasure.new(npc_drop, 0)
       else                                # ワンダリングの場合
         $game_party.tired_battle          # 戦闘疲労
-        $scene = Scene_Map.new
+        $scene = SceneMap.new
       end
       @message_window.clear
       Graphics.fadeout(30)
@@ -458,7 +458,7 @@ class Scene_Battle < Scene_Base
   #--------------------------------------------------------------------------
   def draw_summon_status
     return if $game_summon.all_dead? and $game_mercenary.all_dead?
-    return unless $scene.is_a?(Scene_Battle)
+    return unless $scene.is_a?(SceneBattle)
     if @party_command_window.visible == true
       @ss = Window_SummonStatus.new         # 召喚モンスターのステータス
       @ss.turn_on
@@ -1032,11 +1032,11 @@ class Scene_Battle < Scene_Base
       if @item_window.item != nil and @item_window.item[1] == true # 鑑定済み
         kind = @item_window.item[0][0]
         id = @item_window.item[0][1]
-        selected_item = MISC.item(kind, id)
+        selected_item = Misc.item(kind, id)
         ## 装備中の武器や防具を選択した場合、アイテムIDに設定されたアイテムとして使用する。
         if @item_window.item[2] > 0  # 装備済みか？
           return if selected_item.item_id == 0 # 効果が無いアイテムの場合
-          @item = MISC.item(0, selected_item.item_id)
+          @item = Misc.item(0, selected_item.item_id)
           @active_battler.action.set_item(@item.id)
           @active_battler.action.bag_index = @item_window.index # 選択したアイテムのbagindex
           determine_item
@@ -1075,7 +1075,7 @@ class Scene_Battle < Scene_Base
     if $game_troop.surprise             # バックアタック時
       text = sprintf(Vocab::Surprise)
       $game_party.reverse_order         # 順序を逆にする
-      DEBUG::write(c_m,"戦闘開始処理：バックアタック検知")
+      Debug::write(c_m,"戦闘開始処理：バックアタック検知")
       @message_window.clear
       @message_window.visible = true
       wait(10)
@@ -1084,7 +1084,7 @@ class Scene_Battle < Scene_Base
       @message_window.clear
     elsif $game_troop.preemptive        # 先制攻撃時
       text = sprintf(Vocab::Preemptive)
-      DEBUG::write(c_m,"戦闘開始処理：先制攻撃検知")
+      Debug::write(c_m,"戦闘開始処理：先制攻撃検知")
       @message_window.clear
       @message_window.visible = true
       wait(10)
@@ -1115,11 +1115,11 @@ class Scene_Battle < Scene_Base
     text = sprintf(Vocab::EscapeStart)
     $game_message.texts.push(text)
     # if $game_temp.next_drop_box   # 玄室の場合
-    #   ratio = Constant_Table::ESCAPE_RATIO_G
+    #   ratio = ConstantTable::ESCAPE_RATIO_G
     # elsif $game_temp.event_battle # イベントバトル
-    #   ratio = Constant_Table::ESCAPE_RATIO_E
+    #   ratio = ConstantTable::ESCAPE_RATIO_E
     # else                          # ワンダリング
-    #   ratio = Constant_Table::ESCAPE_RATIO_W
+    #   ratio = ConstantTable::ESCAPE_RATIO_W
     # end
     # penalty = 0
     case $game_party.get_movable_members.size
@@ -1131,10 +1131,10 @@ class Scene_Battle < Scene_Base
     when 1; ratio = 45
     when 0; ratio = 5
     end
-    # penalty += $game_party.dead_members.size * Constant_Table::PENALTY_ESCAPE
-    # penalty += $game_troop.get_sharp_eye * Constant_Table::SHARP_EYE_P
+    # penalty += $game_party.dead_members.size * ConstantTable::PENALTY_ESCAPE
+    # penalty += $game_troop.get_sharp_eye * ConstantTable::SHARP_EYE_P
     # ratio -= penalty
-    DEBUG::write(c_m,"逃走処理 成功率:#{ratio}%")
+    Debug::write(c_m,"逃走処理 成功率:#{ratio}%")
     if $game_troop.preemptive
       success = true
     else
@@ -1193,7 +1193,7 @@ class Scene_Battle < Scene_Base
 
     ## パーティ脅威度と宝箱中身の決定
     if $game_temp.next_drop_box # 玄室の場合
-      @drop_items += TREASURE::lottery_treasure($game_troop.lottery_treasure)
+      @drop_items += Treasure::lottery_treasure($game_troop.lottery_treasure)
       @gold = $game_troop.calc_gold
     end
     text1 = "パーティはとうばつしたモンスターのなきがらから"
@@ -1249,7 +1249,7 @@ class Scene_Battle < Scene_Base
   #--------------------------------------------------------------------------
   def call_gameover
     $game_temp.next_scene = nil
-    $scene = Scene_Gameover.new
+    $scene = SceneGameover.new
     @message_window.clear
   end
   #--------------------------------------------------------------------------
@@ -1257,7 +1257,7 @@ class Scene_Battle < Scene_Base
   #--------------------------------------------------------------------------
   def call_title
     $game_temp.next_scene = nil
-    $scene = Scene_Title.new
+    $scene = SceneTitle.new
     @message_window.clear
     Graphics.fadeout(60)
   end
@@ -1300,7 +1300,7 @@ class Scene_Battle < Scene_Base
     double = []
     for member in @action_battlers
       if member.action.physical_attack? && member.double_attack_activate? # 攻撃時のみ
-        DEBUG::write(c_m,"2回攻撃確定 <#{member.name}>")
+        Debug::write(c_m,"2回攻撃確定 <#{member.name}>")
         double.push(member)
       end
     end
@@ -1310,7 +1310,7 @@ class Scene_Battle < Scene_Base
     triple = []
     for member in @action_battlers
       if member.action.physical_attack? && member.triple_attack_activate? # 攻撃時のみ
-        DEBUG::write(c_m,"3回攻撃確定 <#{member.name}>")
+        Debug::write(c_m,"3回攻撃確定 <#{member.name}>")
         triple.push(member)
         triple.push(member)
       end
@@ -1324,15 +1324,15 @@ class Scene_Battle < Scene_Base
       b.action.initiative - a.action.initiative
     end
 
-    DEBUG::write(c_m, "== Action Order =============================================")
+    Debug::write(c_m, "== Action Order =============================================")
     for battler in @action_battlers
       next unless battler.exist?    # 戦闘不能の場合はリストから外れる
-      name = MISC.get_string(battler.name, 23)
-      state = MISC.get_string(battler.main_state_name, 10)
-      command = MISC.get_string(battler.action.get_command, 12)
-      DEBUG::write(c_m, sprintf("== Init:%2d %s %8s %8s ==", battler.action.initiative, name, state, command))
+      name = Misc.get_string(battler.name, 23)
+      state = Misc.get_string(battler.main_state_name, 10)
+      command = Misc.get_string(battler.action.get_command, 12)
+      Debug::write(c_m, sprintf("== Init:%2d %s %8s %8s ==", battler.action.initiative, name, state, command))
     end
-    DEBUG::write(c_m, "=============================================================")
+    Debug::write(c_m, "=============================================================")
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の処理
@@ -1366,22 +1366,22 @@ class Scene_Battle < Scene_Base
   #--------------------------------------------------------------------------
   def execute_action
     ## 恐怖キャンセル
-    # if @active_battler.fear? && (Constant_Table::CANCEL_RATE_F > rand(100))
+    # if @active_battler.fear? && (ConstantTable::CANCEL_RATE_F > rand(100))
     #   execute_action_cancel_fear
     #   return
     # end
     ## 感電キャンセル
-    if @active_battler.shock? && ($data_states[STATEID::SHOCK].cancel_ratio > rand(100))
+    if @active_battler.shock? && ($data_states[StateId::SHOCK].cancel_ratio > rand(100))
       execute_action_cancel_shock
       return
     end
     ## 吐き気キャンセル
-    if @active_battler.nausea? && ($data_states[STATEID::NAUSEA].cancel_ratio > rand(100))
+    if @active_battler.nausea? && ($data_states[StateId::NAUSEA].cancel_ratio > rand(100))
       execute_action_cancel_nausea
       return
     end
     ## 疲労キャンセル
-    if @active_battler.tired? && ($data_states[STATEID::TIRED].cancel_ratio > rand(100)) # 疲労中か？
+    if @active_battler.tired? && ($data_states[StateId::TIRED].cancel_ratio > rand(100)) # 疲労中か？
       execute_action_cancel
       return
     end
@@ -1429,7 +1429,7 @@ class Scene_Battle < Scene_Base
     when 7  # チャネリング
       execute_action_summon
     end
-    @active_battler.chance_skill_increase(SKILLID::TACTICS)  # 戦術
+    @active_battler.chance_skill_increase(SkillId::TACTICS)  # 戦術
     @action_battlers.unshift(@active_battler) if @active_battler.insert
     $game_temp.need_ps_refresh = true   # PSをリフレッシュ
   end
@@ -1461,7 +1461,7 @@ class Scene_Battle < Scene_Base
     $game_troop.identified_change     # 不確定・確定変更
     platoon_change if platoon_redraw  # 隊列変更
     start_party_command_selection
-    $game_actors.check_injured_member(Constant_Table::SECONDS_PER_TURN * $game_map.map_id)  # 30秒*マップID経過
+    $game_actors.check_injured_member(ConstantTable::SECONDS_PER_TURN * $game_map.map_id)  # 30秒*マップID経過
   end
   #--------------------------------------------------------------------------
   # ● 発狂による隊列変更
@@ -1643,11 +1643,11 @@ class Scene_Battle < Scene_Base
     skip = false    # 心眼による攻撃スキップフラグ
     no_counter = @active_battler.can_back_attack? ? true : false # 遠距離攻撃にはカウンタ不可
     if @active_battler.countered
-      DEBUG.write(c_m, "カウンターフラグあり、以降の攻撃はスキップ。カウンターフラグは一度攻撃済みの証拠")
+      Debug.write(c_m, "カウンターフラグあり、以降の攻撃はスキップ。カウンターフラグは一度攻撃済みの証拠")
       return
     elsif @active_battler.counter?
       ## カウンターか？
-      DEBUG.write(c_m, "#{@active_battler.name}のカウンター開始")
+      Debug.write(c_m, "#{@active_battler.name}のカウンター開始")
       @active_battler.unset_counter
       str1 = Vocab::Counter
       str2 = ""
@@ -1664,8 +1664,8 @@ class Scene_Battle < Scene_Base
         targets[0].set_counter
         targets[0].action.counter_target_push(@active_battler)
         @action_battlers.unshift(targets[0])
-        DEBUG.write(c_m, "心眼チェック成功:#{targets[0].name}")
-        targets[0].chance_skill_increase(SKILLID::SHINGAN)
+        Debug.write(c_m, "心眼チェック成功:#{targets[0].name}")
+        targets[0].chance_skill_increase(SkillId::SHINGAN)
         $music.se_play("心眼")
         skip = true
       else
@@ -1704,14 +1704,14 @@ class Scene_Battle < Scene_Base
     return unless defender.action.attack? or defender.action.guard?
     ## アクターか？
     if defender.actor? and defender.can_counter?
-      sv = MISC.skill_value(SKILLID::COUNTER, defender)
-      diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
-      defender.chance_skill_increase(SKILLID::COUNTER)
+      sv = Misc.skill_value(SkillId::COUNTER, defender)
+      diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
+      defender.chance_skill_increase(SkillId::COUNTER)
       ratio = Integer([sv * diff, 95].min)
       ratio /= 2 if defender.tired?
     ## モンスターが反撃スキルを持つ？
     elsif defender.can_counter?
-      ratio = Constant_Table::ENEMY_COUNTER_RATIO
+      ratio = ConstantTable::ENEMY_COUNTER_RATIO
     else
       ratio = 0
     end
@@ -1719,15 +1719,15 @@ class Scene_Battle < Scene_Base
       defender.set_counter
       defender.action.counter_target_push(@active_battler)
       @action_battlers.unshift(defender)
-      DEBUG.write(c_m, "反撃チェック:#{defender.name}, 確率:#{ratio}%")
+      Debug.write(c_m, "反撃チェック:#{defender.name}, 確率:#{ratio}%")
     end
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の実行 : 不意をつく
   #--------------------------------------------------------------------------
   def execute_action_supattack
-    @active_battler.chance_skill_increase(SKILLID::BACKSTAB)           # スキル：バックスタブ
-    DEBUG::write(c_m,"#{@active_battler.name}は不意打ちを実行")
+    @active_battler.chance_skill_increase(SkillId::BACKSTAB)           # スキル：バックスタブ
+    Debug::write(c_m,"#{@active_battler.name}は不意打ちを実行")
     targets = @active_battler.action.make_targets
     text1 = sprintf(Vocab::DosupAttack_1, @active_battler.name, targets[0].name)
     text2 = sprintf(Vocab::DosupAttack_2)
@@ -1752,13 +1752,13 @@ class Scene_Battle < Scene_Base
   # ● 戦闘行動の実行 : ターンアンデッド
   #--------------------------------------------------------------------------
   def execute_action_turn_undead
-    DEBUG::write(c_m,"#{@active_battler.name}はターンアンデッドを実行")
+    Debug::write(c_m,"#{@active_battler.name}はターンアンデッドを実行")
     @active_battler.cast_turn_undead = true # 1戦闘に1度のみ
     @active_battler.tired_turnud
     targets = @active_battler.action.make_targets
     text = sprintf(Vocab::Doturnundead, @active_battler.name)
     @message_window.add_instant_text(text)
-    magic = $data_magics[Constant_Table::TURN_UNDEAD] # ターンアンデッドの呪文オブジェクト取得
+    magic = $data_magics[ConstantTable::TURN_UNDEAD] # ターンアンデッドの呪文オブジェクト取得
     display_normal_animation(targets, magic.anim_id)
     wait(20)
     for target in targets
@@ -1770,7 +1770,7 @@ class Scene_Battle < Scene_Base
   # ● 戦闘行動の実行 : 瞑想
   #--------------------------------------------------------------------------
   def execute_action_meditation
-    DEBUG::write(c_m,"#{@active_battler.name}は瞑想を実行")
+    Debug::write(c_m,"#{@active_battler.name}は瞑想を実行")
     @active_battler.meditation = true
     text = sprintf(Vocab::Domeditation, @active_battler.name)
     @message_window.add_instant_text(text)
@@ -1787,7 +1787,7 @@ class Scene_Battle < Scene_Base
       text = sprintf(Vocab::Doencourage_s, @active_battler.name)  # 成功
       @message_window.add_instant_text(text)
       targets = @active_battler.action.make_targets
-      anim_id = Constant_Table::ENCOURAGE_ANIM_ID
+      anim_id = ConstantTable::ENCOURAGE_ANIM_ID
       display_normal_animation(targets, anim_id)
       wait(20)
       for target in targets
@@ -1805,7 +1805,7 @@ class Scene_Battle < Scene_Base
   def execute_action_cancel
     text = sprintf(Vocab::Cancel, @active_battler.name)
     @message_window.add_instant_text(text)
-    DEBUG::write(c_m,"#{@active_battler.name}は疲労の為アクションキャンセル")
+    Debug::write(c_m,"#{@active_battler.name}は疲労の為アクションキャンセル")
     wait(45)
   end
   #--------------------------------------------------------------------------
@@ -1814,7 +1814,7 @@ class Scene_Battle < Scene_Base
   def execute_action_cancel_shock
     text = sprintf(Vocab::Shock, @active_battler.name)
     @message_window.add_instant_text(text)
-    DEBUG::write(c_m,"#{@active_battler.name}は感電の為アクションキャンセル")
+    Debug::write(c_m,"#{@active_battler.name}は感電の為アクションキャンセル")
     wait(45)
   end
   #--------------------------------------------------------------------------
@@ -1823,43 +1823,43 @@ class Scene_Battle < Scene_Base
   def execute_action_cancel_nausea
     text = sprintf(Vocab::Nausea, @active_battler.name)
     @message_window.add_instant_text(text)
-    DEBUG::write(c_m,"#{@active_battler.name}は吐き気の為アクションキャンセル")
+    Debug::write(c_m,"#{@active_battler.name}は吐き気の為アクションキャンセル")
     wait(45)
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の実行 : 防御
   #--------------------------------------------------------------------------
   def execute_action_guard
-    DEBUG::write(c_m,"#{@active_battler.name}は防御を実行")
+    Debug::write(c_m,"#{@active_battler.name}は防御を実行")
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の実行 : 隠れる
   #--------------------------------------------------------------------------
   def execute_action_hide
-    @active_battler.chance_skill_increase(SKILLID::HIDE) # スキル：隠密技
+    @active_battler.chance_skill_increase(SkillId::HIDE) # スキル：隠密技
     case @active_battler.index
-    when 0; limit = Constant_Table::HIDE_0  # 先頭だと0%が上限に制限（先頭は隠れられない）
-    when 1; limit = Constant_Table::HIDE_1
-    when 2; limit = Constant_Table::HIDE_2
-    when 3; limit = Constant_Table::HIDE_3
-    when 4; limit = Constant_Table::HIDE_4
-    when 5; limit = Constant_Table::HIDE_5
+    when 0; limit = ConstantTable::HIDE_0  # 先頭だと0%が上限に制限（先頭は隠れられない）
+    when 1; limit = ConstantTable::HIDE_1
+    when 2; limit = ConstantTable::HIDE_2
+    when 3; limit = ConstantTable::HIDE_3
+    when 4; limit = ConstantTable::HIDE_4
+    when 5; limit = ConstantTable::HIDE_5
     end
 
-    sv = MISC.skill_value(SKILLID::HIDE, @active_battler) # 隠密技 特性値補正後のスキル値
-    diff = Constant_Table::DIFF_70[$game_map.map_id] # フロア係数
+    sv = Misc.skill_value(SkillId::HIDE, @active_battler) # 隠密技 特性値補正後のスキル値
+    diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
     ratio = Integer(sv * diff)
-    penalty = $game_troop.get_sharp_eye * Constant_Table::SHARP_EYE_P
+    penalty = $game_troop.get_sharp_eye * ConstantTable::SHARP_EYE_P
     rate = [ratio, limit - penalty].min
 
     if rate > rand(100) # 隠密判定成功
       text = sprintf(Vocab::DoHide_s, @active_battler.name)
-      @active_battler.add_state(STATEID::HIDING) # 隠密
-      DEBUG::write(c_m,"#{@active_battler.name}は隠密を実施 成功率:#{rate}%で成功 -#{penalty}%") # debug
+      @active_battler.add_state(StateId::HIDING) # 隠密
+      Debug::write(c_m,"#{@active_battler.name}は隠密を実施 成功率:#{rate}%で成功 -#{penalty}%") # debug
       @active_battler.modify_motivation(13) # 気力増加
     else                # 隠密判定失敗
       text = sprintf(Vocab::DoHide_f, @active_battler.name)
-      DEBUG::write(c_m,"#{@active_battler.name}は隠密を実施 成功率:#{rate}%で失敗 -#{penalty}%") # debug
+      Debug::write(c_m,"#{@active_battler.name}は隠密を実施 成功率:#{rate}%で失敗 -#{penalty}%") # debug
       @active_battler.modify_motivation(12) # 失敗で気力が減少
     end
     @message_window.add_instant_text(text)
@@ -1902,7 +1902,7 @@ class Scene_Battle < Scene_Base
     magic = $data_magics[@active_battler.action.magic_id] # オブジェクト取得
     magic_level = @active_battler.action.magic_lv
     if @active_battler.interruption # スペルブレイクされていたらスキップ
-      DEBUG::write(c_m,"スペルブレイクの為スキップ:#{@active_battler.name}")
+      Debug::write(c_m,"スペルブレイクの為スキップ:#{@active_battler.name}")
       return
     else
       magic_skill_increase_chance(magic, magic_level)
@@ -1920,7 +1920,7 @@ class Scene_Battle < Scene_Base
         next if id == 0
         nm_array.push($data_magics[id]) if $data_magics[id].for_opponent?
       end
-      # DEBUG.write(c_m, "array:#{array} nm_array:#{nm_array} nm_array.size:#{nm_array.size}")
+      # Debug.write(c_m, "array:#{array} nm_array:#{nm_array} nm_array.size:#{nm_array.size}")
       new_magic = nm_array[rand(nm_array.size)]
       if new_magic == nil  # 相手が攻撃術者でない場合
         ## 詠唱時のバトルメッセージの指定------------------------------------------------------------------------------------
@@ -1937,7 +1937,7 @@ class Scene_Battle < Scene_Base
         end
         return
       end
-      DEBUG.write(c_m, "魔力よ弾けろにてmagic id 上書き=>#{new_magic.name}")
+      Debug.write(c_m, "魔力よ弾けろにてmagic id 上書き=>#{new_magic.name}")
       magic = new_magic           # 暴走させた呪文
       magic_level = new_magic_lv  # 暴走させた呪文CP
       ## 詠唱時のバトルメッセージの指定------------------------------------------------------------------------------------
@@ -1982,7 +1982,6 @@ class Scene_Battle < Scene_Base
       display_cast_miss
     end
     @active_battler.meditation = false                  # 瞑想フラグオフ
-    @active_battler.tired_casting(original_magic_lv) # 疲労加算
   end
   #--------------------------------------------------------------------------
   # ● 戦闘行動の実行 : 呪文
@@ -1991,7 +1990,7 @@ class Scene_Battle < Scene_Base
     magic = $data_magics[@active_battler.action.magic_id] # オブジェクト取得
     magic_level = @active_battler.action.magic_lv
     if @active_battler.interruption # スペルブレイクされていたらスキップ
-      DEBUG::write(c_m,"スペルブレイクの為スキップ:#{@active_battler.name}")
+      Debug::write(c_m,"スペルブレイクの為スキップ:#{@active_battler.name}")
       return
     elsif magic.purpose == "miracle"
       text = "#{@active_battler.name}は てんにいのりをささげた。"
@@ -2018,7 +2017,7 @@ class Scene_Battle < Scene_Base
     ## targetの設定が必要な場合は設定
     reverse = false
     if reverse_fire(@active_battler, magic, magic_level)
-      DEBUG::write(c_m,"!!呪文の逆流!! actor:#{@active_battler.name}")
+      Debug::write(c_m,"!!呪文の逆流!! actor:#{@active_battler.name}")
       reverse = true
       if magic.need_target?
         targets = @active_battler.action.make_reverse_targets(magic_level)
@@ -2077,7 +2076,6 @@ class Scene_Battle < Scene_Base
       @active_battler.check_remove_stealth(true)  # 隠密解除判定
     end
     @active_battler.meditation = false          # 瞑想フラグオフ
-    @active_battler.tired_casting(magic_level)  # 疲労加算
   end
   #--------------------------------------------------------------------------
   # ● 呪文スキル上昇
@@ -2086,22 +2084,22 @@ class Scene_Battle < Scene_Base
     case magic.domain
     when 0;
       magic_level.times do
-        @active_battler.chance_skill_increase(SKILLID::RATIONAL) # スキル：呪文の知識(-)
+        @active_battler.chance_skill_increase(SkillId::RATIONAL) # スキル：呪文の知識(-)
       end
     when 1;
       magic_level.times do
-        @active_battler.chance_skill_increase(SKILLID::MYSTIC) # スキル：呪文の知識(+)
+        @active_battler.chance_skill_increase(SkillId::MYSTIC) # スキル：呪文の知識(+)
       end
     end
     ##> 四大元素スキルの上昇
     if magic.fire > 0
-      skill = SKILLID::FIRE
+      skill = SkillId::FIRE
     elsif magic.water > 0
-      skill = SKILLID::WATER
+      skill = SkillId::WATER
     elsif magic.air > 0
-      skill = SKILLID::AIR
+      skill = SkillId::AIR
     elsif magic.earth > 0
-      skill = SKILLID::EARTH
+      skill = SkillId::EARTH
     end
     magic_level.times do @active_battler.chance_skill_increase(skill) end
   end
@@ -2113,7 +2111,7 @@ class Scene_Battle < Scene_Base
     return true if user.action.breath?  # ブレスに詠唱成功判定無し
     ratio = user.get_cast_ratio(magic, cast_power) # 詠唱成功率取得
     user.meditation = false             # 瞑想フラグオフ
-    DEBUG::write(c_m,"#{user.name} 詠唱成功率:#{ratio}%")
+    Debug::write(c_m,"#{user.name} 詠唱成功率:#{ratio}%")
     return true if ratio > rand(100)
     return false
   end
@@ -2123,13 +2121,13 @@ class Scene_Battle < Scene_Base
   def judge_fizzle(user, reverse = false)
     return true if reverse
     if user.fizzle_field > 0
-      upper = Constant_Table::FF_UPPERRATE  # 上限設定
+      upper = ConstantTable::FF_UPPERRATE  # 上限設定
       rate = [upper, user.fizzle_field].min
       if rate > rand(100)                   # 判定
         ## 妨害成功
-        user.fizzle_field *= (100 - Constant_Table::FF_DETERIORATE2)  # フィールド減退
+        user.fizzle_field *= (100 - ConstantTable::FF_DETERIORATE2)  # フィールド減退
         user.fizzle_field /= 100
-        DEBUG::write(c_m,"#{user.name} 詠唱妨害率:#{rate}% 現フィールド値:#{user.fizzle_field}")
+        Debug::write(c_m,"#{user.name} 詠唱妨害率:#{rate}% 現フィールド値:#{user.fizzle_field}")
         return false
       end
     end
@@ -2144,7 +2142,7 @@ class Scene_Battle < Scene_Base
     when "damage","status"
       return false if magic.for_opponent?
       ## FFが強い？
-      c = battler.fizzle_field > Constant_Table::FF_UPPERRATE ? 3 : 1
+      c = battler.fizzle_field > ConstantTable::FF_UPPERRATE ? 3 : 1
       return true if $TEST
       ratio = [magic_level - 1, 0].max
       ratio *= c
@@ -2154,7 +2152,7 @@ class Scene_Battle < Scene_Base
           ratio = [ratio - 2, 0].max
         end
       end
-      DEBUG::write(c_m,"逆流CHECK:#{ratio}% C.P.#{magic_level}")
+      Debug::write(c_m,"逆流CHECK:#{ratio}% C.P.#{magic_level}")
       return true if ratio > rand(100)
     end
     return false
@@ -2172,12 +2170,12 @@ class Scene_Battle < Scene_Base
       return
     end
     case @active_battler.action.basic
-    when 0; obj = $data_magics[Constant_Table::BREATH1_ID]  # ノーマルブレス
-    when 1; obj = $data_magics[Constant_Table::BREATH2_ID]  # 火のブレス
-    when 2; obj = $data_magics[Constant_Table::BREATH3_ID]  # 氷のブレス
-    when 3; obj = $data_magics[Constant_Table::BREATH4_ID]  # 雷のブレス
-    when 4; obj = $data_magics[Constant_Table::BREATH5_ID]  # 毒のブレス
-    when 5; obj = $data_magics[Constant_Table::BREATH6_ID]  # 死のブレス
+    when 0; obj = $data_magics[ConstantTable::BREATH1_ID]  # ノーマルブレス
+    when 1; obj = $data_magics[ConstantTable::BREATH2_ID]  # 火のブレス
+    when 2; obj = $data_magics[ConstantTable::BREATH3_ID]  # 氷のブレス
+    when 3; obj = $data_magics[ConstantTable::BREATH4_ID]  # 雷のブレス
+    when 4; obj = $data_magics[ConstantTable::BREATH5_ID]  # 毒のブレス
+    when 5; obj = $data_magics[ConstantTable::BREATH6_ID]  # 死のブレス
     end
     ## バトルメッセージの指定--------------------
     text = "#{@active_battler.name}は #{obj.name}を はいた。"
@@ -2221,7 +2219,7 @@ class Scene_Battle < Scene_Base
   def execute_action_summon
     text = sprintf(Vocab::UseSummon, @active_battler.name)
     @message_window.add_instant_text(text)
-    anim_id = Constant_Table::CHANNELING_ANIME
+    anim_id = ConstantTable::CHANNELING_ANIME
     display_animation([@active_battler], anim_id)
     @active_battler.channeling_effect
     display_action_effects(@active_battler, "channeling")
@@ -2247,7 +2245,7 @@ class Scene_Battle < Scene_Base
   #    アクターの場合は二刀流を考慮 (左手武器は反転して表示) 。
   #--------------------------------------------------------------------------
   def display_attack_animation(targets)
-    if @active_battler.is_a?(Game_Enemy)
+    if @active_battler.is_a?(GameEnemy)
       $music.se_play("敵攻撃")
 #~       Sound.play_enemy_attack
       wait(15, true)
@@ -2271,7 +2269,7 @@ class Scene_Battle < Scene_Base
     animation = $data_animations[anim_id]
     if animation != nil
       to_screen = (animation.position == 3)       # 位置が「画面」か？
-      unless @active_battler.is_a?(Game_Enemy) # 味方の攻撃
+      unless @active_battler.is_a?(GameEnemy) # 味方の攻撃
         for target in targets
           # target = targets[0] # targetの先頭を強制的に代入
           if target.actor? # 仲間への回復？
@@ -2486,7 +2484,7 @@ class Scene_Battle < Scene_Base
           ## 二刀流時メッセージ
           text2 = sprintf(Vocab::Enemy2Damage, target.subhits, target.hp_subdamage + target.element_subdamage) if target.dual_attacked
           ## ダメージ描画開始
-          @damage.start_drawing(target.screen_x, target.screen_y, target.hp_damage+target.hp_subdamage, target.power_attacked, false, false, false)
+          @damage.start_drawing(target.screen_x, target.screen_y, target.hp_damage+target.hp_subdamage, target.power_attacked)
           ## 属性武器の時にのみ属性ダメージを0でも表示させる。(0は属性ダメージが属性防御にて減退させられていることを示す)
           if target.damage_element_type > 0
             total_element_damage = target.element_damage + target.element_subdamage # 属性ダメージの合計
@@ -2600,18 +2598,18 @@ class Scene_Battle < Scene_Base
       end
       ## 以下のステートでコラプスを実施
       array = []
-      array.push(STATEID::DEATH)        # 死亡
-      array.push(STATEID::CRITICAL)     # 首はね
-      array.push(STATEID::F_BLOW)       # とどめ
-      array.push(STATEID::SUFFOCATION)  # 窒息
-      array.push(STATEID::PURIFY)       # ターンアンデッド
-      array.push(STATEID::NIGHTMARE)    # 悪夢(睡眠中に悪夢呪文)
+      array.push(StateId::DEATH)        # 死亡
+      array.push(StateId::CRITICAL)     # 首はね
+      array.push(StateId::F_BLOW)       # とどめ
+      array.push(StateId::SUFFOCATION)  # 窒息
+      array.push(StateId::PURIFY)       # ターンアンデッド
+      array.push(StateId::NIGHTMARE)    # 悪夢(睡眠中に悪夢呪文)
       if array.include?(state.id)
         target.call_front = true
         target.perform_collapse
         @active_battler.countup_marks unless @active_battler == nil # 討伐数を追加
         @active_battler.modify_motivation(2)  # 討伐による気力増加
-        @active_battler.finish_blow = true if state.id == STATEID::F_BLOW
+        @active_battler.finish_blow = true if state.id == StateId::F_BLOW
       end
       @message_window.add_instant_text(text)
       wait(20)
@@ -2910,19 +2908,19 @@ class Scene_Battle < Scene_Base
     map_id = $game_map.map_id
     pow = rand(10) + 1 + cp
     result = (pow > map_id) ? true : false
-    DEBUG.write(c_m, "帰還呪文 強さ:#{pow} CP:#{cp} #{map_id}階層")
+    Debug.write(c_m, "帰還呪文 強さ:#{pow} CP:#{cp} #{map_id}階層")
     return unless result
     num = rand(6) + 1 + cp
     if num >= $game_party.members.size  # 【呪文の成功】
-      DEBUG::write(c_m,"ESCAPE成功")
+      Debug::write(c_m,"ESCAPE成功")
       ## 戦闘の強制終了
       battle_end(:escape, true) # callhomeフラグtrue
       $game_party.in_party                        # 迷宮に残るフラグオフ
       $game_system.remove_unique_id               # ユニークIDの削除
       caster.forget_home_magic                    # 呪文を忘れる
-      $scene = Scene_Village.new                  # 村へ
+      $scene = SceneVillage.new                  # 村へ
     else
-      DEBUG::write(c_m,"ESCAPE失敗")
+      Debug::write(c_m,"ESCAPE失敗")
       ## 戦闘の強制終了
       battle_end(:escape, true) # callhomeフラグtrue
       ## 全員分のIDリストを作成
@@ -2935,9 +2933,9 @@ class Scene_Battle < Scene_Base
         $game_party.remove_actor(actor_id)  # 実際にパーティから外す
         $game_actors[actor_id].out = false  # 地上フラグオン
         name = $game_actors[actor_id].name
-        DEBUG::write(c_m,"ACTOR_ID:#{actor_id} #{name}が地上へ帰還")
+        Debug::write(c_m,"ACTOR_ID:#{actor_id} #{name}が地上へ帰還")
       end
-      DEBUG::write(c_m,"残ったパーティの人数:#{$game_party.members.size}")
+      Debug::write(c_m,"残ったパーティの人数:#{$game_party.members.size}")
     end
   end
   #--------------------------------------------------------------------------
@@ -2947,8 +2945,7 @@ class Scene_Battle < Scene_Base
     return if target.actor?
     return if target.mercenary?
     return if target.summon?
-    return if target.poison_damage == 0
-    @damage.start_drawing(target.screen_x, target.screen_y, target.poison_damage, false, true)
+    @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("毒ダメージ")
     wait(45)
   end
@@ -2959,8 +2956,7 @@ class Scene_Battle < Scene_Base
     return if target.actor?
     return if target.mercenary?
     return if target.summon?
-    return if target.bleeding_damage == 0
-    @damage.start_drawing(target.screen_x, target.screen_y, target.bleeding_damage, false, false, false, true)
+    @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("出血ダメージ")
     wait(45)
   end
@@ -2972,7 +2968,7 @@ class Scene_Battle < Scene_Base
     return if target.mercenary?
     return if target.summon?
     return if target.hp_healing == 0
-    @damage.start_drawing(target.screen_x, target.screen_y, target.hp_healing, false, false, true)
+    @damage.start_drawing(target.screen_x, target.screen_y, target.hp_healing, false, true)
     $music.se_play("ヒーリング")
     wait(45)
   end

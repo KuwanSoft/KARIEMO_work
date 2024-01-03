@@ -4,7 +4,7 @@
 # 性格を選ぶ
 #==============================================================================
 
-class Window_Personality < Window_Selectable
+class Window_Personality < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -30,8 +30,8 @@ class Window_Personality < Window_Selectable
   # candidateには直接性格のシンボルが入る
   #--------------------------------------------------------------------------
   def make_list(side = "p")
-    a = Constant_Table::PERSONALITY_P_hash.keys if side == "p"
-    a = Constant_Table::PERSONALITY_N_hash.keys if side == "n"
+    a = ConstantTable::PERSONALITY_P_hash.keys if side == "p"
+    a = ConstantTable::PERSONALITY_N_hash.keys if side == "n"
     a.delete(@actor.personality_p)
     @candidate1 = a[rand(a.size)]
     a.delete(@candidate1)
@@ -72,11 +72,11 @@ class Window_Personality < Window_Selectable
     change_font_to_v
     case @phase
     when 1;
-      hash1 = Constant_Table::PERSONALITY_P_hash
-      hash2 = Constant_Table::PERSONALITY_P_DESC
+      hash1 = ConstantTable::PERSONALITY_P_hash
+      hash2 = ConstantTable::PERSONALITY_P_DESC
     when 2;
-      hash1 = Constant_Table::PERSONALITY_N_hash
-      hash2 = Constant_Table::PERSONALITY_N_DESC
+      hash1 = ConstantTable::PERSONALITY_N_hash
+      hash2 = ConstantTable::PERSONALITY_N_DESC
     end
     text1 = hash1[@candidate1]
     text1d = hash2[@candidate1]

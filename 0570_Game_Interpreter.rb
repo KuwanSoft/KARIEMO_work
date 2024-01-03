@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Interpreter
+# ■ GameInterpreter
 #------------------------------------------------------------------------------
 # 　イベントコマンドを実行するインタプリタです。このクラスは Game_Map クラス、
-# Game_Troop クラス、Game_Event クラスの内部で使用されます。
+# GameTroop クラス、GameEvent クラスの内部で使用されます。
 #==============================================================================
 
-class Game_Interpreter
+class GameInterpreter
   attr_accessor :wait_count
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -86,13 +86,13 @@ class Game_Interpreter
         return
       end
     end
-    for event in $data_common_events.compact      # コモンイベント
-      if event.trigger == 1 and           # トリガーが自動実行かつ
-        $game_switches[event.switch_id] == true  # 条件スイッチが ON の場合
-        setup(event.list)                 # イベントをセットアップ
-        return
-      end
-    end
+    # for event in $data_common_events.compact      # コモンイベント
+    #   if event.trigger == 1 and           # トリガーが自動実行かつ
+    #     $game_switches[event.switch_id] == true  # 条件スイッチが ON の場合
+    #     setup(event.list)                 # イベントをセットアップ
+    #     return
+    #   end
+    # end
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新
@@ -702,7 +702,7 @@ class Game_Interpreter
   def command_117
     common_event = $data_common_events[@params[0]]
     if common_event != nil
-      @child_interpreter = Game_Interpreter.new(@depth + 1)
+      @child_interpreter = GameInterpreter.new(@depth + 1)
       @child_interpreter.setup(common_event.list, @event_id)
     end
     return true

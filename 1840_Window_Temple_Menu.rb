@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_CHURCH_Menu
+# ■ Window_Temple_Menu
 #------------------------------------------------------------------------------
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_CHURCH_Menu < Window_Selectable
+class Window_Temple_Menu < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -48,8 +48,8 @@ class Window_CHURCH_Menu < Window_Selectable
       @adjust_x = WLW*3
       @item_max = 4
       change_font_to_v        # フォント変更
-      str1 = "まよえるこひつじたちよ、"
-      str2 = "わがきょうかいへようこそ"
+      str1 = "まよえる こひつじたちよ、"
+      str2 = "わが しんでんへ ようこそ"
       self.contents.draw_text(0, 0, self.width-32, 24, str1, 0)
       self.contents.draw_text(0, BLH, self.width-32, 24, str2, 2)
       change_font_to_normal   # フォント戻し
@@ -116,7 +116,7 @@ class Window_CHURCH_Menu < Window_Selectable
     self.contents.clear
     str1 = "きふは だいかんげいです。"
     ep = 1000
-    gp = MISC.ep2gp(ep, actor).to_i
+    gp = Misc.ep2gp(ep, actor).to_i
     str2 = "1000E.P. ="
     str3 = "#{gp}Goldです。"
     self.contents.draw_text(0, 0, self.width-32, 24, str1, 1)

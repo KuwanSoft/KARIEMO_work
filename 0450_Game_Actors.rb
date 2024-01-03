@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Actors
+# ■ GameActors
 #------------------------------------------------------------------------------
 # 　アクターの配列を扱うクラスです。このクラスのインスタンスは $game_actors で
 # 参照されます。
 #==============================================================================
 
-class Game_Actors
+class GameActors
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Game_Actors
   #--------------------------------------------------------------------------
   def [](actor_id)
     if @data[actor_id] == nil
-      @data[actor_id] = Game_Actor.new(actor_id)
+      @data[actor_id] = GameActor.new(actor_id)
     end
     return @data[actor_id]
   end
@@ -46,7 +46,7 @@ class Game_Actors
     for id in 1..20
       return false unless (@data[id].dead? and @data[id].out)
     end
-    DEBUG.write(c_m, "20名全員Dead&Out確認")
+    Debug.write(c_m, "20名全員Dead&Out確認")
     return true
   end
   #--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class Game_Actors
   def make_random_survivor(s_id)
     survivor = $game_actors[s_id]                   # オブジェクトの取得
     survivor.setup(s_id)                            # 初期化
-    DEBUG::write(c_m,"サバイバーセットアップ開始")
+    Debug::write(c_m,"サバイバーセットアップ開始")
     survivor.name = "ゆくえふめいしゃ"
     survivor.age = 14 + rand(10)
     survivor.principle = [1,-1][rand(2)]  # 1 or -1
@@ -65,25 +65,25 @@ class Game_Actors
     end
     survivor.class_id = candidates[rand(candidates.size)]
     rand(20).times do survivor.level_up end
-    survivor.init_str = survivor.str = MISC.gen_number(survivor.level)
-    survivor.init_int = survivor.int = MISC.gen_number(survivor.level)
-    survivor.init_vit = survivor.vit = MISC.gen_number(survivor.level)
-    survivor.init_spd = survivor.spd = MISC.gen_number(survivor.level)
-    survivor.init_mnd = survivor.mnd = MISC.gen_number(survivor.level)
-    survivor.init_luk = survivor.luk = MISC.gen_number(survivor.level)
-    survivor.personality_p = Constant_Table::PERSONALITY_P_hash.keys[rand(12)]
-    survivor.personality_n = Constant_Table::PERSONALITY_N_hash.keys[rand(12)]
+    survivor.init_str = survivor.str = Misc.gen_number(survivor.level)
+    survivor.init_int = survivor.int = Misc.gen_number(survivor.level)
+    survivor.init_vit = survivor.vit = Misc.gen_number(survivor.level)
+    survivor.init_spd = survivor.spd = Misc.gen_number(survivor.level)
+    survivor.init_mnd = survivor.mnd = Misc.gen_number(survivor.level)
+    survivor.init_luk = survivor.luk = Misc.gen_number(survivor.level)
+    survivor.personality_p = ConstantTable::PERSONALITY_P_hash.keys[rand(12)]
+    survivor.personality_n = ConstantTable::PERSONALITY_N_hash.keys[rand(12)]
     # HPの設定
     dice = $data_classes[survivor.class_id].hp_base
     # case survivor.class_id      # それぞれのCLASSで基本値を適用
-    # when 1;     dice = Constant_Table::WAR_HP    # 戦士
-    # when 4;     dice = Constant_Table::KGT_HP    # 騎士
-    # when 2,5,9; dice = Constant_Table::THF_HP    # 盗賊・忍者・従士
-    # when 3,6;   dice = Constant_Table::SOR_HP    # 呪術師・賢者
-    # when 7,10;  dice = Constant_Table::HUN_HP    # 狩人・侍
-    # when 8;     dice = Constant_Table::CLE_HP    # 聖職者
+    # when 1;     dice = ConstantTable::WAR_HP    # 戦士
+    # when 4;     dice = ConstantTable::KGT_HP    # 騎士
+    # when 2,5,9; dice = ConstantTable::THF_HP    # 盗賊・忍者・従士
+    # when 3,6;   dice = ConstantTable::SOR_HP    # 呪術師・賢者
+    # when 7,10;  dice = ConstantTable::HUN_HP    # 狩人・侍
+    # when 8;     dice = ConstantTable::CLE_HP    # 聖職者
     # end
-    survivor.maxhp = MISC.dice(survivor.level, dice, 0)
+    survivor.maxhp = Misc.dice(survivor.level, dice, 0)
     survivor.marks = rand(300)
     survivor.rip += rand(10)
     set_face_exclusively(survivor)
@@ -103,7 +103,7 @@ class Game_Actors
     survivor.rescue = false             # 未救出フラグオン
     survivor.recover_all
     survivor.hp -= survivor.maxhp       # 死亡状態にする
-    DEBUG.write(c_m, "hp:#{survivor.hp} maxhp:#{survivor.maxhp}")
+    Debug.write(c_m, "hp:#{survivor.hp} maxhp:#{survivor.maxhp}")
   end
   #--------------------------------------------------------------------------
   # ● 顔をプレイヤーキャラクタとかぶらないように
@@ -116,9 +116,9 @@ class Game_Actors
       fa.push(self[id].face.scan(/face \((\S+)\)/)[0][0].to_i)
     end
     fa.compact!                                     # nilの削除
-    randomf = rand(Constant_Table::MAX_FACE_ID)+1
+    randomf = rand(ConstantTable::MAX_FACE_ID)+1
     while fa.include?(randomf)                      # 既存Faceとかぶっている間はLOOP
-      randomf = rand(Constant_Table::MAX_FACE_ID)+1
+      randomf = rand(ConstantTable::MAX_FACE_ID)+1
     end
     survivor.set_face("face (#{randomf})")
   end
@@ -137,7 +137,7 @@ class Game_Actors
     when 15..17; rank = 4
     when 18..20; rank = 5
     end
-    TREASURE.survivor_equip(survivor, rank)
+    Treasure.survivor_equip(survivor, rank)
   end
   #--------------------------------------------------------------------------
   # ● 治療中のメンバーの秒数(value秒)経過

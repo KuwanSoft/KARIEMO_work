@@ -4,7 +4,7 @@
 # 　バトル画面で、キャラクタのコマンドを選択するウィンドウです。
 #==============================================================================
 
-class Window_ActorCommand < Window_Selectable
+class Window_ActorCommand < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ class Window_ActorCommand < Window_Selectable
 
     @commands = []
     # 攻撃or不意を突くのコマンド
-    if actor.state?(STATEID::HIDING)                 # 隠密？
+    if actor.state?(StateId::HIDING)                 # 隠密？
       @commands.push(Vocab::Command06)  # 不意を突く
     elsif can_atk
       @commands.push(Vocab::Command01)  # 攻撃
@@ -75,7 +75,7 @@ class Window_ActorCommand < Window_Selectable
     ## アイテムを使う
     @commands.push(Vocab::Command03)
     ## 姿を隠す
-    if actor.can_hide? and not actor.state?(STATEID::HIDING)
+    if actor.can_hide? and not actor.state?(StateId::HIDING)
       @commands.push(Vocab::Command05)
     end
     ## ターンアンデッド

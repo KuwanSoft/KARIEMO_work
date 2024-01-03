@@ -1,4 +1,4 @@
-class NPC
+class Npc
   attr_accessor :id
   attr_accessor :name
   attr_accessor :sprite_name

@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 他のパーティの名前
 #==============================================================================
-class Window_OtherParty < Window_Selectable
+class Window_OtherParty < WindowSelectable
   def initialize
     super(x = (512-320)/2, y = 260, width = 320, WLH*6 + 32)
     self.visible = false

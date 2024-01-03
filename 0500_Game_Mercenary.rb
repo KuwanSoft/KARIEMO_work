@@ -1,12 +1,12 @@
 #==============================================================================
-# ■ Game_Mercenary
+# ■ GameMercenary
 #------------------------------------------------------------------------------
 # 　傭兵および戦闘に関するデータを扱うクラスです。バトルイベントの処理も
 # 行います。このクラスのインスタンスは $game_mercenary で参照されます。
 # troopやpartyと同列の扱い。
 #==============================================================================
 
-class Game_Mercenary < Game_Unit
+class GameMercenary < GameUnit
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class Game_Mercenary < Game_Unit
   #--------------------------------------------------------------------------
   def initialize
     super
-    @screen = Game_Screen.new
+    @screen = GameScreen.new
     @mercenarys = []
     @total_share = 0
     clear
@@ -42,9 +42,9 @@ class Game_Mercenary < Game_Unit
   #--------------------------------------------------------------------------
   def share(gold)
     return gold unless active? # ガイドがいない場合
-    share = gold * Constant_Table::SHARE_RATIO / 100
+    share = gold * ConstantTable::SHARE_RATIO / 100
     @total_share += share
-    DEBUG.write(c_m, "ガイド取り分:#{share}G 総量:#{@total_share}G")
+    Debug.write(c_m, "ガイド取り分:#{share}G 総量:#{@total_share}G")
     return gold - share
   end
   #--------------------------------------------------------------------------
@@ -63,7 +63,7 @@ class Game_Mercenary < Game_Unit
   # ● トレジャーハント判定
   #--------------------------------------------------------------------------
   def treasure_hunting?
-    DEBUG.write(c_m, "ガイドのTreasureHunt:+#{skill_check("treasure")}")
+    Debug.write(c_m, "ガイドのTreasureHunt:+#{skill_check("treasure")}")
     return skill_check("treasure")
   end
   #--------------------------------------------------------------------------
@@ -129,7 +129,7 @@ class Game_Mercenary < Game_Unit
         value = members[0].enemy.skill.scan(/危(\d+)/)[0][0].to_i
       end
     end
-    DEBUG.write(c_m, "ガイドスキルボーナス判定:#{str} => +#{value}")
+    Debug.write(c_m, "ガイドスキルボーナス判定:#{str} => +#{value}")
     return value
   end
   #--------------------------------------------------------------------------
@@ -147,11 +147,11 @@ class Game_Mercenary < Game_Unit
   def setup(mercenary_id)
     clear
     # TargetIndexは0で決め打ち(smoothはunit内でされるため連番だとエラー)
-    index = Constant_Table::GUIDE_INDEX
-    mercenary = Game_Enemy.new(index, mercenary_id, 4)  # 傭兵はグループ5
+    index = ConstantTable::GUIDE_INDEX
+    mercenary = GameEnemy.new(index, mercenary_id, 4)  # 傭兵はグループ5
     mercenary.mercenary = true  # 傭兵フラグ
-    DEBUG::write(c_m,"INDEX:#{mercenary.index} Group:#{mercenary.group_id+1}")         # debug
-    DEBUG::write(c_m,"傭兵の名前:#{mercenary.original_name} MAXHP:#{mercenary.maxhp}") # debug
+    Debug::write(c_m,"INDEX:#{mercenary.index} Group:#{mercenary.group_id+1}")         # debug
+    Debug::write(c_m,"傭兵の名前:#{mercenary.original_name} MAXHP:#{mercenary.maxhp}") # debug
     @mercenarys.push(mercenary)
   end
   #--------------------------------------------------------------------------

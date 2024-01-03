@@ -1,4 +1,4 @@
-class ThreeDmap < Scene_Map
+class ThreeDmap < SceneMap
   attr_reader   :kakushi               # 隠し扉
   ADJ_SCREEN_Y = 40
   #--------------------------------------------------------------------------
@@ -172,8 +172,8 @@ class ThreeDmap < Scene_Map
     @wall["#{loc}"].visible = false # 扉と壁が重なるので、壁を消す
 		@door["#{loc}"].visible = false # 通常扉も消す
 #~     case $game_map.map_id
-#~     when 1 ; @down_stairs["#{loc}"].tone = Constant_Table::TONE_B1F
-#~     when 2 ; @down_stairs["#{loc}"].tone = Constant_Table::TONE_B2F
+#~     when 1 ; @down_stairs["#{loc}"].tone = ConstantTable::TONE_B1F
+#~     when 2 ; @down_stairs["#{loc}"].tone = ConstantTable::TONE_B2F
 #~     end
 		@down_stairs["#{loc}"].visible = true
   end
@@ -184,8 +184,8 @@ class ThreeDmap < Scene_Map
     @wall["#{loc}"].visible = false # 扉と壁が重なるので、壁を消す
 		@door["#{loc}"].visible = false # 通常扉も消す
 #~     case $game_map.map_id
-#~     when 1 ; @iron_door["#{loc}"].tone = Constant_Table::TONE_B1F
-#~     when 2 ; @iron_door["#{loc}"].tone = Constant_Table::TONE_B2F
+#~     when 1 ; @iron_door["#{loc}"].tone = ConstantTable::TONE_B1F
+#~     when 2 ; @iron_door["#{loc}"].tone = ConstantTable::TONE_B2F
 #~     end
 		@iron_door["#{loc}"].visible = true
   end
@@ -407,7 +407,7 @@ class ThreeDmap < Scene_Map
   #   if direction == $game_player.kakushi[x, y, id] # 隠し扉のdirectionとあったら
   #     @kakushi.visible = true
   #     @wall["1"].visible = false  # 目の前の壁表示は消す
-  #     $music.se_play("シークレットドア") unless $scene.is_a?(Scene_CAMP)
+  #     $music.se_play("シークレットドア") unless $scene.is_a?(SceneCamp)
   #   end
   # end
   #--------------------------------------------------------------------------
@@ -547,8 +547,8 @@ class ThreeDmap < Scene_Map
       end
   		@wall["#{i}"].ox = @wall["#{i}"].bitmap.width / 2
   		@wall["#{i}"].oy = @wall["#{i}"].bitmap.height / 2
-      @wall["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @wall["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @wall["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @wall["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
   		case i
       when 1,2,3;         @wall["#{i}"].z = 29
   		when 4,5,6,7,8;       @wall["#{i}"].z = 27
@@ -569,8 +569,8 @@ class ThreeDmap < Scene_Map
       end
       @door["#{i}"].ox = @door["#{i}"].bitmap.width / 2
   		@door["#{i}"].oy = @door["#{i}"].bitmap.height / 2
-      @door["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @door["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @door["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @door["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
   		case i
       when 1,2,3;         @door["#{i}"].z = 29
   		when 4,5,6,7,8;       @door["#{i}"].z = 27
@@ -591,8 +591,8 @@ class ThreeDmap < Scene_Map
       end
       @iron_door["#{i}"].ox = @iron_door["#{i}"].bitmap.width / 2
   		@iron_door["#{i}"].oy = @iron_door["#{i}"].bitmap.height / 2
-      @iron_door["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @iron_door["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @iron_door["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @iron_door["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
   		case i
       when 1,2,3;         @iron_door["#{i}"].z = 29
   		when 4,5,6,7,8;       @iron_door["#{i}"].z = 27
@@ -613,8 +613,8 @@ class ThreeDmap < Scene_Map
       end
       @up_stairs["#{i}"].ox = @up_stairs["#{i}"].bitmap.width / 2
   		@up_stairs["#{i}"].oy = @up_stairs["#{i}"].bitmap.height / 2
-      @up_stairs["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @up_stairs["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @up_stairs["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @up_stairs["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
   		case i
       when 1,2,3;         @up_stairs["#{i}"].z = 29
   		when 4,5,6,7,8;       @up_stairs["#{i}"].z = 27
@@ -635,8 +635,8 @@ class ThreeDmap < Scene_Map
       end
       @down_stairs["#{i}"].ox = @down_stairs["#{i}"].bitmap.width / 2
   		@down_stairs["#{i}"].oy = @down_stairs["#{i}"].bitmap.height / 2
-      @down_stairs["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @down_stairs["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @down_stairs["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @down_stairs["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
   		case i
       when 1,2,3;         @down_stairs["#{i}"].z = 29
   		when 4,5,6,7,8;       @down_stairs["#{i}"].z = 27
@@ -652,8 +652,8 @@ class ThreeDmap < Scene_Map
 #~   		@t_wall["#{i}"].bitmap = Cache.dungeon("#{i}t")
 #~       @t_wall["#{i}"].ox = @t_wall["#{i}"].bitmap.width / 2
 #~   		@t_wall["#{i}"].oy = @t_wall["#{i}"].bitmap.height / 2
-#~       @t_wall["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-#~       @t_wall["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2
+#~       @t_wall["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+#~       @t_wall["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2
 #~   		case i
 #~       when 1,2,3;         @t_wall["#{i}"].z = 29
 #~   		when 4,5,6,7,8;       @t_wall["#{i}"].z = 27
@@ -706,8 +706,8 @@ class ThreeDmap < Scene_Map
   		@floor["#{i}"].bitmap = Cache.dungeon("#{i}")
       @floor["#{i}"].ox = @floor["#{i}"].bitmap.width / 2
   		@floor["#{i}"].oy = @floor["#{i}"].bitmap.height / 2
-      @floor["#{i}"].x = Constant_Table::SCREEN_WIDTH / 2
-      @floor["#{i}"].y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+      @floor["#{i}"].x = ConstantTable::SCREEN_WIDTH / 2
+      @floor["#{i}"].y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
       case i
       when "A-"; @floor["#{i}"].z = 30
       when "B-","C-","D-"; @floor["#{i}"].z = 28
@@ -732,8 +732,8 @@ class ThreeDmap < Scene_Map
     end
     @field.ox = @field.bitmap.width / 2
     @field.oy = @field.bitmap.height / 2
-    @field.x = Constant_Table::SCREEN_WIDTH / 2
-    @field.y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+    @field.x = ConstantTable::SCREEN_WIDTH / 2
+    @field.y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
     @field.z = 1
     # 隠し扉の表示
     # @kakushi = Sprite.new
@@ -741,8 +741,8 @@ class ThreeDmap < Scene_Map
     # @kakushi.bitmap = Cache.dungeon("1D_kakushi")
     # @kakushi.ox = @kakushi.bitmap.width / 2
     # @kakushi.oy = @kakushi.bitmap.height / 2
-    # @kakushi.x = Constant_Table::SCREEN_WIDTH / 2
-    # @kakushi.y = Constant_Table::SCREEN_HEIGHT / 2
+    # @kakushi.x = ConstantTable::SCREEN_WIDTH / 2
+    # @kakushi.y = ConstantTable::SCREEN_HEIGHT / 2
     # @kakushi.z = 29
     # スイッチ壁の表示
     @switch_wall = Sprite.new
@@ -755,8 +755,8 @@ class ThreeDmap < Scene_Map
     end
     @switch_wall.ox = @switch_wall.bitmap.width / 2
     @switch_wall.oy = @switch_wall.bitmap.height / 2
-    @switch_wall.x = Constant_Table::SCREEN_WIDTH / 2
-    @switch_wall.y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+    @switch_wall.x = ConstantTable::SCREEN_WIDTH / 2
+    @switch_wall.y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
     @switch_wall.z = 29
     # 宝壁の表示
     @chest_wall = Sprite.new
@@ -769,8 +769,8 @@ class ThreeDmap < Scene_Map
     end
     @chest_wall.ox = @chest_wall.bitmap.width / 2
     @chest_wall.oy = @chest_wall.bitmap.height / 2
-    @chest_wall.x = Constant_Table::SCREEN_WIDTH / 2
-    @chest_wall.y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+    @chest_wall.x = ConstantTable::SCREEN_WIDTH / 2
+    @chest_wall.y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
     @chest_wall.z = 29
     # 水汲み場の表示
     @drawing_fountain = Sprite.new
@@ -778,8 +778,8 @@ class ThreeDmap < Scene_Map
     @drawing_fountain.bitmap = Cache.dungeon("drawing_fountain")
     @drawing_fountain.ox = @drawing_fountain.bitmap.width / 2
     @drawing_fountain.oy = @drawing_fountain.bitmap.height / 2
-    @drawing_fountain.x = Constant_Table::SCREEN_WIDTH / 2
-    @drawing_fountain.y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+    @drawing_fountain.x = ConstantTable::SCREEN_WIDTH / 2
+    @drawing_fountain.y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
     @drawing_fountain.z = 29
     # 一歩先のダークゾーンの表示
     @darkzone = Sprite.new
@@ -787,11 +787,11 @@ class ThreeDmap < Scene_Map
     @darkzone.bitmap = Cache.dungeon("darkzone")
     @darkzone.ox = @darkzone.bitmap.width / 2
     @darkzone.oy = @darkzone.bitmap.height / 2
-    @darkzone.x = Constant_Table::SCREEN_WIDTH / 2
-    @darkzone.y = Constant_Table::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
+    @darkzone.x = ConstantTable::SCREEN_WIDTH / 2
+    @darkzone.y = ConstantTable::SCREEN_HEIGHT / 2 + ADJ_SCREEN_Y
     @darkzone.z = 27
 
-    # @frame = Window_Base.new(0+8, 0+8, Constant_Table::SCREEN_WIDTH-16, Constant_Table::SCREEN_HEIGHT-16)
+    # @frame = WindowBase.new(0+8, 0+8, ConstantTable::SCREEN_WIDTH-16, ConstantTable::SCREEN_HEIGHT-16)
     # @frame.back_opacity = 0
     # @frame.visible = false
     # @frame_b = Sprite.new
@@ -2645,7 +2645,7 @@ class ThreeDmap < Scene_Map
     end
 
     bdata = n + e + s + w + nd + ed + sd + wd + floor_b
-#~     DEBUG.write(c_m, "Wall Info 0b#{bdata.to_s(2)}")
+#~     Debug.write(c_m, "Wall Info 0b#{bdata.to_s(2)}")
     return bdata
   end
   #--------------------------------------------------------------------------
@@ -2677,7 +2677,7 @@ class ThreeDmap < Scene_Map
     $game_player.kakushi[x, y, id] = direction # 上記座標と向きに隠し扉あり
     $game_player.visit_place
     input_kakushi_anotherside # 逆側からも隠し扉を入力
-    DEBUG.write(c_m, "#{$game_player.kakushi}")
+    Debug.write(c_m, "#{$game_player.kakushi}")
   end
   #--------------------------------------------------------------------------
   # ● 反対側の扉の隠し扉の処理
@@ -2723,7 +2723,7 @@ class ThreeDmap < Scene_Map
     y = $game_player.y if y == nil
     id = $game_map.map_id if id == nil
     direction = $game_player.direction if direction == nil
-    DEBUG.write(c_m, "x:#{x} y:#{y} map:#{id} direction:#{direction}")
+    Debug.write(c_m, "x:#{x} y:#{y} map:#{id} direction:#{direction}")
     result = $game_player.unlock[x, y, id] == 0 ? true : false
     $game_player.unlock[x, y, id] = direction  # 上記座標と向きに鍵開済扉あり
     input_unlock_anotherside(id, x, y, direction) # 反対側の扉の開錠処理
@@ -2768,7 +2768,7 @@ class ThreeDmap < Scene_Map
       y += 1
     end
     $game_player.unlock[x, y, id] = direction # 上記座標と向きに鍵開済扉あり
-    DEBUG.write(c_m, "x:#{x} y:#{y} id:#{id} direction:#{direction}")
+    Debug.write(c_m, "x:#{x} y:#{y} id:#{id} direction:#{direction}")
   end
   #--------------------------------------------------------------------------
   # ● 解錠状態の削除（鉄格子イベント）
@@ -2802,7 +2802,7 @@ class ThreeDmap < Scene_Map
     y = $game_player.y
     id = $game_map.map_id
     $game_player.input_secret(x, y, id)
-    DEBUG.write(c_m, "x:#{x} y:#{y} B#{id}F")
+    Debug.write(c_m, "x:#{x} y:#{y} B#{id}F")
   end
   #--------------------------------------------------------------------------
   # ● 踏破度の確認

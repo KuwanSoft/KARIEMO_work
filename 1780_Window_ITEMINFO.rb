@@ -4,17 +4,17 @@
 # アイテム説明
 #==============================================================================
 
-class Window_ITEMINFO < Window_Base
+class Window_ITEMINFO < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    if $scene.is_a?(Scene_SHOP)
+    if $scene.is_a?(SceneShop)
       super(4, WLH*0+4, 512-8, WLH*7+32+24)
       self.visible = true
-    elsif $scene.is_a?(Scene_CAMP)
+    elsif $scene.is_a?(SceneCamp)
       super(4, 448-(WLH*7+32+24)-4, 512-8, WLH*7+32+24+8)
       self.z = 120
       self.visible = false
@@ -40,7 +40,7 @@ class Window_ITEMINFO < Window_Base
     else
       kind = item[0][0]
       id = item[0][1]
-      @item = MISC.item(kind, id)
+      @item = Misc.item(kind, id)
       @bag_pointer = item
     end
     self.contents.clear
@@ -62,7 +62,7 @@ class Window_ITEMINFO < Window_Base
     weight = 0 if @item.kind == "gold"
     self.contents.draw_text(WLW*16, WLH*0, WLW*12, WLH, "Weight:#{weight}")
     self.contents.draw_text(WLW*16, WLH*1, WLW*5, WLH, "Rank:")
-    irn = Constant_Table::ITEM_RANK_NAME[@item.rank]
+    irn = ConstantTable::ITEM_RANK_NAME[@item.rank]
     self.contents.font.color = get_item_rank_color(@item.rank)
     self.contents.draw_text(WLW*(16+5), WLH*1, WLW*20, WLH, "#{irn}")
     self.contents.font.color = normal_color
@@ -205,8 +205,8 @@ class Window_ITEMINFO < Window_Base
     end
     if kind == 0
       com = @item.comment.split(";")
-      DEBUG.write(c_m, "#{com[0]}")
-      DEBUG.write(c_m, "#{com[1]}")
+      Debug.write(c_m, "#{com[0]}")
+      Debug.write(c_m, "#{com[1]}")
       @str = com[0] if com[0] != nil
       @str2 = com[1] if com[1] != nil
 #~       ## 治療を取得
@@ -239,7 +239,7 @@ class Window_ITEMINFO < Window_Base
     end
 
     rune_str = ""
-    if $scene.is_a?(Scene_CAMP)
+    if $scene.is_a?(SceneCamp)
       ## ルーンボーナスの表示
       if @bag_pointer[5] != nil
         equip = @bag_pointer[2] > 0 ? true : false
@@ -247,31 +247,31 @@ class Window_ITEMINFO < Window_Base
         for key in @bag_pointer[5].keys
           desc = ""
           case key
-          when Constant_Table::MAGIC_HASH_AP
+          when ConstantTable::MAGIC_HASH_AP
             desc = "AP+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_SWING
+          when ConstantTable::MAGIC_HASH_SWING
             desc = "Swg+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_DAMAGE
+          when ConstantTable::MAGIC_HASH_DAMAGE
             desc = "Dmg+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_DOUBLE
+          when ConstantTable::MAGIC_HASH_DOUBLE
             desc = "ばいだ+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_ARMOR
+          when ConstantTable::MAGIC_HASH_ARMOR
             desc = "アーマー+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_CAPACITY_UP
+          when ConstantTable::MAGIC_HASH_CAPACITY_UP
             desc = "C.C.+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_RANGE
+          when ConstantTable::MAGIC_HASH_RANGE
             desc = "ロングレンジ"
-          when Constant_Table::MAGIC_HASH_SKILL_SHIELD
+          when ConstantTable::MAGIC_HASH_SKILL_SHIELD
             desc = "シールドスキル+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_SKILL_TACTICS
+          when ConstantTable::MAGIC_HASH_SKILL_TACTICS
             desc = "せんじゅつスキル+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_DR
+          when ConstantTable::MAGIC_HASH_DR
             desc = "D.R.+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_INITIATIVE
+          when ConstantTable::MAGIC_HASH_INITIATIVE
             desc = "イニシアチブ+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_DAMAGERESIST
+          when ConstantTable::MAGIC_HASH_DAMAGERESIST
             desc = "ダメージレジスト+#{@bag_pointer[5][key]}"
-          when Constant_Table::MAGIC_HASH_A_ELEMENT
+          when ConstantTable::MAGIC_HASH_A_ELEMENT
             desc = "ぞくせいぼうぎょ#{@bag_pointer[5][key]}"
           end
           rune_str += desc

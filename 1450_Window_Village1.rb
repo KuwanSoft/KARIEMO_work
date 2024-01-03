@@ -4,7 +4,7 @@
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_Village1 < Window_Selectable
+class Window_Village1 < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -31,18 +31,18 @@ class Window_Village1 < Window_Selectable
   #--------------------------------------------------------------------------
   # def draw_items
   #   self.contents.draw_text( CUR,  WLH*0, self.width-32, WLH, "へんきょうのむら:", 0)
-  #   self.contents.draw_text( CUR,  WLH*1, self.width-32, WLH, Constant_Table::NAME_PUB)
-  #   self.contents.draw_text( CUR,  WLH*2, self.width-32, WLH, Constant_Table::NAME_INN)
-  #   self.contents.draw_text( CUR,  WLH*3, self.width-32, WLH, Constant_Table::NAME_SHOP)
-  #   self.contents.draw_text( CUR,  WLH*4, self.width-32, WLH, Constant_Table::NAME_CHURCH)
-  #   self.contents.draw_text( CUR,  WLH*5, self.width-32, WLH, Constant_Table::NAME_GUILD)
-  #   self.contents.draw_text( CUR,  WLH*6, self.width-32, WLH, Constant_Table::NAME_EDGE_OF_VILLAGE)
+  #   self.contents.draw_text( CUR,  WLH*1, self.width-32, WLH, ConstantTable::NAME_PUB)
+  #   self.contents.draw_text( CUR,  WLH*2, self.width-32, WLH, ConstantTable::NAME_INN)
+  #   self.contents.draw_text( CUR,  WLH*3, self.width-32, WLH, ConstantTable::NAME_SHOP)
+  #   self.contents.draw_text( CUR,  WLH*4, self.width-32, WLH, ConstantTable::NAME_CHURCH)
+  #   self.contents.draw_text( CUR,  WLH*5, self.width-32, WLH, ConstantTable::NAME_GUILD)
+  #   self.contents.draw_text( CUR,  WLH*6, self.width-32, WLH, ConstantTable::NAME_EDGE_OF_VILLAGE)
   # end
   def draw_items
     self.contents.draw_text( CUR,  WLH*0+@adjust_y, self.width-32, WLH, "たいしゅうさかば")
     self.contents.draw_text( CUR,  WLH*1+@adjust_y, self.width-32, WLH, "ぼうけんしゃのやど")
     self.contents.draw_text( CUR,  WLH*2+@adjust_y, self.width-32, WLH, "トレーディング・ポスト")
-    self.contents.draw_text( CUR,  WLH*3+@adjust_y, self.width-32, WLH, "さびれたきょうかい")
+    self.contents.draw_text( CUR,  WLH*3+@adjust_y, self.width-32, WLH, "さびれたしんでん")
     self.contents.draw_text( CUR,  WLH*4+@adjust_y, self.width-32, WLH, "ぼうけんしゃギルド")
     self.contents.draw_text( CUR,  WLH*5+@adjust_y, self.width-32, WLH, "むらはずれ")
   end
@@ -52,27 +52,27 @@ class Window_Village1 < Window_Selectable
   def update_info
     case self.index
     when 0;
-      name = Constant_Table::NAME_PUB
+      name = ConstantTable::NAME_PUB
       text1 = "ともにぼうけんする"
       text2 = "なかまをさがします。"
     when 1;
-      name = Constant_Table::NAME_INN
+      name = ConstantTable::NAME_INN
       text1 = "ひとばん グッスリやすんで"
       text2 = "たいりょくをかいふくします。"
     when 2;
-      name = Constant_Table::NAME_SHOP
+      name = ConstantTable::NAME_SHOP
       text1 = "ぼうけんにひつような"
       text2 = "ぶぐや どうぐをそろえます。"
     when 3;
-      name = Constant_Table::NAME_CHURCH
+      name = ConstantTable::NAME_TEMPLE
       text1 = "きふをして からだの"
       text2 = "いじょうをなおします。"
     when 4;
-      name = Constant_Table::NAME_GUILD
+      name = ConstantTable::NAME_GUILD
       text1 = "しんきのぼうけんしゃとして"
       text2 = "とうろくします。"
     when 5;
-      name = "むらはずれ"
+      name = ConstantTable::NAME_EDGE_OF_VILLAGE
       text1 = "さるのおうのしろへむかいます。"
       text2 = ""
     end

@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Player
+# ■ GamePlayer
 #------------------------------------------------------------------------------
 # 　プレイヤーを扱うクラスです。イベントの起動判定や、マップのスクロールなどの
 # 機能を持っています。このクラスのインスタンスは $game_player で参照されます。
 #==============================================================================
 
-class Game_Player < Game_Character
+class GamePlayer < GameCharacter
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -120,10 +120,10 @@ class Game_Player < Game_Character
     @new_x = x
     @new_y = y
     @new_direction = direction
-    # DEBUG::write(c_m,"@new_map_id:#{@new_map_id}")
-    # DEBUG::write(c_m,"@new_x:#{@new_x}")
-    # DEBUG::write(c_m,"@new_y:#{@new_y}")
-    # DEBUG::write(c_m,"@new_direction:#{@new_direction}")
+    # Debug::write(c_m,"@new_map_id:#{@new_map_id}")
+    # Debug::write(c_m,"@new_x:#{@new_x}")
+    # Debug::write(c_m,"@new_y:#{@new_y}")
+    # Debug::write(c_m,"@new_direction:#{@new_direction}")
 #~     $game_party.arrived_floor(map_id)
   end
   #--------------------------------------------------------------------------
@@ -383,7 +383,7 @@ class Game_Player < Game_Character
     return if $game_map.interpreter.running?
     no_step = false # 床を動かすか
     if Input.trigger?(Input::DOWN)
-      $game_temp.prediction = false if Constant_Table::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -395,7 +395,7 @@ class Game_Player < Game_Character
       $game_mapkits.mapkit_check_and_store  # マップの更新
     end
     if Input.trigger?(Input::LEFT)
-      $game_temp.prediction = false if Constant_Table::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -407,7 +407,7 @@ class Game_Player < Game_Character
       $game_mapkits.mapkit_check_and_store  # マップの更新
     end
     if Input.trigger?(Input::RIGHT)
-      $game_temp.prediction = false if Constant_Table::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -582,11 +582,11 @@ class Game_Player < Game_Character
     end
     return unless $threedmap.check_door == 1 # 素通り扉
     return unless $game_system.check_roomguard($game_map.map_id, x, y)
-    return unless $game_party.check_prediction >= Constant_Table::NEEDPREDICTION
+    return unless $game_party.check_prediction >= ConstantTable::NEEDPREDICTION
     $popup.set_text("*けはいをさっち*")
     $popup.visible = true
     $game_temp.prediction = true
-    DEBUG.write(c_m," PREDICTION:#{$game_temp.prediction} ")
+    Debug.write(c_m," PREDICTION:#{$game_temp.prediction} ")
   end
   #--------------------------------------------------------------------------
   # ● 一歩後の各種チェック
@@ -688,7 +688,7 @@ class Game_Player < Game_Character
   # ● 一度訪れた座標かどうかの判定
   #--------------------------------------------------------------------------
   def visit_place?(mapid, x, y)
-    DEBUG.write(c_m, "x:#{x} y:#{y} #{@visit[x, y, mapid]}")
+    Debug.write(c_m, "x:#{x} y:#{y} #{@visit[x, y, mapid]}")
     return (@visit[x, y, mapid] != 0)
   end
   #--------------------------------------------------------------------------
@@ -750,7 +750,7 @@ class Game_Player < Game_Character
     return if moving?
     # 逃走したイベントバトルがある場合、そちらを処理
     if $game_system.check_undefeated_monster > 0 and last_moving
-      MISC.encount_event_battle($game_system.check_undefeated_monster)
+      Misc.encount_event_battle($game_system.check_undefeated_monster)
       return
     end
     if last_moving # 移動後にイベントマスに入ったかチェック
@@ -777,7 +777,7 @@ class Game_Player < Game_Character
   #--------------------------------------------------------------------------
   def update_encounter
     return if $game_temp.next_scene == "battle" # すでにエンカウント処理済
-    return unless $scene.is_a?(Scene_Map)       # マップ以外
+    return unless $scene.is_a?(SceneMap)       # マップ以外
   end
   #--------------------------------------------------------------------------
   # ● 接触（重なり）によるイベント起動判定
@@ -889,7 +889,7 @@ class Game_Player < Game_Character
       $music.se_play("階段")
       $game_party.in_party
       $game_system.remove_unique_id
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
       return
     end
     ## 向きを確定する

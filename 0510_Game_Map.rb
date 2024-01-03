@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Map
+# ■ GameMap
 #------------------------------------------------------------------------------
 # 　マップを扱うクラスです。スクロールや通行可能判定などの機能を持っています。
 # このクラスのインスタンスは $game_map で参照されます。
 #==============================================================================
 
-class Game_Map
+class GameMap
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -22,8 +22,8 @@ class Game_Map
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    @screen = Game_Screen.new
-    @interpreter = Game_Interpreter.new(0, true)
+    @screen = GameScreen.new
+    @interpreter = GameInterpreter.new(0, true)
     @map_id = 0
     @display_x = 0
     @display_y = 0
@@ -58,7 +58,7 @@ class Game_Map
   def setup_events
     @events = {}                      # マップイベント(ハッシュである
     for event_id in @map.events.keys  # マップデータからイベントKeyを抽出
-      @events[event_id] = Game_Event.new(@map_id, @map.events[event_id])
+      @events[event_id] = GameEvent.new(@map_id, @map.events[event_id])
     end
     setup_random
     setup_fixed
@@ -70,12 +70,12 @@ class Game_Map
   def setup_random
     map = load_data(sprintf("Data/Map%03d.rvdata", 15))
     for i in map.events.keys  # マップデータからイベントKeyを抽出
-      if @events[i+Constant_Table::RG_EVENTID_OFFSET] != nil
-        raise StandardError.new("event setup error, too many events setup @event[#{i+Constant_Table::RG_EVENTID_OFFSET}] != nil")
+      if @events[i+ConstantTable::RG_EVENTID_OFFSET] != nil
+        raise StandardError.new("event setup error, too many events setup @event[#{i+ConstantTable::RG_EVENTID_OFFSET}] != nil")
       else
         random = true
         fixed = false
-        @events[i+Constant_Table::RG_EVENTID_OFFSET] = Game_Event.new(@map_id, map.events[i], random, fixed)
+        @events[i+ConstantTable::RG_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
       end
     end
   end
@@ -86,12 +86,12 @@ class Game_Map
   def setup_fixed
     map = load_data(sprintf("Data/Map%03d.rvdata", 10))
     for i in map.events.keys  # マップデータからイベントKeyを抽出
-      if @events[i+Constant_Table::FIXED_EVENTID_OFFSET] != nil
-        raise StandardError.new("event setup error, too many events setup @event[#{i+Constant_Table::FIXED_EVENTID_OFFSET}] != nil")
+      if @events[i+ConstantTable::FIXED_EVENTID_OFFSET] != nil
+        raise StandardError.new("event setup error, too many events setup @event[#{i+ConstantTable::FIXED_EVENTID_OFFSET}] != nil")
       else
         random = false
         fixed = true
-        @events[i+Constant_Table::FIXED_EVENTID_OFFSET] = Game_Event.new(@map_id, map.events[i], random, fixed)
+        @events[i+ConstantTable::FIXED_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
       end
     end
   end
@@ -298,110 +298,110 @@ class Game_Map
     result = []
     ## ランダムグリッドの場合
     if $threedmap.check_random_floor  # REの確認
-      # DEBUG::write(c_m,"random floor検知")
+      # Debug::write(c_m,"random floor検知")
       kind = $game_system.check_randomevent(@map_id, x, y)
-      # DEBUG::write(c_m,"kind:#{kind}")
+      # Debug::write(c_m,"kind:#{kind}")
       ## kind=0は何もおこらない
       case kind
-      when 1..99; result.push(@events[kind+Constant_Table::RG_EVENTID_OFFSET]) # kindに100足したイベントとする
+      when 1..99; result.push(@events[kind+ConstantTable::RG_EVENTID_OFFSET]) # kindに100足したイベントとする
       end
     ## 閂ドアイベント
     elsif $threedmap.check_1way_door_in == 8 # 北
       fixed_event_id = 13
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_in == 6 # 東
       fixed_event_id = 14
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_in == 4 # 西
       fixed_event_id = 15
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_in == 2 # 南
       fixed_event_id = 16
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_out == 8 # 北
       fixed_event_id = 17
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_out == 6 # 東
       fixed_event_id = 18
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_out == 4 # 西
       fixed_event_id = 19
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_1way_door_out == 2 # 南
       fixed_event_id = 20
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_switch_wall == 8 # 北
       fixed_event_id = 21
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_switch_wall == 6 # 東
       fixed_event_id = 22
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_switch_wall == 4 # 西
       fixed_event_id = 23
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_switch_wall == 2 # 南
       fixed_event_id = 24
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 固定ハーブイベント
     elsif $threedmap.check_herb_floor
       fixed_event_id = 3
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 固定きのこイベント
     elsif $threedmap.check_mush_floor
       fixed_event_id = 4
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 固定ピットイベント
     elsif $threedmap.check_pit_floor
       fixed_event_id = 5
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 固定回転床イベント
     elsif $threedmap.check_turn_floor
       fixed_event_id = 6
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 固定すべる床イベント
     elsif $threedmap.check_slip_floor_n
       fixed_event_id = 7
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_slip_floor_e
       fixed_event_id = 8
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_slip_floor_s
       fixed_event_id = 9
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.check_slip_floor_w
       fixed_event_id = 10
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## ダストシュート
     elsif $threedmap.check_dustshoot
       fixed_event_id = 11
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## メインエレベータ(id:1)
     elsif $threedmap.check_elevator(1)
       fixed_event_id = 12
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 邪神像
     elsif $threedmap.check_evilstatue_floor
       fixed_event_id = 25
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 魔法の水汲み場
     elsif $threedmap.check_drawing_fountain_floor
       fixed_event_id = 26
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## ゴミ捨て場場
     elsif $threedmap.check_dump_floor
       fixed_event_id = 27
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 帰還の魔法陣（留守）
     elsif $threedmap.check_return_floor
       fixed_event_id = 28
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 階段が目の前にある
     elsif $threedmap.get_stair == 1
       fixed_event_id = 1
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     elsif $threedmap.get_stair == 2
       fixed_event_id = 2
-      result.push(@events[fixed_event_id+Constant_Table::FIXED_EVENTID_OFFSET])
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     else
       for event in $game_map.events.values
         next if event.random?                   # REは除外

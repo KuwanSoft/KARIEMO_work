@@ -1,4 +1,4 @@
-class Window_PartyMagic < Window_Selectable
+class Window_PartyMagic < WindowSelectable
   RIGHT_X = 478
   LEFT_X = 2
   def initialize

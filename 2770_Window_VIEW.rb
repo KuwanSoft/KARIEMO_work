@@ -4,7 +4,7 @@
 # 冒険者のステータス一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_VIEW < Window_Base
+class Window_VIEW < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -151,7 +151,7 @@ class Window_VIEW < Window_Base
     self.contents.font.color = normal_color
     self.contents.draw_text(WLW*10, WLH*21, WLW*4, WLH, "C.C.")
 
-    if $scene.is_a?(Scene_OFFICE)
+    if $scene.is_a?(SceneGuild)
       self.contents.font.color.alpha = 128
       self.contents.draw_text(WLW*10, WLH*6+ya, WLW*3, WLH, "#{actor.init_str}", 2)
       self.contents.draw_text(WLW*10, WLH*7+ya, WLW*3, WLH, "#{actor.init_int}", 2)
@@ -176,7 +176,7 @@ class Window_VIEW < Window_Base
     self.contents.font.color.alpha = 255
 
     ## キャンプ時のみヘルプの表示
-    return unless $scene.is_a?(Scene_CAMP)
+    return unless $scene.is_a?(SceneCamp)
     self.contents.draw_text(WLW*19, WLH*23, self.width-32, WLH, "←:   アイテム")
     self.contents.draw_text(WLW*19, WLH*24, self.width-32, WLH, "→:   スキル")
     self.contents.draw_text(WLW*19, WLH*25, self.width-32, WLH, "LR: Charへんこう")

@@ -1,4 +1,4 @@
-class Window_GAMEOVER_Top < Window_Base
+class Window_GAMEOVER_Top < WindowBase
   def initialize
     super(0,0,512,24*2+32)
     change_font_to_v

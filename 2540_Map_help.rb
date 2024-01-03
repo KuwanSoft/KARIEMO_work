@@ -1,4 +1,4 @@
-class Map_help < Window_Base
+class Map_help < WindowBase
 
   def initialize
     super(170,190,110,WLH*1+32)

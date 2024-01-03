@@ -4,7 +4,7 @@
 # 特性値を選択し成長させるwindow
 #==============================================================================
 
-class Window_aptiSelect < Window_Selectable
+class Window_aptiSelect < WindowSelectable
   attr_reader   :bonus
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化

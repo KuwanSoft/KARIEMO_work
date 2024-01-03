@@ -21,7 +21,7 @@
 #   しまう場合がある不具合を修正しました。
 #------------------------------------------------------------------------------
 
-class Sprite_Base
+class SpriteBase
   alias eb_sp1_dispose_animation dispose_animation
   def dispose_animation
     eb_sp1_dispose_animation
@@ -46,7 +46,7 @@ class Sprite_Base
   end
 end
 
-class Window_NameEdit
+class WindowNameEdit
   alias eb_sp2_refresh refresh
   def refresh
     self.contents.font.color = normal_color
@@ -54,7 +54,7 @@ class Window_NameEdit
   end
 end
 
-class Window_NameInput
+class WindowNameInput
   alias eb_sp2_refresh refresh
   def refresh
     self.contents.font.color = normal_color

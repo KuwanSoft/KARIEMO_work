@@ -45,7 +45,7 @@
 #     total = 0.0
 #     list.each { |i| total += i }
 #     result = (total / list.size).to_f
-#     DEBUG.perfd_write(name, result)
+#     Debug.perfd_write(name, result)
 #   end
 # end
 
@@ -58,7 +58,7 @@ module Benchmark
     total = (Time.now - time).to_f
     $game_system.update_highest_alert(name, total)
     $game_system.update_average_alert(name, total)
-    if total >= Constant_Table::ALERT_THRES
+    if total >= ConstantTable::ALERT_THRES
       $game_system.input_alert(name)
     end
   end

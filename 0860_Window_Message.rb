@@ -4,7 +4,7 @@
 # 　文章表示に使うメッセージウィンドウです。
 #==============================================================================
 
-class Window_Message < Window_Selectable
+class Window_Message < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class Window_Message < Window_Selectable
     self.z += 5
     create_number_input_window
 #~     create_back_sprite
-    self.contents.font.name = Constant_Table::Font_main_v  # フォント縦長
+    self.contents.font.name = ConstantTable::Font_main_v  # フォント縦長
     self.contents.font.size = BLH
   end
   #--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class Window_Message < Window_Selectable
   # ● 数値入力ウィンドウの作成
   #--------------------------------------------------------------------------
   def create_number_input_window
-    @number_input_window = Window_NumberInput.new
+    @number_input_window = WindowNumberInput.new
     @number_input_window.visible = false
   end
   #--------------------------------------------------------------------------
@@ -295,7 +295,7 @@ class Window_Message < Window_Selectable
   #--------------------------------------------------------------------------
   def draw_mes
     contents.draw_text(0, @contents_y, self.width-32, BLH, @mes, 1)
-    keys = MISC.check_keyword(@mes)         # キーワードであればストア
+    keys = Misc.check_keyword(@mes)         # キーワードであればストア
     unless keys.empty?
       names = $game_actors.get_all_name
       ## 一旦黄色文字で一行をすべて書き出す
@@ -305,8 +305,8 @@ class Window_Message < Window_Selectable
       for key in keys
         next if names.include?(key)         # 名前リストにKey値と同じ値がある場合はNEXT
         next unless @mes.include?(key)      # メッセージがkeywordを含まない場合はNEXT
-        next if $scene.is_a?(Scene_Battle)    # バトル中は無視
-        next if $scene.is_a?(Scene_Treasure)  # 宝箱シーンでは無視
+        next if $scene.is_a?(SceneBattle)    # バトル中は無視
+        next if $scene.is_a?(SceneTreasure)  # 宝箱シーンでは無視
         word = ""
         (key.length/3).times do             # 1文字3でカウントされる
           word += "  "

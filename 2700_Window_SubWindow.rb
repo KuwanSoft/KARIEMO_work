@@ -4,7 +4,7 @@
 # 　迷宮画面の上部に位置する蝋燭の表示を行うクラスです。
 #   迷宮画面の上に位置する現在地の表示を行うクラスです。
 #==============================================================================
-class Window_SubWindow < Window_Base
+class Window_SubWindow < WindowBase
   ADJ_Y = 2
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -30,7 +30,7 @@ class Window_SubWindow < Window_Base
     super
     @timer += 1
     if $game_temp.need_sub_refresh
-      if $scene.is_a?(Scene_CAMP)
+      if $scene.is_a?(SceneCamp)
         refresh_camp
       else
         # toggle_lantern
@@ -39,7 +39,7 @@ class Window_SubWindow < Window_Base
       $game_temp.need_sub_refresh = false
     end
     if @timer > 20
-      if $scene.is_a?(Scene_CAMP)
+      if $scene.is_a?(SceneCamp)
         refresh_camp
       else
         toggle_lantern

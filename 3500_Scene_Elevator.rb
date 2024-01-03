@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Elevator
+# ■ SceneElevator
 #------------------------------------------------------------------------------
 # 昇降機イベントの処理
 #==============================================================================
 
-class Scene_Elevator < Scene_Base
+class SceneElevator < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -54,9 +54,9 @@ class Scene_Elevator < Scene_Base
       floor,x,y = set_destination                 # 行先の設定
       return if ($game_map.map_id == floor) and (@elevator_id != 2) # 行先と現在階が同じ
       $game_player.reserve_transfer(floor, x, y, $game_player.direction)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
   #--------------------------------------------------------------------------

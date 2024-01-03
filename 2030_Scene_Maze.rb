@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Maze
+# ■ SceneMaze
 #------------------------------------------------------------------------------
 #   地下迷宮前
 #==============================================================================
 
-class Scene_Maze < Scene_Base
+class SceneMaze < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -46,8 +46,6 @@ class Scene_Maze < Scene_Base
     @menu_window.visible = true
     @menu_window.active = true
     @menu_window.index = 0
-    @locname = Window_LOCNAME.new
-    @locname.set_text("むらはずれ")
     @attention_window = Window_Attention.new  # attention表示用
     $game_temp.hide_face = false
     @window_picture = Window_Picture.new(0, 0)
@@ -61,7 +59,6 @@ class Scene_Maze < Scene_Base
     @ps.dispose
     @entering.dispose
     @menu_window.dispose
-    @locname.dispose
     @attention_window.dispose
     @window_picture.dispose
   end
@@ -72,7 +69,6 @@ class Scene_Maze < Scene_Base
     super
     @ps.update
     @menu_window.update
-    @locname.update
     update_command_window
     @entering.update
     if @menu_window.openness < 255
@@ -92,7 +88,6 @@ class Scene_Maze < Scene_Base
         if $game_party.existing_members.size == 0
           return
         else
-          @locname.visible = false
           @menu_window.index = -1
           @menu_window.active = false
           @menu_window.visible = false
@@ -112,17 +107,17 @@ class Scene_Maze < Scene_Base
           RPG::BGM.fade(1500)
           Graphics.fadeout(60)
           Graphics.wait(40)
-          $scene = Scene_Map.new
+          $scene = SceneMap.new
           $game_system.input_party_location   # パーティの場所とメンバーを記憶
-          SAVE.write_stats_data               # STAT DATAの保存
-          SAVE::do_save("#{self.class.name}", true) # セーブ(Recoveryポイント作成)
+          Save.write_stats_data               # STAT DATAの保存
+          Save::do_save("#{self.class.name}", true) # セーブ(Recoveryポイント作成)
         end
       when 1 # 冒険の再開
         unless $game_system.check_avaID_exclude_survivor.empty? # 可能なパーティの情報
           $scene = Scene_Continue.new
         end
       when 2 # 冒険を終了する
-        SAVE::do_save("#{self.class.name}") # セーブの実行
+        Save::do_save("#{self.class.name}") # セーブの実行
         @attention_window.set_text("* おつかれさまでした *")
         wait_for_attention
         RPG::BGM.fade(800)
@@ -130,10 +125,10 @@ class Scene_Maze < Scene_Base
         RPG::ME.fade(800)
         $scene = nil
       when 3 # 村へ戻る
-        $scene = Scene_Village.new
+        $scene = SceneVillage.new
       end
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
     end
   end
 end

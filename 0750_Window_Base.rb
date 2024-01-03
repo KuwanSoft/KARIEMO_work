@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_Base
+# ■ WindowBase
 #------------------------------------------------------------------------------
 # 　ゲーム中のすべてのウィンドウのスーパークラスです。
 #==============================================================================
 
-class Window_Base < Window
+class WindowBase < Window
   #--------------------------------------------------------------------------
   # ● 無呼び出しメソッドチェック対象
   #--------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class Window_Base < Window
     self.y = y
     self.width = width
     self.height = height
-    self.back_opacity = Constant_Table::BACK_OPACITY
+    self.back_opacity = ConstantTable::BACK_OPACITY
     self.openness = 255
     create_contents
     create_yajirushi
@@ -370,7 +370,7 @@ class Window_Base < Window
 
     number = ""                               # スタック数
     ## 装備可・不可：ショップ時は暗転処理
-    if $scene.is_a?(Scene_SHOP)
+    if $scene.is_a?(SceneShop)
       if can_equip
         self.contents.font.color.alpha = prev_alpha
       else
@@ -394,7 +394,7 @@ class Window_Base < Window
     ##--------------------------------------------------
 
     ## 装備可・不可：ショップ時は暗転処理
-    if $scene.is_a?(Scene_Battle)
+    if $scene.is_a?(SceneBattle)
       if $game_party.item_can_use?(item)  # アイテム使用可能？
       elsif item_info[2] > 0        # 装備済み()=鑑定済み)か？
         if item.item_id == 0        # アイテムID無し？
@@ -411,16 +411,16 @@ class Window_Base < Window
 
     ## 個数の表示
     ## キャンプの場合
-    if $scene.is_a?(Scene_CAMP) or $scene.is_a?(Scene_Map)
+    if $scene.is_a?(SceneCamp) or $scene.is_a?(SceneMap)
       self.contents.draw_text(x, y + y_adj, self.width-(x*2+32), BLH, "#{number}", 2) unless number == ""
-    elsif $scene.is_a?(Scene_SHOP)
+    elsif $scene.is_a?(SceneShop)
       ## ショップでのゴールドの表示
       unless item.money?
         ## ショップでのその他の表示
         self.contents.font.color.alpha = prev_alpha
         self.contents.draw_text(x, y + y_adj, WLW*16, BLH, "#{number}", 2) unless number == ""
       end
-    elsif $scene.is_a?(Scene_Battle)
+    elsif $scene.is_a?(SceneBattle)
       self.contents.draw_text(x, y + y_adj, self.width-(x*2+32), BLH, "#{number}", 2) unless number == ""
     end
 
@@ -470,12 +470,12 @@ class Window_Base < Window
     ## 従士の場合
     # elsif actor.class_id == 9
     #   value = actor.skill[index] / 10.0
-    #   value = MISC.skill_value(index, actor) if include_adjust
+    #   value = Misc.skill_value(index, actor) if include_adjust
     ## そのクラスの保持スキルで無い場合
     elsif not $data_skills[index].initial_skill?(actor)
       value = actor.skill[index] / 10.0
-      value = MISC.skill_value(index, actor) if include_adjust
-      color = stone_color unless index == SKILLID::RUNE
+      value = Misc.skill_value(index, actor) if include_adjust
+      color = stone_color unless index == SkillId::RUNE
     ## 封印されたスキルの場合
     elsif actor.skill[index] < 0
       value = - actor.skill[index] / 10.0 # 負の符号を表示用に取る
@@ -484,7 +484,7 @@ class Window_Base < Window
 #~       self.contents.font.color = color
     else
       value = actor.skill[index] / 10.0
-      value = MISC.skill_value(index, actor) if include_adjust
+      value = Misc.skill_value(index, actor) if include_adjust
     end
     self.contents.blt( x, y+6, icon, r)
     self.contents.draw_text( x+CUR, y, self.width-32, 24, name)
@@ -582,7 +582,7 @@ class Window_Base < Window
   # ● COMMANDの表示
   #--------------------------------------------------------------------------
   def draw_command(actor, visible, tired)
-    if $scene.is_a?(Scene_Battle) and visible # 戦闘コマンドの表示
+    if $scene.is_a?(SceneBattle) and visible # 戦闘コマンドの表示
       action = actor.action.get_command # コマンドの取得
       if action != nil          # アクションの表示（何かしらアクションがある場合）
         action = action[0..14]  # 6文字目までを切り出す（収めるため）
@@ -592,7 +592,7 @@ class Window_Base < Window
           self.contents.draw_text(STA+WLW*23, (actor.index+1)*WLH, WLW*7, WLH, actor.main_state_name, 2)
         end
       end
-    elsif $scene.is_a?(Scene_Treasure)           # 罠の調査結果を表示
+    elsif $scene.is_a?(SceneTreasure)           # 罠の調査結果を表示
       str = actor.trap_result[0..14]  # 文字を切り出す
       self.contents.draw_text(STA+WLW*23, (actor.index+1)*WLH, WLW*7, WLH, str, 2)
     elsif not actor.good_condition?
@@ -643,7 +643,7 @@ class Window_Base < Window
   # ● ウインドウで使用するフォントの変更
   #--------------------------------------------------------------------------
   def change_font_to_v(color = true)
-    self.contents.font.name = Constant_Table::Font_main_v  # フォント縦長
+    self.contents.font.name = ConstantTable::Font_main_v  # フォント縦長
     self.contents.font.size = 24
     self.contents.font.color = text_color(0) if color
   end
@@ -651,7 +651,7 @@ class Window_Base < Window
   # ● ウインドウで使用するフォントの変更
   #--------------------------------------------------------------------------
   def change_font_to_normal(color = true)
-    self.contents.font.name = Constant_Table::Font_main    # フォントノーマル
+    self.contents.font.name = ConstantTable::Font_main    # フォントノーマル
     self.contents.font.size = 16
     self.contents.font.color = text_color(0) if color
   end
@@ -685,7 +685,7 @@ class Window_Base < Window
   #--------------------------------------------------------------------------
   def draw_face(x, y, actor)
     opacity = actor.dead? ? 64 : 255 # 死亡時は薄暗く
-    reg = $scene.is_a?(Scene_REG) ? true : false
+    reg = $scene.is_a?(SceneRegistration) ? true : false
     opacity = 255 if reg
     bitmap = Cache.face("frame")
     self.contents.blt(x, y, bitmap, bitmap.rect, 255)
@@ -705,54 +705,29 @@ class Window_Base < Window
     end
     ## ステータスマーク
     x_adj = 22; y_adj = 62
-    if actor.stone?
-      bitmap = Cache.state("石化")
+    bitmaps = []
+    for state in actor.states.sort {|a, b| a.priority <=> b.priority}
+      Debug::write(c_m, "#{state.name} priority:#{state.priority}")
+      bitmaps.push(Cache.state(state.name))
+    end
+    # bitmaps.push(Cache.state("石化")) if actor.stone?
+    # bitmaps.push(Cache.state("麻痺")) if actor.paralysis?
+    # bitmaps.push(Cache.state("吐き気")) if actor.nausea?
+    # bitmaps.push(Cache.state("睡眠")) if actor.sleep?
+    # bitmaps.push(Cache.state("ペスト")) if actor.miasma?
+    # bitmaps.push(Cache.state("呪文封じ")) if actor.silent?
+    # bitmaps.push(Cache.state("毒")) if actor.poison?
+    # bitmaps.push(Cache.state("出血")) if actor.bleeding?
+    # bitmaps.push(Cache.state("重症")) if actor.severe?
+    # bitmaps.push(Cache.state("発狂")) if actor.mad?
+    # bitmaps.push(Cache.state("凍結")) if actor.freeze?
+    # bitmaps.push(Cache.state("火傷")) if actor.burn?
+    # bitmaps.push(Cache.state("隠密")) if actor.onmitsu?
+    # bitmaps.push(Cache.state("悪臭")) if actor.stink?
+    # bitmaps.push(Cache.state("骨折")) if actor.fracture?
+    for bitmap in bitmaps
       self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.paralysis?
-      bitmap = Cache.state("麻痺")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.sleep?
-      bitmap = Cache.state("睡眠")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.miasma?
-      bitmap = Cache.state("ペスト")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.silent? # 呪文禁止床含む
-      bitmap = Cache.state("呪文封じ")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.poison?
-      bitmap = Cache.state("毒")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.bleeding?
-      bitmap = Cache.state("出血")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.nausea?
-      bitmap = Cache.state("吐き気")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.severe?
-      bitmap = Cache.state("重症")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.mad?
-      bitmap = Cache.state("発狂")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.freeze?
-      bitmap = Cache.state("凍結")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.shock?
-      bitmap = Cache.state("感電")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.burn?
-      bitmap = Cache.state("火傷")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.onmitsu?
-      bitmap = Cache.state("隠密")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.stink?
-      bitmap = Cache.state("悪臭")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
-    elsif actor.fracture?
-      bitmap = Cache.state("骨折")
-      self.contents.blt(x+x_adj, y+y_adj, bitmap, bitmap.rect)
+      y_adj -= 4
     end
     ## 秘密の発見
     # if actor.find
@@ -957,20 +932,20 @@ class Window_Base < Window
     else
       ## SubWeaponの表示
       if actor.subweapon_id != 0
-        item2 = MISC.item(1, actor.subweapon_id)
+        item2 = Misc.item(1, actor.subweapon_id)
         sub = Cache.icon_sub(item2.icon)
         num2 = actor.get_arrow(true) if item2.stackable?
         self.contents.blt(x, y, sub, sub.rect)
       ## Shieldの表示
       elsif actor.armor2_id != 0
-        item2 = MISC.item(2, actor.armor2_id)
+        item2 = Misc.item(2, actor.armor2_id)
         sub = Cache.icon(item2.icon)
         num2 = actor.get_arrow(true) if item2.stackable?
         self.contents.blt(x, y, sub, sub.rect)
       end
       ## MainWeaponの表示
       if actor.weapon_id != 0
-        item = MISC.item(1, actor.weapon_id)
+        item = Misc.item(1, actor.weapon_id)
         wep = Cache.icon(item.icon)
         num = actor.get_arrow if item.stackable?
       else
@@ -1130,7 +1105,7 @@ class Window_Base < Window
   # ● ウインドウで使用するフォントの変更
   #--------------------------------------------------------------------------
   def change_font_to_skill
-    self.contents.font.name = Constant_Table::Font_skill    # 美咲フォント
+    self.contents.font.name = ConstantTable::Font_skill    # 美咲フォント
     self.contents.font.size = 16
     self.contents.font.color = text_color(8)
   end

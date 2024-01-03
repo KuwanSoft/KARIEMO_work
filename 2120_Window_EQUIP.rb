@@ -4,7 +4,7 @@
 # 　装備画面
 #==============================================================================
 
-class Window_EQUIP < Window_Selectable
+class Window_EQUIP < WindowSelectable
   attr_accessor :curse_pos
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -59,7 +59,7 @@ class Window_EQUIP < Window_Selectable
       next if item[1] == false
       kind = item[0][0]
       id = item[0][1]
-      item_data = MISC.item(kind, id)
+      item_data = Misc.item(kind, id)
       return true if actor.equippable?(item_data)
     end
     return false
@@ -110,7 +110,7 @@ class Window_EQUIP < Window_Selectable
       @index = 0 # カーソルを表示
 #~       self.contents.draw_text(0, 0, self.width-32, WLH, text, 1) # 題名
       for i in 0...(@item_max-1)
-        equipment = MISC.item(@data[i][0][0],@data[i][0][1])
+        equipment = Misc.item(@data[i][0][0],@data[i][0][1])
         draw_item_name(WLW, @row_height*(i), equipment, true, @data[i])
       end
       change_font_to_v
@@ -141,7 +141,7 @@ class Window_EQUIP < Window_Selectable
     for equip in @actor.bag     # BAG内を検索
       next if equip[1] == false # 未鑑定品の場合スキップ
       next if equip[2] > 0      # 装備済みの場合スキップ
-      item_data = MISC.item(equip[0][0], equip[0][1])
+      item_data = Misc.item(equip[0][0], equip[0][1])
       if equip == item
         equip[2] = @next_position  # 装備済みフラグオン
         case @next_position
@@ -220,7 +220,7 @@ class Window_EQUIP < Window_Selectable
     @others = []
     for item in actor.bag
       next if item[1] == false # 未鑑定品はリストへ入れない
-      item_data = MISC.item(item[0][0], item[0][1]) # アイテムOBJの取得
+      item_data = Misc.item(item[0][0], item[0][1]) # アイテムOBJの取得
       next if item[2] == 7  # その他1で装備済みであるか？（排他装備）
       ## アクセサリ7と同じアーマーIDを持つアイテムか？(排他装備)
       next if actor.armor7_id == item_data.id and item_data.is_a?(Armors2)

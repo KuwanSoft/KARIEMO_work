@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_BattleAction
+# ■ GameBattleAction
 #------------------------------------------------------------------------------
-# 　戦闘行動を扱うクラスです。このクラスは Game_Battler クラスの内部で使用され
+# 　戦闘行動を扱うクラスです。このクラスは GameBattler クラスの内部で使用され
 # ます。
 #==============================================================================
 
-class Game_BattleAction
+class GameBattleAction
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -367,7 +367,7 @@ class Game_BattleAction
     @initiative += fast_attack?                       # 長柄武器ボーナス
     r1 = rand(10) + 1                                 # 1~10の乱数を追加
     r2 = rand(10) + 1
-    name = MISC.get_string(battler.name, 23)
+    name = Misc.get_string(battler.name, 23)
     @initiative += r1 + r2
     @initiative += battler.initiative_bonus           # 時よ速まれのボーナス
     @initiative = rapid_cast? ? @initiative : @initiative / 2 if magic?
@@ -436,25 +436,25 @@ class Game_BattleAction
   def make_arrow_targets
     case battler.class_id
     when 7  # 狩人の場合は45%で発生
-      sv = MISC.skill_value(SKILLID::MULTITARGET, battler)
-      diff = Constant_Table::DIFF_45[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::MULTITARGET, battler)
+      diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
     else    # その他は25%で発生
-      sv = MISC.skill_value(SKILLID::MULTITARGET, battler)
-      diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::MULTITARGET, battler)
+      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
     end
     ratio /= 2 if battler.tired?
-    ratio = [ratio, Constant_Table::MULTI_MAXRATIO].min
+    ratio = [ratio, ConstantTable::MULTI_MAXRATIO].min
     result = 1
     ## 9体まで判定
     while result < 9
-      DEBUG.write(c_m, "貫通判定 => #{ratio}% #{result}体目")
+      Debug.write(c_m, "貫通判定 => #{ratio}% #{result}体目")
       if ratio > rand(100)
         result += 1
-        DEBUG.write(c_m, "貫通判定 => HIT")
+        Debug.write(c_m, "貫通判定 => HIT")
       else
-        DEBUG.write(c_m, "貫通判定 => MISS")
+        Debug.write(c_m, "貫通判定 => MISS")
         break
       end
       ratio = [ratio - ((result-1)*3), 5].max     # 1体貫通することで貫通体*3%の確率減少
@@ -462,10 +462,10 @@ class Game_BattleAction
     targets = make_targets_group(result).compact
     ## 実際に存在し貫通した人数のみスキル上昇チャンス
     targets.size.times do
-      battler.chance_skill_increase(SKILLID::MULTITARGET) # レゴラスの御業
+      battler.chance_skill_increase(SkillId::MULTITARGET) # レゴラスの御業
     end
     @multitarget_number = targets.size                    # 貫通人数を記憶
-    DEBUG.write(c_m,"貫通矢 結果#{@multitarget_number}体貫通")
+    Debug.write(c_m,"貫通矢 結果#{@multitarget_number}体貫通")
     return targets
   end
   #--------------------------------------------------------------------------
@@ -474,12 +474,12 @@ class Game_BattleAction
   def make_spear_targets
     case battler.class_id
     when 4  # 騎士の場合
-      sv = MISC.skill_value(SKILLID::POLE_STAFF, battler)
-      diff = Constant_Table::DIFF_35[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::POLE_STAFF, battler)
+      diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
     else
-      sv = MISC.skill_value(SKILLID::POLE_STAFF, battler)
-      diff = Constant_Table::DIFF_25[$game_map.map_id] # フロア係数
+      sv = Misc.skill_value(SkillId::POLE_STAFF, battler)
+      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
       ratio = Integer([sv * diff, 95].min)
     end
     ratio /= 2 if battler.tired?
@@ -488,7 +488,7 @@ class Game_BattleAction
     if ratio > rand(100)
       result += 1
     end
-    DEBUG.write(c_m,"貫通槍 #{result}体貫通(#{ratio}%)")
+    Debug.write(c_m,"貫通槍 #{result}体貫通(#{ratio}%)")
     return make_targets_group(result).compact
   end
   #--------------------------------------------------------------------------
@@ -696,7 +696,7 @@ class Game_BattleAction
       end
     end
     if target_number > 8
-      DEBUG::write(c_m,"target_numberが >8のため召喚と傭兵を追加")
+      Debug::write(c_m,"target_numberが >8のため召喚と傭兵を追加")
       for spirit in $game_summon.existing_members   # 召喚を追加
         result.push(spirit)
       end

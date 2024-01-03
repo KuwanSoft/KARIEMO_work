@@ -10,7 +10,7 @@ module Init
   #     暗号化されたFontsを解凍させる。
   #--------------------------------------------------------------------------
   def self.decrypt(input, output, console)
-    r = TCrypt.decrypt(input, output, Constant_Table::KEY, TCrypt::MODE_MKERS)
+    r = TCrypt.decrypt(input, output, ConstantTable::KEY, TCrypt::MODE_MKERS)
     console.add_text("Processing #{input} RC:#{r}")
   end
   #--------------------------------------------------------------------------
@@ -59,24 +59,24 @@ module Init
     console.add_text("Phase.1 starting..")
     ##> Phase.1 FILEチェックと解凍、メモリ展開
     @config_datas = []
-    @config_datas.push(Constant_Table::FontData1)
-    @config_datas.push(Constant_Table::FontData2)
-    @config_datas.push(Constant_Table::FontData3)
-    @config_datas.push(Constant_Table::FontData4)
+    @config_datas.push(ConstantTable::FontData1)
+    @config_datas.push(ConstantTable::FontData2)
+    @config_datas.push(ConstantTable::FontData3)
+    @config_datas.push(ConstantTable::FontData4)
     @decode_datas = []
-    @decode_datas.push(Constant_Table::FontData1_)
-    @decode_datas.push(Constant_Table::FontData2_)
-    @decode_datas.push(Constant_Table::FontData3_)
-    @decode_datas.push(Constant_Table::FontData4_)
+    @decode_datas.push(ConstantTable::FontData1_)
+    @decode_datas.push(ConstantTable::FontData2_)
+    @decode_datas.push(ConstantTable::FontData3_)
+    @decode_datas.push(ConstantTable::FontData4_)
     for index in 0...@config_datas.size
       cfile = @config_datas[index]
       dfile = @decode_datas[index]
       if FileTest.exist?(cfile)
         case index
-        when 0; next if Font.exist?(Constant_Table::Font_main)
-        when 1; next if Font.exist?(Constant_Table::Font_main_v)
-        when 2; next if Font.exist?(Constant_Table::Font_title)
-        when 3; next if Font.exist?(Constant_Table::Font_skill)
+        when 0; next if Font.exist?(ConstantTable::Font_main)
+        when 1; next if Font.exist?(ConstantTable::Font_main_v)
+        when 2; next if Font.exist?(ConstantTable::Font_title)
+        when 3; next if Font.exist?(ConstantTable::Font_skill)
         end
         decrypt(cfile, dfile, console)
         Font.add(dfile)
@@ -127,7 +127,7 @@ module Init
 
   #   # フォントオブジェクトを作成する
   #   font = Font.new
-  #   font.name = Constant_Table::Font_main
+  #   font.name = ConstantTable::Font_main
   #   font.size = 16
   #   font.color = Color.new(255, 255, 255)
   #   font.shadow = true
@@ -144,39 +144,39 @@ module Init
     GC.start                    # ガベージコレクション
     sleep 2
     decode_data = []
-    decode_data.push(Constant_Table::FontData1_)
-    decode_data.push(Constant_Table::FontData2_)
-    decode_data.push(Constant_Table::FontData3_)
-    decode_data.push(Constant_Table::FontData4_)
+    decode_data.push(ConstantTable::FontData1_)
+    decode_data.push(ConstantTable::FontData2_)
+    decode_data.push(ConstantTable::FontData3_)
+    decode_data.push(ConstantTable::FontData4_)
     for dfile in decode_data
       next unless FileTest.exist?(dfile)
       begin # エラーを捕捉させない様に
         Font.remove_resource(dfile)
         Font.send_mes
         i = 0
-        while i < Constant_Table::TIMEOUT_POSTPROCESS
+        while i < ConstantTable::TIMEOUT_POSTPROCESS
           File.delete(dfile)
           break unless FileTest.exist?(dfile)
           i += 1
         end
       rescue StandardError => e
-        DEBUG.write(c_m, "error:#{$!} e:#{e.message}") if post
+        Debug.write(c_m, "error:#{$!} e:#{e.message}") if post
       end
     end
-    DEBUG.write(c_m, "Post Process Completed.") if post
+    Debug.write(c_m, "Post Process Completed.") if post
   end
   #--------------------------------------------------------------------------
   # ● すべてのフォントが使用可能？
   #--------------------------------------------------------------------------
   def self.all_font_available?(console)
-    console.add_text("AFA_main => #{Font.exist?(Constant_Table::Font_main) ? 'OK' : 'N/A' }")
-    console.add_text("AFA_main_v => #{Font.exist?(Constant_Table::Font_main_v) ? 'OK' : 'N/A'}")
-    console.add_text("AFA_title => #{Font.exist?(Constant_Table::Font_title) ? 'OK' : 'N/A'}")
-    console.add_text("AFA_skill => #{Font.exist?(Constant_Table::Font_skill) ? 'OK' : 'N/A'}")
-    return false unless Font.exist?(Constant_Table::Font_main)
-    return false unless Font.exist?(Constant_Table::Font_main_v)
-    return false unless Font.exist?(Constant_Table::Font_title)
-    return false unless Font.exist?(Constant_Table::Font_skill)
+    console.add_text("AFA_main => #{Font.exist?(ConstantTable::Font_main) ? 'OK' : 'N/A' }")
+    console.add_text("AFA_main_v => #{Font.exist?(ConstantTable::Font_main_v) ? 'OK' : 'N/A'}")
+    console.add_text("AFA_title => #{Font.exist?(ConstantTable::Font_title) ? 'OK' : 'N/A'}")
+    console.add_text("AFA_skill => #{Font.exist?(ConstantTable::Font_skill) ? 'OK' : 'N/A'}")
+    return false unless Font.exist?(ConstantTable::Font_main)
+    return false unless Font.exist?(ConstantTable::Font_main_v)
+    return false unless Font.exist?(ConstantTable::Font_title)
+    return false unless Font.exist?(ConstantTable::Font_skill)
     return true
   end
 end
@@ -184,7 +184,7 @@ end
 ## 初期化プロセス開始
 #--------------------------------------------------------------------------
 # exit if $reset  # F12で再起動を防ぐ
-$wi = Window_Init2.new
+$wi = WindowInit.new
 $TRACE = true # traceの作成
 TEST = false
 ##> Phase.1
@@ -247,7 +247,7 @@ upck = Unpacker.new
 upck = Zlib::Inflate.inflate(load_data('Data/Unpacker.rvdata'))
 upck = Marshal.load(upck)
 eval(upck.code2)
-data = load_data(Constant_Table::MAIN_SCRIPT)
+data = load_data(ConstantTable::MAIN_SCRIPT)
 $wi.add_text('step3. loading archives')
 I = 1
 data.freeze

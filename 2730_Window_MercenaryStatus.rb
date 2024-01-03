@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 傭兵モンスターのステータス表示を行うクラスです。
 #==============================================================================
-class Window_MercenaryStatus < Window_Base
+class Window_MercenaryStatus < WindowBase
   def initialize
     super( 4, 448-(WLH*1+32)-4, 512-8, WLH*1+32)
     self.visible = true

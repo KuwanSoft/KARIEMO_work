@@ -4,7 +4,7 @@
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_ShopBuy < Window_Selectable
+class Window_ShopBuy < WindowSelectable
   attr_reader   :pre_kind            # 表示中のアイテムの種類
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -69,7 +69,7 @@ class Window_ShopBuy < Window_Selectable
   # ● 選択中のアイテムオブジェクトを取得
   #--------------------------------------------------------------------------
   def item_obj
-    item = MISC.item(@data[index][0], @data[index][1])
+    item = Misc.item(@data[index][0], @data[index][1])
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ
@@ -83,14 +83,14 @@ class Window_ShopBuy < Window_Selectable
       for id in $game_party.get_sorted_items(0)
         next if $game_party.shop_items[id] == nil
         next if $game_party.shop_items[id] == 0
-        next if MISC.item(0, id).kind == "skillbook"  # スキルブックを入れると画面が大きくなりすぎてbitmap failする。
+        next if Misc.item(0, id).kind == "skillbook"  # スキルブックを入れると画面が大きくなりすぎてbitmap failする。
         @data.push([0, id]) # アイテムデータをPush
       end
     when "スキルブック";
       for id in $game_party.get_sorted_items(0)
         next if $game_party.shop_items[id] == nil
         next if $game_party.shop_items[id] == 0
-        next if MISC.item(0, id).kind != "skillbook"
+        next if Misc.item(0, id).kind != "skillbook"
         @data.push([0, id]) # アイテムデータをPush
       end
     when "ぶき";
@@ -101,7 +101,7 @@ class Window_ShopBuy < Window_Selectable
       end
     else # 各防具の場合
       for id in $game_party.get_sorted_items(2)
-        item_data = MISC.item(2, id)
+        item_data = Misc.item(2, id)
         if item_data.kind == @pre_kind
           @data.push([2, id]) unless $game_party.shop_armors[id] == 0
         end
@@ -115,7 +115,7 @@ class Window_ShopBuy < Window_Selectable
       self.active = true
       self.index = 0
     end
-    DEBUG.write(c_m, "@data.size #{@data.size}")
+    Debug.write(c_m, "@data.size #{@data.size}")
     @item_max = @data.size
     create_contents
     self.contents.clear
@@ -134,7 +134,7 @@ class Window_ShopBuy < Window_Selectable
   def draw_item(index)
     kind = @data[index][0]
     id = @data[index][1]
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     rect = item_rect(index)
     price = if item.price == 0 then " " else item.price end # 値段が0はブランク
     draw_item_name(0, rect.y, item, @actor.equippable?(item))

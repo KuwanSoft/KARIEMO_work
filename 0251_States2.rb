@@ -153,7 +153,7 @@ class States2
     d1 = @recover_value.scan(/(\S+)d/)[0][0].to_i
     d2 = @recover_value.scan(/.*d(\d+)[+-]/)[0][0].to_i
     d3 = @recover_value.scan(/.*([+-]\d+)/)[0][0].to_i
-    return MISC.dice(d1, d2, d3)
+    return Misc.dice(d1, d2, d3)
   end
   #--------------------------------------------------------------------------
   # ● 累積値を取得
@@ -162,7 +162,7 @@ class States2
     d1 = @accum_value.scan(/(\S+)d/)[0][0].to_i
     d2 = @accum_value.scan(/.*d(\d+)[+-]/)[0][0].to_i
     d3 = @accum_value.scan(/.*([+-]\d+)/)[0][0].to_i
-    return MISC.dice(d1, d2, d3)
+    return Misc.dice(d1, d2, d3)
   end
   #--------------------------------------------------------------------------
   # ● 解除するステートを取得
@@ -200,7 +200,7 @@ class States2
     array.push(29) if @s29 == 'TRUE'
     array.push(30) if @s30 == 'TRUE'
     array.push(31) if @s31 == 'TRUE'
-    # DEBUG.write(c_m, "#{array}")
+    # Debug.write(c_m, "#{array}")
     return array
   end
 end

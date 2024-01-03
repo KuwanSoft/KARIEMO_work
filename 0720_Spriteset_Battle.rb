@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Spriteset_Battle
+# ■ SpritesetBattle
 #------------------------------------------------------------------------------
-# 　バトル画面のスプライトをまとめたクラスです。このクラスは Scene_Battle クラ
+# 　バトル画面のスプライトをまとめたクラスです。このクラスは SceneBattle クラ
 # スの内部で使用されます。
 #==============================================================================
 
-class Spriteset_Battle
+class SpritesetBattle
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -87,9 +87,9 @@ class Spriteset_Battle
     return if @battlefloor_ready
     ## バトルフロアが開ききったらエネミーを表示
     if @battlefloor_sprite.src_rect.height >= 192+12
-      DEBUG.write(c_m,"x:#{@battlefloor_sprite.src_rect.x}")
-      DEBUG.write(c_m,"y:#{@battlefloor_sprite.src_rect.y}")
-      DEBUG.write(c_m,"height:#{@battlefloor_sprite.src_rect.height}")
+      Debug.write(c_m,"x:#{@battlefloor_sprite.src_rect.x}")
+      Debug.write(c_m,"y:#{@battlefloor_sprite.src_rect.y}")
+      Debug.write(c_m,"height:#{@battlefloor_sprite.src_rect.height}")
       make_enemy_visible
       @battlefloor_ready = true
       return
@@ -106,7 +106,7 @@ class Spriteset_Battle
   def create_enemies
     @enemy_sprites = []
     for enemy in $game_troop.members.reverse
-      @enemy_sprites.push(Sprite_Battler.new(@viewport1, enemy))
+      @enemy_sprites.push(SpriteBattler.new(@viewport1, enemy))
     end
     ## 最初の作成では一旦非表示に
     for enemy_sprite in @enemy_sprites
@@ -119,7 +119,7 @@ class Spriteset_Battle
   def make_enemy_visible
     for enemy_sprite in @enemy_sprites
       enemy_sprite.visible = true
-      enemy_sprite.x += Constant_Table::SCREEN_PREP_ADJ
+      enemy_sprite.x += ConstantTable::SCREEN_PREP_ADJ
       enemy_sprite.battler.redraw = true
     end
   end
@@ -139,12 +139,12 @@ class Spriteset_Battle
   #--------------------------------------------------------------------------
   def create_actors
     @actor_sprites = []
-    @actor_sprites.push(Sprite_Battler.new(@viewport1))
-    @actor_sprites.push(Sprite_Battler.new(@viewport1))
-    @actor_sprites.push(Sprite_Battler.new(@viewport1))
-    @actor_sprites.push(Sprite_Battler.new(@viewport1))
-    @actor_sprites.push(Sprite_Battler.new(@viewport1)) # 6人パーティ用？
-    @actor_sprites.push(Sprite_Battler.new(@viewport1))
+    @actor_sprites.push(SpriteBattler.new(@viewport1))
+    @actor_sprites.push(SpriteBattler.new(@viewport1))
+    @actor_sprites.push(SpriteBattler.new(@viewport1))
+    @actor_sprites.push(SpriteBattler.new(@viewport1))
+    @actor_sprites.push(SpriteBattler.new(@viewport1)) # 6人パーティ用？
+    @actor_sprites.push(SpriteBattler.new(@viewport1))
     @actor_sprites[0].battler = $game_party.members[0]
     @actor_sprites[1].battler = $game_party.members[1]
     @actor_sprites[2].battler = $game_party.members[2]
@@ -158,7 +158,7 @@ class Spriteset_Battle
   def create_spirits
     @summon_sprites = []
     for spirit in $game_summon.members.reverse
-      @summon_sprites.push(Sprite_Battler.new(@viewport1))
+      @summon_sprites.push(SpriteBattler.new(@viewport1))
     end
   end
   #--------------------------------------------------------------------------
@@ -167,7 +167,7 @@ class Spriteset_Battle
   def create_mercenarys
     @mercenary_sprites = []
     for spirit in $game_mercenary.members.reverse
-      @mercenary_sprites.push(Sprite_Battler.new(@viewport1))
+      @mercenary_sprites.push(SpriteBattler.new(@viewport1))
     end
   end
   #--------------------------------------------------------------------------
@@ -176,7 +176,7 @@ class Spriteset_Battle
   def create_pictures
     @picture_sprites = []
     for i in 1..20
-      @picture_sprites.push(Sprite_Picture.new(@viewport2,
+      @picture_sprites.push(SpritePicture.new(@viewport2,
         $game_troop.screen.pictures[i]))
     end
   end
@@ -184,7 +184,7 @@ class Spriteset_Battle
   # ● タイマースプライトの作成
   #--------------------------------------------------------------------------
   def create_timer
-    @timer_sprite = Sprite_Timer.new(@viewport2)
+    @timer_sprite = SpriteTimer.new(@viewport2)
   end
   #--------------------------------------------------------------------------
   # ● 解放

@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Spriteset_Map
+# ■ SpritesetMap
 #------------------------------------------------------------------------------
 # 　マップ画面のスプライトやタイルマップなどをまとめたクラスです。このクラスは
-# Scene_Map クラスの内部で使用されます。
+# SceneMap クラスの内部で使用されます。
 #==============================================================================
 
-class Spriteset_Map
+class SpritesetMap
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -60,14 +60,14 @@ class Spriteset_Map
   def create_characters
     @character_sprites = []
     for i in $game_map.events.keys.sort
-      sprite = Sprite_Character.new(@viewport1, $game_map.events[i])
+      sprite = SpriteCharacter.new(@viewport1, $game_map.events[i])
       @character_sprites.push(sprite)
     end
     for vehicle in $game_map.vehicles
-      sprite = Sprite_Character.new(@viewport1, vehicle)
+      sprite = SpriteCharacter.new(@viewport1, vehicle)
       @character_sprites.push(sprite)
     end
-    @character_sprites.push(Sprite_Character.new(@viewport1, $game_player))
+    @character_sprites.push(SpriteCharacter.new(@viewport1, $game_player))
   end
   #--------------------------------------------------------------------------
   # ● 飛行船の影スプライトの作成
@@ -83,7 +83,7 @@ class Spriteset_Map
   # ● 天候の作成
   #--------------------------------------------------------------------------
   def create_weather
-    @weather = Spriteset_Weather.new(@viewport2)
+    @weather = SpritesetWeather.new(@viewport2)
   end
   #--------------------------------------------------------------------------
   # ● ピクチャスプライトの作成
@@ -91,7 +91,7 @@ class Spriteset_Map
   def create_pictures
     @picture_sprites = []
     for i in 1..20
-      @picture_sprites.push(Sprite_Picture.new(@viewport2,
+      @picture_sprites.push(SpritePicture.new(@viewport2,
         $game_map.screen.pictures[i]))
     end
   end
@@ -99,7 +99,7 @@ class Spriteset_Map
   # ● タイマースプライトの作成
   #--------------------------------------------------------------------------
   def create_timer
-    @timer_sprite = Sprite_Timer.new(@viewport2)
+    @timer_sprite = SpriteTimer.new(@viewport2)
   end
   #--------------------------------------------------------------------------
   # ● 解放

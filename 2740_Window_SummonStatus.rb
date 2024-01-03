@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 # 召喚モンスターのステータス表示を行うクラスです。
 #==============================================================================
-class Window_SummonStatus < Window_Base
+class Window_SummonStatus < WindowBase
   def initialize
     if $game_mercenary.all_dead?
       super( (512-320)/2, 188+80, 320, WLH*1+32)

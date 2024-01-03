@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Constant_Table
+# ■ ConstantTable
 #------------------------------------------------------------------------------
 # 　ゲーム内での定数を一括で定義
 #==============================================================================
 
-module Constant_Table
+module ConstantTable
   SCREEN_WIDTH = 512
   SCREEN_HEIGHT = 448
   Font_main   = ["Wizardry (kuwansoft, ver5.3)"]
@@ -237,19 +237,20 @@ module Constant_Table
   UNLOCK_MAGIC_ID = 37      # 扉よ開けの呪文ID
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
+  RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
     array = []
-    array.push(Constant_Table::SURVIVOR_ID1)
-    array.push(Constant_Table::SURVIVOR_ID2)
-    array.push(Constant_Table::SURVIVOR_ID3)
-    array.push(Constant_Table::SURVIVOR_ID4)
-    array.push(Constant_Table::SURVIVOR_ID5)
-    array.push(Constant_Table::SURVIVOR_ID6)
-    array.push(Constant_Table::SURVIVOR_ID7)
-    array.push(Constant_Table::SURVIVOR_ID8)
-    array.push(Constant_Table::SURVIVOR_ID9)
+    array.push(ConstantTable::SURVIVOR_ID1)
+    array.push(ConstantTable::SURVIVOR_ID2)
+    array.push(ConstantTable::SURVIVOR_ID3)
+    array.push(ConstantTable::SURVIVOR_ID4)
+    array.push(ConstantTable::SURVIVOR_ID5)
+    array.push(ConstantTable::SURVIVOR_ID6)
+    array.push(ConstantTable::SURVIVOR_ID7)
+    array.push(ConstantTable::SURVIVOR_ID8)
+    array.push(ConstantTable::SURVIVOR_ID9)
     return array
   end
 
@@ -262,7 +263,8 @@ module Constant_Table
     "風",   # 5
     "地",   # 6
     "爆",   # 7
-    "呪"    # 8
+    "呪",   # 8
+    "血"    # 9
   ]
 
   ITEM_RANK_NAME = [
@@ -314,8 +316,6 @@ module Constant_Table
   STABLE_R_RATE = 28
   STABLE_DAYS = 7       # 馬小屋の日数
   STINKRATIO = 5        # 臭う確率
-  ## 休息時の最大疲労回復値
-  REST_THRES = 0.20
 
   ## 宿屋の料金と疲労回復量
   INN1_FEE = 5    #
@@ -329,7 +329,7 @@ module Constant_Table
 
   ## 古びた錠前の難易度
   LOCK_NUM_B1F = 1
-  LOCK_NUM_B2F = 1+4
+  LOCK_NUM_B2F = 1
   LOCK_NUM_B3F = 2
   LOCK_NUM_B4F = 2
   LOCK_NUM_B5F = 3
@@ -339,7 +339,7 @@ module Constant_Table
   LOCK_NUM_B9F = 5
 
   LOCK_DIF_B1F = 10
-  LOCK_DIF_B2F = 12+50
+  LOCK_DIF_B2F = 12
   LOCK_DIF_B3F = 14
   LOCK_DIF_B4F = 16
   LOCK_DIF_B5F = 18
@@ -393,8 +393,8 @@ module Constant_Table
   NAME_PUB = "Pub"
   NAME_INN = "Inn"
   NAME_SHOP = "Trading Post"
-  NAME_CHURCH = "Church"
-  NAME_GUILD = "Guild"
+  NAME_TEMPLE = "Temple"
+  NAME_GUILD = "Adventurers' Guild"
   NAME_EDGE_OF_VILLAGE = "EdgeOfVil."
 
   PERSONALITY_P_hash = {
@@ -607,13 +607,13 @@ module Constant_Table
   end
   MAIN_SCRIPT = "Data/Archive.rvdata"               # メインスクリプト（Scripts.rvdataは使わない）
   INIT_SCRIPT = "Data/Init.rvdata"                  # 初期化スクリプト
-  DEBUG_FILE_NAME = "kariemo.log"                   # DEBUGデータファイル名
+  DEBUG_FILE_NAME = "kariemo.log"                   # Debugデータファイル名
   PERFD_FILE_NAME = "kariemo.perf"                  # パフォーマンスデータ
   BUGREPORT_FILE_NAME = "BugReport.txt"
   KEY = "*KUWANSOFT*"                               # Tcrypt Key
   C_KEY = 1                                         # シーザーキー
-  DECODE_KEY = "*DECODE*"                           # DEBUGファイルのデコード起動PASS
-  THROUGH_KEY = "*THROUGH*"                         # DEBUGファイルのデコードスルーモード
+  DECODE_KEY = "*DECODE*"                           # Debugファイルのデコード起動PASS
+  THROUGH_KEY = "*THROUGH*"                         # Debugファイルのデコードスルーモード
   DECODE_FILE_NAME = "kariemo.dtrc"
   FontData1 = "Debug/config_data_1.rvdata"          # FontData1
   FontData2 = "Debug/config_data_2.rvdata"          # FontData2

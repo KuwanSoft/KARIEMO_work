@@ -4,28 +4,28 @@
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_Guide < Scene_Base
+class Scene_Guide < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
     $music.play("満月亭")
     array = []
-    for gi in Constant_Table::GUIDE_ID
+    for gi in ConstantTable::GUIDE_ID
       next if gi == 0
       ## TEST時は全GUIDEとなる
       if $TEST
         array.push(gi)
       else
         ## 現在のマップが満たしていればGUIDEが候補に
-        if $game_map.map_id >= Constant_Table::GUIDE_FR[gi]
+        if $game_map.map_id >= ConstantTable::GUIDE_FR[gi]
           array.push(gi) unless $game_mercenary.dup?(gi)
         end
       end
     end
     @guide_id = array[rand(array.size)] # ランダムでピックアップ
-    DEBUG.write(c_m, "Selected GUIDE_ID: #{@guide_id}")
-    @guide = Game_Enemy.new(1, @guide_id, 1)
+    Debug.write(c_m, "Selected GUIDE_ID: #{@guide_id}")
+    @guide = GameEnemy.new(1, @guide_id, 1)
   end
   #--------------------------------------------------------------------------
   # ● メッセージ表示が終わるまでウェイト
@@ -120,9 +120,9 @@ class Scene_Guide < Scene_Base
       $game_mercenary.setup(@guide_id)
       @attention_window.set_text("#{@guide.enemy.name} をやとった")
       wait_for_attention
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     when 1; # おわり
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
 end

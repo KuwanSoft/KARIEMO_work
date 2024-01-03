@@ -4,7 +4,7 @@
 # 変数を保存しないモジュール処理を集めたモジュール
 #==============================================================================
 
-module MISC
+module Misc
   HIRAGANA_MAP = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ']
   #--------------------------------------------------------------------------
   # ● メインの壁紙
@@ -62,7 +62,7 @@ module MISC
     ratio *= actor.motivation
     ratio /= 100.0
     ls = 0
-    unless id == SKILLID::LEADERSHIP
+    unless id == SkillId::LEADERSHIP
       ##> LeaderSkillBonusの計算
       if $game_party.get_leader == actor
         ls = 0
@@ -75,16 +75,16 @@ module MISC
     end
     ## mp量を決定づけるスキルはLSの影響を受けない
     ## ラーニングスキルはLSの影響を受けない
-    ls = 0 if [SKILLID::FIRE, SKILLID::WATER, SKILLID::AIR, SKILLID::EARTH,
-      SKILLID::LEARNING].include?(id)
+    ls = 0 if [SkillId::FIRE, SkillId::WATER, SkillId::AIR, SkillId::EARTH,
+      SkillId::LEARNING].include?(id)
 
     ## Rune補正
     case id
-    when SKILLID::TACTICS
+    when SkillId::TACTICS
       rs = actor.get_magic_attr(6)
-    when SKILLID::SHIELD
+    when SkillId::SHIELD
       rs = actor.get_magic_attr(12)
-    when SKILLID::D_RESIST
+    when SkillId::D_RESIST
       rs = actor.get_magic_attr(11)
     else
       rs = 0
@@ -125,7 +125,7 @@ module MISC
     $game_troop.setup($game_map.map_id, false, 0, true)
     $game_temp.next_scene = "battle"
     $game_temp.event_battle = true
-    DEBUG::write(c_m,"***********【ENCOUNT type:Team】***********")
+    Debug::write(c_m,"***********【ENCOUNT type:Team】***********")
   end
   #--------------------------------------------------------------------------
   # ● イベントエンカウントの処理
@@ -135,7 +135,7 @@ module MISC
     $game_system.store_undefeated_monster(enemy_id) # イベントバトルのモンスターIDを保存
     $game_temp.next_scene = "battle"
     $game_temp.event_battle = true
-    DEBUG::write(c_m,"***********【ENCOUNT type:Event】***********")
+    Debug::write(c_m,"***********【ENCOUNT type:Event】***********")
   end
   #--------------------------------------------------------------------------
   # ● NPCエンカウントの処理
@@ -145,20 +145,20 @@ module MISC
     $game_temp.next_scene = "npc_battle"
     $game_temp.event_battle = true
     $game_temp.npc_battle = npc_id
-    DEBUG::write(c_m,"***********【ENCOUNT type:NPC】***********")
+    Debug::write(c_m,"***********【ENCOUNT type:NPC】***********")
   end
   #--------------------------------------------------------------------------
   # ● シーザーキー暗号化
   #--------------------------------------------------------------------------
   def self.crypt_caesar(string)
-    key = Constant_Table::C_KEY # シーザーキー
+    key = ConstantTable::C_KEY # シーザーキー
     return string.unpack("C*").map{ |n| (n + key) % 256 }.pack("C*")
   end
   #--------------------------------------------------------------------------
   # ● シーザーキー複合化
   #--------------------------------------------------------------------------
   def self.decrypt_caesar(string)
-    key = Constant_Table::C_KEY # シーザーキー
+    key = ConstantTable::C_KEY # シーザーキー
     return string.unpack("C*").map{ |n| (n - key) % 256 }.pack("C*")
   end
   #--------------------------------------------------------------------------
@@ -170,7 +170,7 @@ module MISC
     check_bit = number.split(//).inject(0) { |sum, n| sum + n.to_i } % 10
     number_with_check_bit = number + check_bit.to_s
     playid = number_with_check_bit.split(//).map { |n| HIRAGANA_MAP[n.to_i] }.join('')
-    DEBUG::write(c_m,"PlayID: #{playid}")
+    Debug::write(c_m,"PlayID: #{playid}")
     return playid
   end
   #--------------------------------------------------------------------------
@@ -207,26 +207,26 @@ module MISC
   def self.write_partyreport
     array = []
     string1 = "====PARTY REPORT======================================================================="
-    string2 = "プレイ時間 #{playtime} 討伐数:#{$game_party.all_marks}体 平均LV:#{sprintf("%02d", $game_party.ave_lv)} Reset:#{DEBUG.check_reset_count}"
+    string2 = "プレイ時間 #{playtime} 討伐数:#{$game_party.all_marks}体 平均LV:#{sprintf("%02d", $game_party.ave_lv)} Reset:#{Debug.check_reset_count}"
     string3 = "---------------------------------------------------------------------------------------"
     array.push string1
     array.push string2
     array.push string3
-    DEBUG::write(c_m, string1)
-    DEBUG::write(c_m, string2)
-    DEBUG::write(c_m, string3)
+    Debug::write(c_m, string1)
+    Debug::write(c_m, string2)
+    Debug::write(c_m, string3)
     for m in $game_party.members
       header = m.leader? ? "L" : " "
-      name = header + MISC.get_string(m.name, 18)
+      name = header + Misc.get_string(m.name, 18)
       str = sprintf("%s レベル%02d %s H.P.%3d Ar:%02d RIP %02d Marks %5d S.P. %g(%g)", name, m.level, m.class_kanji, m.maxhp, m.armor, m.rip, m.marks, m.calc_all_sp(0), m.calc_all_sp(1))
-      DEBUG::write(c_m, str)
+      Debug::write(c_m, str)
       array.push str
     end
     string4 = "======================================================================================="
     array.push string4
-    DEBUG::write(c_m, string4)
+    Debug::write(c_m, string4)
     ## ファイルへの書き出し
-    filename = Constant_Table::PARTY_REPORT_FILE
+    filename = ConstantTable::PARTY_REPORT_FILE
     pr = File.open(filename, "w")
     for item in array
       pr.puts item
@@ -274,8 +274,8 @@ module MISC
   # ● ファイル暗号化（開発用）
   #--------------------------------------------------------------------------
   def self.encrypt(input, output)
-    r = TCrypt.encrypt(input, output, Constant_Table::KEY, TCrypt::MODE_MKERS)
-    DEBUG::write(c_m, "IN:#{input} OUT:#{output}暗号化RC:#{crypt_result(r)}") # debug
+    r = TCrypt.encrypt(input, output, ConstantTable::KEY, TCrypt::MODE_MKERS)
+    Debug::write(c_m, "IN:#{input} OUT:#{output}暗号化RC:#{crypt_result(r)}") # debug
     Graphics.update  # おまじない
   end
   #--------------------------------------------------------------------------
@@ -283,7 +283,7 @@ module MISC
   #     暗号化されたFontsを解凍させる。
   #--------------------------------------------------------------------------
   def self.decrypt(input, output, console)
-    r = TCrypt.decrypt(input, output, Constant_Table::KEY, TCrypt::MODE_MKERS)
+    r = TCrypt.decrypt(input, output, ConstantTable::KEY, TCrypt::MODE_MKERS)
     console.add_text("Processing #{input} RC:#{r}")
   end
   #--------------------------------------------------------------------------
@@ -309,7 +309,7 @@ module MISC
   # MapとCamp時に自然現象する
   #--------------------------------------------------------------------------
   def self.update_light_timer
-    if $scene.is_a?(Scene_CAMP) or $scene.is_a?(Scene_Map)
+    if $scene.is_a?(SceneCamp) or $scene.is_a?(SceneMap)
       $game_system.convergence_light
     end
   end
@@ -319,16 +319,16 @@ module MISC
   def self.set_default_volume
     ## 初期設定
     ## INIファイルにエントリーがない場合はCTから初期値を持ってくる。
-    vol = IniFile.read("Game.ini", "Settings", "MASTER_VOLUME", Constant_Table::MASTER_VOLUME)
+    vol = IniFile.read("Game.ini", "Settings", "MASTER_VOLUME", ConstantTable::MASTER_VOLUME)
     IniFile.write("Game.ini", "Settings", "MASTER_VOLUME", vol)
     $master_volume = vol
-    vol = IniFile.read("Game.ini", "Settings", "MASTER_ME_VOLUME", Constant_Table::MASTER_ME_VOLUME)
+    vol = IniFile.read("Game.ini", "Settings", "MASTER_ME_VOLUME", ConstantTable::MASTER_ME_VOLUME)
     IniFile.write("Game.ini", "Settings", "MASTER_ME_VOLUME", vol)
     $master_me_volume = vol
-    vol = IniFile.read("Game.ini", "Settings", "MASTER_SE_VOLUME", Constant_Table::MASTER_SE_VOLUME)
+    vol = IniFile.read("Game.ini", "Settings", "MASTER_SE_VOLUME", ConstantTable::MASTER_SE_VOLUME)
     IniFile.write("Game.ini", "Settings", "MASTER_SE_VOLUME", vol)
     $master_se_volume = vol
-    DEBUG::write(c_m, "BGM:#{$master_volume} ME:#{$master_me_volume} SE:#{$master_se_volume}")
+    Debug::write(c_m, "BGM:#{$master_volume} ME:#{$master_me_volume} SE:#{$master_se_volume}")
   end
   #--------------------------------------------------------------------------
   # ● 最初のウインドウタイプ
@@ -339,7 +339,7 @@ module MISC
     wt = IniFile.read("Game.ini", "Settings", "WINDOW", 0)
     IniFile.write("Game.ini", "Settings", "WINDOW", wt)
     $window_type = wt
-    DEBUG::write(c_m, "Window Color:#{$window_type}")
+    Debug::write(c_m, "Window Color:#{$window_type}")
   end
   #--------------------------------------------------------------------------
   # ● INIファイルに書き込み
@@ -435,27 +435,27 @@ module MISC
   #--------------------------------------------------------------------------
   def self.str2stateid(str)
     case str
-    when "首"; state_id = STATEID::CRITICAL
-    when "石"; state_id = STATEID::STONE
-    when "痺"; state_id = STATEID::PARALYSIS
-    when "封"; state_id = STATEID::CONTAINMENT
-    when "毒"; state_id = STATEID::POISON
-    when "眠"; state_id = STATEID::SLEEP
-    when "暗"; state_id = STATEID::BLIND
-    when "怖"; state_id = STATEID::FEAR
-    when "鎧"; state_id = STATEID::RUST
-    when "老"; state_id = STATEID::DRAIN_AGE
-    when "経"; state_id = STATEID::DRAIN_EXP
-    when "窒"; state_id = STATEID::SUFFOCATION
-    when "浄"; state_id = STATEID::PURIFY
-    when "病"; state_id = STATEID::SICKNESS
-    when "火"; state_id = STATEID::BURN
-    when "狂"; state_id = STATEID::MADNESS
-    when "骨"; state_id = STATEID::FRACTURE
-    when "電"; state_id = STATEID::SHOCK
-    when "凍"; state_id = STATEID::FREEZE
-    when "祓"; state_id = STATEID::EXORCIST
-    else; state_id = STATEID::DUMMY
+    when "首"; state_id = StateId::CRITICAL
+    when "石"; state_id = StateId::STONE
+    when "痺"; state_id = StateId::PARALYSIS
+    when "封"; state_id = StateId::CONTAINMENT
+    when "毒"; state_id = StateId::POISON
+    when "眠"; state_id = StateId::SLEEP
+    when "暗"; state_id = StateId::BLIND
+    when "怖"; state_id = StateId::FEAR
+    when "鎧"; state_id = StateId::RUST
+    when "老"; state_id = StateId::DRAIN_AGE
+    when "経"; state_id = StateId::DRAIN_EXP
+    when "窒"; state_id = StateId::SUFFOCATION
+    when "浄"; state_id = StateId::PURIFY
+    when "病"; state_id = StateId::SICKNESS
+    when "火"; state_id = StateId::BURN
+    when "狂"; state_id = StateId::MADNESS
+    when "骨"; state_id = StateId::FRACTURE
+    when "電"; state_id = StateId::SHOCK
+    when "凍"; state_id = StateId::FREEZE
+    when "祓"; state_id = StateId::EXORCIST
+    else; state_id = StateId::DUMMY
     end
     return state_id
   end
@@ -463,8 +463,8 @@ module MISC
   # ● スクリプト行数のカウント
   #--------------------------------------------------------------------------
   def self.count_script_lines
-    filename = Constant_Table::MAIN_SCRIPT
-    initfilename = Constant_Table::INIT_SCRIPT
+    filename = ConstantTable::MAIN_SCRIPT
+    initfilename = ConstantTable::INIT_SCRIPT
     file1 = File.open(filename, "r")
     file2 = File.open(initfilename, "r")
     scripts1 = Marshal.load(file1)
@@ -481,17 +481,17 @@ module MISC
       line_count = data.count("\n")
       counts[line_count] = "#{one[0]}"
       total_line += line_count
-      DEBUG.write(c_m, "File:#{one[0]} line_count:#{line_count}")
+      Debug.write(c_m, "File:#{one[0]} line_count:#{line_count}")
     end
     for one in scripts2
       data = Zlib::Inflate.inflate(one[2])
       line_count = data.count("\n")
       counts[line_count] = "#{one[1]}"
       total_line += line_count
-      DEBUG.write(c_m, "File:#{one[1]} line_count:#{line_count}")
+      Debug.write(c_m, "File:#{one[1]} line_count:#{line_count}")
     end
-    DEBUG.write(c_m, "total_line:#{total_line}行")
-    DEBUG.write(c_m, "max_script_name:#{counts[counts.keys.max]}")
+    Debug.write(c_m, "total_line:#{total_line}行")
+    Debug.write(c_m, "max_script_name:#{counts[counts.keys.max]}")
     return total_line
   end
   #--------------------------------------------------------------------------
@@ -516,21 +516,21 @@ module MISC
     when 3,4,6,8;
       if magic.domain == 0          # 呪文が理性
         if actor.principle == -1    # 主義が理性
-          max = Constant_Table::MAX_MAGIC_LEVEL         # Sor/Kgt/Wis/Cle
+          max = ConstantTable::MAX_MAGIC_LEVEL         # Sor/Kgt/Wis/Cle
         elsif actor.principle == 1  # 主義が神秘
-          max = Constant_Table::NONCASTER_MAX_CAST
+          max = ConstantTable::NONCASTER_MAX_CAST
         end
       elsif magic.domain == 1       # 呪文が神秘
         if actor.principle == 1     # 主義が神秘
-          max = Constant_Table::MAX_MAGIC_LEVEL
+          max = ConstantTable::MAX_MAGIC_LEVEL
         elsif actor.principle == -1 # 主義が理性
-          max = Constant_Table::NONCASTER_MAX_CAST
+          max = ConstantTable::NONCASTER_MAX_CAST
         end
       end
     ## 従
-    when 9; max = Constant_Table::SERVANT_MAX_CAST      # Ser
+    when 9; max = ConstantTable::SERVANT_MAX_CAST      # Ser
     ## 戦・盗・忍・狩・侍
-    else; max = Constant_Table::NONCASTER_MAX_CAST      # War/Thf/Nin/Hun
+    else; max = ConstantTable::NONCASTER_MAX_CAST      # War/Thf/Nin/Hun
     end
     return max
   end
@@ -539,15 +539,15 @@ module MISC
   #--------------------------------------------------------------------------
   def self.set_return_fee
     case $game_map.map_id
-    when 1; $game_variables[Constant_Table::TEMP_VAR_ID] = 100
-    when 2; $game_variables[Constant_Table::TEMP_VAR_ID] = 200
-    when 3; $game_variables[Constant_Table::TEMP_VAR_ID] = 300
-    when 4; $game_variables[Constant_Table::TEMP_VAR_ID] = 500
-    when 5; $game_variables[Constant_Table::TEMP_VAR_ID] = 800
-    when 6; $game_variables[Constant_Table::TEMP_VAR_ID] = 1300
-    when 7; $game_variables[Constant_Table::TEMP_VAR_ID] = 2100
-    when 8; $game_variables[Constant_Table::TEMP_VAR_ID] = 3400
-    when 9; $game_variables[Constant_Table::TEMP_VAR_ID] = 5500
+    when 1; $game_variables[ConstantTable::TEMP_VAR_ID] = 100
+    when 2; $game_variables[ConstantTable::TEMP_VAR_ID] = 200
+    when 3; $game_variables[ConstantTable::TEMP_VAR_ID] = 300
+    when 4; $game_variables[ConstantTable::TEMP_VAR_ID] = 500
+    when 5; $game_variables[ConstantTable::TEMP_VAR_ID] = 800
+    when 6; $game_variables[ConstantTable::TEMP_VAR_ID] = 1300
+    when 7; $game_variables[ConstantTable::TEMP_VAR_ID] = 2100
+    when 8; $game_variables[ConstantTable::TEMP_VAR_ID] = 3400
+    when 9; $game_variables[ConstantTable::TEMP_VAR_ID] = 5500
     end
   end
   #--------------------------------------------------------------------------
@@ -564,7 +564,7 @@ module MISC
     ## n = actor
     ## m = enemy
     diff = m - n
-    DEBUG.write(c_m, "敵TR:#{enemy_tr} アクターLV:#{actor_lv} 差分:#{diff}")
+    Debug.write(c_m, "敵TR:#{enemy_tr} アクターLV:#{actor_lv} 差分:#{diff}")
     return diff
   end
   #--------------------------------------------------------------------------
@@ -574,7 +574,7 @@ module MISC
     param_a = 1000
     param_b = 2000
     ratio = actor.personality_n == :tiredness ? 1.05 : 1.00 # 性格によるボーナス
-    ep = [[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max, Constant_Table::MAX_EP].min.to_i
+    ep = [[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max, ConstantTable::MAX_EP].min.to_i
     return Integer(ep * ratio)
   end
   #--------------------------------------------------------------------------

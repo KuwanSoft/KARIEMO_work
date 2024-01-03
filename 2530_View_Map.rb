@@ -1,4 +1,4 @@
-class View_Map < Window_Base
+class View_Map < WindowBase
   #--------------------------------------------------------------------------
   # ● 初期化
   #--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ class View_Map < Window_Base
   #   point_x, point_y: プレイヤー座標
   #--------------------------------------------------------------------------
   def start_drawing(point_x, point_y, mapid, mapdata_id, ndp)
-    # DEBUG::write(c_m, "MAPID:フロアB#{mapid}Fの描画開始 x:#{point_x} y:#{point_y}")
+    # Debug::write(c_m, "MAPID:フロアB#{mapid}Fの描画開始 x:#{point_x} y:#{point_y}")
     draw_floor(mapid, point_x, point_y)
     prepare # 準備開始
     ##> アクターIDが合致するマップオブジェクトを取得

@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_CHURCH
+# ■ SceneTemple
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_CHURCH < Scene_Base
+class SceneTemple < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     menu_index : コマンドのカーソル初期位置
@@ -56,7 +56,7 @@ class Scene_CHURCH < Scene_Base
     @back_s.y += 96-24                      # メッセージ枠小
     @ps = Window_PartyStatus.new            # PartyStatus
     turn_on_face
-    @menu_window = Window_CHURCH_Menu.new   # メインメニュー
+    @menu_window = Window_Temple_Menu.new   # メインメニュー
     @menu_window.change_page(1)             # 初期ページ１
     @cure = Window_CURE.new                 # 治療リスト
     @injured = Window_INJURED.new           # 怪我人リスト
@@ -65,7 +65,7 @@ class Scene_CHURCH < Scene_Base
     @give_window = Window_GiveMoney.new     # 寄付ウインドウ
     @wallet = Window_WalletInfo.new
     @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/church", "Church")
+    @window_picture.create_picture("Graphics/System/church", ConstantTable::NAME_TEMPLE)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -168,7 +168,7 @@ class Scene_CHURCH < Scene_Base
         @back_s.set_text(text1, text2, 0, 2)
       end
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Village.new
+      $scene = SceneVillage.new
     end
   end
   #--------------------------------------------------------------------------
@@ -271,7 +271,7 @@ class Scene_CHURCH < Scene_Base
       name = @cure_actor.name
       if @cure_actor.actor?
         a = @cure_actor.recover_all(true)   # 治療の実施 結果をaに入力
-        DEBUG::write(c_m,"復活の結果 RETURN:#{a}")
+        Debug::write(c_m,"復活の結果 RETURN:#{a}")
         case a
         when 0;result = "よくなりました"
         when 1;result = "くさりはじめました"
@@ -331,7 +331,7 @@ class Scene_CHURCH < Scene_Base
         @give_window.visible = false
         @back_s.visible = false
         g = @give_window.gold
-        ep = MISC.gp2ep(g, @ps.actor)
+        ep = Misc.gp2ep(g, @ps.actor)
         exp = @ps.actor.gain_exp(ep)
         @ps.actor.gain_gold(-g)
         $game_system.gain_consumed_gold(g)

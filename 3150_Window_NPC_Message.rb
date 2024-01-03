@@ -4,7 +4,7 @@
 # 文章表示に使うメッセージウィンドウです。
 #==============================================================================
 
-class Window_NPC_Message < Window_Selectable
+class Window_NPC_Message < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 定数
   #--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class Window_NPC_Message < Window_Selectable
     @lines = ["","","","",""]                 # 行メッセージ
     create_number_input_window
 #~     create_back_sprite
-    self.contents.font.name = Constant_Table::Font_main_v  # フォント縦長
+    self.contents.font.name = ConstantTable::Font_main_v  # フォント縦長
     self.contents.font.size = 24
   end
   #--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class Window_NPC_Message < Window_Selectable
   # ● 数値入力ウィンドウの作成
   #--------------------------------------------------------------------------
   def create_number_input_window
-    @number_input_window = Window_NumberInput.new
+    @number_input_window = WindowNumberInput.new
     @number_input_window.visible = false
   end
   #--------------------------------------------------------------------------
@@ -283,7 +283,7 @@ class Window_NPC_Message < Window_Selectable
     @lines.push(@mes)
     if @lines.size > 5  # 5行以上であればシフト
       @lines.shift
-#~       DEBUG::write(c_m, "shift:#{@line_count}")
+#~       Debug::write(c_m, "shift:#{@line_count}")
     end
     align1 = @lines[0].include?("\x01") ? 0 : 1
     align2 = @lines[1].include?("\x01") ? 0 : 1
@@ -295,7 +295,7 @@ class Window_NPC_Message < Window_Selectable
     contents.draw_text(0, WLH*2*2, self.width-32, WLH*2, @lines[2], align3)
     contents.draw_text(0, WLH*2*3, self.width-32, WLH*2, @lines[3], align4)
     contents.draw_text(0, WLH*2*4, self.width-32, WLH*2, @lines[4], align5)
-    MISC.check_keyword(@mes)  # キーワードであればストア
+    Misc.check_keyword(@mes)  # キーワードであればストア
     @mes = ""
     @line_count += 1          # 行追加
     @wait_count = 15

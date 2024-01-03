@@ -4,7 +4,7 @@
 # 　新しい宝箱システム, 左側ペイン
 #==============================================================================
 
-class Window_Treasure_Inspect < Window_Selectable
+class Window_Treasure_Inspect < WindowSelectable
 
   attr_accessor :device_array   # 解除済みデバイスリスト（true:解除済み）
 
@@ -28,22 +28,22 @@ class Window_Treasure_Inspect < Window_Selectable
   #--------------------------------------------------------------------------
   def create_device_list
     @device_list = []
-    @device_list.push(Constant_Table::TRAP1_DEVICES)
-    @device_list.push(Constant_Table::TRAP2_DEVICES)
-    @device_list.push(Constant_Table::TRAP3_DEVICES)
-    @device_list.push(Constant_Table::TRAP4_DEVICES)
-    @device_list.push(Constant_Table::TRAP5_DEVICES)
-    @device_list.push(Constant_Table::TRAP6_DEVICES)
-    @device_list.push(Constant_Table::TRAP7_DEVICES)
-    @device_list.push(Constant_Table::TRAP8_DEVICES)
-    @device_list.push(Constant_Table::TRAP9_DEVICES)
-    @device_list.push(Constant_Table::TRAP10_DEVICES)
-    @device_list.push(Constant_Table::TRAP11_DEVICES)
-    @device_list.push(Constant_Table::TRAP18_DEVICES)
-    @device_list.push(Constant_Table::TRAP19_DEVICES)
-    @device_list.push(Constant_Table::TRAP20_DEVICES)
-    @device_list.push(Constant_Table::TRAP21_DEVICES)
-    @device_list.push(Constant_Table::TRAP22_DEVICES)
+    @device_list.push(ConstantTable::TRAP1_DEVICES)
+    @device_list.push(ConstantTable::TRAP2_DEVICES)
+    @device_list.push(ConstantTable::TRAP3_DEVICES)
+    @device_list.push(ConstantTable::TRAP4_DEVICES)
+    @device_list.push(ConstantTable::TRAP5_DEVICES)
+    @device_list.push(ConstantTable::TRAP6_DEVICES)
+    @device_list.push(ConstantTable::TRAP7_DEVICES)
+    @device_list.push(ConstantTable::TRAP8_DEVICES)
+    @device_list.push(ConstantTable::TRAP9_DEVICES)
+    @device_list.push(ConstantTable::TRAP10_DEVICES)
+    @device_list.push(ConstantTable::TRAP11_DEVICES)
+    @device_list.push(ConstantTable::TRAP18_DEVICES)
+    @device_list.push(ConstantTable::TRAP19_DEVICES)
+    @device_list.push(ConstantTable::TRAP20_DEVICES)
+    @device_list.push(ConstantTable::TRAP21_DEVICES)
+    @device_list.push(ConstantTable::TRAP22_DEVICES)
     @selected_device = 0
   end
   #--------------------------------------------------------------------------
@@ -68,8 +68,8 @@ class Window_Treasure_Inspect < Window_Selectable
       when 1..4; @r1 += result.to_s unless @result == nil
       when 5..8; @r2 += result.to_s unless @result == nil
       end
-      DEBUG.write(c_m, "@result#{@result} result#{result}")
-      DEBUG.write(c_m, "@r1#{@r1} @r2#{@r2}")
+      Debug.write(c_m, "@result#{@result} result#{result}")
+      Debug.write(c_m, "@r1#{@r1} @r2#{@r2}")
     end
     self.contents.draw_text(4,4,WLW*4,WLH, @r1)
     self.contents.draw_text(4,WLH+4,WLW*4,WLH, @r2)
@@ -82,104 +82,104 @@ class Window_Treasure_Inspect < Window_Selectable
     str = "???"
     case @selected_device % @device_list.size
     when 0;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME1)
-        str = Constant_Table::TRAP_NAME1
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME1)
+        str = ConstantTable::TRAP_NAME1
       else
         str1 = str2 = "----"
       end
     when 1;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME2)
-        str = Constant_Table::TRAP_NAME2
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME2)
+        str = ConstantTable::TRAP_NAME2
       else
         str1 = str2 = "----"
       end
     when 2;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME3)
-        str = Constant_Table::TRAP_NAME3
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME3)
+        str = ConstantTable::TRAP_NAME3
       else
         str1 = str2 = "----"
       end
     when 3;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME4)
-        str = Constant_Table::TRAP_NAME4
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME4)
+        str = ConstantTable::TRAP_NAME4
       else
         str1 = str2 = "----"
       end
     when 4;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME5)
-        str = Constant_Table::TRAP_NAME5
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME5)
+        str = ConstantTable::TRAP_NAME5
       else
         str1 = str2 = "----"
       end
     when 5;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME6)
-        str = Constant_Table::TRAP_NAME6
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME6)
+        str = ConstantTable::TRAP_NAME6
       else
         str1 = str2 = "----"
       end
     when 6;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME7)
-        str = Constant_Table::TRAP_NAME7
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME7)
+        str = ConstantTable::TRAP_NAME7
       else
         str1 = str2 = "----"
       end
     when 7;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME8)
-        str = Constant_Table::TRAP_NAME8
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME8)
+        str = ConstantTable::TRAP_NAME8
       else
         str1 = str2 = "----"
       end
     when 8;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME9)
-        str = Constant_Table::TRAP_NAME9
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME9)
+        str = ConstantTable::TRAP_NAME9
       else
         str1 = str2 = "----"
       end
     when 9;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME10)
-        str = Constant_Table::TRAP_NAME10
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME10)
+        str = ConstantTable::TRAP_NAME10
       else
         str1 = str2 = "----"
       end
     when 10;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME11)
-        str = Constant_Table::TRAP_NAME11
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME11)
+        str = ConstantTable::TRAP_NAME11
       else
         str1 = str2 = "----"
       end
     when 11;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME18)
-        str = Constant_Table::TRAP_NAME18
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME18)
+        str = ConstantTable::TRAP_NAME18
       else
         str1 = str2 = "----"
       end
     when 12;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME19)
-        str = Constant_Table::TRAP_NAME19
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME19)
+        str = ConstantTable::TRAP_NAME19
       else
         str1 = str2 = "----"
       end
     when 13;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME20)
-        str = Constant_Table::TRAP_NAME20
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME20)
+        str = ConstantTable::TRAP_NAME20
       else
         str1 = str2 = "----"
       end
     when 14;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME21)
-        str = Constant_Table::TRAP_NAME21
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME21)
+        str = ConstantTable::TRAP_NAME21
       else
         str1 = str2 = "----"
       end
     when 15;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME22)
-        str = Constant_Table::TRAP_NAME22
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME22)
+        str = ConstantTable::TRAP_NAME22
       else
         str1 = str2 = "----"
       end
     when 16;
-      if actor.trap_list.include?(Constant_Table::TRAP_NAME23)
-        str = Constant_Table::TRAP_NAME23
+      if actor.trap_list.include?(ConstantTable::TRAP_NAME23)
+        str = ConstantTable::TRAP_NAME23
       else
         str1 = str2 = "----"
       end
@@ -221,7 +221,7 @@ class Window_Treasure_Inspect < Window_Selectable
     self.contents.blt(lm+WLW*15+2*3, 32+2*1, bitmap, Rect.new(0,0,32,32))
 
     ## 残り調査回数
-    w = (Constant_Table::MAX_ATTEMPTS - actor.attempts) * 16
+    w = (ConstantTable::MAX_ATTEMPTS - actor.attempts) * 16
     bitmap = Cache.system("attempts2")
     self.contents.draw_text(WLW*8, WLH*6, self.width-32, WLH, "のこり")
     self.contents.blt(WLW*8+WLW*3, WLH*6, bitmap, Rect.new(0, 0, w, 16))

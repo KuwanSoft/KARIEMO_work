@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Game_Quest
+# ■ GameQuest
 #------------------------------------------------------------------------------
 # 　クエストの内部データ
 #==============================================================================
 
-class Game_Quest
+class GameQuest
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #   Quest { key => 0:Active 5:Wait 999:Inactive}
@@ -38,10 +38,10 @@ class Game_Quest
   def deactivate(id)
     if $data_quests[id].repeat == "TRUE"
       @q_hash[id] = $data_quests[id].min  # インターバルをセット
-      DEBUG::write(c_m,"QuestID:#{id} インターバルセット:#{$data_quests[id].min}分")
+      Debug::write(c_m,"QuestID:#{id} インターバルセット:#{$data_quests[id].min}分")
     else
       @q_hash[id] = 999 # Inactive
-      DEBUG::write(c_m,"QuestID:#{id} => Inactive")
+      Debug::write(c_m,"QuestID:#{id} => Inactive")
     end
   end
   #--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class Game_Quest
     for q_id in @q_hash.keys
       if @q_hash[q_id] > 0 and @q_hash[q_id] != 999
         @q_hash[q_id] -= 1
-        DEBUG::write(c_m,"QuestID:#{q_id} 残り:#{@q_hash[q_id]}分")
+        Debug::write(c_m,"QuestID:#{q_id} 残り:#{@q_hash[q_id]}分")
       end
     end
   end

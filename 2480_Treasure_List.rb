@@ -4,7 +4,7 @@
 # 　敵パーティのステータス簡易表示
 #==============================================================================
 
-class Treasure_List < Window_Base
+class Treasure_List < WindowBase
   #--------------------------------------------------------------------------
   # ● 初期化
   #--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class Treasure_List < Window_Base
     when 2; bitmap = Cache.icon($data_armors[id].icon)
     when 3; bitmap = Cache.icon($data_drops[id].icon)
     end
-    item = MISC.item(kind, id)
+    item = Misc.item(kind, id)
     num = item.stackable? ? item.stack : ""
     ## 武器か防具の場合は未鑑定
     if [1,2].include?(kind)

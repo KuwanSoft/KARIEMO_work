@@ -1,11 +1,11 @@
 #==============================================================================
-# ■ Game_Enemy
+# ■ GameEnemy
 #------------------------------------------------------------------------------
-# 敵キャラを扱うクラスです。このクラスは Game_Troop クラス ($game_troop) の
+# 敵キャラを扱うクラスです。このクラスは GameTroop クラス ($game_troop) の
 # 内部で使用されます。
 #==============================================================================
 
-class Game_Enemy < Game_Battler
+class GameEnemy < GameBattler
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class Game_Enemy < Game_Battler
     dice_number = enemy.hp_a
     dice_max = enemy.hp_b
     dice_plus = enemy.hp_c
-    @maxhp = MISC.dice(dice_number, dice_max, dice_plus)
+    @maxhp = Misc.dice(dice_number, dice_max, dice_plus)
     @hp = maxhp
   end
   #--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class Game_Enemy < Game_Battler
   def number_of_dice(dummy = false)
     nod = enemy.nm == 1 ? 2 : 1
     nod = enemy.npc == 1 ? 3 : nod
-    DEBUG.write(c_m, "High Number NoD Detected =>#{nod}") if nod > 1
+    Debug.write(c_m, "High Number NoD Detected =>#{nod}") if nod > 1
     return nod
   end
   #--------------------------------------------------------------------------
@@ -114,10 +114,10 @@ class Game_Enemy < Game_Battler
   # ● 傭兵モンスターフラグオンにすると確定化
   #--------------------------------------------------------------------------
   def mercenary=(new)
-    DEBUG.write(c_m, "ガイドフラグ:#{@mercenary}")
+    Debug.write(c_m, "ガイドフラグ:#{@mercenary}")
     @identified = true if new == true
     @mercenary = new
-    DEBUG.write(c_m, "=>ガイドフラグ:#{@mercenary}")
+    Debug.write(c_m, "=>ガイドフラグ:#{@mercenary}")
   end
   #--------------------------------------------------------------------------
   # ● 敵キャラオブジェクト取得
@@ -162,7 +162,7 @@ class Game_Enemy < Game_Battler
       when 75..99; @hit_part = 3 # 具足：脚 25%
       end
     end
-    DEBUG::write(c_m,"被弾部位=>#{@hit_part} (0:頭 1:胴 2:腕 3:脚 4:弱点) Head_atk:#{head_atk}")
+    Debug::write(c_m,"被弾部位=>#{@hit_part} (0:頭 1:胴 2:腕 3:脚 4:弱点) Head_atk:#{head_atk}")
   end
   #--------------------------------------------------------------------------
   # ● DRベース値(兜)
@@ -215,7 +215,7 @@ class Game_Enemy < Game_Battler
       dr = enemy.dr_ph
       ## 隠密かつダガー使用で2倍
       # dr = attacker.onmitsu? && attacker.using_dagger?(sub) ? dr*2 : dr
-      DEBUG::write(c_m,"#{attacker.name} POWERHIT発生 敵DR:#{dr}")
+      Debug::write(c_m,"#{attacker.name} POWERHIT発生 敵DR:#{dr}")
       shield = false        # 弱点は盾発動キャンセル
       return dr.to_i
     end
@@ -224,7 +224,7 @@ class Game_Enemy < Game_Battler
     dr /= 2 if fracture? and (dr > 0)
     if shield       # 盾防御時は2倍
       dr *= 2 if (dr > 0)
-      DEBUG::write(c_m,"#{enemy.name} シールド防御発生 DR:#{dr}")
+      Debug::write(c_m,"#{enemy.name} シールド防御発生 DR:#{dr}")
     end
     return dr
   end
@@ -260,18 +260,18 @@ class Game_Enemy < Game_Battler
   # 炎3 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
-    str = Constant_Table::ELEMENTAL_STR[element_type]       # 属性STRの代入
+    str = ConstantTable::ELEMENTAL_STR[element_type]       # 属性STRの代入
     return damage unless enemy.element_resistant.include?(str)   # 属性防御無し
     regex = /#{str}([0-9])/
     value = enemy.element_resistant.scan(regex)[0][0].to_i
     if value == 0
       self.weak_flag = true                             # 弱点フラグ
-      return Integer(damage * Constant_Table::RATE_WEAKELEMENT)
+      return Integer(damage * ConstantTable::RATE_WEAKELEMENT)
     end
     case value
     when 2..5
       self.resist_element_flag = true                   # 耐性フラグ
-      DEBUG::write(c_m,"属性抵抗 ダメージ1/#{value}倍: TYPE(#{element_type})")
+      Debug::write(c_m,"属性抵抗 ダメージ1/#{value}倍: TYPE(#{element_type})")
       return Integer(damage * 1/value)
     else
       raise StandardError.new("invalid value, should be in 2..5")
@@ -288,7 +288,7 @@ class Game_Enemy < Game_Battler
   #--------------------------------------------------------------------------
   def odds(back = false)
     value = enemy.odds
-    DEBUG::write(c_m,"⇒#{MISC.get_string(name, 16)} ⇒ODDS:#{value}")
+    Debug::write(c_m,"⇒#{Misc.get_string(name, 16)} ⇒ODDS:#{value}")
     return value
   end
   #--------------------------------------------------------------------------
@@ -327,9 +327,9 @@ class Game_Enemy < Game_Battler
   def perform_collapse
     if $game_temp.in_battle and dead?
       @collapse = true
-      if self.state?(STATEID::CRITICAL) # くびはね
+      if self.state?(StateId::CRITICAL) # くびはね
         $music.se_play("首はね")
-      elsif self.state?(STATEID::F_BLOW)
+      elsif self.state?(StateId::F_BLOW)
         $music.se_play("フィニッシュブロー")
       else
         $music.se_play("敵消滅")
@@ -391,21 +391,21 @@ class Game_Enemy < Game_Battler
     @action.clear
     return unless movable?
     return if self.stop > 0 # 時よ止まれ状態を検知
-    DEBUG::write(c_m,"戦闘可能ENEMYの行動の作成開始 #{enemy.name}")
+    Debug::write(c_m,"戦闘可能ENEMYの行動の作成開始 #{enemy.name}")
     if fear?
       @action.set_guard
-      DEBUG::write(c_m,"恐怖状態の為、強制ガード #{enemy.name}")
+      Debug::write(c_m,"恐怖状態の為、強制ガード #{enemy.name}")
       return
     end
     ratio = enemy.cast
     f_ratio = [[self.fascinated, 0].max, 95].min
     if f_ratio > rand(100)
       @action.set_escape
-      DEBUG.write(c_m, "#{enemy.name} 魅了の為逃走コマンド 魅了値:#{self.fascinated}")
+      Debug.write(c_m, "#{enemy.name} 魅了の為逃走コマンド 魅了値:#{self.fascinated}")
       return
     end
     if ratio > rand(100) and not silent?  # 呪文攻撃判定 魔封時はスキップ
-      DEBUG::write(c_m,"┗戦闘行動:呪文詠唱決定 #{ratio}%")
+      Debug::write(c_m,"┗戦闘行動:呪文詠唱決定 #{ratio}%")
       @action.kind = 1
       roulette = []
       1.times do roulette.push(6) unless enemy.magic6_id == 0 end
@@ -435,10 +435,10 @@ class Game_Enemy < Game_Battler
         @action.magic_id = enemy.magic6_id  # 呪文名
         @action.magic_lv = enemy.magic6_cp  # 呪文強度
       end
-      DEBUG::write(c_m,"　┗戦闘行動:呪文の決定 ID#{@action.magic_id}")
-      DEBUG::write(c_m,"　　┗戦闘行動:呪文の強さ CP#{@action.magic_lv}")
+      Debug::write(c_m,"　┗戦闘行動:呪文の決定 ID#{@action.magic_id}")
+      Debug::write(c_m,"　　┗戦闘行動:呪文の強さ CP#{@action.magic_lv}")
       decrease = 0
-      d_rate = Constant_Table::MLDECREASERATIO
+      d_rate = ConstantTable::MLDECREASERATIO
       (@action.magic_lv - 1).times do # 最大詠唱レベル回数分の減少レベルを判定
         if d_rate > rand(100) # 設定%で詠唱レベルが下がる
           decrease += 1   # 詠唱レベルを下げる
@@ -448,47 +448,47 @@ class Game_Enemy < Game_Battler
       end
       @action.magic_lv -= decrease  # 最大レベルから減少させる
       @action.magic_lv = [[@action.magic_lv, 1].max, 6].min
-      DEBUG::write(c_m,"　　　┗戦闘行動:呪文の強さ補正後 CP#{@action.magic_lv}")
+      Debug::write(c_m,"　　　┗戦闘行動:呪文の強さ補正後 CP#{@action.magic_lv}")
     elsif breath_activate?          # ブレス(メソッドでkindとbasicを入れ込む)
-      DEBUG::write(c_m,"┗戦闘行動:ブレス決定 #{enemy.name}")
+      Debug::write(c_m,"┗戦闘行動:ブレス決定 #{enemy.name}")
     else; @action.kind = 0          # その他
     end
     if @action.kind == 0  # 呪文以外の行動判定開始
-      DEBUG::write(c_m,"┗戦闘行動:呪文・ブレス以外の行動判定開始")
+      Debug::write(c_m,"┗戦闘行動:呪文・ブレス以外の行動判定開始")
       @action.basic = 0
       ## 行動キャンセルルーチンをスキップさせている。
 #~       case @group_id
 #~       when 0
 #~         if $game_troop.existing_g1_members.size > 4 # 5体以上のGROUPの場合
 #~           if $game_troop.existing_g1_members[4].index <= @index
-#~             DEBUG::write(c_m,"　┗行動キャンセル判定開始 Group:1 Index:#{@index}")
+#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:1 Index:#{@index}")
 #~             if 5 > rand(10) then @action.basic = -1 end
 #~           end
 #~         end
 #~       when 1
 #~         if $game_troop.existing_g2_members.size > 3 # 4体以上のGROUPの場合
 #~           if $game_troop.existing_g2_members[3].index <= @index
-#~             DEBUG::write(c_m,"　┗行動キャンセル判定開始 Group:2 Index:#{@index}")
+#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:2 Index:#{@index}")
 #~             if 4 > rand(10) then @action.basic = -1 end
 #~           end
 #~         end
 #~       when 2
 #~         if $game_troop.existing_g3_members.size > 2 # 3体以上のGROUPの場合
 #~           if $game_troop.existing_g3_members[2].index <= @index
-#~             DEBUG::write(c_m,"　┗行動キャンセル判定開始 Group:3 Index:#{@index}")
+#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:3 Index:#{@index}")
 #~             if 3 > rand(10) then @action.basic = -1 end
 #~           end
 #~         end
 #~       when 3
 #~         if $game_troop.existing_g4_members.size > 1 # 2体以上のGROUPの場合
 #~           if $game_troop.existing_g4_members[1].index <= @index
-#~             DEBUG::write(c_m,"　┗行動キャンセル判定開始 Group:4 Index:#{@index}")
+#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:4 Index:#{@index}")
 #~             if 2 > rand(10) then @action.basic = -1 end
 #~           end
 #~         end
 #~       end
 #~       return if @action.basic == -1 # 行動キャンセル決定
-      DEBUG::write(c_m,"　┗通常物理攻撃決定 #{enemy.name}")
+      Debug::write(c_m,"　┗通常物理攻撃決定 #{enemy.name}")
       @action.decide_random_target
     end
     add_fascinate(-5) # 毎ターン減少する
@@ -587,10 +587,10 @@ class Game_Enemy < Game_Battler
   def shield_activate?
     return false unless movable?
     if enemy.skill.include?("盾")
-      rate = Constant_Table::SHIELD
+      rate = ConstantTable::SHIELD
       if rate > rand(100)
         @shield_block = true
-        DEBUG::write(c_m,"#{@original_name} 盾ブロック発動:#{rate}%")
+        Debug::write(c_m,"#{@original_name} 盾ブロック発動:#{rate}%")
         return true
       end
     end
@@ -603,10 +603,10 @@ class Game_Enemy < Game_Battler
   def breath_activate?
     ## ファーストターン時の設定
     if @breath_action_ratio == 0
-      @breath_action_ratio += rand(Constant_Table::BREATH_RATIO_FLU+1)+Constant_Table::BREATH_RATIO # 15%~25%
+      @breath_action_ratio += rand(ConstantTable::BREATH_RATIO_FLU+1)+ConstantTable::BREATH_RATIO # 15%~25%
     else
       ## 翌ターンより率が上昇
-      @breath_action_ratio += Constant_Table::BREATH_RATIO_ADD  # +15%
+      @breath_action_ratio += ConstantTable::BREATH_RATIO_ADD  # +15%
     end
     ratio = [[@breath_action_ratio, 95].min, 5].max
     if enemy.skill.include?("ブ") && ratio > rand(100)
@@ -633,19 +633,19 @@ class Game_Enemy < Game_Battler
 
     if result
       @action.kind = 3
-      c = Constant_Table::BREATH_HP_C # HPを割る数
+      c = ConstantTable::BREATH_HP_C # HPを割る数
       @breath_dmg = [@hp / c, 1].max  # 現HPの1/2
       case @action.basic
-      when 0; obj = $data_magics[Constant_Table::BREATH1_ID]  # ノーマルブレス
-      when 1; obj = $data_magics[Constant_Table::BREATH2_ID]  # 火のブレス
-      when 2; obj = $data_magics[Constant_Table::BREATH3_ID]  # 氷のブレス
-      when 3; obj = $data_magics[Constant_Table::BREATH4_ID]  # 雷のブレス
-      when 4; obj = $data_magics[Constant_Table::BREATH5_ID]  # 毒のブレス
-      when 5; obj = $data_magics[Constant_Table::BREATH6_ID]  # 死のブレス
+      when 0; obj = $data_magics[ConstantTable::BREATH1_ID]  # ノーマルブレス
+      when 1; obj = $data_magics[ConstantTable::BREATH2_ID]  # 火のブレス
+      when 2; obj = $data_magics[ConstantTable::BREATH3_ID]  # 氷のブレス
+      when 3; obj = $data_magics[ConstantTable::BREATH4_ID]  # 雷のブレス
+      when 4; obj = $data_magics[ConstantTable::BREATH5_ID]  # 毒のブレス
+      when 5; obj = $data_magics[ConstantTable::BREATH6_ID]  # 死のブレス
       end
       @breath_dmg *= obj.damage.to_f    # ブレスダメージ倍率（呪文で定義）
       @breath_dmg = Integer(@breath_dmg)
-      DEBUG.write(c_m, "ブレス攻撃決定 発動率:#{@breath_action_ratio}% ﾌﾞﾚｽﾀﾞﾒｰｼﾞ:#{@breath_dmg} ﾀﾞﾒｰｼﾞ倍率:#{obj.damage.to_f}")
+      Debug.write(c_m, "ブレス攻撃決定 発動率:#{@breath_action_ratio}% ﾌﾞﾚｽﾀﾞﾒｰｼﾞ:#{@breath_dmg} ﾀﾞﾒｰｼﾞ倍率:#{obj.damage.to_f}")
       @breath_action_ratio = 0
     else
       return false
@@ -723,9 +723,9 @@ class Game_Enemy < Game_Battler
   #--------------------------------------------------------------------------
   def base_initiative
     value = enemy.initiative
-    value += Constant_Table::FRONT_BONUS if @group_id == 0
+    value += ConstantTable::FRONT_BONUS if @group_id == 0
     if enemy.skill.include?("俊")
-      ratio = Constant_Table::ENEMY_INITDOUBLE_RATIO
+      ratio = ConstantTable::ENEMY_INITDOUBLE_RATIO
       value *= 2 if ratio > rand(100)
     end
     return value
@@ -754,7 +754,7 @@ class Game_Enemy < Game_Battler
   #--------------------------------------------------------------------------
   def double_attack_activate?
     return false unless enemy.skill.include?("ダ")
-    ratio = Constant_Table::ENEMY_DOUBLEATTACK_RATIO
+    ratio = ConstantTable::ENEMY_DOUBLEATTACK_RATIO
     return true if ratio > rand(100)
     return false
   end
@@ -850,7 +850,7 @@ class Game_Enemy < Game_Battler
   #--------------------------------------------------------------------------
   # ● 疲労度加算:呪文詠唱時＊エネミーは無し
   #--------------------------------------------------------------------------
-  def tired_casting(cp)
+  def tired_casting(mp)
   end
   #--------------------------------------------------------------------------
   # ● 疲労度加算:戦闘終了時＊エネミーは無し
@@ -982,42 +982,42 @@ class Game_Enemy < Game_Battler
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def luk
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def str
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def int
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def spd
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def mnd
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------
   # ● 特性値：運（ガイド用ダミー特性値参照）
   #--------------------------------------------------------------------------
   def luk
-    DEBUG.write(c_m, "======================#{self.name} 特性値参照Alert================================")
+    Debug.write(c_m, "======================#{self.name} 特性値参照Alert================================")
     return 8
   end
   #--------------------------------------------------------------------------

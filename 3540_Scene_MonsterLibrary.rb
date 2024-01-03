@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_Treasure
+# ■ SceneTreasure
 #------------------------------------------------------------------------------
 # メニュー画面の処理を行うクラスです。
 #==============================================================================
 
-class Scene_MonsterLibrary < Scene_Base
+class SceneMonsterLibrary < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -42,9 +42,9 @@ class Scene_MonsterLibrary < Scene_Base
       @window_enemy.draw_graphic(true)
     elsif Input.trigger?(Input::B)
       if @back_to_camp
-        $scene = Scene_CAMP.new
+        $scene = SceneCamp.new
       else
-        $scene = Scene_Title.new
+        $scene = SceneTitle.new
       end
     end
   end

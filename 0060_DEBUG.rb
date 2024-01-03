@@ -1,6 +1,6 @@
-module DEBUG
+module Debug
   #--------------------------------------------------------------------------
-  # ● DEBUGファイルの準備
+  # ● Debugファイルの準備
   #--------------------------------------------------------------------------
   @before_method = ""
   @path = "./Debug/"
@@ -26,23 +26,23 @@ module DEBUG
       release_date_f = ver.scan(/\d.\d+.(\d+)-/)[0][0]
       build_f = ver.scan(/\S+-(\d+)/)[0][0]
       file.close
-      DEBUG::write(c_m, "version check:#{now_version_f}=>#{now_version}")
-      DEBUG::write(c_m, "release_date check:#{release_date_f}=>#{release_date}")
-      DEBUG::write(c_m, "build check:#{build_f}=>#{build}")
+      Debug::write(c_m, "version check:#{now_version_f}=>#{now_version}")
+      Debug::write(c_m, "release_date check:#{release_date_f}=>#{release_date}")
+      Debug::write(c_m, "build check:#{build_f}=>#{build}")
       if now_version.to_i == now_version_f.to_i &&
         release_date.to_i == release_date_f.to_i &&
         build.to_i == build_f.to_i
-        DEBUG::write(c_m, "同バージョン検知 SKIP")
+        Debug::write(c_m, "同バージョン検知 SKIP")
         return unless publish
       else
-        DEBUG::write(c_m, "新規バージョン検知")
+        Debug::write(c_m, "新規バージョン検知")
       end
     else  # ファイルが無ければ作成
       File.open(@version_path+@version_file, "w")
     end
     ## バージョンストリングを作成
     # for fn in Dir.glob("Kariemo_*")
-      # DEBUG.write(c_m, "#{fn} deleted") if File.delete(fn) == 1
+      # Debug.write(c_m, "#{fn} deleted") if File.delete(fn) == 1
     # end
     now_version = sprintf("%.3f",now_version)
     version = "#{now_version}.#{release_date}-#{build}"
@@ -69,7 +69,7 @@ module DEBUG
     file = File.open(@version_path+@version_file, "a") # ファイルをオープン
     diff = (line_count - temp[0][0].to_i)
     if publish
-      file.puts Constant_Table::PUBLISHED_FLAG
+      file.puts ConstantTable::PUBLISHED_FLAG
       file.puts "【" + sprintf("%-16s", version) + " " + Time.now.strftime("%j %H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}(diff:#{diff})" + "】"
     end
     file.puts sprintf("%-16s", version) + " " + Time.now.strftime("%H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}(diff:#{diff})"
@@ -90,22 +90,22 @@ module DEBUG
     ################################################
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGファイルのローテート
+  # ● Debugファイルのローテート
   #   10MBを超えたファイルは_bakとし、過去の_bakは削除される
   #--------------------------------------------------------------------------
   def self.log_rotate
-    DEBUG.write(c_m, "Log Rotate Start")
-    filename = Constant_Table::DEBUG_FILE_NAME    # ファイル名を取得
+    Debug.write(c_m, "Log Rotate Start")
+    filename = ConstantTable::DEBUG_FILE_NAME    # ファイル名を取得
     size = $TEST ? 10000000 : 1000000   # 10MBと1MB
     if FileTest.size(@path+filename) > size
       File.delete(@path+filename+"_bak") if FileTest.exist?(@path+filename+"_bak")
       File.rename(@path+filename, @path+filename+"_bak")
-      DEBUG::write(c_m, "Log Rotation done")
+      Debug::write(c_m, "Log Rotation done")
     end
-    DEBUG.write(c_m, "Log Rotate End")
+    Debug.write(c_m, "Log Rotate End")
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGファイルのローテート
+  # ● Debugファイルのローテート
   # mainで各ﾌﾚｰﾑで呼び出し
   #--------------------------------------------------------------------------
   def self.update_timer
@@ -127,7 +127,7 @@ module DEBUG
   # ● PERFDのDUMP
   #--------------------------------------------------------------------------
   def self.dump_perfd
-    filename = Constant_Table::PERFD_FILE_NAME    # デバッグファイル名を取得
+    filename = ConstantTable::PERFD_FILE_NAME    # デバッグファイル名を取得
     d_file = File.open(@path+filename, "w")       # ファイルをオープン
     for s in @perfd
       d_file.puts s
@@ -136,8 +136,8 @@ module DEBUG
     @perfd.clear
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGデータの書き込み
-  # DEBUG::write(c_m,"param:#{valiable}")
+  # ● Debugデータの書き込み
+  # Debug::write(c_m,"param:#{valiable}")
   #--------------------------------------------------------------------------
   def self.write(method, str)
     tod = Time.now.strftime("%j %H:%M:%S")        # 時刻を取得
@@ -147,7 +147,7 @@ module DEBUG
         # if $through
         #   @dump_str.push(NKF.nkf("-sm0W8x", string1.to_s))
         # else
-          @dump_str.push(MISC.crypt_caesar(string1))
+          @dump_str.push(Misc.crypt_caesar(string1))
         # end
       end
       @before_method = method
@@ -157,9 +157,9 @@ module DEBUG
     space = ["start", "terminate"].include?(method) ? " " : "  "
     string2 += space
     string2 += str
-    @dump_str.push((MISC.crypt_caesar(string2)))
+    @dump_str.push((Misc.crypt_caesar(string2)))
     return unless $TRACE  # Traceをinitでtrueにしていなければ終わり
-    filename = Constant_Table::DEBUG_FILE_NAME    # デバッグファイル名を取得
+    filename = ConstantTable::DEBUG_FILE_NAME    # デバッグファイル名を取得
     File.open(@path+filename, "a") do |file|      # ファイルをオープン
       file.puts NKF.nkf("-sm0W8x", string1) unless string1 == nil
       file.puts NKF.nkf("-sm0W8x", string2)
@@ -169,7 +169,7 @@ module DEBUG
   # ● BugReport書き出し時にたまったTrace分を吐き出す
   #--------------------------------------------------------------------------
   def self.apend_trace
-    filename = Constant_Table::BUGREPORT_FILE_NAME    # ファイル名を取得
+    filename = ConstantTable::BUGREPORT_FILE_NAME    # ファイル名を取得
     file = File.open(@path + filename, "a")          # ファイルをオープン
     for s in @dump_str
       file.puts s
@@ -180,43 +180,43 @@ module DEBUG
   # ● トレースバッファは一定量に管理する
   #--------------------------------------------------------------------------
   def self.apend_and_shift
-    while @dump_str.size > Constant_Table::TRACE_ARRAY_SIZE
+    while @dump_str.size > ConstantTable::TRACE_ARRAY_SIZE
       @dump_str.shift
     end
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGデータの書き込み
+  # ● Debugデータの書き込み
   # 書き込みを行ってもdump_strは消さない。BugReportに反映させるため
   #--------------------------------------------------------------------------
   def self.dump_strings(str = nil)
     @dump_str.push(str) unless str == nil
-    filename = Constant_Table::DEBUG_FILE_NAME    # デバッグファイル名を取得
+    filename = ConstantTable::DEBUG_FILE_NAME    # デバッグファイル名を取得
     d_file = File.open(@path+filename, "a")       # ファイルをオープン
     for s in @dump_str
-      d_file.puts NKF.nkf("-sm0W8x", MISC.decrypt_caesar(s).to_s)
+      d_file.puts NKF.nkf("-sm0W8x", Misc.decrypt_caesar(s).to_s)
     end
     d_file.close
     # @dump_str.clear
   end
   #--------------------------------------------------------------------------
-  # ● DEBUGデータのMOTD等の初期データの書き込み
+  # ● DebugデータのMOTD等の初期データの書き込み
   #    起動時にmainより実行される
   #--------------------------------------------------------------------------
   def self.write_motd
-    filename = Constant_Table::DEBUG_FILE_NAME    # ファイル名を取得
+    filename = ConstantTable::DEBUG_FILE_NAME    # ファイル名を取得
     file = File.open(@path+filename, "a")         # ファイルをオープン
     File.foreach(@path+"motd") do |line|
       # if $through            # ログスルーモードの場合
         file.print NKF.nkf("-sm0W8x", line.to_s)  # カエサル暗号化せずに書く
       # else
-        # file.print MISC.crypt_caesar(line)
+        # file.print Misc.crypt_caesar(line)
       # end
     end
     str = "\n-----> TOD: #{Time.now.strftime("%y%m%d %H:%M:%S")}\n"
     # if $through
       file.print NKF.nkf("-sm0W8x", str.to_s)
     # else
-      # file.print MISC.crypt_caesar(str)
+      # file.print Misc.crypt_caesar(str)
     # end
     file.close
   end
@@ -226,16 +226,16 @@ module DEBUG
   def self.rn_mv_savefile
     Dir::glob(@path+"recovery*.*").each {|f|
       # ここにマッチしたファイルに対して行う処理を記述する
-      DEBUG::write(c_m,"Deleting #{f}")
+      Debug::write(c_m,"Deleting #{f}")
       File.delete(f)
     }
-    filename = Constant_Table::FILE_NAME
+    filename = ConstantTable::FILE_NAME
   end
   #--------------------------------------------------------------------------
   # ● セーブデータの削除（バックアップを消去）
   #--------------------------------------------------------------------------
   def self.remove_save_data
-    filename = Constant_Table::FILE_NAME  # セーブファイル
+    filename = ConstantTable::FILE_NAME  # セーブファイル
     begin
       return File.delete(filename)
     rescue
@@ -246,14 +246,14 @@ module DEBUG
   # ● バグレポートを書く
   #--------------------------------------------------------------------------
   def self.write_bugreport(string = nil)
-    filename = Constant_Table::BUGREPORT_FILE_NAME    # ファイル名を取得
+    filename = ConstantTable::BUGREPORT_FILE_NAME    # ファイル名を取得
     mode = string != nil ? "a" : "w"                  # 文字が無ければHEADERのみ
     file = File.open(@path + filename, mode)          # ファイルをオープン
     if string == nil                                  # 文字が無ければHEADERのみ
       str = "-----> TOD: #{Time.now.strftime("%y%m%d %H:%M:%S")}"
       file.puts NKF.nkf("-sm0W8x", str.to_s)
-      version = load_data("Data/Version.rvdata")
-      str = "VER:#{version.get_version_string} / UNIQUE_ID:#{version.read_uniqueid} / PLAYID:#{$game_system.playid}"
+      version_hash = load_data("Data/Version2.rvdata")
+      str = "VER:#{"#{version_hash[:ver]}"+"."+"#{version_hash[:date]}"+"-"+"#{version_hash[:build]}"} / UNIQUE_ID:#{version_hash[:unique_id]} / PLAYID:#{$game_system.playid}"
       file.puts NKF.nkf("-sm0W8x", str.to_s)
     else
       file.puts NKF.nkf("-sm0W8x", string.to_s)
@@ -313,39 +313,69 @@ module DEBUG
   #--------------------------------------------------------------------------
   # ● リセットカウントファイルの初期化(TESTのみ)
   #--------------------------------------------------------------------------
-  def self.init_rcfile
-    file = @path+@reset_file
-    unless FileTest.exist?(file)
-      rc_obj = RCount.new
-      save_data(rc_obj, file)
-      DEBUG.write(c_m, "RCfile初期化")
-    end
-  end
+  # def self.init_rcfile
+  #   file = @path+@reset_file
+  #   unless FileTest.exist?(file)
+  #     rc_obj = RCount.new
+  #     save_data(rc_obj, file)
+  #     Debug.write(c_m, "RCfile初期化")
+  #   end
+  # end
   #--------------------------------------------------------------------------
   # ● リセットカウントの取得
   #--------------------------------------------------------------------------
   def self.check_reset_count
-    pi = $game_system.playid
-    file = @path+@reset_file
-    rc = load_data(file)
-    return rc.data[pi] == nil ? 0 : rc.data[pi]
+    playid = $game_system.playid
+    data = load_rcdata
+    data[playid] ||= 0
+    return data[playid]
   end
   #--------------------------------------------------------------------------
   # ● リセットカウントの増加
   #--------------------------------------------------------------------------
-  def self.increase_reset_count
-    pi = $game_system.playid
-    file = @path+@reset_file
-    rc = load_data(file)
-    rc.data[pi] = rc.data[pi] == nil ? 1 : rc.data[pi] + 1
-    DEBUG.write(c_m, "RESET Count +1 playid:#{pi}")
-    save_data(rc, file)
+  # def self.increase_reset_count
+  #   playid = $game_system.playid
+  #   file = @path+@reset_file
+  #   data = load_data(file)
+  #   data[playid] ||= 0
+  #    = rc.data[pi] == nil ? 1 : rc.data[pi] + 1
+  #   Debug.write(c_m, "RESET Count +1 playid:#{pi}")
+  #   save_data(rc, file)
+  # end
+  #--------------------------------------------------------------------------
+  # ● リセットカウントデータのロード
+  # 無ければ空のhashを返す
+  #--------------------------------------------------------------------------
+  def self.load_rcdata
+    path = @path+@reset_file
+    if File.exists?(path)
+      File.open(path, 'rb') { |file| Marshal.load(file) }
+    else
+      {}
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● リセットカウントデータのセーブ
+  #--------------------------------------------------------------------------
+  def self.save_rcdata(data)
+    File.open(FILE_PATH, 'wb') { |file| Marshal.dump(data, file) }
+  end
+  #--------------------------------------------------------------------------
+  # ● リセットカウントデータのインクリメント
+  #--------------------------------------------------------------------------
+  def self.increment_reset_count
+    playid = $game_system.playid
+    data = load_rcdata
+    data[playid] ||= 0
+    data[playid] += 1
+    Debug.write(c_m, "RESET Count +1 playid:#{playid}")
+    save_data(data)
   end
   #--------------------------------------------------------------------------
   # ● 呼び出されていないメソッドの確認
   #--------------------------------------------------------------------------
   def self.check_unused_method
-    DEBUG.write(c_m, "start process")
+    Debug.write(c_m, "start process")
     # called_list = []
     ## 確認する
     # ObjectSpace.each_object(Class) do |klass|
@@ -358,16 +388,16 @@ module DEBUG
     # end
     begin
       diff = @defined_klass_list - $game_system.get_called_klass
-      DEBUG.write(c_m, "未呼び出しClass数: #{diff.size}")
+      Debug.write(c_m, "未呼び出しClass数: #{diff.size}")
       index = 0
       for item in diff
-        DEBUG.write(c_m, "index:#{index} 未呼び出しClass: #{item}")
+        Debug.write(c_m, "index:#{index} 未呼び出しClass: #{item}")
         index += 1
       end
     rescue StandardError => e
-      DEBUG.write(c_m, "err:#{e.message}")
+      Debug.write(c_m, "err:#{e.message}")
     end
-    DEBUG.write(c_m, "finish process")
+    Debug.write(c_m, "finish process")
   end
   #--------------------------------------------------------------------------
   # ● 起動時の定義済みクラスの確認

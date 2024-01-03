@@ -4,7 +4,7 @@
 # 特性値を選択し成長させるwindow
 #==============================================================================
 
-class Window_diceSelect < Window_Selectable
+class Window_diceSelect < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -58,7 +58,7 @@ class Window_diceSelect < Window_Selectable
     ## 金ダイスかどうか？
     if @b_array[self.index] == 8
       @golden[self.index] = true
-      DEBUG.write(c_m, "*!金ダイス!* 場所:#{self.index}")
+      Debug.write(c_m, "*!金ダイス!* 場所:#{self.index}")
     end
     draw_dice(self.index)                   # 書き直し
     return @b_array[self.index]

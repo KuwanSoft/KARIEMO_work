@@ -3,20 +3,20 @@
 #------------------------------------------------------------------------------
 # 宝箱のドロップテーブルを定義
 #==============================================================================
-module TREASURE
+module Treasure
   #--------------------------------------------------------------------------
   # ● ドロップアイテムの定義
   #--------------------------------------------------------------------------
   def self.lottery_treasure(table)
     drop_item = []
-    DEBUG::write(c_m,"---------------------------------------------------------------")
-    DEBUG::write(c_m,"ドロップアイテムテーブルグレード: ===> #{table}")
-    DEBUG::write(c_m,"---------------------------------------------------------------")
+    Debug::write(c_m,"---------------------------------------------------------------")
+    Debug::write(c_m,"ドロップアイテムテーブルグレード: ===> #{table}")
+    Debug::write(c_m,"---------------------------------------------------------------")
     ## 抽選回数の決定
-    chance = Constant_Table::DEF_CHANCE
+    chance = ConstantTable::DEF_CHANCE
     chance += $game_party.treasure_hunting?
     chance += $game_mercenary.treasure_hunting?
-    DEBUG::write(c_m,"抽選回数: #{chance}回")
+    Debug::write(c_m,"抽選回数: #{chance}回")
 
     chance.times do
     ## ドロップアイテムの抽選
@@ -202,9 +202,9 @@ module TREASURE
       end
     end
     for item in drop_item
-      DEBUG::write(c_m,"抽選データ:#{item}")
+      Debug::write(c_m,"抽選データ:#{item}")
       next if item == nil
-      DEBUG::write(c_m,"宝:#{MISC.item(item[0],item[1]).name}")
+      Debug::write(c_m,"宝:#{Misc.item(item[0],item[1]).name}")
     end
     return drop_item
   end
@@ -332,8 +332,8 @@ module TREASURE
   # ● G.P.の抽選
   #--------------------------------------------------------------------------
   def self.calc_gp(table)
-    gold = Constant_Table::BASE_TRE_GOLD * (Constant_Table::GOLD_ROOT ** (table-1))
-    DEBUG::write(c_m,"ゴールド抽選:#{gold}G")
+    gold = ConstantTable::BASE_TRE_GOLD * (ConstantTable::GOLD_ROOT ** (table-1))
+    Debug::write(c_m,"ゴールド抽選:#{gold}G")
     return gold.to_i
   end
   #--------------------------------------------------------------------------
@@ -353,7 +353,7 @@ module TREASURE
     end
     for i in array
       next if i == nil
-      DEBUG.write(c_m, "#{survivor.name} kind:#{i[0]} id:#{i[1]} #{MISC.item(i[0],i[1]).name}")
+      Debug.write(c_m, "#{survivor.name} kind:#{i[0]} id:#{i[1]} #{Misc.item(i[0],i[1]).name}")
       survivor.gain_item(i[0], i[1], false)
     end
   end

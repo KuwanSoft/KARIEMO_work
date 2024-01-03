@@ -4,7 +4,7 @@
 # 傭兵を雇う画面
 #==============================================================================
 
-class Window_Mercenary < Window_Selectable
+class Window_Mercenary < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -63,7 +63,7 @@ class Window_Mercenary < Window_Selectable
     dice_number = @data[index].hp_a
     dice_max = @data[index].hp_b
     dice_plus = @data[index].hp_c
-    maxhp = MISC.dice(dice_number, dice_max, dice_plus)
+    maxhp = Misc.dice(dice_number, dice_max, dice_plus)
     cls = @data[index].name2
     gold = @data[index].fee.to_i
     rect = item_rect(index)

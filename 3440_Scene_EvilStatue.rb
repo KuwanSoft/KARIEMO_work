@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_EvilStatue
+# ■ SceneEvilStatue
 #------------------------------------------------------------------------------
 # 邪神像の処理
 #==============================================================================
 
-class Scene_EvilStatue < Scene_Base
+class SceneEvilStatue < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class Scene_EvilStatue < Scene_Base
           when "positive";  $game_troop.preemptive = true
           when "negative";  $game_troop.surprise = true
           end
-          $scene = Scene_Map.new  # フェードアウトはかけない
+          $scene = SceneMap.new  # フェードアウトはかけない
         when "orb"
           RPG::ME.stop  # MEの停止
           case @side
@@ -127,7 +127,7 @@ class Scene_EvilStatue < Scene_Base
             $music.me_play("邪神像：パーティの異常")
             for member in $game_party.existing_members
               depth = $game_map.map_id * 10 # 深度を設定
-              member.add_state(STATEID::SICKNESS, depth)  # 病気
+              member.add_state(StateId::SICKNESS, depth)  # 病気
             end
             @mini.set_text("パーティが びょうきになった")
           end
@@ -142,7 +142,7 @@ class Scene_EvilStatue < Scene_Base
             wait_for_effect
             $game_party.in_party
             $game_system.remove_unique_id
-            $scene = Scene_Village.new
+            $scene = SceneVillage.new
           when "negative"
             $music.me_play("邪神像：ランダム移動")
             @mini.set_text("あたりをひかりがつつんだ")
@@ -151,7 +151,7 @@ class Scene_EvilStatue < Scene_Base
             floor += rand(3) - 1
             floor = 1 if floor < 1
             $game_map.random_transfer(floor)
-            $scene = Scene_Map.new
+            $scene = SceneMap.new
           end
         when "stare"
           RPG::ME.stop  # MEの停止
@@ -194,6 +194,6 @@ class Scene_EvilStatue < Scene_Base
     RPG::BGM.fade(250)
     Graphics.fadeout(15)
     Graphics.wait(10)
-    $scene = Scene_Map.new
+    $scene = SceneMap.new
   end
 end

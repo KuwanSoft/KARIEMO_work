@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Scene_BBS
+# ■ SceneBbs
 #------------------------------------------------------------------------------
 # 掲示板シーン
 #==============================================================================
 
-class Scene_BBS < Scene_Base
+class SceneBbs < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -31,13 +31,13 @@ class Scene_BBS < Scene_Base
   # ● トップメッセージの作成
   #--------------------------------------------------------------------------
   def create_top_message
-    @top_window = Window_Base.new(4, 4, 512-8, Window_Base::BLH*3+32)
+    @top_window = WindowBase.new(4, 4, 512-8, WindowBase::BLH*3+32)
     @top_window.create_contents
     text1 = "ぼうけんしゃたちが かいた らくがきがある。"
     text2 = "どれを よみますか?"
     @top_window.change_font_to_v
-    @top_window.contents.draw_text(0, Window_Base::BLH*0, @top_window.width-32, Window_Base::BLH, text1, 1)
-    @top_window.contents.draw_text(0, Window_Base::BLH*1, @top_window.width-32, Window_Base::BLH, text2, 1)
+    @top_window.contents.draw_text(0, WindowBase::BLH*0, @top_window.width-32, WindowBase::BLH, text1, 1)
+    @top_window.contents.draw_text(0, WindowBase::BLH*1, @top_window.width-32, WindowBase::BLH, text2, 1)
     @top_window.visible = true
   end
   #--------------------------------------------------------------------------
@@ -58,13 +58,13 @@ class Scene_BBS < Scene_Base
     s2 = "らくがき##{@id_array[1]}"
     s3 = "らくがき##{@id_array[2]}"
     s4 = "らくがき##{@id_array[3]}"
-    @command_window = Window_Command.new(200, [s1, s2, s3, s4])
+    @command_window = WindowCommand.new(200, [s1, s2, s3, s4])
     @command_window.x = (512-200)/2
     @command_window.y = WLH*8
     @command_window.active = true
     @command_window.index = 0
     @command_window.visible = true
-    @command_window.adjust_x = Window_Base::WLW
+    @command_window.adjust_x = WindowBase::WLW
     @command_window.refresh
   end
   #--------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class Scene_BBS < Scene_Base
       end
       wait_for_message
     elsif Input.trigger?(Input::B)
-      $scene = Scene_Map.new
+      $scene = SceneMap.new
     end
   end
 end
