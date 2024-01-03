@@ -1,7 +1,7 @@
 #==============================================================================
 # ■ ConstantTable
 #------------------------------------------------------------------------------
-# 　ゲーム内での定数を一括で定義
+# ゲーム内での定数を一括で定義
 #==============================================================================
 
 module ConstantTable
@@ -210,7 +210,7 @@ module ConstantTable
   SURVIVOR_ID6 = 27          # ゆくえふめいしゃのアクターID
   SURVIVOR_ID7 = 28          # ゆくえふめいしゃのアクターID
   SURVIVOR_ID8 = 29          # ゆくえふめいしゃのアクターID
-  SURVIVOR_ID9 = 30          # ゆくえふめいしゃのアクターID
+  SURVIVOR_ID9 = 22          # ゆくえふめいしゃのアクターID
   SURVIVOR_MARK_RANK1 = 99  # 帰還の証１
   SURVIVOR_MARK_RANK2 = 98  # 帰還の証２
   SURVIVOR_MARK_RANK3 = 97  # 帰還の証３
@@ -238,6 +238,7 @@ module ConstantTable
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
   RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
+  RECOVER_RATE_IN_VILLAGE = 5 # 酒場での疲労回復
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids

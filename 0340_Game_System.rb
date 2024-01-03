@@ -180,10 +180,10 @@ class GameSystem
   def respawn_survivor
     array = ConstantTable.get_survivor_ids
     for s_id in array
-      Debug.write(c_m,"s_id:#{s_id}")
       next if $game_actors[s_id].rescue == false        # 未救出ならばスキップ
       $game_actors.make_random_survivor(s_id)           # ランダムパラメータで再作成
       input_survivor_location(s_id)                     # 行方不明パーティとして登録
+      Debug.write(c_m,"行方不明者の再配置 survivor_id:#{s_id}")
     end
   end
   #--------------------------------------------------------------------------
@@ -379,7 +379,7 @@ class GameSystem
   def update
     @timer += 1
     reset = false
-    # 3秒毎
+    # 1秒毎
     if (@timer % 60 == 0)
       $game_actors.check_injured_member
     end
@@ -388,6 +388,7 @@ class GameSystem
       Debug.write(c_m, "=====================1分毎処理")
       $game_quest.check_quest_update_for_1_min
       $game_temp.refresh_mood_decrease
+      $game_actors.check_recover_fatigue
     end
     ## 3分毎
     if (@timer % (3600*3) == 0)

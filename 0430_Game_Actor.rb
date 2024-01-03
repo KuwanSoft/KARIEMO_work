@@ -2722,11 +2722,11 @@ class GameActor < GameBattler
     value *= cc_penalty
     value = Integer(value)
 
-    Debug.write(c_m, "戦術スキルイニシアチブ値:#{t_bonus}")
-    Debug.write(c_m, "性格ボーナス:+#{p_bonus} 前衛ボーナス:+#{f_bonus} リーダー:+#{l_bonus} ルーン:+#{r_bonus}")
-    Debug.write(c_m, "SPD特性値ボーナス:+#{spd_bonus}(SPD:#{spd})")
-    Debug.write(c_m, "二刀流ボーナス:#{d_bonus} 隠密ボーナス:#{h_bonus}")
-    Debug.write(c_m, "base_init:#{value} c.c.ペナルティ:#{cc_penalty}")
+    # Debug.write(c_m, "戦術スキルイニシアチブ値:#{t_bonus}")
+    # Debug.write(c_m, "性格ボーナス:+#{p_bonus} 前衛ボーナス:+#{f_bonus} リーダー:+#{l_bonus} ルーン:+#{r_bonus}")
+    # Debug.write(c_m, "SPD特性値ボーナス:+#{spd_bonus}(SPD:#{spd})")
+    # Debug.write(c_m, "二刀流ボーナス:#{d_bonus} 隠密ボーナス:#{h_bonus}")
+    # Debug.write(c_m, "base_init:#{value} c.c.ペナルティ:#{cc_penalty}")
 
     return value
   end
@@ -3282,12 +3282,14 @@ class GameActor < GameBattler
   #     rate: 現在の疲労を何％回復 ＊現疲労が大きいほど回復量は大きい
   #--------------------------------------------------------------------------
   def recover_fatigue(rate)
-    Debug.write(c_m, "現在疲労値:#{@fatigue}")
-    ratio = (100 - rate).to_f
-    @fatigue *= ratio
-    @fatigue /= 100
-    @fatigue = Integer(@fatigue)
-    Debug.write(c_m, "回復(#{rate}%)=> #{@fatigue}")
+    @fatigue -= [@fatigue * rate / 100.0, 1].max
+    @fatigue = Integer([@fatigue, 0].max)
+    # ratio = (100 - rate).to_f
+    # @fatigue *= ratio
+    # @fatigue /= 100
+    # @fatigue = Integer(@fatigue)
+    return if resting_thres >= 1  # すでに全快か
+    Debug.write(c_m, "ID:#{@actor_id} #{@name} 疲労回復(#{rate}%)=>疲労値:#{@fatigue} 現スタミナ:#{resting_thres*100}%")
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復を絶対値で（未使用）
@@ -3300,7 +3302,7 @@ class GameActor < GameBattler
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復閾値まで（休息で使用）
-  #     rate: ここまで回復%　＊徐々に5%ずつ回復
+  #     rate: ここまで回復% ＊徐々に5%ずつ回復
   #--------------------------------------------------------------------------
   def recover_fatigue_to_in_rest(rate)
     ## 疲労値が限度を超えている？
@@ -4752,7 +4754,7 @@ class GameActor < GameBattler
       Debug.write(c_m, "ベール属性と一致(#{str}) rank:#{rank}")
       rank += 1
     end
-    if str == ConstantTable::ELEMENTAL_STR[1] && @class_id == 7  # 狩人は寒さに強い
+    if str == ConstantTable::ELEMENTAL_STR[2] && @class_id == 7  # 狩人は寒さに強い
       Debug.write(c_m, "狩人＝#{str}属性と一致 rank:#{rank}")
       rank += 1
     end

@@ -151,4 +151,16 @@ class GameActors
       member.progress_clock(value)
     end
   end
+  #--------------------------------------------------------------------------
+  # ● 酒場のメンバーは徐々に疲労回復する
+  #--------------------------------------------------------------------------
+  def check_recover_fatigue
+    for member in @data
+      next if member == nil
+      next if member.out                            # 迷宮内でなければ
+      next if member.in_church?                     # 教会内でなければ
+      next if $game_party.party_member?(member.id)  # パーティ内でなければ
+      member.recover_fatigue(ConstantTable::RECOVER_RATE_IN_VILLAGE)
+    end
+  end
 end

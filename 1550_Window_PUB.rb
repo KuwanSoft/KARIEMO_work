@@ -4,24 +4,24 @@
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_PUB < WindowSelectable
+class WindowPub < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super(4, WLH*3, 504, WLH*12+20+32)
+    super(0, WLH*8, 512, WLH*17+32)
     self.index = -1
     self.visible = false
     self.active = false
     self.opacity = 255
     self.z = 103
-    @column_max = 2
+    @column_max = 3
     @spacing = 0
-    @row_height = WLH*6 + 10
+    @row_height = WLH*7 + 10
     refresh
-    @help = Window_PUB_help.new
+    @help = WindowPubHelp.new
   end
   #--------------------------------------------------------------------------
   # ● DISPOSE
@@ -85,25 +85,26 @@ class Window_PUB < WindowSelectable
       self.contents.font.color = normal_color
     end
     rect = item_rect(index)
-    adj_y = 12
+    adj_y = 4
     ##> ポートレート
-    draw_face(rect.x+4, rect.y+4, actor)
+    draw_face(rect.x+4, rect.y+4+WLH*1, actor)
     fw = 56+2+8 # face width
     # キャラクター名
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*0+adj_y, WLW*8, WLH, actor.name)
+    self.contents.draw_text(rect.x, rect.y+WLH*0+adj_y, WLW*8, WLH, actor.name)
     # レベル
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*1+adj_y, WLW*8, WLH, "LEVEL")
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*1+adj_y, WLW*10, WLH, actor.level, 2)
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*1+adj_y, WLW*4, WLH, "LV")
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*1+adj_y, WLW*6, WLH, actor.level, 2)
     # クラス名
-    draw_classname(rect.x+fw+WLW*2+6+16, rect.y+WLH*4+adj_y, actor)
+    draw_classname(rect.x+fw+WLW*1, rect.y+WLH*4+adj_y, actor, 0)
     # 最大HP
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*2+adj_y, WLW*4, WLH, "H.P.")
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*2+adj_y, WLW*10, WLH, actor.maxhp, 2)
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*2+adj_y, WLW*4, WLH, "HP")
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*2+adj_y, WLW*6, WLH, actor.maxhp, 2)
     # 最大MP
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*3+adj_y, WLW*4, WLH, "M.P.")
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*3+adj_y, WLW*10, WLH, actor.total_mp, 2)
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*3+adj_y, WLW*4, WLH, "MP")
+    self.contents.draw_text(rect.x+fw, rect.y+WLH*3+adj_y, WLW*6, WLH, actor.total_mp, 2)
     # 年齢
-    self.contents.draw_text(rect.x+fw, rect.y+WLH*4+adj_y, WLW*5, WLH, "#{actor.age}さい")
+    self.contents.draw_text(rect.x+fw+12, rect.y+WLH*5+adj_y, WLW*5, WLH, "#{actor.age}さい")
+    draw_stamina(actor, rect.x+fw+12, rect.y+WLH*6+adj_y)
   end
   #--------------------------------------------------------------------------
   # ● カーソルの更新

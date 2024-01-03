@@ -1,17 +1,17 @@
 #==============================================================================
-# ■ Window_QuestBoard
+# ■ WindowQuestBoard
 #------------------------------------------------------------------------------
 # クエストボード
 #==============================================================================
 
-class Window_QuestBoard < WindowSelectable
+class WindowQuestBoard < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    @info = Window_QuestBoard_b.new
-    @top = Window_QuestBoard_Top.new
-    @progress = Window_QuestBoard_progress.new
+    @info = WindowQuestBoardB.new
+    @top = WindowQuestBoardTop.new
+    @progress = WindowQuestBoardProgress.new
     super( 0, BLH+32, 512, WLH*9+32)
     self.visible = false
     self.active = false

@@ -25,7 +25,7 @@ class Scene_Mercenary < SceneBase
   #--------------------------------------------------------------------------
   def start
     super
-    @ps = Window_PartyStatus.new                  # PartyStatus
+    @ps = WindowPartyStatus.new                  # PartyStatus
     @ps.turn_off
     @attention_window = Window_ShopAttention.new  # attention表示用
     create_menu_background  # 背景

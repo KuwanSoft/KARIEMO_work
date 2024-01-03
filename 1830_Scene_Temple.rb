@@ -54,7 +54,7 @@ class SceneTemple < SceneBase
     @result_window = Window_Attention4.new  # attention表示用
     @back_s = Window_ShopBack_Small.new     # メッセージ枠小
     @back_s.y += 96-24                      # メッセージ枠小
-    @ps = Window_PartyStatus.new            # PartyStatus
+    @ps = WindowPartyStatus.new            # PartyStatus
     turn_on_face
     @menu_window = Window_Temple_Menu.new   # メインメニュー
     @menu_window.change_page(1)             # 初期ページ１

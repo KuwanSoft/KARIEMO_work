@@ -1,16 +1,16 @@
 #==============================================================================
-# ■ Window_MapTrader_List
+# ■ WindowMapTraderList
 #------------------------------------------------------------------------------
 # クエストボード
 #==============================================================================
 
-class Window_MapTrader_List < WindowSelectable
+class WindowMapTraderList < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    @info = Window_MapTrader_Detail.new
-    @top = Window_MapTrader_Top.new
+    @info = WindowMapTraderDetail.new
+    @top = WindowMapTraderTop.new
     super( 0, BLH*1+32, 512, WLH*6+32)
     self.visible = false
     self.active = false

@@ -19,7 +19,7 @@ class SceneMap < SceneBase
     @spriteset = SpritesetMap.new
     @message_window = Window_Message.new
     @attention_window = Window_Attention.new # attention表示用
-    @ps = Window_PartyStatus.new        # パーティステータス
+    @ps = WindowPartyStatus.new        # パーティステータス
     @sub_window = Window_SubWindow.new    # 情報枠の定義
     @sign = Window_SignWindow.new
     @pm = Window_PartyMagic.new
@@ -31,7 +31,7 @@ class SceneMap < SceneBase
     @search2 = Window_SEARCH2.new         # 探索メニュー2
     @search3 = Window_SEARCH3.new         # 探索メニュー2
     @inventory = Window_BagSelection.new("キャンプ", 100)
-    @target_ps = Window_PartyStatus.new(true)   # アイテム使用先
+    @target_ps = WindowPartyStatus.new(true)   # アイテム使用先
     @target_ps.turn_off
     @effect_window = Window_ActorStatusEffect.new  # アイテム・呪文エフェクト
     @window_other = Window_OtherParty.new # 他のパーティを探す

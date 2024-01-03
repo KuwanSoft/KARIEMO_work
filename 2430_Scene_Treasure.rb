@@ -68,7 +68,7 @@ class SceneTreasure < SceneBase
     @treasure_window = Window_Treasure.new
     @message_window = Window_Message.new  # メッセージ枠
     @message_window.z = 255               # 最前列へ
-    @ps = Window_PartyStatus.new
+    @ps = WindowPartyStatus.new
     @pm = Window_PartyMagic.new
     @back_s = Window_ShopBack_Small.new   # メッセージ枠小
     @inspect_window = Window_Treasure_Inspect.new

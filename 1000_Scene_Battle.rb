@@ -206,7 +206,7 @@ class SceneBattle < SceneBase
   # ● 情報表示ビューポートの作成
   #--------------------------------------------------------------------------
   def create_info_viewport
-    @ps = Window_PartyStatus.new
+    @ps = WindowPartyStatus.new
     @party_command_window = Window_PartyCommand.new
     @actor_command_window = Window_ActorCommand.new
     @actor_status_window = Window_ActorStatus.new
@@ -1445,6 +1445,7 @@ class SceneBattle < SceneBase
     $game_party.increase_skills_per_turn  # 戦術スキル上昇判定
     $game_party.clear_arranged_flag
     display_poison_damage           # 毒ダメージ処理
+    display_bleeding_damage         # 出血ダメージ処理
     $game_party.regeneration_effect # リジェネの処理
     display_healing                 # ゾンビ等の自動回復
     apply_turn_end_magic_effect     # ターン経過による呪文の効果減少
@@ -1690,7 +1691,7 @@ class SceneBattle < SceneBase
       target.attack_effect(@active_battler)
       display_action_effects(target, nil, @active_battler)
       @active_battler.consume_arrow   # 矢弾の消費
-      target.set_countered
+      target.set_countered if counter # カウンター攻撃を被弾した場合のフラグ
     end
     return if counter     # カウンターにカウンターは行わない
     return if no_counter  # 遠距離攻撃にはカウンタ不可
@@ -2945,6 +2946,7 @@ class SceneBattle < SceneBase
     return if target.actor?
     return if target.mercenary?
     return if target.summon?
+    return if target.poison_strength == 0
     @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("毒ダメージ")
     wait(45)
@@ -2956,6 +2958,7 @@ class SceneBattle < SceneBase
     return if target.actor?
     return if target.mercenary?
     return if target.summon?
+    return if target.bleeding_strength == 0
     @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("出血ダメージ")
     wait(45)

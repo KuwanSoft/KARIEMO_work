@@ -70,7 +70,7 @@ class Scene_Guide < SceneBase
     @attention_window = Window_Attention.new # attention表示用
     @selection = Window_YesNo.new
     @selection.y -= 40
-    @ps = Window_PartyStatus.new                  # PartyStatus
+    @ps = WindowPartyStatus.new                  # PartyStatus
     @guide_window = Window_Guide.new(@guide)              # ガイドウィンドウ
     setup_message
   end

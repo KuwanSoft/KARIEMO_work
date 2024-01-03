@@ -32,7 +32,7 @@ class SceneVillage < SceneBase
     Save::do_save("#{self.class.name}") # セーブの実行
     $music.play("へんきょうのむら")
     super
-    @ps = Window_PartyStatus.new
+    @ps = WindowPartyStatus.new
     turn_on_face
     @ps.turn_on
     @village_command = Window_Village1.new

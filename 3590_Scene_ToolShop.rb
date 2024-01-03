@@ -78,7 +78,7 @@ class Scene_ToolShop < SceneBase
   #--------------------------------------------------------------------------
   def start
     super
-    @ps = Window_PartyStatus.new                  # PartyStatus
+    @ps = WindowPartyStatus.new                  # PartyStatus
     @window_shop = Window_ToolShop.new(@weighted_items)
     @attention_window = Window_ShopAttention.new(110)  # attention表示用
     create_menu_background  # 背景

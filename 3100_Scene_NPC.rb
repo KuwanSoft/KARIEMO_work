@@ -54,7 +54,7 @@ class Scene_NPC < SceneBase
   def start
     super
     @message_window = Window_NPC_Message.new          # メッセージウインドウ
-    @ps = Window_PartyStatus.new                  # PartyStatus
+    @ps = WindowPartyStatus.new                  # PartyStatus
     @npc = Window_NPC.new(@npc_id)                # NPCグラフィック
     @name = Window_NPCName.new(@npc_id)
     @give_window = Window_GiveMoney.new

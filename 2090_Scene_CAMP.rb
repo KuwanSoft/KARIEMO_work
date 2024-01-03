@@ -28,11 +28,11 @@ class SceneCamp < SceneBase
     super
     @attention_window = Window_Attention.new # attention表示用
     @attention_window.y = WLH*10
-    @ps = Window_PartyStatus.new            # パーティステータス
+    @ps = WindowPartyStatus.new            # パーティステータス
     @camp = Window_CAMP.new       # キャンプウィンドウ(準備フラグ)
     @pm = Window_PartyMagic.new
     @equip = Window_EQUIP.new               # 装備ウィンドウ
-    @target_ps = Window_PartyStatus.new(true)     # partystatus
+    @target_ps = WindowPartyStatus.new(true)     # partystatus
     @target_ps.turn_off
     @view = Window_VIEW.new                 # ステータス閲覧ウィンドウ
     @back_s = Window_ShopBack_Small.new     # メッセージ枠

@@ -170,6 +170,12 @@ class GameParty < GameUnit
     end
   end
   #--------------------------------------------------------------------------
+  # ● パーティメンバーか？
+  #--------------------------------------------------------------------------
+  def party_member?(actor_id)
+    return @actors.include?(actor_id)
+  end
+  #--------------------------------------------------------------------------
   # ● パーティフル？
   #--------------------------------------------------------------------------
   def member_max?
@@ -513,7 +519,7 @@ class GameParty < GameUnit
   # ● 全滅判定
   #--------------------------------------------------------------------------
   def all_dead?
-    return false if $scene.is_a?(Scene_Continue)
+    return false if $scene.is_a?(SceneContinue)
     return false if $scene.is_a?(Scene_PRESENTS)
     return false if $scene.is_a?(SceneGameover)
     if @actors.size == 0 and not $game_temp.in_battle
@@ -1709,19 +1715,19 @@ class GameParty < GameUnit
   def resting
     fountain = $game_temp.drawing_fountain
     case check_survival_skill
-    when 0;  val = 100; multiplier = 0.01; rate = 0.05
-    when 1;  val = 50;  multiplier = 0.02; rate = 0.05
-    when 2;  val = 25;  multiplier = 0.02; rate = 0.05
-    when 3;  val = 20;  multiplier = 0.03; rate = 0.05
-    when 4;  val = 15;  multiplier = 0.03; rate = 0.05
-    when 5;  val = 10;  multiplier = 0.04; rate = 0.05
-    when 6;  val =  9;  multiplier = 0.04; rate = 0.05
-    when 7;  val =  8;  multiplier = 0.05; rate = 0.05
-    when 8;  val =  7;  multiplier = 0.05; rate = 0.05
+    when 0;  val = 100; multiplier = 0.01; rate = 0.15
+    when 1;  val = 50;  multiplier = 0.02; rate = 0.15
+    when 2;  val = 25;  multiplier = 0.02; rate = 0.15
+    when 3;  val = 20;  multiplier = 0.03; rate = 0.15
+    when 4;  val = 15;  multiplier = 0.03; rate = 0.15
+    when 5;  val = 10;  multiplier = 0.04; rate = 0.15
+    when 6;  val =  9;  multiplier = 0.04; rate = 0.15
+    when 7;  val =  8;  multiplier = 0.05; rate = 0.15
+    when 8;  val =  7;  multiplier = 0.05; rate = 0.15
     end
     ## 魔法の水汲み場フラグ
     if fountain
-      rate = 0.05
+      rate = 0.15
       val /= 2
       multiplier *= 2
     end
@@ -1961,12 +1967,12 @@ class GameParty < GameUnit
     result = 0
     for member in existing_members
       diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
-      sv = Misc.skill_value(SkillId::TreasureHUNT, member)
+      sv = Misc.skill_value(SkillId::TREASUREHUNT, member)
       ratio = Integer(sv * diff)
       if ratio > rand(100)
         result += 1
         Debug.write(c_m, "TreasureHunting Check: #{member.name}")
-        member.chance_skill_increase(SkillId::TreasureHUNT)
+        member.chance_skill_increase(SkillId::TREASUREHUNT)
       end
     end
     Debug.write(c_m, "TreasureHunting Check: --> +#{result}") unless result == 0

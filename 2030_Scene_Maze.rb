@@ -40,7 +40,7 @@ class SceneMaze < SceneBase
   def start
     super
     # show_vil_picture
-    @ps = Window_PartyStatus.new            # PartyStatus
+    @ps = WindowPartyStatus.new            # PartyStatus
     @entering = Window_EnteringMessage.new  # 突入メッセージ
     @menu_window = Window_Maze.new
     @menu_window.visible = true
@@ -114,7 +114,7 @@ class SceneMaze < SceneBase
         end
       when 1 # 冒険の再開
         unless $game_system.check_avaID_exclude_survivor.empty? # 可能なパーティの情報
-          $scene = Scene_Continue.new
+          $scene = SceneContinue.new
         end
       when 2 # 冒険を終了する
         Save::do_save("#{self.class.name}") # セーブの実行

@@ -64,7 +64,7 @@ class SceneFountain < SceneBase
     super
     create_menu_background
     @top_window = WindowBase.new(2, 2, 512-4, WindowBase::BLH*4+32-4)
-    @ps = Window_PartyStatus.new
+    @ps = WindowPartyStatus.new
     @fountain_window = Window_Fountain.new
     @depth_window = Window_Depth.new(@depth)
     set_firsttext

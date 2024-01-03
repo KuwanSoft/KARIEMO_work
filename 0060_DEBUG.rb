@@ -358,7 +358,8 @@ module Debug
   # ● リセットカウントデータのセーブ
   #--------------------------------------------------------------------------
   def self.save_rcdata(data)
-    File.open(FILE_PATH, 'wb') { |file| Marshal.dump(data, file) }
+    path = @path+@reset_file
+    File.open(path, 'wb') { |file| Marshal.dump(data, file) }
   end
   #--------------------------------------------------------------------------
   # ● リセットカウントデータのインクリメント
@@ -369,7 +370,7 @@ module Debug
     data[playid] ||= 0
     data[playid] += 1
     Debug.write(c_m, "RESET Count +1 playid:#{playid}")
-    save_data(data)
+    save_rcdata(data)
   end
   #--------------------------------------------------------------------------
   # ● 呼び出されていないメソッドの確認

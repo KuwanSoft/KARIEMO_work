@@ -21,7 +21,7 @@ class SceneBbs < SceneBase
   #--------------------------------------------------------------------------
   def start
     super
-    @ps = Window_PartyStatus.new                  # PartyStatus
+    @ps = WindowPartyStatus.new                  # PartyStatus
     $threedmap.start_drawing
     create_top_message
     create_list

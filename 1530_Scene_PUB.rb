@@ -29,7 +29,6 @@ class ScenePub < SceneBase
     @pub.dispose
     @view.dispose
     @command_window.dispose
-    @locname.dispose
     @quest_window.dispose
     @map_list.dispose
     @window_picture.dispose
@@ -61,19 +60,17 @@ class ScenePub < SceneBase
   def start
     super
     # show_vil_picture
-    @ps = Window_PartyStatus.new          # PartyStatus
+    @ps = WindowPartyStatus.new          # PartyStatus
     @ps.turn_on
     turn_on_face
-    @pub = Window_PUB.new                 # くわえる
+    @pub = WindowPub.new                 # くわえる
     @view = Window_VIEW.new               # みる時のステータス枠
-    @command_window = Window_PUB_Menu.new
+    @command_window = WindowPubMenu.new
     @command_window.visible = true
     @command_window.active = true
     @command_window.index = 0
-    @locname = Window_LOCNAME.new
-    @locname.set_text(ConstantTable::NAME_PUB)
-    @quest_window = Window_QuestBoard.new
-    @map_list = Window_MapTrader_List.new
+    @quest_window = WindowQuestBoard.new
+    @map_list = WindowMapTraderList.new
     @window_picture = Window_Picture.new(0, 0)
     @window_picture.create_picture("Graphics/System/tavern4", ConstantTable::NAME_PUB)
   end
@@ -87,7 +84,6 @@ class ScenePub < SceneBase
     @pub.update
     @ps.update
     @view.update
-    @locname.update
     @quest_window.update
     @map_list.update
     if @pub.active

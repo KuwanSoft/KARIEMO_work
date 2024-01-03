@@ -1136,6 +1136,24 @@ class WindowBase < Window
     change_font_to_normal
   end
   #--------------------------------------------------------------------------
+  # ● 疲労度を描画
+  #--------------------------------------------------------------------------
+  def draw_stamina(actor, x, y)
+    back = Cache.system("motivation_bar_back")
+    bar = Cache.system("stamina_bar2")
+    rect = Rect.new(0, 0, 62, 16)
+    self.contents.blt(x, y, back, rect)
+    ## メーター中身の描画
+    stamina = Integer(100 * actor.resting_thres)
+    width = Integer(stamina / 2.083)
+    rect = Rect.new(0, 0, width, 4)
+    self.contents.blt(x+7, y+6, bar, rect)
+    ## 数値で表示
+    change_font_to_skill
+    self.contents.draw_text(x+16, y, 24, WLH, stamina)
+    change_font_to_normal
+  end
+  #--------------------------------------------------------------------------
   # ● スキルチェック結果を描画
   #--------------------------------------------------------------------------
   def draw_scout_check(x, y, actor)
