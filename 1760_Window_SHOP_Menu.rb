@@ -13,7 +13,7 @@ class Window_SHOP_Menu < WindowSelectable
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    super( 128, WLH*6, 380, 210)
+    super( 128, WLH*8, 384, 210-2-WLH)
     @page = 1
     @cursor = {}
     @adjust_y = WLH*3

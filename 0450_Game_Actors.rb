@@ -152,15 +152,15 @@ class GameActors
     end
   end
   #--------------------------------------------------------------------------
-  # ● 酒場のメンバーは徐々に疲労回復する
+  # ● 酒場のメンバーは1秒毎に疲労回復する
   #--------------------------------------------------------------------------
-  def check_recover_fatigue
+  def check_recover_fatigue(value = 1)
     for member in @data
       next if member == nil
       next if member.out                            # 迷宮内でなければ
       next if member.in_church?                     # 教会内でなければ
       next if $game_party.party_member?(member.id)  # パーティ内でなければ
-      member.recover_fatigue(ConstantTable::RECOVER_RATE_IN_VILLAGE)
+      member.recover_fatigue_by(value)              # 1秒で1疲労回復,マップでは階層分減る
     end
   end
 end

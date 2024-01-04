@@ -1462,7 +1462,6 @@ class SceneBattle < SceneBase
     $game_troop.identified_change     # 不確定・確定変更
     platoon_change if platoon_redraw  # 隊列変更
     start_party_command_selection
-    $game_actors.check_injured_member(ConstantTable::SECONDS_PER_TURN * $game_map.map_id)  # 30秒*マップID経過
   end
   #--------------------------------------------------------------------------
   # ● 発狂による隊列変更
@@ -1989,7 +1988,8 @@ class SceneBattle < SceneBase
   #--------------------------------------------------------------------------
   def execute_action_magic
     magic = $data_magics[@active_battler.action.magic_id] # オブジェクト取得
-    magic_level = @active_battler.action.magic_lv
+    magic_level = @active_battler.action.magic_lv               # 詠唱時のCP
+    rf_magic_level = @active_battler.action.reinforced_magic_lv # コンセントレートにて上昇したCP
     if @active_battler.interruption # スペルブレイクされていたらスキップ
       Debug::write(c_m,"スペルブレイクの為スキップ:#{@active_battler.name}")
       return
@@ -1999,10 +1999,9 @@ class SceneBattle < SceneBase
     else
       magic_skill_increase_chance(magic, magic_level)   # スキル上昇
       @active_battler.reserve_cast(magic, magic_level)  # MPを消費（詠唱レベル×コスト）
-
       ## 詠唱時のバトルメッセージの指定------------------------------------------------------------------------------------
       text1 = "#{@active_battler.name}は"
-      text2 = "#{magic.name}の じゅもんをえいしょう。"
+      text2 = "#{magic.name}#{rf_magic_level}の じゅもんをえいしょう。"
       # 1行に26文字までは入るので、それ以下
       if (text1+text2).split(//).size < 27
         @message_window.add_instant_text(text1+" "+text2)
@@ -2021,14 +2020,14 @@ class SceneBattle < SceneBase
       Debug::write(c_m,"!!呪文の逆流!! actor:#{@active_battler.name}")
       reverse = true
       if magic.need_target?
-        targets = @active_battler.action.make_reverse_targets(magic_level)
+        targets = @active_battler.action.make_reverse_targets(rf_magic_level)
       end
       wait(20)
       reverse_text = "じゅもんが ぎゃくりゅうした!"
       @message_window.add_instant_text(reverse_text)
     ## 逆流せず
     elsif magic.need_target?
-      targets = @active_battler.action.make_targets(magic_level)
+      targets = @active_battler.action.make_targets(rf_magic_level)
     end
 
     e_number = 0
@@ -2053,7 +2052,7 @@ class SceneBattle < SceneBase
             target.resist_flag = true # メッセージ用の無効化フラグ
           else
             ##---> 呪文の無効化失敗
-            target.magic_effect(@active_battler, magic, magic_level, e_number, drain_power)
+            target.magic_effect(@active_battler, magic, rf_magic_level, e_number, drain_power)
           end
           display_action_effects(target, magic)
         end
@@ -2109,9 +2108,9 @@ class SceneBattle < SceneBase
   #--------------------------------------------------------------------------
   def judge_cast_success(user, magic, cast_power, reverse = false)
     return true if reverse
-    return true if user.action.breath?  # ブレスに詠唱成功判定無し
-    ratio = user.get_cast_ratio(magic, cast_power) # 詠唱成功率取得
-    user.meditation = false             # 瞑想フラグオフ
+    return true if user.action.breath?              # ブレスに詠唱成功判定無し
+    ratio = user.get_cast_ratio(magic, cast_power)  # 詠唱成功率取得
+    user.meditation = false                         # 瞑想フラグオフ
     Debug::write(c_m,"#{user.name} 詠唱成功率:#{ratio}%")
     return true if ratio > rand(100)
     return false

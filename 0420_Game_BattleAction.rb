@@ -19,7 +19,8 @@ class GameBattleAction
   attr_accessor :target_g_index             # 対象グループインデックス(new)
   attr_accessor :forcing                  # 強制フラグ
   attr_accessor :value                    # 自動戦闘用 評価値
-  attr_accessor :magic_lv                 # スキルのレベル
+  attr_reader   :magic_lv                 # 呪文の詠唱レベル（C.P.）
+  attr_reader   :reinforced_magic_lv      # コンセントレート後の呪文の詠唱レベル（C.P.）
   attr_accessor :bag_index                # 使用したアイテムのバッグindex
   attr_accessor :attack_type              # 攻撃手段タイプ
   attr_accessor :counter_target           # カウンターターゲット
@@ -42,6 +43,7 @@ class GameBattleAction
     @basic = -1
     @magic_id = 0
     @magic_lv = 0
+    @reinforced_magic_lv = 0
     @item_id = 0
     @using_equip = false
     @target_index = -1
@@ -178,6 +180,25 @@ class GameBattleAction
     @basic = 0  # 詠唱前フラグ
     @magic_id = magic_id
     @magic_lv = magic_lv
+  end
+  #--------------------------------------------------------------------------
+  # ● マジックレベルの取得
+  #--------------------------------------------------------------------------
+  def magic_lv
+    @reinforced_magic_lv = @magic_lv  # オリジナルのCPを保管
+    return @magic_lv unless $game_temp.in_battle
+    ## コンセントレート倍率
+    sv = Misc.skill_value(SkillId::CONCENTRATE, @battler)
+    diff = ConstantTable::DIFF_25[$game_map.map_id]
+    ratio = Integer([sv * diff, 95].min)
+    ratio /= 2 if @battler.tired?
+    plus = 0
+    @magic_lv.times do
+      plus += 1 if ratio > rand(100)
+    end
+    @reinforced_magic_lv += plus
+    Debug.write(c_m, "マジックレベルの上昇判定 CP:#{@magic_lv} reinforced:#{@reinforced_magic_lv}")
+    return @magic_lv
   end
   #--------------------------------------------------------------------------
   # ● アイテムを設定

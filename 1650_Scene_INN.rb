@@ -51,19 +51,17 @@ class SceneInn < SceneBase
     # show_vil_picture
     @message_window = Window_LevelMessage.new     # レベルアップmessage表示用
     @attention_window = Window_ShopAttention.new  # attention表示用
-    @master_skill = Window_MasterSkill.new
-    @master_slot = Window_MasterSlot.new
     @magic_candidate = Window_MagicCandidate.new
     @magic_detail = Window_MagicDetail.new        # 呪文詳細画面
     @selection = Window_YesNo.new
-    @is = Window_IndivisualStatus.new          # PartyStatus
-    @menu_window = Window_INN_Menu.new    # メインメニュー
+    @is = WindowIndivisualStatus.new          # PartyStatus
+    @menu_window = WindowInnMenu.new    # メインメニュー
     @menu_window.refresh(@is.actor)
     @back_s = Window_ShopBack_Small.new   # メッセージ枠小
     @locname = Window_LOCNAME.new
     @locname.set_text(ConstantTable::NAME_INN)
     @skill_selection = Window_Skill.new      # スキルウインドウ
-    @fee = Window_INN_Fee.new
+    @fee = WindowInnFee.new
     @fee.refresh(0, @is.actor, @menu_window.index)
     @window_picture = Window_Picture.new(0, 0)
     @window_picture.create_picture("Graphics/System/inn", ConstantTable::NAME_INN)
@@ -75,8 +73,6 @@ class SceneInn < SceneBase
     super
     @message_window.dispose
     @attention_window.dispose
-    @master_skill.dispose
-    @master_slot.dispose
     @is.dispose
     @magic_candidate.dispose
     @magic_detail.dispose
@@ -97,8 +93,6 @@ class SceneInn < SceneBase
     @message_window.update
     @is.update
     @menu_window.update
-    @master_skill.update
-    @master_slot.update
     @magic_candidate.update
     @magic_detail.update
     @selection.update
@@ -107,10 +101,6 @@ class SceneInn < SceneBase
     @fee.update
     if @magic_candidate.active
       update_magic_candidate
-    elsif @master_slot.active
-      update_master_slot_selection
-    elsif @master_skill.active
-      update_master_skill_selection
     elsif @skill_selection.visible
       update_skill_selection
     elsif @pre_sleep
@@ -213,10 +203,12 @@ class SceneInn < SceneBase
       when 1 # やめる
         @verification = false
         @menu_window.refresh(@is.actor)
+        @fee.refresh(@fee.page, @is.actor, @menu_window.index)
       end
     elsif Input.trigger?(Input::B)
       @verification = false
       @menu_window.refresh(@is.actor)
+      @fee.refresh(@fee.page, @is.actor, @menu_window.index)
     end
   end
   #--------------------------------------------------------------------------
@@ -417,49 +409,6 @@ class SceneInn < SceneBase
         return
       end
     end
-  end
-  #--------------------------------------------------------------------------
-  # ● 新規マスタースキルの選択
-  #--------------------------------------------------------------------------
-  def update_master_skill_selection
-    if Input.trigger?(Input::C)
-      @is.actor.learn_master_skill(@master_skill.get_skill_id)
-      @master_skill.active = false
-      @master_skill.visible = false
-      if @is.actor.number_of_master_skill < 3 # 有効なスキル数が2以下
-        @is.actor.delete_master_skill(2)      # 最後尾を削除
-        end_master_skill
-        return
-      end
-      @master_slot.refresh(@is.actor)
-      @master_slot.active = true
-      @master_slot.visible = true
-      @master_slot.index = 0
-      text1 = "どのスロットをすてますか?"
-      text2 = "[A]でけってい"
-      @back_s.set_text(text1, text2, 0, 2)
-      @back_s.visible = true
-    end
-  end
-  #--------------------------------------------------------------------------
-  # ● 破棄マスタースキルの選択
-  #--------------------------------------------------------------------------
-  def update_master_slot_selection
-    if Input.trigger?(Input::C)
-      @back_s.visible = false
-      @is.actor.delete_master_skill(@master_slot.get_skill_position)
-      end_master_skill
-    end
-  end
-  #--------------------------------------------------------------------------
-  # ● マスタースキル更新の終了
-  #--------------------------------------------------------------------------
-  def end_master_skill
-    @master_skill.active = false
-    @master_skill.visible = false
-    @master_slot.active = false
-    @master_slot.visible = false
-    start_skill_selection         # スキル割り振りへ
   end
   #--------------------------------------------------------------------------
   # ● メッセージの初期化

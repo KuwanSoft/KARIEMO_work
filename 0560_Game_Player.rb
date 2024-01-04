@@ -566,7 +566,8 @@ class GamePlayer < GameCharacter
     $game_party.find_other       # 他のパーティのチェック
     $game_mapkits.mapkit_check_and_store              # マップの更新
     $game_party.on_player_walk
-    $game_actors.check_injured_member($game_map.map_id)  # 治療経過
+    $game_actors.check_injured_member($game_map.map_id)   # 治療経過
+    $game_actors.check_recover_fatigue($game_map.map_id)  # 治療経過
   end
   #--------------------------------------------------------------------------
   # ● ルームガードチェック

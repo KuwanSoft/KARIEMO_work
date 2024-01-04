@@ -230,7 +230,6 @@ module ConstantTable
   MAX_EXP_LEVEL = 20        # 経験値計算上の最高レベル
   BROKEN_RATIO = 15         # 鍵穴を壊す確率
   MAX_ATTEMPTS = 5          # 最大宝箱調査回数
-  SECONDS_PER_TURN = 30     # 1ターンで経過する治療秒数
   STUN_EVISON = 5           # スタン回避率
   SEVERE_THRES = 50         # 重症化のHPロスト閾値
   REST_NAUSEA_RECOVER_RATIO_PER_TURN = 5  # 吐き気の累積値1を減少させる休息のターン毎の確率
@@ -238,7 +237,6 @@ module ConstantTable
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
   RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
-  RECOVER_RATE_IN_VILLAGE = 5 # 酒場での疲労回復
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
@@ -269,13 +267,13 @@ module ConstantTable
   ]
 
   ITEM_RANK_NAME = [
-    "N/A",      # No Rank
-    "Esquire",  # RANK1
-    "Dame",     # RANK2
-    "Baroness", # RANK3
-    "Countess", # RANK4
-    "Duchess",  # RANK5
-    "Royal",    # RANK6
+    "N/A",          # No Rank
+    "Common",       # RANK1
+    "Uncommon",     # RANK2
+    "Rare",         # RANK3
+    "Epic",         # RANK4
+    "Legendary",    # RANK5 伝説
+    "Mythic",       # RANK6 神話的
   ]
 
   ## 歪みよ消えろでの呪文効果消去確率
@@ -319,14 +317,14 @@ module ConstantTable
   STINKRATIO = 5        # 臭う確率
 
   ## 宿屋の料金と疲労回復量
-  INN1_FEE = 5    #
-  INN2_FEE = 45   #
-  INN3_FEE = 200  #
-  INN4_FEE = 700 #
-  INN1_RECOVER = 10    #
-  INN2_RECOVER = 100    #
-  INN3_RECOVER = 500
-  INN4_RECOVER = 2000
+  INN1_FEE = 10    #
+  INN2_FEE = 40   #
+  INN3_FEE = 180  #
+  INN4_FEE = 1000 #
+  INN1_RECOVER = 24    #
+  INN2_RECOVER = 60    #
+  INN3_RECOVER = 182
+  INN4_RECOVER = 728
 
   ## 古びた錠前の難易度
   LOCK_NUM_B1F = 1

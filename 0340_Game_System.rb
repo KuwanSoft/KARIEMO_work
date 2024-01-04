@@ -382,13 +382,13 @@ class GameSystem
     # 1秒毎
     if (@timer % 60 == 0)
       $game_actors.check_injured_member
+      $game_actors.check_recover_fatigue
     end
     ## 1分毎
     if (@timer % 3600 == 0)
       Debug.write(c_m, "=====================1分毎処理")
       $game_quest.check_quest_update_for_1_min
       $game_temp.refresh_mood_decrease
-      $game_actors.check_recover_fatigue
     end
     ## 3分毎
     if (@timer % (3600*3) == 0)

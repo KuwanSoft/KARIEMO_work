@@ -726,7 +726,8 @@ class GameActor < GameBattler
     for item in armors.compact
       return true if item.prevent_state.include?(state)
     end
-    return true if (state == "凍") and (@class_id == 7) # 狩人には凍結無効
+    return true if @veil_element.include?(state)        # ベールでの状態無効効果
+    return true if (state == StateId::FREEZE) and (@class_id == 7) # 狩人には凍結無効
     return false
   end
   #--------------------------------------------------------------------------
@@ -3013,6 +3014,7 @@ class GameActor < GameBattler
     when 4; c = 2.5
     when 5; c = 3.0
     when 6; c = 3.5 # 14      66.5
+    else; c = 3.5
     end
     cost = Integer(magic.cost * c)
     ## 戦闘中で無いときに限り成長
@@ -3071,6 +3073,7 @@ class GameActor < GameBattler
     when 4; c = 2.5
     when 5; c = 3.0
     when 6; c = 3.5
+    else; c = 3.5
     end
     cost = Integer(magic.cost * c)
     if magic.fire > 0
@@ -3186,17 +3189,17 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def tired_casting(mp_consumed)
     case mp_consumed
-    when 1..12;     value = TIRED_RATIO * 10 * 1 / 100  # 2
-    when 13..24;    value = TIRED_RATIO * 20 * 1 / 100
-    when 25..36;    value = TIRED_RATIO * 30 * 1 / 100
-    when 37..48;    value = TIRED_RATIO * 50 * 1 / 100
-    when 49..60;    value = TIRED_RATIO * 80 * 1 / 100
-    when 61..72;    value = TIRED_RATIO * 130 * 1 / 100 # 26
-    when 73..84;    value = TIRED_RATIO * 210 * 1 / 100 # 42
-    when 85..96;    value = TIRED_RATIO * 340 * 1 / 100 # 68
-    when 97..108;   value = TIRED_RATIO * 550 * 1 / 100 # 110
-    when 109..120;  value = TIRED_RATIO * 890 * 1 / 100 # 178
-    else;           value = TIRED_RATIO * 1440 * 1 / 100 # 288
+    when 1..12;     value = ConstantTable::TIRED_RATIO * 10 * 1 / 100  # 2
+    when 13..24;    value = ConstantTable::TIRED_RATIO * 20 * 1 / 100
+    when 25..36;    value = ConstantTable::TIRED_RATIO * 30 * 1 / 100
+    when 37..48;    value = ConstantTable::TIRED_RATIO * 50 * 1 / 100
+    when 49..60;    value = ConstantTable::TIRED_RATIO * 80 * 1 / 100
+    when 61..72;    value = ConstantTable::TIRED_RATIO * 130 * 1 / 100 # 26
+    when 73..84;    value = ConstantTable::TIRED_RATIO * 210 * 1 / 100 # 42
+    when 85..96;    value = ConstantTable::TIRED_RATIO * 340 * 1 / 100 # 68
+    when 97..108;   value = ConstantTable::TIRED_RATIO * 550 * 1 / 100 # 110
+    when 109..120;  value = ConstantTable::TIRED_RATIO * 890 * 1 / 100 # 178
+    else;           value = ConstantTable::TIRED_RATIO * 1440 * 1 / 100 # 288
     end
     Debug.write(c_m, "呪文詠唱による疲労度加算:+#{value}")
     add_tired(value)
@@ -3292,13 +3295,13 @@ class GameActor < GameBattler
     Debug.write(c_m, "ID:#{@actor_id} #{@name} 疲労回復(#{rate}%)=>疲労値:#{@fatigue} 現スタミナ:#{resting_thres*100}%")
   end
   #--------------------------------------------------------------------------
-  # ● 疲労回復を絶対値で（未使用）
+  # ● 疲労回復を絶対値で
   #     value: 回復絶対値
   #--------------------------------------------------------------------------
   def recover_fatigue_by(value)
-    Debug.write(c_m, "#{@fatigue} tired_ratio:#{tired_ratio} 値:#{value}")
-    @fatigue = [@fatigue - value, 0].max
-    Debug.write(c_m, "=> #{@fatigue}")
+    @fatigue = Integer([@fatigue - value, 0].max)
+    return if resting_thres >= 1  # すでに全快か
+    Debug.write(c_m, "ID:#{@actor_id} #{@name} 疲労回復(#{value}pts)=>疲労値:#{@fatigue} 現スタミナ:#{resting_thres*100}%")
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復閾値まで（休息で使用）
@@ -4728,16 +4731,12 @@ class GameActor < GameBattler
   def recover_nausea
     ratio = ConstantTable::REST_NAUSEA_RECOVER_RATIO_PER_TURN
     state_id = StateId::NAUSEA
-    return if @state_depth[state_id] == nil
-    if ratio > rand(100)
-      @state_depth[state_id] -= 1
-      if @state_depth[state_id] <= 0
-        ## 回復値で累積値が0以下になる
-        @state_depth[state_id] = 0    # リセット
-        remove_state(state_id)
-        Debug.write(c_m, "休息中の吐き気の回復")
-      end
-    end
+    @state_depth[state_id] ||= 0
+    return unless @state_depth[state_id] > 0
+    return unless ratio > rand(100)
+    @state_depth[state_id] -= 1
+    Debug.write(c_m, "休息中の吐き気の累積値-1回復")
+    remove_state(state_id) if @state_depth[state_id] <= 0
   end
   #--------------------------------------------------------------------------
   # ● 属性抵抗の有無（アクターのみ）
@@ -4777,5 +4776,54 @@ class GameActor < GameBattler
     self.resist_element_flag = true        # 弱点フラグ
     Debug::write(c_m,"属性抵抗#{rank}個検知 ダメージ1/#{rank+1}倍: TYPE(#{element_type})")
     return damage
+  end
+  #--------------------------------------------------------------------------
+  # ● エクソシスト攻撃発動チェック
+  #--------------------------------------------------------------------------
+  def check_exorcist
+    sv = Misc.skill_value(SkillId::EXORCIST, self)
+    case @class_id
+    when 8; diff = ConstantTable::DIFF_25[$game_map.map_id]
+    else;   diff = ConstantTable::DIFF_15[$game_map.map_id]
+    end
+    ratio = Integer([sv * diff, 95].min)
+    ratio /= 2 if tired?
+    result = (ratio > rand(100))
+    chance_skill_increase(SkillId::EXORCIST) if result
+    return result
+  end
+  #--------------------------------------------------------------------------
+  # ● クリティカル攻撃発動チェック
+  #--------------------------------------------------------------------------
+  def check_critical
+    sv = Misc.skill_value(SkillId::CRITICAL, self)
+    case @class_id
+    when 5,10;  diff = ConstantTable::DIFF_25[$game_map.map_id]  # 忍者・侍
+    else;       diff = ConstantTable::DIFF_10[$game_map.map_id]
+    end
+    ratio = Integer([sv * diff, 95].min)
+    ratio /= 2 if tired?
+    result = (ratio > rand(100))
+    chance_skill_increase(SkillId::CRITICAL) if result
+    return result
+  end
+  #--------------------------------------------------------------------------
+  # ● 屍によるクリティカル攻撃発動チェック
+  #--------------------------------------------------------------------------
+  def check_kabane
+    sv = Misc.skill_value(SkillId::POISONING, self)
+    diff = ConstantTable::DIFF_15[$game_map.map_id]
+    ratio = Integer([sv * diff, 95].min)
+    ratio /= 2 if tired?
+    result = (ratio > rand(100))
+    chance_skill_increase(SkillId::POISONING) if result
+    return result
+  end
+  #--------------------------------------------------------------------------
+  # ● クリティカル攻撃をくらった？
+  #--------------------------------------------------------------------------
+  def critical_received?
+    Debug::write(c_m,"クリティカル被弾判定 #{(1.0/@level)*100}%")
+    return (rand(@level) < 1)                                    # 1/lvの確率
   end
 end

@@ -455,6 +455,12 @@ module Misc
     when "電"; state_id = StateId::SHOCK
     when "凍"; state_id = StateId::FREEZE
     when "祓"; state_id = StateId::EXORCIST
+    when "血"; state_id = StateId::BLEEDING
+    when "吐"; state_id = StateId::NAUSEA
+    when "ス"; state_id = StateId::STUN
+    when "夢"; state_id = StateId::NIGHTMARE
+    when "魅"; state_id = StateId::MUPPET
+    when "臭"; state_id = StateId::STINK
     else; state_id = StateId::DUMMY
     end
     return state_id
@@ -507,13 +513,15 @@ module Misc
   # ● 最大C.P.の判定
   #~     ノンキャスター職の呪文はCP2で制限
   #~     従士は両方CP3で制限
-  #~     キャスター職でも領域違いの呪文はCP2で制限
+  #~     キャスター職でも領域違いの呪文はCP2で制限, 賢者は除く
   #--------------------------------------------------------------------------
   def self.get_max_cp(actor, magic)
     ## 最大詠唱CPをクラスで制限
+    ## 賢
     case actor.class_id
-    ## 魔・騎・賢・聖
-    when 3,4,6,8;
+    when 6; max = ConstantTable::MAX_MAGIC_LEVEL
+    ## 魔・騎・聖
+    when 3,4,8;
       if magic.domain == 0          # 呪文が理性
         if actor.principle == -1    # 主義が理性
           max = ConstantTable::MAX_MAGIC_LEVEL         # Sor/Kgt/Wis/Cle

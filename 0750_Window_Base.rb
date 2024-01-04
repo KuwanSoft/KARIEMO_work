@@ -209,12 +209,12 @@ class WindowBase < Window
   def get_item_rank_color(rank)
     case rank
     when 0; color = text_color(0)
-    when 1; color = text_color(0)   # 白
-    when 2; color = text_color(9)   # 青
-    when 3; color = text_color(11)  # 緑
-    when 4; color = text_color(14)  # 黄色
-    when 5; color = text_color(2)   # 橙
-    when 6; color = text_color(10)  # 赤
+    when 1; color = text_color(8)   # 灰 Common
+    when 3; color = text_color(9)   # 青 Rare
+    when 2; color = text_color(11)  # 緑 Uncommon
+    when 4; color = text_color(30)  # 紫 Epic
+    when 5; color = text_color(20)  # 橙 Legendary
+    when 6; color = text_color(14)  # 黄 Mythic
     end
     return color
   end

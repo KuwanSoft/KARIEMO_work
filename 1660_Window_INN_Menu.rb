@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_INN_Menu
+# ■ WindowInnMenu
 #------------------------------------------------------------------------------
 #
 #==============================================================================
 
-class Window_INN_Menu < WindowSelectable
+class WindowInnMenu < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -16,7 +16,7 @@ class Window_INN_Menu < WindowSelectable
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    super( 128, WLH*6, 380, 210)
+    super( 128, WLH*8, 384, 210-2-WLH)
     @page = 1
     @adjust_x = WLW*2
   end
@@ -51,16 +51,16 @@ class Window_INN_Menu < WindowSelectable
     self.contents.clear
     self.contents.draw_text(0, 0, self.width-32, WLH, str)
     self.contents.draw_text(0, WLH, self.width-32, WLH, str2, 2)
-    self.contents.draw_text(@adjust_x, WLH*3, self.width-(32+@adjust_x*2), WLH, "うまごや")
-    self.contents.draw_text(@adjust_x, WLH*4, self.width-(32+@adjust_x*2), WLH, "2とうしんだい")
-    self.contents.draw_text(@adjust_x, WLH*5, self.width-(32+@adjust_x*2), WLH, "スタンダード")
-    self.contents.draw_text(@adjust_x, WLH*6, self.width-(32+@adjust_x*2), WLH, "デラックス")
-    self.contents.draw_text(@adjust_x, WLH*7, self.width-(32+@adjust_x*2), WLH, "スイート")
-    self.contents.draw_text(@adjust_x, WLH*8, self.width-(32+@adjust_x*2), WLH, "おかねを あつめる")
-    self.contents.draw_text(0, WLH*9, self.width-32, WLH, "#{actor.get_amount_of_money}G.P.", 2)
+    self.contents.draw_text(@adjust_x, WLH*2, self.width-(32+@adjust_x*2), WLH, "うまごや")
+    self.contents.draw_text(@adjust_x, WLH*3, self.width-(32+@adjust_x*2), WLH, "2とうしんだい")
+    self.contents.draw_text(@adjust_x, WLH*4, self.width-(32+@adjust_x*2), WLH, "スタンダード")
+    self.contents.draw_text(@adjust_x, WLH*5, self.width-(32+@adjust_x*2), WLH, "デラックス")
+    self.contents.draw_text(@adjust_x, WLH*6, self.width-(32+@adjust_x*2), WLH, "スイート")
+    self.contents.draw_text(@adjust_x, WLH*7, self.width-(32+@adjust_x*2), WLH, "おかねを あつめる")
+    self.contents.draw_text(0, WLH*8, self.width-32, WLH, "#{actor.get_amount_of_money}G.P.", 2)
     str = "←L キャラクタきりかえ R→"
-     self.contents.draw_text(0, WLH*10, self.width-32, WLH, str, 1)
-    @adjust_y = WLH*3
+     self.contents.draw_text(0, WLH*9, self.width-32, WLH, str, 1)
+    @adjust_y = WLH*2
     @item_max = 6
     self.visible = true
     self.active = true
