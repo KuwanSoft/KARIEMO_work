@@ -5,6 +5,7 @@
 #==============================================================================
 
 class WindowBase < Window
+  attr_accessor :subcontents
   #--------------------------------------------------------------------------
   # ● 無呼び出しメソッドチェック対象
   #--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ class WindowBase < Window
     self.back_opacity = ConstantTable::BACK_OPACITY
     self.openness = 255
     create_contents
+    @subcontents = Bitmap.new(width - 32, height - 32)
     create_yajirushi
     create_shop_cursor
     create_face_cursor
@@ -116,6 +118,7 @@ class WindowBase < Window
   #--------------------------------------------------------------------------
   def dispose
     self.contents.dispose
+    self.subcontents.dispose
     @yaji.bitmap.dispose
     @yaji.dispose
     @shop_cursor.bitmap.dispose
@@ -151,6 +154,13 @@ class WindowBase < Window
   def create_contents
     self.contents.dispose
     self.contents = Bitmap.new(width - 32, height - 32)
+  end
+  #--------------------------------------------------------------------------
+  # ● サブウィンドウ内容の作成
+  #--------------------------------------------------------------------------
+  def create_subcontents
+    self.subcontents.dispose
+    self.subcontents = Bitmap.new(width - 32, height - 32)
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新

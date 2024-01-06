@@ -243,7 +243,6 @@ class Unpacker
   attr_accessor   :code2
 end
 $wi.add_text('step2. initializing unpacker')
-upck = Unpacker.new
 upck = Zlib::Inflate.inflate(load_data('Data/Unpacker.rvdata'))
 upck = Marshal.load(upck)
 eval(upck.code2)

@@ -63,8 +63,8 @@ class SceneInn < SceneBase
     @skill_selection = Window_Skill.new      # スキルウインドウ
     @fee = WindowInnFee.new
     @fee.refresh(0, @is.actor, @menu_window.index)
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/inn", ConstantTable::NAME_INN)
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/inn", ConstantTable::NAME_INN)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -82,7 +82,7 @@ class SceneInn < SceneBase
     @locname.dispose
     @skill_selection.dispose
     @fee.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新

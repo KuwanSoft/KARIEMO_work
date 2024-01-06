@@ -9,7 +9,7 @@ class Window_ContinueHelp < WindowBase
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    super(0, 0, 512, 24 + 32)
+    super(0, WLH*8, 512, 24 + 32)
     self.visible = false
     self.z = 103
     change_font_to_v

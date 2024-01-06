@@ -1,22 +1,22 @@
 #==============================================================================
-# ■ Window_WAIT
+# ■ WindowWait
 #------------------------------------------------------------------------------
 # ギルドの待機キャラ一覧。
 #==============================================================================
 
-class Window_WAIT < WindowSelectable
+class WindowWait < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super(0, WLH*3, 512, WLH*21+32)
+    super(0, WLH*10, 512, WLH*16+32)
     self.opacity = 0
     self.visible = false
     self.active = false
     @adjust_x = WLW
-    @adjust_y = WLH
+    @adjust_y = WLH*0
   end
   #--------------------------------------------------------------------------
   # ● アイテムの取得
@@ -50,13 +50,6 @@ class Window_WAIT < WindowSelectable
     for i in 0...@item_max
       draw_item(i)
     end
-    self.contents.font.color = system_color
-    self.contents.draw_text(STA+WLW*1, 0, WLW*4, WLH, "ID")
-    self.contents.draw_text(STA+WLW*4, 0, WLW*4, WLH, "Name")
-    self.contents.draw_text(STA+WLW*13, 0, WLW*4, WLH, "Lvl")
-    self.contents.draw_text(STA+WLW*16, 0, WLW*6, WLH, "Class")
-    self.contents.draw_text(STA+WLW*21, 0, WLW*8, WLH, "Location")
-    self.contents.font.color = normal_color
   end
   #--------------------------------------------------------------------------
   # ● 項目の描画
@@ -64,7 +57,7 @@ class Window_WAIT < WindowSelectable
   #--------------------------------------------------------------------------
   def draw_item(index)
     actor = @data[index]
-    index += 1
+
     rect = item_rect(index)
     self.contents.clear_rect(rect)
     if actor.name == "** みとうろく **"
@@ -87,7 +80,6 @@ class Window_WAIT < WindowSelectable
       str = ""
     end
     self.contents.font.color.alpha = 128 if deadout
-    # n = sprintf("%02d", actor.actor_id)
     n = sprintf("%02d", actor.sort_id)
     self.contents.draw_text(rect.x+CUR, rect.y, WLW*2, WLH, n, 2)
     self.contents.draw_text(rect.x+WLW*4, rect.y, rect.width-(STA*2), WLH, actor.name)
@@ -97,5 +89,6 @@ class Window_WAIT < WindowSelectable
     self.contents.draw_text(rect.x+WLW*21, rect.y, WLW*12, WLH, str)
     self.contents.font.color = normal_color
     self.contents.font.color.alpha = 255
+    index += 1
   end
 end

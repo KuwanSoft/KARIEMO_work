@@ -61,16 +61,16 @@ class SceneMap < SceneBase
   # ● イベント画像の定義
   #--------------------------------------------------------------------------
   def set_picture(path)
-    @window_picture = Window_Picture.new(160-16, 192)
-    @window_picture.create_picture( path, "")
+    @WindowPicture = WindowPicture.new(160-16, 192)
+    @WindowPicture.create_picture( path, "")
   end
   #--------------------------------------------------------------------------
   # ● イベント画像の消去
   #--------------------------------------------------------------------------
   def erase_picture
     return if @window_picure == nil
-    @window_picture.temp_dispose
-    @window_picture.visible = false
+    @WindowPicture.temp_dispose
+    @WindowPicture.visible = false
   end
   #--------------------------------------------------------------------------
   # ● 矢印の定義

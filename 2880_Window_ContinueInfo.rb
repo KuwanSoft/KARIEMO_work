@@ -1,15 +1,15 @@
 #==============================================================================
-# ■ Window_ContinueInfo
+# ■ WindowContinueInfo
 #------------------------------------------------------------------------------
 # セーブ画面およびロード画面で表示する、パーティ数を表示
 #==============================================================================
 
-class Window_ContinueInfo < WindowBase
+class WindowContinueInfo < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    super((512-380)/2, 90, 380, 24*2+32)
+    super((512-380)/2, WLH*8+2, 380, BLH*3+32)
     self.visible = false
     change_font_to_v
   end
@@ -19,9 +19,11 @@ class Window_ContinueInfo < WindowBase
   def refresh(number)
     self.visible = true
     self.contents.clear
+    text = "さいかいするパーティをえらんでください。"
     text1 = "げんざい、#{number}パーティが"
     text3 = "ぼうけんちゅうです。"
-    self.contents.draw_text(STA, 24*0, self.width-32, 24, text1, 0)
-    self.contents.draw_text(STA, 24*1, self.width-32, 24, text3, 2)
+    self.contents.draw_text(0, BLH*0, self.width-32, BLH, text, 1)
+    self.contents.draw_text(STA, BLH*1, self.width-32, BLH, text1, 0)
+    self.contents.draw_text(STA, BLH*2, self.width-32, BLH, text3, 2)
   end
 end

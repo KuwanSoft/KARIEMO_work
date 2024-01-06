@@ -114,8 +114,8 @@ class SceneRegistration < SceneBase
     @command_window.adjust_x = WLW
     @command_window.refresh
 
-    @job_window = Window_CLASS.new # jobWindowの準備
-    @face_window = Window_FaceSelection.new # ポートレートの選択
+    @job_window = WindowClass.new # jobWindowの準備
+    @face_window = WindowFaceSelection.new # ポートレートの選択
     @skill_selection = Window_Skill.new
   end
   #--------------------------------------------------------------------------

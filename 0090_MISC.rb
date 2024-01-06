@@ -582,8 +582,10 @@ module Misc
     param_a = 1000
     param_b = 2000
     ratio = actor.personality_n == :tiredness ? 1.05 : 1.00 # 性格によるボーナス
-    ep = [[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max, ConstantTable::MAX_EP].min.to_i
-    return Integer(ep * ratio)
+    ep = [[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max, actor.next_rest_exp_s].min
+    Debug.write(c_m, "next_exp:#{actor.next_rest_exp_s} 計算値:#{[gp * 4 / (1.45 ** (actor.exp / param_b)), 0].max}")
+    # Integer(ep.ceil * ratio) < 10 ? 0 : Integer(ep.ceil * ratio)
+    ep * ratio
   end
   #--------------------------------------------------------------------------
   # ● EP vs GOLD 寄付金

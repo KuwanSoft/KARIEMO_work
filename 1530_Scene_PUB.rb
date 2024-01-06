@@ -31,7 +31,7 @@ class ScenePub < SceneBase
     @command_window.dispose
     @quest_window.dispose
     @map_list.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● メッセージ表示が終わるまでウェイト
@@ -71,8 +71,8 @@ class ScenePub < SceneBase
     @command_window.index = 0
     @quest_window = WindowQuestBoard.new
     @map_list = WindowMapTraderList.new
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/tavern4", ConstantTable::NAME_PUB)
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/tavern4", ConstantTable::NAME_PUB)
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新

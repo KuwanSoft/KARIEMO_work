@@ -838,7 +838,7 @@ class GamePlayer < GameCharacter
     picture.x = x
     picture.y = y
     picture.z = 255
-    waku = Window_Picture.new
+    waku = WindowPicture.new
     waku.z = 254
     while true
       Graphics.update                 # ゲーム画面を更新

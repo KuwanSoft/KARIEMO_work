@@ -97,8 +97,9 @@ class SceneGuild < SceneBase
   # ● コマンドウィンドウの作成
   #--------------------------------------------------------------------------
   def create_command_window
-    @command_window1 = Window_guild_Menu.new
+    @command_window1 = WindowGuildMenu.new
     @command_window1.active = true
+    @command_window1.index = 0
     @command_window1.visible = true
   end
   #--------------------------------------------------------------------------
@@ -110,19 +111,21 @@ class SceneGuild < SceneBase
     @delete_flag = false
     @message_window = Window_Message.new          # message表示用
     @attention_window = Window_ShopAttention.new  # attention表示用
-    @office = Window_Office.new           # 壁紙
-    @wait_list = Window_WAIT.new               # 役場冒険者リスト
-    @wait_list_dup = Window_WAIT.new  # 並び替え用
-    @class_selection = Window_CLASS.new
-    @change_message = Window_CLASS_CHANGE.new # クラス変更後のメッセージ枠
-    create_command_window # コマンドウィンドウの作成
-    @view = Window_VIEW.new               # えつらん時のステータス枠
+    @guildback = WindowGuildBack.new              # 壁紙
+    @wait_list = WindowWait.new                   # 役場冒険者リスト
+    @wait_list_dup = WindowWait.new               # 並び替え用
+    @class_selection = WindowClass.new
+    @change_message = WindowClass_CHANGE.new      # クラス変更後のメッセージ枠
+    create_command_window                         # コマンドウィンドウの作成
+    @view = Window_VIEW.new                       # えつらん時のステータス枠
     @reset = Window_BackupClear.new
     @selection = Window_YesNo.new
-    @face_window = Window_FaceSelection.new # ポートレートの選択
-    @top_message = Window_Message_Top.new  # 上部枠
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/guild", ConstantTable::NAME_GUILD)
+    @face_window = WindowFaceSelection.new        # ポートレートの選択
+    @face_window.y = WLH*8
+    @face_window.height = 448-(WLH*8)
+    @top_message = Window_Message_Top.new         # 上部枠
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/guild", ConstantTable::NAME_GUILD)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -132,7 +135,7 @@ class SceneGuild < SceneBase
     @message_window.dispose
     @attention_window.dispose
     @command_window1.dispose
-    @office.dispose
+    @guildback.dispose
     @wait_list.dispose
     @wait_list_dup.dispose
     @view.dispose
@@ -142,7 +145,7 @@ class SceneGuild < SceneBase
     @selection.dispose
     @face_window.dispose
     @top_message.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新
@@ -150,7 +153,7 @@ class SceneGuild < SceneBase
   def update
     super
     @message_window.update
-    @office.update
+    @guildback.update
     @wait_list.update
     @view.update
     @command_window1.update
@@ -215,7 +218,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタを みますか?"
         text2 = ""
         text3 = "[A]でみる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @command_window1.visible = false
         @command_window1.active = false
         @wait_list.visible = true
@@ -233,7 +236,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタを さくじょしますか?"
         text2 = ""
         text3 = "[A]でけす  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @delete_flag = true # さくじょフラグ
         @verification = false # かくにんフラグ
         @command_window1.visible = false
@@ -246,7 +249,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタの なまえをかえますか?"
         text2 = ""
         text3 = "[A]でかえる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @name_flag = true # 名前変更フラグ
         @command_window1.visible = false
         @command_window1.active = false
@@ -258,7 +261,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタの しょくぎょうをかえますか?"
         text2 = ""
         text3 = "[A]でかえる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @class_flag = true # 職業変更フラグ
         @command_window1.visible = false
         @command_window1.active = false
@@ -270,7 +273,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタの ポートレートをかえますか?"
         text2 = ""
         text3 = "[A]でかえる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @command_window1.visible = false
         @command_window1.active = false
         @wait_list.visible = true
@@ -281,7 +284,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタを ならびかえますか?"
         text2 = ""
         text3 = "[A]でかえる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @command_window1.visible = false
         @command_window1.active = false
         @wait_list.visible = true
@@ -331,7 +334,7 @@ class SceneGuild < SceneBase
         text1 = "どのクラスに てんしょくしますか?"
         text2 = ""
         text3 = "[A]でけってい  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2)
       when 5; # ポートレートの変更
         return if @wait_list.actor.out
         @wait_list.active = false
@@ -346,7 +349,7 @@ class SceneGuild < SceneBase
         text1 = "どのキャラクタと ならびかえますか?"
         text2 = ""
         text3 = "[A]でかえる  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2, true)
         @wait_list_dup.visible = true
         @wait_list_dup.active = true
         @wait_list_dup.back_opacity = 0
@@ -364,6 +367,7 @@ class SceneGuild < SceneBase
   # ● 並び替え先選択の更新
   #--------------------------------------------------------------------------
   def update_target_selection
+    @wait_list.top_row=(@wait_list_dup.top_row) # 選択をシンクさせる
     if Input.trigger?(Input::C)
       if @wait_list_dup.actor.actor_id != @wait_list.actor.actor_id
         ## ソートIDを入れ替える
@@ -413,12 +417,12 @@ class SceneGuild < SceneBase
     text1 = ""
     text2 = ""
     text3 = ""
-    @office.set_text(text1, text2, text3)
+    @guildback.set_text(text1, text2, text3)
     @wait_list.visible = false
     @wait_list.active = false
     @command_window1.visible = true
     @command_window1.active = true
-    @office.visible = false
+    @guildback.visible = false
   end
   #--------------------------------------------------------------------------
   # ● 閲覧のupdate
@@ -440,7 +444,7 @@ class SceneGuild < SceneBase
           text1 = "ほんとうにさくじょしますか?"
           text2 = ""
           text3 = "[A]でけす  [B]でもどる"
-          @office.set_text(text1, text2, text3, 0, 0, 2)
+          @guildback.set_text(text1, text2, text3, 0, 0, 2)
           @wait_list.active = false
         elsif @verification == true # 確認フラグありの場合の削除処理
           @wait_list.actor.clear_bag # バッグの中身をすべて店の在庫へ移管
@@ -455,14 +459,14 @@ class SceneGuild < SceneBase
         text1 = "おもいとどまりました"
         text2 = ""
         text3 = "[A]でけす  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2)
         @verification = false
         @wait_list.active = true
       else # 通常のキャンセル処理
         text1 = ""
         text2 = ""
         text3 = ""
-        @office.set_text(text1, text2, text3)
+        @guildback.set_text(text1, text2, text3)
         @delete_flag = false
         @command_window1.visible = true
         @command_window1.active = true
@@ -486,7 +490,7 @@ class SceneGuild < SceneBase
       text1 = ""
       text2 = ""
       text3 = ""
-      @office.set_text(text1, text2, text3)
+      @guildback.set_text(text1, text2, text3)
       @name_flag = false
       @command_window1.visible = true
       @command_window1.active = true
@@ -508,13 +512,13 @@ class SceneGuild < SceneBase
         text1 = "どのクラスに てんしょくしますか?"
         text2 = ""
         text3 = "[A]でけってい  [B]でもどる"
-        @office.set_text(text1, text2, text3, 0, 0, 2)
+        @guildback.set_text(text1, text2, text3, 0, 0, 2)
       end
     elsif Input.trigger?(Input::B)
       text1 = ""
       text2 = ""
       text3 = ""
-      @office.set_text(text1, text2, text3)
+      @guildback.set_text(text1, text2, text3)
       @class_flag = false # 職業変更フラグ
       @command_window1.visible = true
       @command_window1.active = true
@@ -555,7 +559,7 @@ class SceneGuild < SceneBase
       text1 = ""
       text2 = ""
       text3 = ""
-      @office.set_text(text1, text2, text3)
+      @guildback.set_text(text1, text2, text3)
       @class_selection.active = false
       @class_selection.visible = false
       @command_window1.active = true
@@ -564,7 +568,7 @@ class SceneGuild < SceneBase
       text1 = ""
       text2 = ""
       text3 = ""
-      @office.set_text(text1, text2, text3)
+      @guildback.set_text(text1, text2, text3)
       @class_selection.active = false
       @class_selection.visible = false
       @command_window1.active = true

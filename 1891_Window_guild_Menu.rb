@@ -1,20 +1,20 @@
 #==============================================================================
-# ■ Window_guild_Menu
+# ■ WindowGuildMenu
 #------------------------------------------------------------------------------
 #
 #==============================================================================
 
-class Window_guild_Menu < WindowSelectable
+class WindowGuildMenu < WindowSelectable
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super(240, 48, 252, 192+32)
+    super((512-310)/2, WLH*9, 310, WLH*8+32)
     self.visible = false
     self.active = false
-    @adjust_y = WLH*3
+    @adjust_y = WLH*0
     @adjust_x = WLW*1
     @item_max = 8
     set_text
@@ -25,7 +25,6 @@ class Window_guild_Menu < WindowSelectable
   def set_text
     self.contents.clear
     change_font_to_normal
-    self.contents.draw_text(0, 0, self.width-32, WLH, "ぼうけんしゃギルド:", 1)
     self.contents.draw_text(@adjust_x, WLH*0+@adjust_y, self.width-32, WLH, "キャラクタの とうろく")
     self.contents.draw_text(@adjust_x, WLH*1+@adjust_y, self.width-32, WLH, "キャラクタの えつらん")
     self.contents.draw_text(@adjust_x, WLH*2+@adjust_y, self.width-32, WLH, "キャラクタの さくじょ")

@@ -11,8 +11,7 @@ class WindowPubMenu < WindowSelectable
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    # super(260, 48, 220, 192+32)
-    super((512-240)/2, WLH*9, 240, WLH*9+32)
+    super((512-240)/2, WLH*9, 240, WLH*8+32)
     self.visible = false
     self.active = false
     @adjust_y = WLH*0

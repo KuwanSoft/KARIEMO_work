@@ -12,10 +12,11 @@ class Window_GiveMoney < WindowSelectable
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super( (512-(WLW*10+32))/2, WLH*(17+3), WLW*10+32, WLH*2+32)
+    super( (512-(WLW*10+32))/2, WLH*(17+3-5), WLW*10+32, WLH*2+32)
     self.z = 104        # 先にz座標を指定すること
     self.visible = false
     self.active = false
+    self.opacity = 0
     @column_max = 6     # 列は6
     @item_max = 6
     create_magic_cursor
@@ -29,6 +30,13 @@ class Window_GiveMoney < WindowSelectable
     @mc_u.visible = false
     @mc_u.bitmap = Cache.system("cursor_magic_up")
     @mc_u.z = self.z + 1
+  end
+  #--------------------------------------------------------------------------
+  # ● 呪文カーソルの表示の継承
+  #--------------------------------------------------------------------------
+  def visible=(new)
+    super
+    @mc_u.visible = new if @mc_u != nil
   end
   #--------------------------------------------------------------------------
   # ● 解放

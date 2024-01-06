@@ -20,7 +20,7 @@ class Window_Dungeon_Pic < WindowBase
   # ● 村の表示
   #--------------------------------------------------------------------------
   def draw_picture
-    @picture.bitmap = Cache.picture("dungeon_picture")
+    @picture.bitmap = Cache.picture("intoadarkdungeon")
     @picture.x = (512 - @picture.width) / 2
     @picture.y = 0
   end

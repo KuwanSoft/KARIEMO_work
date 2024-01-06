@@ -41,8 +41,8 @@ class SceneVillage < SceneBase
     @attention_window = Window_Attention.new  # attention表示用
     # show_vil_picture
     $game_system.clear_random_events          # REクリア
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/village2", "Village")
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/village2", "Village")
     show_injured_member
   end
   #--------------------------------------------------------------------------
@@ -57,7 +57,7 @@ class SceneVillage < SceneBase
     @attention_window.dispose
     @minstrel.dispose
     # @locname.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● アテンション表示が終わるまでウェイト

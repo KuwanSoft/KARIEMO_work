@@ -99,7 +99,7 @@ class WindowPartyStatus < WindowSelectable
       turn_off_sv
       $game_temp.need_ps_refresh = true
       ## 村では顔をひっこめない
-      if $scene.is_a?(SceneVillage) or $scene.is_a?(ScenePub)
+      if $scene.is_a?(SceneVillage) or $scene.is_a?(ScenePub) or $scene.is_a?(SceneTemple)
         return
       end
       $game_temp.hide_face = true

@@ -11,6 +11,7 @@ class SceneTemple < SceneBase
   #--------------------------------------------------------------------------
   def initialize
     $music.play("きょうかい")
+    @prev_donation = 0
   end
   #--------------------------------------------------------------------------
   # ● アテンション表示が終わるまでウェイト
@@ -51,12 +52,15 @@ class SceneTemple < SceneBase
     # show_vil_picture
     @message_window = Window_Message.new    # message表示用
     @attention_window = Window_ShopAttention.new  # attention表示用
+    @attention_window.y = WLH*24+8
+    @attention_window.width = 310
+    @attention_window.x = (512-310)/2
     @result_window = Window_Attention4.new  # attention表示用
     @back_s = Window_ShopBack_Small.new     # メッセージ枠小
     @back_s.y += 96-24                      # メッセージ枠小
     @ps = WindowPartyStatus.new            # PartyStatus
     turn_on_face
-    @menu_window = Window_Temple_Menu.new   # メインメニュー
+    @menu_window = WindowTempleMenu.new   # メインメニュー
     @menu_window.change_page(1)             # 初期ページ１
     @cure = Window_CURE.new                 # 治療リスト
     @injured = Window_INJURED.new           # 怪我人リスト
@@ -64,8 +68,8 @@ class SceneTemple < SceneBase
     @show_cast = false  # 回復詠唱時フラグ
     @give_window = Window_GiveMoney.new     # 寄付ウインドウ
     @wallet = Window_WalletInfo.new
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/church", ConstantTable::NAME_TEMPLE)
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/church", ConstantTable::NAME_TEMPLE)
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -80,7 +84,7 @@ class SceneTemple < SceneBase
     @back_s.dispose
     @give_window.dispose
     @wallet.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新
@@ -229,7 +233,7 @@ class SceneTemple < SceneBase
         @ps.index = -1
         @menu_window.change_page(1)
       when 5  # 寄付をする
-        @menu_window.show_expvsgold(@ps.actor)
+        @menu_window.change_page(5)
         @give_window.set_actor(@ps.actor)
         @give_window.active = true
         @give_window.visible = true
@@ -238,9 +242,10 @@ class SceneTemple < SceneBase
         @wallet.visible = true
         @wallet.show_next_exp(@ps.actor)
         @ps.active = false
-        text1 = "いくらおさめますか?"
-        text2 = "[B]でもどります"
-        @back_s.set_text(text1, text2, 0, 2)
+        @back_s.visible = false
+        # text1 = "いくらおさめますか?"
+        # text2 = "[B]でもどります"
+        # @back_s.set_text(text1, text2, 0, 2)
       end
     elsif Input.trigger?(Input::B)
       case @menu_window.page
@@ -321,6 +326,10 @@ class SceneTemple < SceneBase
   # ● 寄付の更新
   #--------------------------------------------------------------------------
   def update_give_money
+    if @give_window.gold != @prev_donation
+      @wallet.show_next_exp(@ps.actor, @give_window.gold)
+      @prev_donation = @give_window.gold
+    end
     if Input.trigger?(Input::UP)
       @give_window.plus
     elsif Input.trigger?(Input::DOWN)
@@ -328,6 +337,7 @@ class SceneTemple < SceneBase
     elsif Input.trigger?(Input::C)
       return if @give_window.gold == 0            # 何も渡さない時
       unless @ps.actor.get_amount_of_money < @give_window.gold # 財布に無い時
+        @menu_window.change_page(6)
         @give_window.visible = false
         @back_s.visible = false
         g = @give_window.gold
@@ -344,10 +354,6 @@ class SceneTemple < SceneBase
       end
     elsif Input.trigger?(Input::B)
       end_give_money
-    # elsif @give_window.index == 0
-    #   @give_window.set_max(@ps.actor.get_amount_of_money) if Input.trigger?(Input::LEFT)
-    # elsif @give_window.index == 5
-    #   @give_window.set_zero if Input.trigger?(Input::RIGHT)
     end
   end
   #--------------------------------------------------------------------------

@@ -48,8 +48,8 @@ class SceneMaze < SceneBase
     @menu_window.index = 0
     @attention_window = Window_Attention.new  # attention表示用
     $game_temp.hide_face = false
-    @window_picture = Window_Picture.new(0, 0)
-    @window_picture.create_picture("Graphics/System/maze", "Dungeon")
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/maze", "Dungeon")
   end
   #--------------------------------------------------------------------------
   # ● 終了処理
@@ -60,7 +60,7 @@ class SceneMaze < SceneBase
     @entering.dispose
     @menu_window.dispose
     @attention_window.dispose
-    @window_picture.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新

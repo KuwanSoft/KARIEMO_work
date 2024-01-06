@@ -15,14 +15,13 @@ class SceneContinue < SceneBase
   #--------------------------------------------------------------------------
   def start
     super
-    # show_vil_picture
-    @continue_ps = Window_ContinuePS.new  # 旅の続き用PartyStatus
-    @party_info = Window_PartyInfo.new    # 可能なパーティの情報
-    @help = Window_ContinueHelp.new       # 下のメッセージ枠
-    @info = Window_ContinueInfo.new       # 現在のパーティ数
+    @WindowPicture = WindowPicture.new(0, 0)
+    @WindowPicture.create_picture("Graphics/System/maze", "Dungeon")
+    @continue_ps = WindowContinuePS.new  # 旅の続き用PartyStatus
+    @party_info = WindowPartyInfo.new    # 可能なパーティの情報
+    @info = WindowContinueInfo.new       # 現在のパーティ数
     @continue_ps.visible = true
     @party_info.visible = true
-    @help.visible = true
     @position = 1
     unique_id = get_unique_id(@position)
     @party_info.refresh(unique_id)
@@ -37,7 +36,7 @@ class SceneContinue < SceneBase
     @continue_ps.dispose
     @party_info.dispose
     @info.dispose
-    @help.dispose
+    @WindowPicture.dispose
   end
   #--------------------------------------------------------------------------
   # ● フレーム更新
@@ -47,7 +46,6 @@ class SceneContinue < SceneBase
     @continue_ps.update
     @party_info.update
     @info.update
-    @help.update
     update_unique_id_selection
   end
   #--------------------------------------------------------------------------

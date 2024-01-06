@@ -35,7 +35,7 @@
 #     @window_det  = Window_BagSelection.new("鑑定", WLH*6)  # 鑑定window
 #     @window_cur = Window_BagSelection.new("解呪", WLH*6)   # 呪いを解くwindow
 #     @is = WindowIndivisualStatus.new
-#     @menu_window = Window_SHOP_Menu.new    # メインメニュー
+#     @menu_window = WindowShopMenu.new    # メインメニュー
 #     @menu_window.change_page(1, @is.actor)  # 初期ページ１
 #     @locname = Window_LOCNAME.new
 #     @locname.set_text(ConstantTable::NAME_SHOP)

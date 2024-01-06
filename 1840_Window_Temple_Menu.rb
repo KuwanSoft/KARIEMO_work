@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_Temple_Menu
+# ■ WindowTempleMenu
 #------------------------------------------------------------------------------
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_Temple_Menu < WindowSelectable
+class WindowTempleMenu < WindowSelectable
   #--------------------------------------------------------------------------
   # ● 公開インスタンス変数
   #--------------------------------------------------------------------------
@@ -82,13 +82,13 @@ class Window_Temple_Menu < WindowSelectable
       self.visible = true
       self.active = false
       self.index = -1
-    when 5    # きふは だいかんげいです。
+    when 5;    # きふは だいかんげいです。
       @page = 5
       @adjust_y = WLH*3
       @adjust_x = WLW*9
       change_font_to_v        # フォント変更
       str1 = "きふは だいかんげいです。"
-      str3 = "1E.P. = ?Gold"
+      str3 = "いくらおさめますか?"
       self.contents.draw_text(0, 0, self.width-32, 24, str1, 1)
       self.contents.draw_text(0, 24*2, self.width-32, 24, str3, 1)
       change_font_to_normal   # フォント戻し
@@ -106,22 +106,19 @@ class Window_Temple_Menu < WindowSelectable
       self.visible = true
       self.active = false
       self.index = -1
+    when 6;    # お礼
+      @page = 6
+      @adjust_y = WLH*3
+      @adjust_x = WLW*9
+      change_font_to_v        # フォント変更
+      str1 = "きふは だいかんげいです。"
+      str3 = "* その かんだいさに さちあれ *"
+      self.contents.draw_text(0, 0, self.width-32, 24, str1, 1)
+      self.contents.draw_text(0, 24*2, self.width-32, 24, str3, 1)
+      change_font_to_normal   # フォント戻し
+      self.visible = true
+      self.active = false
+      self.index = -1
     end
-  end
-  #--------------------------------------------------------------------------
-  # ● ゴールドとEPの変換表を表示
-  #--------------------------------------------------------------------------
-  def show_expvsgold(actor)
-    change_font_to_v
-    self.contents.clear
-    str1 = "きふは だいかんげいです。"
-    ep = 1000
-    gp = Misc.ep2gp(ep, actor).to_i
-    str2 = "1000E.P. ="
-    str3 = "#{gp}Goldです。"
-    self.contents.draw_text(0, 0, self.width-32, 24, str1, 1)
-    self.contents.draw_text(0, 24*1, self.width-32, 24, str2, 0)
-    self.contents.draw_text(0, 24*2, self.width-32, 24, str3, 2)
-    change_font_to_normal
   end
 end

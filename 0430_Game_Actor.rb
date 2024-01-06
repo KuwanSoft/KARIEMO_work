@@ -1139,9 +1139,9 @@ class GameActor < GameBattler
       exp *= 1.05
     end
     exp *= 2 if check_double_bonus
-    @exp += Integer(exp)
+    @exp += Integer(exp + plus)
     Debug::write(c_m,"経験値取得 #{@name} EXP+#{Integer(exp)}(+#{plus})")
-    return Integer(exp)
+    return Integer(exp + plus)
   end
   #--------------------------------------------------------------------------
   # ● 経験値をレベル初期値へ戻す
