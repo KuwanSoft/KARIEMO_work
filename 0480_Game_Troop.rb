@@ -238,6 +238,46 @@ class GameTroop < GameUnit
     input_enemy_identify(troop_members) # 敵の知識の入力
   end
   #--------------------------------------------------------------------------
+  # ● 増援の処理
+  #--------------------------------------------------------------------------
+  def call_rf(group_id)
+    case group_id
+    when 0  # Group1
+      return false if existing_g1_members.size == 9 # すでにフルの場合
+      enemy_id = existing_g1_members[0].enemy_id
+      identified = existing_g1_members[0].identified
+      screen_x = existing_g1_members[0].screen_x
+      screen_y = existing_g1_members[0].screen_x
+    when 1  # Group2
+      return false if existing_g2_members.size == 9 # すでにフルの場合
+      enemy_id = existing_g2_members[0].enemy_id
+      identified = existing_g2_members[0].identified
+      screen_x = existing_g2_members[0].screen_x
+      screen_y = existing_g2_members[0].screen_x
+    when 2  # Group3
+      return false if existing_g3_members.size == 9 # すでにフルの場合
+      enemy_id = existing_g3_members[0].enemy_id
+      identified = existing_g3_members[0].identified
+      screen_x = existing_g3_members[0].screen_x
+      screen_y = existing_g3_members[0].screen_x
+    when 3  # Group4
+      return false if existing_g4_members.size == 9 # すでにフルの場合
+      enemy_id = existing_g4_members[0].enemy_id
+      identified = existing_g4_members[0].identified
+      screen_x = existing_g4_members[0].screen_x
+      screen_y = existing_g4_members[0].screen_x
+    end
+    enemy = GameEnemy.new(@enemies.size, enemy_id, group_id)
+    enemy.identified = identified       # 確定化フラグのSync
+    enemy.screen_x = screen_x
+    enemy.screen_y = screen_y
+    Debug::write(c_m,"増援=> 敵の名前:#{enemy.original_name} MAXHP:#{enemy.maxhp} INDEX:#{enemy.index} Group:#{enemy.group_id+1}")
+    @enemies.push(enemy)                # 全敵のリストにPUSH
+    refresh_group                       # 敵グループのリフレッシュ
+    identified_change                   # 確定不確定変換
+    return true
+  end
+  #--------------------------------------------------------------------------
   # ● 敵の知識の入力
   #--------------------------------------------------------------------------
   def input_enemy_identify(enemy_ids)
@@ -250,6 +290,12 @@ class GameTroop < GameUnit
   # ● 敵グループのリフレッシュ
   #--------------------------------------------------------------------------
   def refresh_group
+    ## 一旦すべてのグループをクリア
+    @group1.clear
+    @group2.clear
+    @group3.clear
+    @group4.clear
+    ## 再度配置しなおし
     for enemy in @enemies
       case enemy.group_id
       when 0; @group1.push(enemy)

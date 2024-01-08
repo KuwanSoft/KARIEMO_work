@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_Message
+# ■ WindowInjuredMembers
 #------------------------------------------------------------------------------
 # ポップアップメッセージ
 #==============================================================================
 
-class Window_InjuredMembers < WindowBase
+class WindowInjuredMembers < WindowBase
   attr_reader  :confirmed
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -63,7 +63,7 @@ class Window_InjuredMembers < WindowBase
   #--------------------------------------------------------------------------
   def create_picture
     @picture = Sprite.new
-    @picture.bitmap = Bitmap.new("Graphics/System/guard.png")
+    @picture.bitmap = Bitmap.new("Graphics/System/guard2.png")
     @picture.x = self.x + 32
     @picture.y = self.y + 32
     @picture.z = self.z + 1

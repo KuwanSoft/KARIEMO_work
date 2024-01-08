@@ -1248,6 +1248,57 @@ class ThreeDmap < SceneMap
     when 42;    return 0xD0010
     when 43;    return 0xD0001
 
+    ## TileCイベント
+    ## 固定宝箱 ランク1
+    when 256;   return 0x201000
+    when 257;   return 0x210100
+    when 258;   return 0x220010
+    when 259;   return 0x230001
+    ## 固定宝箱 ランク2
+    when 260;   return 0x241000
+    when 261;   return 0x250100
+    when 262;   return 0x260010
+    when 263;   return 0x270001
+    ## 固定宝箱 ランク3
+    when 264;   return 0x281000
+    when 265;   return 0x290100
+    when 266;   return 0x2A0010
+    when 267;   return 0x2B0001
+    ## 固定宝箱 ランク4
+    when 268;   return 0x2C1000
+    when 269;   return 0x2D0100
+    when 270;   return 0x2E0010
+    when 271;   return 0x2F0001
+    ## 固定宝箱 ランク5
+    when 272;   return 0x301000
+    when 273;   return 0x310100
+    when 274;   return 0x320010
+    when 275;   return 0x330001
+    ## 固定宝箱 ランク6
+    when 276;   return 0x341000
+    when 277;   return 0x350100
+    when 278;   return 0x360010
+    when 279;   return 0x370001
+    ## 固定宝箱 固定テーブル
+    when 280;   return 0x380010 # Table10
+    when 281;   return 0x390010
+    when 282;   return 0x3A0010
+    when 283;   return 0x3B0010
+    when 284;   return 0x3C0010
+    when 285;   return 0x3D0010
+    when 286;   return 0x3E0010
+    when 287;   return 0x3F0010
+    when 288;   return 0x400010
+    when 289;   return 0x410010
+    when 290;   return 0x420010
+    when 291;   return 0x430010
+    when 292;   return 0x440010
+    when 293;   return 0x450010
+    when 294;   return 0x460010
+    when 295;   return 0x470010
+    when 296;   return 0x480010
+    when 297;   return 0x490010
+
     else ;     return 0x00000
     end
   end
@@ -2565,6 +2616,153 @@ class ThreeDmap < SceneMap
   #--------------------------------------------------------------------------
   def check_return_floor
     return @upper["41_FLOOR"] == 0x18 # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK1チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_1_n
+    return @upper["41_FLOOR"] == 0x20 # 現在値がフラグ？
+  end
+  def check_fix_chest_1_e
+    return @upper["41_FLOOR"] == 0x21 # 現在値がフラグ？
+  end
+  def check_fix_chest_1_s
+    return @upper["41_FLOOR"] == 0x22 # 現在値がフラグ？
+  end
+  def check_fix_chest_1_w
+    return @upper["41_FLOOR"] == 0x23 # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK2チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_2_n
+    return @upper["41_FLOOR"] == 0x24 # 現在値がフラグ？
+  end
+  def check_fix_chest_2_e
+    return @upper["41_FLOOR"] == 0x25 # 現在値がフラグ？
+  end
+  def check_fix_chest_2_s
+    return @upper["41_FLOOR"] == 0x26 # 現在値がフラグ？
+  end
+  def check_fix_chest_2_w
+    return @upper["41_FLOOR"] == 0x27 # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK3チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_3_n
+    return @upper["41_FLOOR"] == 0x28 # 現在値がフラグ？
+  end
+  def check_fix_chest_3_e
+    return @upper["41_FLOOR"] == 0x29 # 現在値がフラグ？
+  end
+  def check_fix_chest_3_s
+    return @upper["41_FLOOR"] == 0x2A # 現在値がフラグ？
+  end
+  def check_fix_chest_3_w
+    return @upper["41_FLOOR"] == 0x2B # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK4チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_4_n
+    return @upper["41_FLOOR"] == 0x2C # 現在値がフラグ？
+  end
+  def check_fix_chest_4_e
+    return @upper["41_FLOOR"] == 0x2D # 現在値がフラグ？
+  end
+  def check_fix_chest_4_s
+    return @upper["41_FLOOR"] == 0x2E # 現在値がフラグ？
+  end
+  def check_fix_chest_4_w
+    return @upper["41_FLOOR"] == 0x2F # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK5チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_5_n
+    return @upper["41_FLOOR"] == 0x30 # 現在値がフラグ？
+  end
+  def check_fix_chest_5_e
+    return @upper["41_FLOOR"] == 0x31 # 現在値がフラグ？
+  end
+  def check_fix_chest_5_s
+    return @upper["41_FLOOR"] == 0x32 # 現在値がフラグ？
+  end
+  def check_fix_chest_5_w
+    return @upper["41_FLOOR"] == 0x33 # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱RANK6チェック
+  #--------------------------------------------------------------------------
+  def check_fix_chest_6_n
+    return @upper["41_FLOOR"] == 0x34 # 現在値がフラグ？
+  end
+  def check_fix_chest_6_e
+    return @upper["41_FLOOR"] == 0x35 # 現在値がフラグ？
+  end
+  def check_fix_chest_6_s
+    return @upper["41_FLOOR"] == 0x36 # 現在値がフラグ？
+  end
+  def check_fix_chest_6_w
+    return @upper["41_FLOOR"] == 0x37 # 現在値がフラグ？
+  end
+  #--------------------------------------------------------------------------
+  # ● 固定宝箱、固定テーブル
+  #--------------------------------------------------------------------------
+  def check_fix_chest_10_s
+    return @upper["41_FLOOR"] == 0x38 # 現在値がフラグ？
+  end
+  def check_fix_chest_11_s
+    return @upper["41_FLOOR"] == 0x39 # 現在値がフラグ？
+  end
+  def check_fix_chest_12_s
+    return @upper["41_FLOOR"] == 0x3A # 現在値がフラグ？
+  end
+  def check_fix_chest_13_s
+    return @upper["41_FLOOR"] == 0x3B # 現在値がフラグ？
+  end
+  def check_fix_chest_14_s
+    return @upper["41_FLOOR"] == 0x3C # 現在値がフラグ？
+  end
+  def check_fix_chest_15_s
+    return @upper["41_FLOOR"] == 0x3D # 現在値がフラグ？
+  end
+  def check_fix_chest_16_s
+    return @upper["41_FLOOR"] == 0x3E # 現在値がフラグ？
+  end
+  def check_fix_chest_17_s
+    return @upper["41_FLOOR"] == 0x3F # 現在値がフラグ？
+  end
+  def check_fix_chest_18_s
+    return @upper["41_FLOOR"] == 0x40 # 現在値がフラグ？
+  end
+  def check_fix_chest_19_s
+    return @upper["41_FLOOR"] == 0x41 # 現在値がフラグ？
+  end
+  def check_fix_chest_20_s
+    return @upper["41_FLOOR"] == 0x42 # 現在値がフラグ？
+  end
+  def check_fix_chest_21_s
+    return @upper["41_FLOOR"] == 0x43 # 現在値がフラグ？
+  end
+  def check_fix_chest_22_s
+    return @upper["41_FLOOR"] == 0x44 # 現在値がフラグ？
+  end
+  def check_fix_chest_23_s
+    return @upper["41_FLOOR"] == 0x45 # 現在値がフラグ？
+  end
+  def check_fix_chest_24_s
+    return @upper["41_FLOOR"] == 0x46 # 現在値がフラグ？
+  end
+  def check_fix_chest_25_s
+    return @upper["41_FLOOR"] == 0x47 # 現在値がフラグ？
+  end
+  def check_fix_chest_26_s
+    return @upper["41_FLOOR"] == 0x48 # 現在値がフラグ？
+  end
+  def check_fix_chest_27_s
+    return @upper["41_FLOOR"] == 0x49 # 現在値がフラグ？
   end
   #--------------------------------------------------------------------------
   # ● エレベータチェック

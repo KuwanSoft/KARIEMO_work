@@ -16,7 +16,7 @@ class SceneVillage < SceneBase
     $game_system.clear_queue              # スキルメッセージキュークリア
     $game_party.reset_tired_thres_plus    # 疲労許容値プラスのリセット
     $game_party.clear_poison              # 毒塗のリセット
-    @injured = Window_InjuredMembers.new  # 負傷者のリスト
+    @injured = WindowInjuredMembers.new  # 負傷者のリスト
   end
   #--------------------------------------------------------------------------
   # ● ゲームオーバーの確認

@@ -395,6 +395,139 @@ class GameMap
     elsif $threedmap.check_return_floor
       fixed_event_id = 28
       result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK1
+    elsif $threedmap.check_fix_chest_1_n
+      fixed_event_id = 29
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_1_e
+      fixed_event_id = 30
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_1_s
+      fixed_event_id = 31
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_1_w
+      fixed_event_id = 32
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK2
+    elsif $threedmap.check_fix_chest_2_n
+      fixed_event_id = 33
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_2_e
+      fixed_event_id = 34
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_2_s
+      fixed_event_id = 35
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_2_w
+      fixed_event_id = 36
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK3
+    elsif $threedmap.check_fix_chest_3_n
+      fixed_event_id = 37
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_3_e
+      fixed_event_id = 38
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_3_s
+      fixed_event_id = 39
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_3_w
+      fixed_event_id = 40
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK4
+    elsif $threedmap.check_fix_chest_4_n
+      fixed_event_id = 41
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_4_e
+      fixed_event_id = 42
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_4_s
+      fixed_event_id = 43
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_4_w
+      fixed_event_id = 44
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK5
+    elsif $threedmap.check_fix_chest_5_n
+      fixed_event_id = 45
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_5_e
+      fixed_event_id = 46
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_5_s
+      fixed_event_id = 47
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_5_w
+      fixed_event_id = 48
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱RANK6
+    elsif $threedmap.check_fix_chest_6_n
+      fixed_event_id = 49
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_6_e
+      fixed_event_id = 50
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_6_s
+      fixed_event_id = 51
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_6_w
+      fixed_event_id = 52
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    ## 固定宝箱　固定テーブル
+    elsif $threedmap.check_fix_chest_10_s
+      fixed_event_id = 53
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_11_s
+      fixed_event_id = 54
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_12_s
+      fixed_event_id = 55
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_13_s
+      fixed_event_id = 56
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_14_s
+      fixed_event_id = 57
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_15_s
+      fixed_event_id = 58
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_16_s
+      fixed_event_id = 59
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_17_s
+      fixed_event_id = 60
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_18_s
+      fixed_event_id = 61
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_19_s
+      fixed_event_id = 62
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_20_s
+      fixed_event_id = 63
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_21_s
+      fixed_event_id = 64
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_22_s
+      fixed_event_id = 65
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_23_s
+      fixed_event_id = 66
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_24_s
+      fixed_event_id = 67
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_25_s
+      fixed_event_id = 68
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_26_s
+      fixed_event_id = 69
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
+    elsif $threedmap.check_fix_chest_27_s
+      fixed_event_id = 70
+      result.push(@events[fixed_event_id+ConstantTable::FIXED_EVENTID_OFFSET])
     ## 階段が目の前にある
     elsif $threedmap.get_stair == 1
       fixed_event_id = 1

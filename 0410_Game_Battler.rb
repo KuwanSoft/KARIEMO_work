@@ -2597,6 +2597,7 @@ class GameBattler
   def channeling_effect
     clear_action_results
     sv = Misc.skill_value(SkillId::CHANNELING, self)
+    sv /= 2 if tired?
     power = 1
     6.times do
       if sv > rand(100)
@@ -3279,7 +3280,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def redraw=(new)
     @redraw = new
-    Debug.write(c_m, "name:#{@battler_name} redraw flag changed to #{@redraw}") if new == true
+    # Debug.write(c_m, "name:#{@battler_name} redraw flag changed to #{@redraw}") if new == true
   end
   #--------------------------------------------------------------------------
   # ● カウンター食らったフラグ

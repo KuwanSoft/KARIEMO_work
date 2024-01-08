@@ -1428,6 +1428,8 @@ class SceneBattle < SceneBase
       execute_action_encourage
     when 7  # チャネリング
       execute_action_summon
+    when 8  # 増援を呼ぶ
+      execute_action_call_reinforcements
     end
     @active_battler.chance_skill_increase(SkillId::TACTICS)  # 戦術
     @action_battlers.unshift(@active_battler) if @active_battler.insert
@@ -1849,6 +1851,7 @@ class SceneBattle < SceneBase
     sv = Misc.skill_value(SkillId::HIDE, @active_battler) # 隠密技 特性値補正後のスキル値
     diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
     ratio = Integer(sv * diff)
+    ratio /=2 if @active_battler.tired?
     penalty = $game_troop.get_sharp_eye * ConstantTable::SHARP_EYE_P
     rate = [ratio, limit - penalty].min
 
@@ -2223,6 +2226,22 @@ class SceneBattle < SceneBase
     display_animation([@active_battler], anim_id)
     @active_battler.channeling_effect
     display_action_effects(@active_battler, "channeling")
+  end
+  #--------------------------------------------------------------------------
+  # ● 戦闘行動の実行 : 増援
+  #--------------------------------------------------------------------------
+  def execute_action_call_reinforcements
+    text = sprintf(Vocab::CallRF, @active_battler.name)
+    @message_window.add_instant_text(text)
+    wait(10)
+    result = $game_troop.call_rf(@active_battler.group_id)  # 増援の処理
+    if result
+      text = sprintf(Vocab::CallRFs, @active_battler.name)
+    else
+      text = sprintf(Vocab::CallRFf, @active_battler.name)
+    end
+    @message_window.add_instant_text(text)
+    wait(45)
   end
   #--------------------------------------------------------------------------
   # ● アニメーションの表示

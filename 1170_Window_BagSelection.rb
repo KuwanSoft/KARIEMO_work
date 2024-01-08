@@ -25,7 +25,7 @@ class Window_BagSelection < WindowSelectable
       y = WLH*6
       width = 382
       height = 210
-      @wallet = Window_Wallet.new
+      @wallet = WindowWallet.new
       @help = Window_ShopHelp.new
     end
     super(x, y, width, height)

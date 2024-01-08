@@ -177,21 +177,25 @@ class Monsters
     adj += 0.03 if @skill.force_encoding('UTF-8').include?("盾") #~ 盾：	盾で物理攻撃のダメージを軽減することがある。(+3%)
     adj += 0.03 if @skill.force_encoding('UTF-8').include?("後") #~ 後：	後列へも物理攻撃の射程がある。(+2%)
     adj += 0.02 if @skill.force_encoding('UTF-8').include?("回") #~ 回：	H.P.の自動回復能力。(5)%のHPを毎ターン回復(+2%)
-    adj += 0.04 if @skill.force_encoding('UTF-8').include?("復") #  復：　H.P.の自動回復能力。(10)%のHPを毎ターン回復(+4%)
+    adj += 0.03 if @skill.force_encoding('UTF-8').include?("復") #  復：　H.P.の自動回復能力。(10)%のHPを毎ターン回復(+3%)
     adj += 0.15 if @skill.force_encoding('UTF-8').include?("ブ") #~ ブ：	ブレスを使用する。（炎・氷・雷・毒・窒息）のブレスがある。(+15%)
     adj += 0.15 if @skill.force_encoding('UTF-8').include?("炎")
     adj += 0.15 if @skill.force_encoding('UTF-8').include?("氷")
     adj += 0.15 if @skill.force_encoding('UTF-8').include?("雷")
-    adj += 0.15 if @skill.force_encoding('UTF-8').include?("ポ")
+    adj += 0.15 if @skill.force_encoding('UTF-8').include?("ポ")  # ポイゾンブレス
     adj += 0.10 if @skill.force_encoding('UTF-8').include?("首") #~ 首：	クリティカル能力を持つ。(+10%)
     adj += 0.01 if @skill.force_encoding('UTF-8').include?("浮") #~ 浮：	地面から浮いているため地震ダメージは無視される。(+1%)
     adj += 0.25 if @skill.force_encoding('UTF-8').include?("霊") #~ 霊：	霊体の為、一切の物理攻撃が効かない。ターンUDや聖なる武器が有効。(+25%)
     adj += 0.02 if @skill.force_encoding('UTF-8').include?("毒") #~ 毒：	物理攻撃に毒が付与される。(+2%)
+    adj += 0.02 if @skill.force_encoding('UTF-8').include?("ス") #~ ス：	物理攻撃にスタンが付与される。(+2%)
+    adj += 0.02 if @skill.force_encoding('UTF-8').include?("血") #~ 血：	物理攻撃に出血が付与される。(+2%)
+    adj += 0.02 if @skill.force_encoding('UTF-8').include?("吐") #~ 吐：	物理攻撃に吐き気が付与される。(+2%)
     adj += 0.04 if @skill.force_encoding('UTF-8').include?("痺") #~ 痺：	物理攻撃に麻痺が付与される。(+4%)
     adj += 0.02 if @skill.force_encoding('UTF-8').include?("暗") #~ 暗：	物理攻撃に暗闇が付与される。(+2%)
     adj += 0.03 if @skill.force_encoding('UTF-8').include?("病") #~ 病：	物理攻撃に病気（ペスト）が付与される。(+3%)
     adj += 0.03 if @skill.force_encoding('UTF-8').include?("眠") #~ 眠：	物理攻撃に睡眠が付与される。(+3%)
     adj += 0.04 if @skill.force_encoding('UTF-8').include?("狂") #~ 狂：	物理攻撃に発狂が付与される。(+4%)
+    adj += 0.04 if @skill.force_encoding('UTF-8').include?("魅") #~ 魅：	物理攻撃に魅了が付与される。(+4%)
     adj += 0.05 if @skill.force_encoding('UTF-8').include?("老") #~ 老：	物理攻撃に年齢ドレインが付与される。(+5%)
     adj += 0.05 if @skill.force_encoding('UTF-8').include?("忘") #~ 忘：	物理攻撃にEXPドレインが付与される。(+5%)
     adj += 0.01 if @skill.force_encoding('UTF-8').include?("破") #~ 破：	パーティの逃げるコマンドや隠れるコマンドの成功率が下がる。一体あたり-5%のペナルティが入る。(+1%)
@@ -204,12 +208,12 @@ class Monsters
     adj += 0.05 if @skill.force_encoding('UTF-8').include?("石") #~ 石：	物理攻撃に石化が付与される。(+5%)
     adj += 0.03 if @skill.force_encoding('UTF-8').include?("骨") #~ 骨：	物理攻撃に骨折が付与される。(+3%)
     adj += 0.02 if @skill.force_encoding('UTF-8').include?("吹") #~ 吹：	吹き飛ばして隊列を入れ替えさせます。(+2%)
-    adj += 0.05 if @skill.force_encoding('UTF-8').include?("反") #  反：  反撃します。
+    adj += 0.05 if @skill.force_encoding('UTF-8').include?("反") #  反：  反撃します。(+5%)
     adj += 0.10 if @skill.force_encoding('UTF-8').include?("竜") #~ 竜： HPが3倍に計算されます。(+10%)
     adj += 0.10 if @cast > 0    # 呪文詠唱あり
     adj += 0.10 if @cast > 50   # 頻度高
     adj += 0.05 if @cast > 75
-    allowed = ["盾","後","回","復","ブ","炎","氷","雷","ポ","首","浮","霊","毒","痺","暗","病","眠","狂","老","忘","破","前","錆","ダ","ト","増","兜","石","骨","吹","反","竜",""]
+    allowed = ["盾","後","回","復","ブ","炎","氷","雷","ポ","首","浮","霊","毒","ス","血","吐","痺","暗","病","眠","狂","魅","老","忘","破","前","錆","ダ","ト","増","兜","石","骨","吹","反","竜"]
     @skill.delete("\"").each_char do |char|
       unless allowed.include?(char)
         puts "==========> 許可されていない文字:#{char} #{name.force_encoding('UTF-8')}"

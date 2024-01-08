@@ -237,6 +237,7 @@ module ConstantTable
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
   RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
+  CALL_RF_RATIO = 15        # 仲間を呼ぶ確率
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
@@ -297,9 +298,9 @@ module ConstantTable
   GUIDESKILL_PRE = "きけんよち"
   GUIDESKILL_PROVOKE = "ちょうはつ"
 
-  GUIDE_LIGHT_BONUS = 15 # ランタン長持ちのスキルで灯り減少判定に入る確率が減る値
-  SHARE_RATIO = 5  # 5%
-  ODDS_GUIDE_PROVOKE = 6 # 挑発スキルのODDS
+  GUIDE_LIGHT_BONUS = 15  # ランタン長持ちのスキルで灯り減少判定に入る確率が減る値
+  SHARE_RATIO = 5         # 5%
+  ODDS_GUIDE_PROVOKE = 6  # 挑発スキルのODDS
   GUIDE_INDEX = 40
   SUMMON_INDEX_START = 41
   SUMMON_INDEX_END = 50
@@ -357,6 +358,10 @@ module ConstantTable
   WANDERING_B7F = 20
   WANDERING_B8F = 20
   WANDERING_B9F = 20
+
+  ## ランダムイベント確率
+  RE_1F = {3=>0.05, 6=>0.05, 7=>0.05, 9=>0.05, 10=>0.05, 12=>0.05, 13=>0.05,14=>0.05, 17=>0.05, 18=>0.05, 19=>0.05, 20=>0.05, 21=>0.05, 22=>0.05}
+  RE_2F = {3=>0.05, 6=>0.05, 7=>0.05, 9=>0.05, 10=>0.05, 12=>0.05, 13=>0.05,14=>0.05, 17=>0.05, 18=>0.05, 19=>0.05, 20=>0.05, 21=>0.05, 22=>0.05}
 
   ## リスポーンの確率 x/1000
                   #0--B1--B2--B3--B4--B5--B6--B7--B8--B9

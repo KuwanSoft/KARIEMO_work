@@ -22,12 +22,15 @@ module Vocab
   ObtainItem      = "%sをてにいれた"
 
   # 戦闘行動
-  DosupAttack_1     = "%sは %sに "
-  DosupAttack_2     = "ふいうちをしかけた。"
+  DosupAttack_1   = "%sは %sに "
+  DosupAttack_2   = "ふいうちをしかけた。"
   DoHide_s        = "%sは ものかげに かくれた。"
   DoHide_f        = "%sは かくれることに しっぱいした。"
   UseItem         = "%sは %s をつかった。"
   UseSummon       = "%sは せいれいを よびだした。"
+  CallRF          = "%sは なかまを よぼうとこころみた。"
+  CallRFs         = "そして なかまが あらわれた。"
+  CallRFf         = "しかし だれも あらわれなかった。"
   Doturnundead    = "%sは ししゃたちを じょうかしようとした。"
   Doshieldblock   = "%sは たてで みをまもった。"
   Spellbreak      = "%sの えいしょうが ちゅうだんされた。"

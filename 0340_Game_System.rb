@@ -563,36 +563,54 @@ class GameSystem
       for x in 0..49
         case $game_map.data[ x, y, 2]
         when 184..199
-          case $game_map.map_id
-          ##----------------------B1F~B4F---------------------------------------
-          when 1,2,3,4,5,6,7,8,9
-            case rand(100)
-            when  0.. 4; kind = 3   # 薄汚れた鞄(5%)
-            when  5.. 9; kind = 4   # 腰掛石(5%)
-            when 10..13; kind = 6   # 可燃性ガス(4%)
-            when 14..18; kind = 7   # 食料保管庫(5%)
-            when 19..23; kind = 9   # NPC(5%)
-            when 24..28; kind = 10  # トラばさみ(5%)
-            when 29..30; kind = 12  # 落盤(2%)
-            when 31..35; kind = 5   # 帰還の魔法陣(5%)
-            when 36..40; kind = 14  # ランタンオイル(5%)
-            when 41..43; kind = 18  # 記憶の霧(3%)
-            when 44..48; kind = 19  # 落書き(5%)
-            when 49..51; kind = 20  # 迷いの霧(3%)
-            when 52..54; kind = 21  # アラーム(3%)
-            when 55..59; kind = 22  # 出張窓口(5%)
-            when 60..64; kind = 23  # ガイドと遭遇(5%)
-            else;        kind = 0   # なし
-            end
-          else
-            kind = 0
-          end
+          kind = decide_random_event($game_map.map_id)
           array.push([x, y, kind])  # REの座標と種類をPUSH
           Debug::write(c_m,"X:#{x} Y:#{y} MAP_ID:#{$game_map.map_id} 種:#{kind}")
         end
       end
     end
     @random_events[$game_map.map_id] = array
+  end
+  #--------------------------------------------------------------------------
+  # ● ランダムイベントの抽選
+  #--------------------------------------------------------------------------
+  def decide_random_event(map_id)
+    case map_id
+    when 1; rg_hash = ConstantTable::RE_1F
+    when 2; rg_hash = ConstantTable::RE_2F
+    end
+    items = make_weighted_items(rg_hash)
+    return lottery_random_event(items)
+  end
+  #--------------------------------------------------------------------------
+  # ● Oddsを出す
+  #--------------------------------------------------------------------------
+  def make_weighted_items(rg_hash)
+    total_odds = 0.0
+    rg_hash.each {|k, v| total_odds += v}
+    if total_odds < 1.0
+      diff = 1.0 - total_odds
+      rg_hash[0] = diff                                     # kind=0を残りに入れる
+      total_odds = 1.0                                      # トータルを1.0に増やす
+      Debug.write(c_m, "(total_odds < 1.0) diff=>#{diff}")
+    end
+    weighted_items = rg_hash.map do |k, v|
+      probability = v / total_odds
+      Debug.write(c_m, "Kind:#{k}, probability:#{probability}")
+      [k, probability]
+    end
+    return weighted_items
+  end
+  #--------------------------------------------------------------------------
+  # ● 累積確率法にて抽選実施
+  #--------------------------------------------------------------------------
+  def lottery_random_event(weighted_items)
+    random_pick = rand                             # 0~1までの乱数
+    cumulative = 0.0
+    weighted_items.each do |item, probability|
+      cumulative += probability
+      return item if random_pick < cumulative
+    end
   end
   #--------------------------------------------------------------------------
   # ● 【新】ランダムイベントチェック

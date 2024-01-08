@@ -24,7 +24,7 @@ class GameEnemy < GameBattler
   attr_accessor :plural                   # 複数出現フラグ
   attr_accessor :screen_x                 # バトル画面 X 座標
   attr_accessor :screen_y                 # バトル画面 Y 座標
-  attr_accessor :group_id                 # グループID（0,1,2）
+  attr_accessor :group_id                 # グループID（0,1,2,3）
   attr_accessor :identified               # 不確定・確定フラグ
   attr_accessor :transition               # 確定時のエフェクト
   attr_accessor :summon                   # 召喚フラグ
@@ -385,25 +385,28 @@ class GameEnemy < GameBattler
     return true
   end
   #--------------------------------------------------------------------------
-  # ● 戦闘行動の作成 NewVersion
+  # ● 戦闘行動の作成
   #--------------------------------------------------------------------------
   def make_action
     @action.clear
     return unless movable?
     return if self.stop > 0 # 時よ止まれ状態を検知
+    ## 恐怖チェック
     Debug::write(c_m,"戦闘可能ENEMYの行動の作成開始 #{enemy.name}")
     if fear?
       @action.set_guard
       Debug::write(c_m,"恐怖状態の為、強制ガード #{enemy.name}")
       return
     end
-    ratio = enemy.cast
+    ## 逃走チェック
     f_ratio = [[self.fascinated, 0].max, 95].min
     if f_ratio > rand(100)
       @action.set_escape
-      Debug.write(c_m, "#{enemy.name} 魅了の為逃走コマンド 魅了値:#{self.fascinated}")
+      Debug.write(c_m, "#{enemy.name} 魅了(わが声を聞け)の為逃走コマンド 魅了値:#{self.fascinated}")
       return
     end
+    ## 呪文攻撃判定 魔封時はスキップ
+    ratio = enemy.cast
     if ratio > rand(100) and not silent?  # 呪文攻撃判定 魔封時はスキップ
       Debug::write(c_m,"┗戦闘行動:呪文詠唱決定 #{ratio}%")
       @action.kind = 1
@@ -451,43 +454,15 @@ class GameEnemy < GameBattler
       Debug::write(c_m,"　　　┗戦闘行動:呪文の強さ補正後 CP#{@action.magic_lv}")
     elsif breath_activate?          # ブレス(メソッドでkindとbasicを入れ込む)
       Debug::write(c_m,"┗戦闘行動:ブレス決定 #{enemy.name}")
+    elsif can_call_rf? && (ConstantTable::CALL_RF_RATIO > rand(100))
+      @action.set_call_reinforcements
+      Debug::write(c_m,"┗戦闘行動:仲間を呼ぶ決定 #{enemy.name}")
     else; @action.kind = 0          # その他
     end
+    ## 通常攻撃設定
     if @action.kind == 0  # 呪文以外の行動判定開始
       Debug::write(c_m,"┗戦闘行動:呪文・ブレス以外の行動判定開始")
       @action.basic = 0
-      ## 行動キャンセルルーチンをスキップさせている。
-#~       case @group_id
-#~       when 0
-#~         if $game_troop.existing_g1_members.size > 4 # 5体以上のGROUPの場合
-#~           if $game_troop.existing_g1_members[4].index <= @index
-#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:1 Index:#{@index}")
-#~             if 5 > rand(10) then @action.basic = -1 end
-#~           end
-#~         end
-#~       when 1
-#~         if $game_troop.existing_g2_members.size > 3 # 4体以上のGROUPの場合
-#~           if $game_troop.existing_g2_members[3].index <= @index
-#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:2 Index:#{@index}")
-#~             if 4 > rand(10) then @action.basic = -1 end
-#~           end
-#~         end
-#~       when 2
-#~         if $game_troop.existing_g3_members.size > 2 # 3体以上のGROUPの場合
-#~           if $game_troop.existing_g3_members[2].index <= @index
-#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:3 Index:#{@index}")
-#~             if 3 > rand(10) then @action.basic = -1 end
-#~           end
-#~         end
-#~       when 3
-#~         if $game_troop.existing_g4_members.size > 1 # 2体以上のGROUPの場合
-#~           if $game_troop.existing_g4_members[1].index <= @index
-#~             Debug::write(c_m,"　┗行動キャンセル判定開始 Group:4 Index:#{@index}")
-#~             if 2 > rand(10) then @action.basic = -1 end
-#~           end
-#~         end
-#~       end
-#~       return if @action.basic == -1 # 行動キャンセル決定
       Debug::write(c_m,"　┗通常物理攻撃決定 #{enemy.name}")
       @action.decide_random_target
     end
@@ -765,10 +740,10 @@ class GameEnemy < GameBattler
     return enemy.skill.include?("反")
   end
   #--------------------------------------------------------------------------
-  # ● モンスター特殊攻撃: 白刃取り
+  # ● モンスター特殊攻撃: 増援
   #--------------------------------------------------------------------------
-  def can_shirahadori?
-    return enemy.skill.include?("白")
+  def can_call_rf?
+    return enemy.skill.include?("増")
   end
   #--------------------------------------------------------------------------
   # ● モンスター特殊能力: 霊体

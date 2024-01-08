@@ -1480,30 +1480,30 @@ class GameParty < GameUnit
     when "detect";    self.pm_detect = step     # 発見
     when "sword";     self.pm_sword = step      # つるぎ
     when "fog";       self.pm_fog = step        # 霧
-    when "pixiedust"; @pm_float = step
-    when "protect";   @pm_protect = 1       # 魔除けの聖水
-    when "firefly"                          # 蛍の灯り
-      $game_party.light += 1
+    when "pixiedust"; self.pm_float = step      # 妖精の粉
+    when "protect";   @pm_protect = 1           # 魔除けの聖水
+    when "firefly"                              # 蛍の灯り
+      $game_party.light += 5 if $game_party.light < 1 # 何もない時に限る
       Debug::write(c_m,"灯り+1")
-    when "warp";
+    when "warp";                                # マロール
       Debug::write(c_m,"ワープ呪文の詠唱検知")
       $game_temp.next_scene = "warp"
       $game_temp.warp_power = magic_level
       $scene = SceneMap.new
       return
-    when "home"
+    when "home"                                 # 帰還呪文
       Debug::write(c_m,"帰還呪文の詠唱検知")
       $game_temp.next_scene = "home"
       $game_temp.home_power = magic_level
       $scene = SceneMap.new
       return
-    when "locate"
+    when "locate"                               # 居場所を見つけろ
       Debug::write(c_m,"KANDI呪文の詠唱検知")
       $game_temp.next_scene = "locate"
       $game_temp.locate_power = magic_level
       $scene = SceneMap.new
       return
-    when "food"
+    when "food"                                 # 保存食
       Debug::write(c_m,"アイテム使用による食料の増加")
       @food += ConstantTable::FOOD1
     end

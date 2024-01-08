@@ -67,7 +67,7 @@ class SceneTemple < SceneBase
     @time = 0           # 回復詠唱時の時間管理
     @show_cast = false  # 回復詠唱時フラグ
     @give_window = Window_GiveMoney.new     # 寄付ウインドウ
-    @wallet = Window_WalletInfo.new
+    @wallet = WindowWalletInfo.new
     @WindowPicture = WindowPicture.new(0, 0)
     @WindowPicture.create_picture("Graphics/System/church", ConstantTable::NAME_TEMPLE)
   end
