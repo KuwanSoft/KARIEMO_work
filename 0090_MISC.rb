@@ -81,11 +81,11 @@ module Misc
     ## Rune補正
     case id
     when SkillId::TACTICS
-      rs = actor.get_magic_attr(6)
+      rs = actor.get_magic_attr(:s_tactics)
     when SkillId::SHIELD
-      rs = actor.get_magic_attr(12)
+      rs = actor.get_magic_attr(:s_shield)
     when SkillId::D_RESIST
-      rs = actor.get_magic_attr(11)
+      rs = actor.get_magic_attr(:damageresist)
     else
       rs = 0
     end

@@ -581,7 +581,7 @@ class GameActor < GameBattler
     end
     result *= (Misc.skill_value(SkillId::PACKING, self) + 100)
     result /= 100
-    result += get_magic_attr(4)
+    result += get_magic_attr(:capacity_up)
     return result.to_i
   end
   #--------------------------------------------------------------------------
@@ -912,7 +912,7 @@ class GameActor < GameBattler
     end
     unless part == 4
       dr += 2 if $game_party.pm_armor > 0 ## PARTYMAGIC効果(既存D.R.が0ならば加算しない)
-      dr += get_magic_attr(9)   # ルーンの効果(盾以外)
+      dr += get_magic_attr(:dr)   # ルーンの効果(盾以外)
       dr -= reduce_dr           # ペナルティステート [DR減少] 判定
     end
     dr = [dr, 0].max
@@ -942,7 +942,7 @@ class GameActor < GameBattler
     result += $data_armors[@armor7_id].armor if not @armor7_id == 0
     result += $data_armors[@armor8_id].armor if not @armor8_id == 0
     result += @level / 3 if @class_id == 5  # 忍者の場合はレベルが足される
-    result += get_magic_attr(10)            # ルーンの効果
+    result += get_magic_attr(:armor)        # ルーンの効果
     result += 2 if $game_party.pm_armor > 0 # PARTYMAGIC効果
     result += ConstantTable::POTION_ARMOR if @potion_effect == "armor+"
     return result
@@ -1547,14 +1547,14 @@ class GameActor < GameBattler
     else
       result = "C"
     end
-    result = "L" if get_magic_attr(5) > 0
+    result = "L" if get_magic_attr(:range) > 0
     return result
   end
   #--------------------------------------------------------------------------
   # ● サブ武器レンジの取得
   #--------------------------------------------------------------------------
   def range_s
-    return "L" if get_magic_attr(5) > 0
+    return "L" if get_magic_attr(:range) > 0
     if @subweapon_id != 0 # 左手が素手では無い場合
       return $data_weapons[@subweapon_id].range # 装備中のサブ武器データ取得
     else
@@ -1719,7 +1719,7 @@ class GameActor < GameBattler
     ap += get_AP_bonus                    # 装備品によるAPボーナス
     ap += get_ArrowAP                     # 弓のAP補正
     ap += 2 if $game_party.pm_sword > 0   # 常駐呪文補正
-    ap += get_magic_attr(0)               # マジックアイテム補正
+    ap += get_magic_attr(:ap)               # マジックアイテム補正
     ap += ConstantTable::POTION_AP if @potion_effect == "ap+"  # ポーションの効果
     return ap
   end
@@ -1752,7 +1752,7 @@ class GameActor < GameBattler
     end
     s += val
     adjust = 0
-    adjust += get_magic_attr(1)                      # マジックアイテム
+    adjust += get_magic_attr(:swing)                      # マジックアイテム
     return [s, (weapon_data.max_hits + adjust)].min  # どちらか小さい方
   end
   #--------------------------------------------------------------------------
@@ -2687,7 +2687,7 @@ class GameActor < GameBattler
     p_bonus = ConstantTable::FLEXIBLE_BONUS if @personality_p == :Flexible # 臨機応変
     f_bonus = ConstantTable::FRONT_BONUS if [0,1,2].include?(index) # 前衛ボーナス
     l_bonus = ConstantTable::LEADER_INIT_BONUS if leader?
-    r_bonus = get_magic_attr(7)
+    r_bonus = get_magic_attr(:initiative)
     ## 特性値ボーナス
     case spd
     when   0..6;  value -= 3
@@ -2958,7 +2958,7 @@ class GameActor < GameBattler
       weapon_data = $data_weapons[@subweapon_id] # 装備中のサブ武器データ取得
       str = weapon_data.double
     end
-    str += ConstantTable::MAGIC_HASH_DOUBLE_ARRAY[get_magic_attr(3)]
+    str += get_magic_attr(:double)
     Debug.write(c_m, "2倍撃フラグ:#{str}")
     return str
   end
@@ -4507,35 +4507,28 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   # ● 装備しているマジックアイテムの効能を取得
   #--------------------------------------------------------------------------
-  def get_magic_attr(position)
+  def get_magic_attr(attribute)
     result = 0
-    case position
-    when  0; attr = ConstantTable::MAGIC_HASH_AP           # 武器AP+
-    when  1; attr = ConstantTable::MAGIC_HASH_SWING        # 武器MaxSwg+
-    when  2; attr = ConstantTable::MAGIC_HASH_DAMAGE       # 武器Dmg+
-    when  3; attr = ConstantTable::MAGIC_HASH_DOUBLE       # 武器2倍撃+
-    when  4; attr = ConstantTable::MAGIC_HASH_CAPACITY_UP  # C.C.+
-    when  5; attr = ConstantTable::MAGIC_HASH_RANGE        # 武器レンジ+
-    when  6; attr = ConstantTable::MAGIC_HASH_SKILL_TACTICS # 戦術スキル+
-    when  7; attr = ConstantTable::MAGIC_HASH_INITIATIVE   # イニシアチブ+
-    when  8; attr = ConstantTable::MAGIC_HASH_A_ELEMENT    # 属性抵抗+
-    when  9; attr = ConstantTable::MAGIC_HASH_DR           # 全防具DR+
-    when 10; attr = ConstantTable::MAGIC_HASH_ARMOR        # アーマー値+
-    when 11; attr = ConstantTable::MAGIC_HASH_DAMAGERESIST # DamageResistスキル+
-    when 12; attr = ConstantTable::MAGIC_HASH_SKILL_SHIELD # シールドスキル+
-    end
+    string = ""
     for item in @bag
       next if item == nil
       next if item[2] == 0
       next if item[5].empty?        # マジックアイテムではない
-      next if item[5][attr] == nil  # ハッシュキーを持たない
+      next if item[5][attribute] == nil  # ハッシュキーを持たない
       item_data = Misc.item(item[0][0], item[0][1])
       ## スキル値がアイテムランクを満たしているか
       next if not check_rune_skill(item_data.rank)
-      result += item[5][attr]
+      case attribute
+      when :double
+        string += ConstantTable::MAGIC_HASH_DOUBLE_ARRAY[item[5][attribute]]
+      else
+        result += item[5][attribute]
+      end
     end
-#~     Debug.write(c_m, "#{self.name} magic hash:#{attr} value:#{result}") unless result == 0
-    return result
+    case attribute
+    when :double; return string
+    else;         return result
+    end
   end
   #--------------------------------------------------------------------------
   # ● ルーンの知識がアイテムランクを上回っているか
@@ -4710,22 +4703,6 @@ class GameActor < GameBattler
     return [calc_fee - @progress, 0].max
   end
   #--------------------------------------------------------------------------
-  # ● 属性武器の装備？
-  # 装備中の武器のエレメントタイプを返す
-  #--------------------------------------------------------------------------
-  def equip_element_weapon?(sub = false)
-    unless self.weapon_id == 0                          # 素手では無い場合
-      if sub
-        weapon_data = $data_weapons[self.subweapon_id]  # 装備中の武器データ取得
-      else
-        weapon_data = $data_weapons[self.weapon_id]     # 装備中の武器データ取得
-      end
-      return weapon_data.element_type
-    else
-      return 0                                          # 無属性
-    end
-  end
-  #--------------------------------------------------------------------------
   # ● 休息中の吐き気の回復
   #--------------------------------------------------------------------------
   def recover_nausea
@@ -4757,7 +4734,7 @@ class GameActor < GameBattler
       Debug.write(c_m, "狩人＝#{str}属性と一致 rank:#{rank}")
       rank += 1
     end
-    if ConstantTable::MAGIC_HASH_ELEMENT_ARRAY[get_magic_attr(8)].include?(str)
+    if ConstantTable::ELEMENTAL_STR[get_magic_attr(:a_element)].include?(str)
       Debug.write(c_m, "ルーンの属性防御と一致 rank:#{rank}")
       rank += 1
     end
@@ -4825,5 +4802,171 @@ class GameActor < GameBattler
   def critical_received?
     Debug::write(c_m,"クリティカル被弾判定 #{(1.0/@level)*100}%")
     return (rand(@level) < 1)                                    # 1/lvの確率
+  end
+  #--------------------------------------------------------------------------
+  # ● 装備武器Iteminfo
+  #--------------------------------------------------------------------------
+  def get_weapon_enchant(sub = false)
+    for iteminfo in @bag
+      return iteminfo[5] if (iteminfo[2] == 1) && !(sub)
+      ## サブ武器では無い=>盾
+      if (iteminfo[2] == 2) && sub && Misc.item(item[0][0], item[0][1]).is_a?(Weapons2)
+        return iteminfo[5]
+      end
+    end
+    return {} # 空のハッシュ
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性武器の装備？
+  # 装備中の武器のエレメントタイプ
+  # エンチャントのエレメントタイプを返す
+  #--------------------------------------------------------------------------
+  def equip_element_weapon?(sub = false)
+    wep_id = sub ? @subweapon_id : @weapon_id
+    weapon_data = $data_weapons[wep_id]         # 装備中のサブ武器データ取得
+    return weapon_data.element_type if weapon_data.element_type > 0
+    hash = get_weapon_enchant(sub)
+    return 0 unless hash.has_key?(:e_damage)
+    return hash[:e_damage][:element_type]
+  end
+  #--------------------------------------------------------------------------
+  # ● エレメンタルダメージDiceNumberの取得
+  # 武器から取得
+  # 武器エンチャントから取得
+  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
+  #--------------------------------------------------------------------------
+  def get_element_damage_per_hit(sub = false)
+    return 0 if equip_element_weapon?(sub) == 0 # 武器属性無し・エンチャント無し
+    damage1 = damage2 = 0                       # 初期化
+    wep_id = sub ? @subweapon_id : @weapon_id
+    weapon_data = $data_weapons[wep_id]         # 装備中のサブ/メイン武器データ取得
+    ## 武器付属の属性ダメージ
+    a = weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i
+    b = weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i
+    c = weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i
+    w_e_type = weapon_data.element_type                                   # エンチャントの属性
+    damage1 = Misc.dice(a, b, c)
+    Debug.write(c_m, "武器付属属性Damage1:#{damage1}")
+    ## 装備武器のエンチャント情報の取得
+    hash = get_weapon_enchant(sub)
+    if hash.has_key?(:e_damage)
+      e_e_type = hash[:e_damage][:element_type]                           # エンチャントの属性
+      d = hash[:e_damage][:element_damage].scan(/(\S+)d/)[0][0].to_i
+      e = hash[:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
+      f = hash[:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
+      if w_e_type == e_e_type
+        damage2 = Misc.dice(d, e, f)
+        Debug.write(c_m, "武器付属属性==エンチャント属性 Damage2:#{damage2}")
+      end
+    end
+    element_kind = w_e_type != 0 ? w_e_type : e_e_type
+    return element_kind, Integer(damage1 + damage2)
+  end
+  #--------------------------------------------------------------------------
+  # ● エレメンタルダメージDiceNumberの取得
+  # 武器から取得
+  # 武器エンチャントから取得
+  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
+  #--------------------------------------------------------------------------
+  def e_dice_number(sub = false)
+    wep_id = sub ? @subweapon_id : @weapon_id
+    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
+    element_type = 0
+    ## 装備武器のエンチャント情報の取得
+    hash = get_weapon_enchant(sub)
+    if hash.has_key?(:e_damage)
+      element_type = hash[:e_damage][:element_type]
+      element_dmg_dice_number = hash[:e_damage][:element_damage].scan(/(\S+)d/)[0][0].to_i
+    end
+    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
+    if (element_type == weapon_data.element_type) && (element_type > 0)
+      return (weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i + element_dmg_dice_number)
+    ## 武器属性が物理属性でない、エンチャントは無い
+    elsif weapon_data.element_type != 0 && (element_type == 0)
+      return weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i
+    ## 武器属性が物理だが、エンチャント属性あり
+    elsif weapon_data.element_type == 0 && (element_type != 0)
+      return element_dmg_dice_number
+    else
+      return 0
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● エレメンタルダメージDiceMaxの取得
+  # 武器から取得
+  # 武器エンチャントから取得
+  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
+  #--------------------------------------------------------------------------
+  def e_dice_max(sub = false)
+    wep_id = sub ? @subweapon_id : @weapon_id
+    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
+    ## 装備武器
+    element_type = 0
+    for item in @bag
+      next if item[2] < 1           # 装備品以外はスキップ
+      if item[2] == 1 && !(sub)
+        next if item[5] == nil
+        next if item[5][:e_damage] == nil
+        element_type = item[5][:e_damage][:element_type]
+        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
+      elsif item[2] == 2 && sub
+        next if item[5] == nil
+        next if item[5][:e_damage] == nil
+        next unless Misc.item(item[0][0], item[0][1]).is_a?(Weapons2) # サブ武器では無い=>盾
+        element_type = item[5][:e_damage][:element_type]
+        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
+      end
+    end
+    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
+    if (element_type == weapon_data.element_type) && (element_type > 0)
+      return (weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i + element_dmg_dice_number)
+    ## 武器属性が物理属性でない、エンチャントは無い
+    elsif weapon_data.element_type != 0 && (element_type == 0)
+      return weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i
+    ## 武器属性が物理だが、エンチャント属性あり
+    elsif weapon_data.element_type == 0 && (element_type != 0)
+      return element_dmg_dice_number
+    else
+      return 0
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● エレメンタルダメージDicePlusの取得
+  # 武器から取得
+  # 武器エンチャントから取得
+  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
+  #--------------------------------------------------------------------------
+  def e_dice_plus(sub = false)
+    wep_id = sub ? @subweapon_id : @weapon_id
+    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
+    ## 装備武器
+    element_type = 0
+    for item in @bag
+      next if item[2] < 1           # 装備品以外はスキップ
+      if item[2] == 1 && !(sub)
+        next if item[5] == nil
+        next if item[5][:e_damage] == nil
+        element_type = item[5][:e_damage][:element_type]
+        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
+      elsif item[2] == 2 && sub
+        next if item[5] == nil
+        next if item[5][:e_damage] == nil
+        next unless Misc.item(item[0][0], item[0][1]).is_a?(Weapons2) # サブ武器では無い=>盾
+        element_type = item[5][:e_damage][:element_type]
+        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
+      end
+    end
+    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
+    if (element_type == weapon_data.element_type) && (element_type > 0)
+      return (weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i + element_dmg_dice_number)
+    ## 武器属性が物理属性でない、エンチャントは無い
+    elsif weapon_data.element_type != 0 && (element_type == 0)
+      return weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i
+    ## 武器属性が物理だが、エンチャント属性あり
+    elsif weapon_data.element_type == 0 && (element_type != 0)
+      return element_dmg_dice_number
+    else
+      return 0
+    end
   end
 end

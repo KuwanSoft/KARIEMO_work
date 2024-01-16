@@ -277,6 +277,11 @@ module ConstantTable
     "Mythic",       # RANK6 神話的
   ]
 
+  ## マジックハッシュの倍打管理アレイ
+  MAGIC_HASH_DOUBLE_ARRAY = ["", "死", "獣", "自", "悪", "人", "蟲", "謎", "竜", "神"]
+  ## マジックハッシュのエレメントアレイ
+  MAGIC_HASH_ELEMENT_ARRAY = ["", "炎","氷","雷","毒","風","地","爆"]
+
   ## 歪みよ消えろでの呪文効果消去確率
   ANTIMAGIC_RATIO = [0, 75, 80, 85, 90, 95, 100]
 
@@ -469,19 +474,19 @@ module ConstantTable
   SEE_FREQ = 5
 
   ## マジックアイテム
-  MAGIC_HASH_AP =             "ap"
-  MAGIC_HASH_SWING =          "swing"
-  MAGIC_HASH_DAMAGE =         "damage"
-  MAGIC_HASH_DOUBLE =         "double"
-  MAGIC_HASH_ARMOR =          "armor"
-  MAGIC_HASH_CAPACITY_UP =    "capacity_up"
-  MAGIC_HASH_RANGE =          "range"
-  MAGIC_HASH_SKILL_SHIELD =   "s_shield"
-  MAGIC_HASH_DR =             "dr"
-  MAGIC_HASH_INITIATIVE =     "initiative"
-  MAGIC_HASH_DAMAGERESIST =   "damageresist"
-  MAGIC_HASH_A_ELEMENT =      "a_element"
-  MAGIC_HASH_SKILL_TACTICS =  "s_tactics"
+  MAGIC_HASH_AP =             :ap
+  MAGIC_HASH_SWING =          :swing
+  MAGIC_HASH_DAMAGE =         :damage
+  MAGIC_HASH_DOUBLE =         :double
+  MAGIC_HASH_ARMOR =          :armor
+  MAGIC_HASH_CAPACITY_UP =    :capacity_up
+  MAGIC_HASH_RANGE =          :range
+  MAGIC_HASH_SKILL_SHIELD =   :s_shield
+  MAGIC_HASH_DR =             :dr
+  MAGIC_HASH_INITIATIVE =     :initiative
+  MAGIC_HASH_DAMAGERESIST =   :damageresist
+  MAGIC_HASH_A_ELEMENT =      :a_element
+  MAGIC_HASH_SKILL_TACTICS =  :s_tactics
 
   ## フロア係数
                 #---B1F--B2F--B3F--B4F--B5F--B6F--B7F--B8F--B9F
@@ -524,11 +529,6 @@ module ConstantTable
   rand(12)+10,  # B8F(16~28)
   rand(12)+10,  # B9F(16~28)
   ]
-
-  ## マジックハッシュの倍打管理アレイ
-  MAGIC_HASH_DOUBLE_ARRAY = ["", "死", "獣", "自", "悪", "人", "蟲", "謎", "竜", "神"]
-  ## マジックハッシュのエレメントアレイ
-  MAGIC_HASH_ELEMENT_ARRAY = ["", "炎","氷","雷","毒","風","地","爆"]
 
   ## クラス毎の自動取得スキル
   CLASS_SKILL = [0,18,30,22,34,17,57,13,21,42,41]

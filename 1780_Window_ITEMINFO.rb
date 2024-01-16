@@ -247,31 +247,31 @@ class Window_ITEMINFO < WindowBase
         for key in @bag_pointer[5].keys
           desc = ""
           case key
-          when ConstantTable::MAGIC_HASH_AP
+          when :ap
             desc = "AP+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_SWING
+          when :swing
             desc = "Swg+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_DAMAGE
+          when :damage
             desc = "Dmg+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_DOUBLE
+          when :double
             desc = "ばいだ+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_ARMOR
+          when :armor
             desc = "アーマー+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_CAPACITY_UP
+          when :capacity_up
             desc = "C.C.+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_RANGE
+          when :range
             desc = "ロングレンジ"
-          when ConstantTable::MAGIC_HASH_SKILL_SHIELD
+          when :s_shield
             desc = "シールドスキル+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_SKILL_TACTICS
+          when :s_tactics
             desc = "せんじゅつスキル+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_DR
+          when :dr
             desc = "D.R.+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_INITIATIVE
+          when :initiative
             desc = "イニシアチブ+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_DAMAGERESIST
+          when :damageresist
             desc = "ダメージレジスト+#{@bag_pointer[5][key]}"
-          when ConstantTable::MAGIC_HASH_A_ELEMENT
+          when :a_element
             desc = "ぞくせいぼうぎょ#{@bag_pointer[5][key]}"
           end
           rune_str += desc

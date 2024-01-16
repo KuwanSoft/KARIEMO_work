@@ -1239,7 +1239,7 @@ class GameBattler
       unless self.weapon_id == 0 #素手では無い場合
         weapon_data = $data_weapons[self.weapon_id] #装備中の武器データ取得
         result = weapon_data.damage.scan(/(\S+)d/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i if element
+        result = e_dice_number if element
       else
         result = 1
       end
@@ -1258,7 +1258,7 @@ class GameBattler
       unless self.weapon_id == 0 #素手では無い場合
         weapon_data = $data_weapons[self.weapon_id] #装備中の武器データ取得
         result = weapon_data.damage.scan(/d(\d+)[+-]/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i if element
+        result = e_dice_max if element
       else
         result = 1
       end
@@ -1277,18 +1277,18 @@ class GameBattler
       unless self.weapon_id == 0 # 素手では無い場合
         weapon_data = $data_weapons[self.weapon_id] # 装備中の武器データ取得
         result = weapon_data.damage.scan(/([+-]\d+)/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i if element
+        result = e_dice_plus if element
         if self.weapon? == "bow"
           if self.subweapon_id != 0
             sub = $data_weapons[self.subweapon_id] # 装備中のサブデータ取得
             ## 弓と矢でダメージを合算
             if sub.kind == "arrow"
               result += sub.damage.scan(/\+(\S+)/)[0][0].to_i
-              result += sub.element_damage.scan(/\+(\S+)/)[0][0].to_i if element
+              result += e_dice_plus(true) if element
             end
           end
         end
-        result += self.get_magic_attr(2)
+        ## result += self.get_magic_attr(:damage) FIXME
       else
         result = 0
       end
@@ -1307,7 +1307,7 @@ class GameBattler
       unless self.subweapon_id == 0 #左手が素手では無い場合
         weapon_data = $data_weapons[self.subweapon_id] #装備中の武器データ取得
         result = weapon_data.damage.scan(/(\S+)d/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i if element
+        result = e_dice_number(true) if element
       else
         result = 0
       end
@@ -1324,7 +1324,7 @@ class GameBattler
       unless self.subweapon_id == 0 #左手が素手では無い場合
         weapon_data = $data_weapons[self.subweapon_id] #装備中の武器データ取得
         result = weapon_data.damage.scan(/d(\d+)[+-]/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i if element
+        result = e_dice_max(true) if element
       else
         result = 0
       end
@@ -1341,8 +1341,8 @@ class GameBattler
       unless self.subweapon_id == 0 #左手が素手では無い場合
         weapon_data = $data_weapons[self.subweapon_id] #装備中の武器データ取得
         result = weapon_data.damage.scan(/([+-]\d+)/)[0][0].to_i
-        result = weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i if element
-        result += self.get_magic_attr(2)
+        result = e_dice_plus(true) if element
+        ## result += self.get_magic_attr(:damage) FIXME
       else
         result = 0
       end
@@ -1455,21 +1455,26 @@ class GameBattler
       damage += d
       hit += 1
       ## エレメントダメージの計算
-      @damage_element_type = attacker.equip_element_weapon?(sub) # エレメントタイプの取得
-      if @damage_element_type > 0
-        e_dn = sub ? attacker.sub_dice_number(true) : attacker.dice_number(true)
-        e_dm = sub ? attacker.sub_dice_max(true) : attacker.dice_max(true)
-        e_dp = sub ? attacker.sub_dice_plus(true) : attacker.dice_plus(true)
-        e_d1 = Misc.dice(e_dn, e_dm, e_dp)
-        e_d = self.calc_element_damage(@damage_element_type, e_d1)
-        e_d = [Integer(e_d), 0].max                           # 最低値の補正
-        e_damage += e_d
-      end
+      # ここでは武器の属性ダメージとエンチャント両方をactor側でとってくることとする。
+      # Mics.diceの形だとaDb+cの形のa,b,c,で出さなければならなくなるので、
+      # 属性一致の場合のaDb+cとaDb+cの足し算は不可能である。
+      @damage_element_type = attacker.get_element_damage_per_hit(sub)[0]
+      e_damage += attacker.get_element_damage_per_hit(sub)[1]
+      # @damage_element_type = attacker.equip_element_weapon?(sub) # エレメントタイプの取得
+      # if @damage_element_type > 0
+      #   e_dn = sub ? attacker.sub_dice_number(true) : attacker.dice_number(true)
+      #   e_dm = sub ? attacker.sub_dice_max(true) : attacker.dice_max(true)
+      #   e_dp = sub ? attacker.sub_dice_plus(true) : attacker.dice_plus(true)
+      #   e_d1 = Misc.dice(e_dn, e_dm, e_dp)
+      #   e_d = self.calc_element_damage(@damage_element_type, e_d1)
+      #   e_d = [Integer(e_d), 0].max                           # 最低値の補正
+      #   e_damage += e_d
+      # end
       Debug::write(c_m,"【スイング:#{sc}】--------------------------------------------------")
       Debug::write(c_m,"FightLV:#{fl}=>命中#{(20-[[fl, 1].max, flmax].min)*5}% NoD:#{nod} Dice[0]:#{array[0]} MAXDice:#{dice} HitCap:#{flmax*5}%")
       Debug::write(c_m,"Dmg:#{dn}D#{dm}+#{dp} DR:#{d4} 精神刃:#{d2} 気力##{d3} SUB?:#{sub}")
       Debug::write(c_m,"HIT##{hit} DMG:#{d} Armor:#{armor} Swing:#{swing} Movable?#{movable?}")
-      Debug::write(c_m,"属性DMG:#{e_d} 属性:#{attacker.equip_element_weapon?(sub)}")
+      Debug::write(c_m,"属性DMG:#{e_d} 属性:#{@damage_element_type}")
     end
 
     ## 霊体への判定
