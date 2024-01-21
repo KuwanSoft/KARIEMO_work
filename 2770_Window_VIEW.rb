@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_VIEW
+# ■ WindowView
 #------------------------------------------------------------------------------
 # 冒険者のステータス一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_VIEW < WindowBase
+class WindowView < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -95,8 +95,8 @@ class Window_VIEW < WindowBase
     self.contents.draw_text(WLW*10, WLH*14, WLW*14, WLH, "じゅもんえいしょう・・")
     self.contents.draw_text(WLW*10, WLH*17, WLW*14, WLH, "A.P.・・")
     self.contents.draw_text(WLW*10, WLH*18, WLW*14, WLH, "ダメージ・・")
-    self.contents.draw_text(WLW*10, WLH*19, WLW*14, WLH, "Swing・・")
-    self.contents.draw_text(WLW*10, WLH*20, WLW*14, WLH, "イニシアチブ・・")
+    self.contents.draw_text(WLW*10, WLH*20, WLW*14, WLH, "Swing・・")
+    self.contents.draw_text(WLW*10, WLH*21, WLW*14, WLH, "イニシアチブ・・")
 
     self.contents.draw_text(0, WLH*13, self.width-32, WLH, sprintf("%d",actor.resist*5), 2)
 #~     m_bitmap = Cache.system_icon("skill_alt_076")
@@ -116,7 +116,9 @@ class Window_VIEW < WindowBase
     if actor.weapon? == "bow"
       self.contents.draw_text(0, WLH*17, self.width-32, WLH, actor.AP, 2)
     elsif actor.subweapon? != "nothing"
-      str = "#{actor.AP}:#{actor.AP(true)}"
+      str = sprintf("%2d/          ", actor.AP)
+      self.contents.draw_text(0, WLH*17, self.width-32, WLH, str, 2)
+      str = sprintf("%2d", actor.AP(true))
       self.contents.draw_text(0, WLH*17, self.width-32, WLH, str, 2)
     else
       self.contents.draw_text(0, WLH*17, self.width-32, WLH, actor.AP, 2)
@@ -124,32 +126,54 @@ class Window_VIEW < WindowBase
 
     min = actor.dice_number * 1 + actor.dice_plus
     min_s = actor.sub_dice_number * 1 + actor.sub_dice_plus
+    min_e = actor.get_element_dice_number * 1 + actor.get_element_dice_plus
+    min_s_e = actor.get_element_dice_number(true) * 1 + actor.get_element_dice_plus(true)
     max = actor.dice_number * actor.dice_max + actor.dice_plus
     max_s = actor.sub_dice_number * actor.sub_dice_max + actor.sub_dice_plus
+    max_e = actor.get_element_dice_number * actor.get_element_dice_max + actor.get_element_dice_plus
+    max_s_e = actor.get_element_dice_number(true) * actor.get_element_dice_max(true) + actor.get_element_dice_plus(true)
     if actor.weapon? == "bow"
       self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%d~%d",min,max),2)
+      if max_e > 0
+        change_font_color_element(actor.get_element_type)
+        self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("%d~%d",min_e,max_e),2)
+      end
     elsif actor.subweapon? != "nothing"
-      self.contents.draw_text(0, WLH*18, self.width-32, WLH, "#{min}~#{max}:#{min_s}~#{max_s}",2)
+      self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%2d~%2d          ",min,max),2)
+      self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%2d~%2d",min_s,max_s),2)
+      self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("/          "),2)
+      if (max_e > 0) || (max_s_e > 0)
+        change_font_color_element(actor.get_element_type)
+        self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("%2d~%2d            ",min_e,max_e),2) if (max_e > 0)
+        change_font_color_element(actor.get_element_type(true))
+        self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("%2d~%2d",min_s_e,max_s_e),2) if (max_s_e > 0)
+        change_font_to_normal
+        self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("/          "),2)
+      end
     else
       self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%d~%d",min,max),2)
+      self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("%d~%d",min_e, max_e),2) unless max_e == 0
     end
+
     if actor.weapon? == "bow"
-      self.contents.draw_text(0, WLH*19, self.width-32, WLH, actor.Swing, 2)
+      self.contents.draw_text(0, WLH*20, self.width-32, WLH, actor.Swing, 2)
     elsif actor.subweapon? != "nothing"
-      str = "#{actor.Swing}:#{actor.Swing(true)}"
-      self.contents.draw_text(0, WLH*19, self.width-32, WLH, str, 2)
+      str = sprintf("%2d/          ", actor.Swing)
+      self.contents.draw_text(0, WLH*20, self.width-32, WLH, str, 2)
+      str = sprintf("%2d", actor.Swing(true))
+      self.contents.draw_text(0, WLH*20, self.width-32, WLH, str, 2)
     else
-      self.contents.draw_text(0, WLH*19, self.width-32, WLH, actor.Swing, 2)
+      self.contents.draw_text(0, WLH*20, self.width-32, WLH, actor.Swing, 2)
     end
-    self.contents.draw_text(0, WLH*20, self.width-32, WLH, actor.base_initiative, 2)
+    self.contents.draw_text(0, WLH*21, self.width-32, WLH, actor.base_initiative, 2)
 
     carry = actor.carrying_capacity
     weight = sprintf("%.1f",actor.weight_sum)
     self.contents.font.color = get_cc_penalty_color(actor.cc_penalty(true))
 #~     self.contents.font.color = knockout_color if actor.over_weight?
-    self.contents.draw_text(WLW*0, WLH*21, self.width-32, WLH, "#{weight}/#{carry}", 2)
+    self.contents.draw_text(WLW*0, WLH*22, self.width-32, WLH, "#{weight}/#{carry}", 2)
     self.contents.font.color = normal_color
-    self.contents.draw_text(WLW*10, WLH*21, WLW*4, WLH, "C.C.")
+    self.contents.draw_text(WLW*10, WLH*22, WLW*4, WLH, "C.C.")
 
     if $scene.is_a?(SceneGuild)
       self.contents.font.color.alpha = 128
@@ -177,8 +201,7 @@ class Window_VIEW < WindowBase
 
     ## キャンプ時のみヘルプの表示
     return unless $scene.is_a?(SceneCamp)
-    self.contents.draw_text(WLW*19, WLH*23, self.width-32, WLH, "←:   アイテム")
-    self.contents.draw_text(WLW*19, WLH*24, self.width-32, WLH, "→:   スキル")
-    self.contents.draw_text(WLW*19, WLH*25, self.width-32, WLH, "LR: Charへんこう")
+    self.contents.draw_text(WLW*0, WLH*24, self.width-32, WLH, "←:アイテム →:スキル", 2)
+    self.contents.draw_text(WLW*0, WLH*25, self.width-32, WLH, "LR: Charへんこう", 2)
   end
 end

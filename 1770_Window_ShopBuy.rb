@@ -12,7 +12,7 @@ class Window_ShopBuy < WindowSelectable
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    @info = Window_ITEMINFO.new
+    @info = WindowItemInfo.new
     @wallet = WindowWallet.new
     @help = Window_ShopHelp.new
     super(4, WLW*7+32+4+24, 512-8, WLH*12+32+8-24)

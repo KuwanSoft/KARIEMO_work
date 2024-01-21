@@ -34,7 +34,7 @@ class SceneCamp < SceneBase
     @equip = Window_EQUIP.new               # 装備ウィンドウ
     @target_ps = WindowPartyStatus.new(true)     # partystatus
     @target_ps.turn_off
-    @view = Window_VIEW.new                 # ステータス閲覧ウィンドウ
+    @view = WindowView.new                 # ステータス閲覧ウィンドウ
     @back_s = Window_ShopBack_Small.new     # メッセージ枠
     @swap_window = Window_SWAP.new          # SwapのActorリスト
     @swap_selection = Window_BagSelection.new("キャンプ", 80)  # インベントリ(Swap用)画面
@@ -47,7 +47,7 @@ class SceneCamp < SceneBase
     @arrange_window = Window_Arrange.new  # 隊列変更用
     @sort_window = Window_Sort.new        # 隊列変更用
     @magic_all = Window_MagicAll.new
-    @item_info = Window_ITEMINFO.new      # アイテム情報
+    @item_info = WindowItemInfo.new      # アイテム情報
     @food = Window_Food.new               # 食事ウインドウ
     @bag_window = Window_BAG.new          # バッグのウインドウ
     @bag_combine = Window_BAG.new         # 組み合わせ用バッグ

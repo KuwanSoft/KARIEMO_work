@@ -13,7 +13,7 @@ class Window_BagSelection < WindowSelectable
       x = (512 - width)/2
       height = WLH*10+32
       opacity = 255
-      @iteminfo = Window_ITEMINFO.new
+      @iteminfo = WindowItemInfo.new
     when 1..99                      # NPC IDの場合
       x = 0
       y = WLH*7

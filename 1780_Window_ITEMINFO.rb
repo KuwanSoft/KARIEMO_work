@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_ITEMINFO
+# ■ WindowItemInfo
 #------------------------------------------------------------------------------
 # アイテム説明
 #==============================================================================
 
-class Window_ITEMINFO < WindowBase
+class WindowItemInfo < WindowBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -88,12 +88,7 @@ class Window_ITEMINFO < WindowBase
       small = d1+d3
       big = d1*d2+d3
       dmg_str = "#{small}~#{big}"
-      case @item.element_type
-      when 1; self.contents.font.color = fire_color
-      when 2; self.contents.font.color = ice_color
-      when 3; self.contents.font.color = thunder_color
-      when 4; self.contents.font.color = poison_color
-      end
+      change_font_color_element(@item.element_type)
       self.contents.draw_text(STA+WLW*9, WLH*3, WLW*5, WLH*2, dmg_str, 2)
       self.contents.font.color = normal_color
     end
@@ -273,6 +268,8 @@ class Window_ITEMINFO < WindowBase
             desc = "ダメージレジスト+#{@bag_pointer[5][key]}"
           when :a_element
             desc = "ぞくせいぼうぎょ#{@bag_pointer[5][key]}"
+          when :e_damage
+            desc = "ぞくせい:#{@bag_pointer[5][key][:element_type]} ダメージ:#{@bag_pointer[5][key][:element_damage]}"
           end
           rune_str += desc
         end

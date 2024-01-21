@@ -117,7 +117,7 @@ class SceneGuild < SceneBase
     @class_selection = WindowClass.new
     @change_message = WindowClass_CHANGE.new      # クラス変更後のメッセージ枠
     create_command_window                         # コマンドウィンドウの作成
-    @view = Window_VIEW.new                       # えつらん時のステータス枠
+    @view = WindowView.new                       # えつらん時のステータス枠
     @reset = Window_BackupClear.new
     @selection = Window_YesNo.new
     @face_window = WindowFaceSelection.new        # ポートレートの選択

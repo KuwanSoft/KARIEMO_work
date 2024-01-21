@@ -666,6 +666,23 @@ class WindowBase < Window
     self.contents.font.color = text_color(0) if color
   end
   #--------------------------------------------------------------------------
+  # ● フォントカラーを属性カラーに
+  #--------------------------------------------------------------------------
+  def change_font_color_element(element_kind)
+    case element_kind
+    when 0; self.contents.font.color = normal_color   # 無
+    when 1; self.contents.font.color = fire_color     # 炎
+    when 2; self.contents.font.color = ice_color      # 氷
+    when 3; self.contents.font.color = thunder_color  # 雷
+    when 4; self.contents.font.color = poison_color   # 毒
+    when 5; self.contents.font.color = air_color      # 風
+    when 6; self.contents.font.color = earth_color    # 地面
+    when 7; self.contents.font.color = paralyze_color # 爆発
+    when 8; self.contents.font.color = curse_color    # 呪い
+    when 9; self.contents.font.color = knockout_color # 出血
+    end
+  end
+  #--------------------------------------------------------------------------
   # ● ステータス画面で表示するHPとバー
   #--------------------------------------------------------------------------
   def draw_hp_and_bar(x, y, actor)

@@ -64,7 +64,7 @@ class ScenePub < SceneBase
     @ps.turn_on
     turn_on_face
     @pub = WindowPub.new                 # くわえる
-    @view = Window_VIEW.new               # みる時のステータス枠
+    @view = WindowView.new               # みる時のステータス枠
     @command_window = WindowPubMenu.new
     @command_window.visible = true
     @command_window.active = true

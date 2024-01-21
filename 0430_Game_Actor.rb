@@ -2571,7 +2571,7 @@ class GameActor < GameBattler
     elsif ratio > rand(100) and stack == 0 and $scene.is_a?(SceneTreasure)
       hash = MAGIC::enchant(item)
       Debug.write(c_m, "====**** (TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
-    elsif $TEST and stack == 0 and $scene.is_a?(SceneTreasure)
+    elsif $TEST and stack == 0
       hash = MAGIC::enchant(item)
       Debug.write(c_m, "====**** ($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
     end
@@ -4544,6 +4544,7 @@ class GameActor < GameBattler
     when 100..124;  rank = 5
     when 125..999;  rank = 6
     end
+    Debug.write(c_m, "ルーンの知識を満たしている。") if (rank >= item_rank)
     return (rank >= item_rank)
   end
   #--------------------------------------------------------------------------
@@ -4817,17 +4818,55 @@ class GameActor < GameBattler
     return {} # 空のハッシュ
   end
   #--------------------------------------------------------------------------
+  # ● WeaponDataのアイテムオブジェクトを取得
+  #--------------------------------------------------------------------------
+  def get_weapon_data(sub = false)
+    wep_id = sub ? @subweapon_id : @weapon_id
+    return $data_weapons[wep_id]
+  end
+  #--------------------------------------------------------------------------
   # ● 属性武器の装備？
   # 装備中の武器のエレメントタイプ
   # エンチャントのエレメントタイプを返す
   #--------------------------------------------------------------------------
   def equip_element_weapon?(sub = false)
-    wep_id = sub ? @subweapon_id : @weapon_id
-    weapon_data = $data_weapons[wep_id]         # 装備中のサブ武器データ取得
+    weapon_data = get_weapon_data(sub)
     return weapon_data.element_type if weapon_data.element_type > 0
     hash = get_weapon_enchant(sub)
     return 0 unless hash.has_key?(:e_damage)
     return hash[:e_damage][:element_type]
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性武器のDiceNumber
+  #--------------------------------------------------------------------------
+  def get_element_dice_number(sub = false)
+    weapon_data = get_weapon_data(sub)
+    return 0 if weapon_data == nil
+    return weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性武器のDiceMax
+  #--------------------------------------------------------------------------
+  def get_element_dice_max(sub = false)
+    weapon_data = get_weapon_data(sub)
+    return 0 if weapon_data == nil
+    return weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性武器のDicePlus
+  #--------------------------------------------------------------------------
+  def get_element_dice_plus(sub = false)
+    weapon_data = get_weapon_data(sub)
+    return 0 if weapon_data == nil
+    return weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i
+  end
+  #--------------------------------------------------------------------------
+  # ● 属性武器のDicePlus
+  #--------------------------------------------------------------------------
+  def get_element_type(sub = false)
+    weapon_data = get_weapon_data(sub)
+    return 0 if weapon_data == nil
+    return weapon_data.element_type             # エンチャントの属性
   end
   #--------------------------------------------------------------------------
   # ● エレメンタルダメージDiceNumberの取得
@@ -4838,135 +4877,36 @@ class GameActor < GameBattler
   def get_element_damage_per_hit(sub = false)
     return 0 if equip_element_weapon?(sub) == 0 # 武器属性無し・エンチャント無し
     damage1 = damage2 = 0                       # 初期化
-    wep_id = sub ? @subweapon_id : @weapon_id
-    weapon_data = $data_weapons[wep_id]         # 装備中のサブ/メイン武器データ取得
-    ## 武器付属の属性ダメージ
-    a = weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i
-    b = weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i
-    c = weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i
-    w_e_type = weapon_data.element_type                                   # エンチャントの属性
-    damage1 = Misc.dice(a, b, c)
-    Debug.write(c_m, "武器付属属性Damage1:#{damage1}")
+    w_e_type = get_element_type                 # エンチャントの属性
+    if w_e_type > 0
+      ## 武器付属の属性ダメージ
+      a = get_element_dice_number(sub)
+      b = get_element_dice_max(sub)
+      c = get_element_dice_plus(sub)
+      damage1 = Misc.dice(a, b, c)
+      Debug.write(c_m, "武器付属属性Damage1:#{damage1} #{a}d#{b}+#{c}")
+    end
     ## 装備武器のエンチャント情報の取得
     hash = get_weapon_enchant(sub)
-    if hash.has_key?(:e_damage)
+    if hash.has_key?(:e_damage) && check_rune_skill(get_weapon_data(sub).rank)
       e_e_type = hash[:e_damage][:element_type]                           # エンチャントの属性
       d = hash[:e_damage][:element_damage].scan(/(\S+)d/)[0][0].to_i
       e = hash[:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
       f = hash[:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
-      if w_e_type == e_e_type
-        damage2 = Misc.dice(d, e, f)
-        Debug.write(c_m, "武器付属属性==エンチャント属性 Damage2:#{damage2}")
+      damage2 = Misc.dice(d, e, f)
+      if w_e_type == 0            # 武器属性が無くエンチャントありの場合
+        Debug.write(c_m, "武器エンチャント属性 Damage2:#{Integer(damage1)} #{d}d#{e}+#{f}")
+        return e_e_type, Integer(damage2)
       end
     end
-    element_kind = w_e_type != 0 ? w_e_type : e_e_type
-    return element_kind, Integer(damage1 + damage2)
-  end
-  #--------------------------------------------------------------------------
-  # ● エレメンタルダメージDiceNumberの取得
-  # 武器から取得
-  # 武器エンチャントから取得
-  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
-  #--------------------------------------------------------------------------
-  def e_dice_number(sub = false)
-    wep_id = sub ? @subweapon_id : @weapon_id
-    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
-    element_type = 0
-    ## 装備武器のエンチャント情報の取得
-    hash = get_weapon_enchant(sub)
-    if hash.has_key?(:e_damage)
-      element_type = hash[:e_damage][:element_type]
-      element_dmg_dice_number = hash[:e_damage][:element_damage].scan(/(\S+)d/)[0][0].to_i
-    end
-    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
-    if (element_type == weapon_data.element_type) && (element_type > 0)
-      return (weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i + element_dmg_dice_number)
-    ## 武器属性が物理属性でない、エンチャントは無い
-    elsif weapon_data.element_type != 0 && (element_type == 0)
-      return weapon_data.element_damage.scan(/(\S+)d/)[0][0].to_i
-    ## 武器属性が物理だが、エンチャント属性あり
-    elsif weapon_data.element_type == 0 && (element_type != 0)
-      return element_dmg_dice_number
+    ## 武器属性とエンチャント属性が一致の場合
+    if w_e_type == e_e_type
+      Debug.write(c_m, "武器付属属性==エンチャント属性 Damage1+2:#{Integer(damage1 + damage2)}")
+      return e_e_type, Integer(damage1 + damage2)
+    ## 武器属性とエンチャントが一致しない場合、武器属性ダメージを返す
     else
-      return 0
-    end
-  end
-  #--------------------------------------------------------------------------
-  # ● エレメンタルダメージDiceMaxの取得
-  # 武器から取得
-  # 武器エンチャントから取得
-  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
-  #--------------------------------------------------------------------------
-  def e_dice_max(sub = false)
-    wep_id = sub ? @subweapon_id : @weapon_id
-    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
-    ## 装備武器
-    element_type = 0
-    for item in @bag
-      next if item[2] < 1           # 装備品以外はスキップ
-      if item[2] == 1 && !(sub)
-        next if item[5] == nil
-        next if item[5][:e_damage] == nil
-        element_type = item[5][:e_damage][:element_type]
-        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
-      elsif item[2] == 2 && sub
-        next if item[5] == nil
-        next if item[5][:e_damage] == nil
-        next unless Misc.item(item[0][0], item[0][1]).is_a?(Weapons2) # サブ武器では無い=>盾
-        element_type = item[5][:e_damage][:element_type]
-        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
-      end
-    end
-    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
-    if (element_type == weapon_data.element_type) && (element_type > 0)
-      return (weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i + element_dmg_dice_number)
-    ## 武器属性が物理属性でない、エンチャントは無い
-    elsif weapon_data.element_type != 0 && (element_type == 0)
-      return weapon_data.element_damage.scan(/d(\d+)[+-]/)[0][0].to_i
-    ## 武器属性が物理だが、エンチャント属性あり
-    elsif weapon_data.element_type == 0 && (element_type != 0)
-      return element_dmg_dice_number
-    else
-      return 0
-    end
-  end
-  #--------------------------------------------------------------------------
-  # ● エレメンタルダメージDicePlusの取得
-  # 武器から取得
-  # 武器エンチャントから取得
-  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
-  #--------------------------------------------------------------------------
-  def e_dice_plus(sub = false)
-    wep_id = sub ? @subweapon_id : @weapon_id
-    weapon_data = $data_weapons[wep_id] # 装備中のサブ武器データ取得
-    ## 装備武器
-    element_type = 0
-    for item in @bag
-      next if item[2] < 1           # 装備品以外はスキップ
-      if item[2] == 1 && !(sub)
-        next if item[5] == nil
-        next if item[5][:e_damage] == nil
-        element_type = item[5][:e_damage][:element_type]
-        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
-      elsif item[2] == 2 && sub
-        next if item[5] == nil
-        next if item[5][:e_damage] == nil
-        next unless Misc.item(item[0][0], item[0][1]).is_a?(Weapons2) # サブ武器では無い=>盾
-        element_type = item[5][:e_damage][:element_type]
-        element_dmg_dice_number = item[5][:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
-      end
-    end
-    ## 武器属性とエンチャント属性が同一でそれが物理属性で無い
-    if (element_type == weapon_data.element_type) && (element_type > 0)
-      return (weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i + element_dmg_dice_number)
-    ## 武器属性が物理属性でない、エンチャントは無い
-    elsif weapon_data.element_type != 0 && (element_type == 0)
-      return weapon_data.element_damage.scan(/([+-]\d+)/)[0][0].to_i
-    ## 武器属性が物理だが、エンチャント属性あり
-    elsif weapon_data.element_type == 0 && (element_type != 0)
-      return element_dmg_dice_number
-    else
-      return 0
+      Debug.write(c_m, "武器付属属性 Damage1:#{Integer(damage1)}")
+      return w_e_type, Integer(damage1)
     end
   end
 end

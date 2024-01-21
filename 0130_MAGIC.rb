@@ -33,7 +33,8 @@ module MAGIC
 
     ## 武器？
     if item.is_a?(Weapons2)
-      case rand(9)
+      # case rand(9)
+      case 8
       ## APボーナス
       when 0;
         case rank
@@ -93,12 +94,12 @@ module MAGIC
       ## エレメントダメージボーナス
       when 8;
         case rank
-        when 1; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+0"}
-        when 2; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+2"}
-        when 3; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+4"}
-        when 4; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+6"}
-        when 5; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+8"}
-        when 6; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1D6+10"}
+        when 1; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+0"}
+        when 2; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+2"}
+        when 3; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+4"}
+        when 4; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+6"}
+        when 5; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+8"}
+        when 6; hash[:e_damage] = {:element_type=>rand(7)+1, :element_damage=>"1d6+10"}
         end
       end
     ## 防具？
