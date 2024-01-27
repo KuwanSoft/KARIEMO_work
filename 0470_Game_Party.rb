@@ -28,6 +28,7 @@ class GameParty < GameUnit
   attr_accessor :shop_legs              # shop_legs
   attr_accessor :shop_arms              # shop_arms
   attr_accessor :shop_others            # shop_others
+  attr_accessor :shop_magicitems        # マジックアイテムの在庫管理
   attr_reader   :shop_npc1              # NPC1ショップ在庫リスト
   attr_reader   :shop_npc2              # NPC2ショップ在庫リスト
   attr_reader   :shop_npc3              # NPC2ショップ在庫リスト
@@ -81,6 +82,7 @@ class GameParty < GameUnit
     @shop_others = {}
     @shop_npc = {}
     @shop_stack_item = {}
+    @shop_magicitems = []     # {[kind, id, enchant_hash],...}
     @keywords = ["こんにちは","さるのおう","さるのおうのしろ"]  # キーワード
     define_initial_shop_item # 初期shopアイテムの定義
     @slain_enemies = {}       # 倒した敵の数 ハッシュKEYは敵ID 要素は討伐数
@@ -722,10 +724,22 @@ class GameParty < GameUnit
   #     itemは[kind, id]のフォーマット
   #    shop_XXXXのハッシュは {"id" <= "個数"}
   #--------------------------------------------------------------------------
-  def modify_shop_item(item, n)
+  def modify_shop_item(item, n = 0, enchant_hash = {})
     kind = item[0]
     id = item[1]
     item_data = Misc.item(kind, id)
+    ## エンチャント品の場合
+    unless enchant_hash.empty?
+      ## 売却の場合
+      if n > 0
+        @shop_magicitems.push([kind, id, enchant_hash])
+      ## 購入の場合
+      elsif n < 0
+        @shop_magicitems.delete([kind, id, enchant_hash])
+      end
+      return false
+    end
+    ## 通常品の場合
     case kind
     when 0; # アイテム種類
       @shop_items[id] = 0 if @shop_items[id] == nil # 定義が無ければゼロを入れる
@@ -753,16 +767,19 @@ class GameParty < GameUnit
     ## idとsortの配列を作成
     result = []
     case kind
+    ## 武器
     when 1
       for id in @shop_weapons.keys
         next if id == 0
         result.push([id, Misc.item(kind, id).sort])
       end
+    ## 防具
     when 2
       for id in @shop_armors.keys
         next if id == 0
         result.push([id, Misc.item(kind, id).sort])
       end
+    ## 道具
     when 0
       for id in @shop_items.keys
         next if id == 0
@@ -2443,6 +2460,13 @@ class GameParty < GameUnit
     for member in existing_members
       member.remove_state(StateId::SLEEP)
     end
+  end
+  #--------------------------------------------------------------------------
+  # ● マジックアイテムの配列ゲッター初期化
+  #--------------------------------------------------------------------------
+  def shop_magicitems
+    @shop_magicitems ||= []
+    return @shop_magicitems
   end
 end
 

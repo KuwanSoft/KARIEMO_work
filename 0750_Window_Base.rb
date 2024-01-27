@@ -364,20 +364,17 @@ class WindowBase < Window
     ## 不確定or確定
     name = item_info[1] ? item.name : item.name2
     ## アイコンの表示
-    magic = !(item_info[5].empty?) if item_info != nil # マジックハッシュは空か？
+    if item_info != nil
+      if item_info[5].empty?              # マジックハッシュは空か？
+        magic = false
+      elsif item_info[5].has_key?(:curse) # 呪いのキーを持つか
+        magic = false
+      else                                # マジックハッシュはあるが呪いではない
+        magic = true
+      end
+    end
     draw_item_icon(x, y, item, !(item_info[1]), magic)
     prev_alpha = self.contents.font.color.alpha
-    ## 装備済み
-    # prefix = item_info[2] > 0 ? "*" : ""
-    ## 呪い？
-    # prefix = item_info[3] ? "-" : prefix
-    # name = prefix + name
-    ## 装備可能？
-    # prefix = can_equip ? "" : "#"
-    # prefix = "" if item.is_a?(Items2) # アイテム
-    # prefix = "" if item.is_a?(Drops)  # 戦利品
-    # name = prefix + name
-
     number = ""                               # スタック数
     ## 装備可・不可：ショップ時は暗転処理
     if $scene.is_a?(SceneShop)

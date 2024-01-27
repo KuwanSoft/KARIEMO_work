@@ -274,13 +274,11 @@ module ConstantTable
     "Rare",         # RANK3
     "Epic",         # RANK4
     "Legendary",    # RANK5 伝説
-    "Mythic",       # RANK6 神話的
+    "Mythic"        # RANK6 神話的
   ]
 
   ## マジックハッシュの倍打管理アレイ
   MAGIC_HASH_DOUBLE_ARRAY = ["", "死", "獣", "自", "悪", "人", "蟲", "謎", "竜", "神"]
-  ## マジックハッシュのエレメントアレイ
-  MAGIC_HASH_ELEMENT_ARRAY = ["", "炎","氷","雷","毒","風","地","爆"]
 
   ## 歪みよ消えろでの呪文効果消去確率
   ANTIMAGIC_RATIO = [0, 75, 80, 85, 90, 95, 100]

@@ -37,17 +37,6 @@ class Window_BagSelection < WindowSelectable
     @row_height = 32
   end
   #--------------------------------------------------------------------------
-  # ● 更新
-  #--------------------------------------------------------------------------
-  # def update
-  #   super
-  #   if Input.press?(Input::X) && (@iteminfo != nil)
-  #     @iteminfo.visible = true
-  #   elsif (@iteminfo != nil)
-  #     @iteminfo.visible = false
-  #   end
-  # end
-  #--------------------------------------------------------------------------
   # ● 開放
   #--------------------------------------------------------------------------
   def dispose
@@ -98,8 +87,12 @@ class Window_BagSelection < WindowSelectable
       ratio = stack / item.stack.to_f
       price = item.price * ratio
     ## 通常アイテム
-    else
+    elsif item_info[5].empty?
       price = item.price
+    elsif item_info[5].has_key?(:curse)
+      price = item.price
+    else
+      price = Integer(item.price * 1.5)   # エンチャント品の場合
     end
 
     alpha = self.contents.font.color.alpha

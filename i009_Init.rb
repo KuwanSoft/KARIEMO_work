@@ -262,6 +262,9 @@ begin
     # $wi.replace_text('step3. loading archives...  ' + progress) unless TEST
     begin
       eval(script, nil, d[I-1])
+    rescue SyntaxError => e
+      print "step3. 構文エラーが発生しました。\n#{e}\n#{d[I-1]}"
+      exit
     rescue StandardError => e
       print "step3. ロードに失敗しました。\n#{e}\n#{d[I-1]}"
       print "Error: #{e.message}"

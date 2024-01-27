@@ -23,7 +23,6 @@ class Window_ShopBuy < WindowSelectable
     @row_height = 32      # アイコン
     @adjust_x = 0
     @prev_item = nil
-#~     change_font_to_v
   end
   #--------------------------------------------------------------------------
   # ● 可視不可視の連携
@@ -72,28 +71,39 @@ class Window_ShopBuy < WindowSelectable
     item = Misc.item(@data[index][0], @data[index][1])
   end
   #--------------------------------------------------------------------------
+  # ● 選択中のアイテムの値段を取得
+  #--------------------------------------------------------------------------
+  def selected_item_price
+    return Integer(item.price * 1.5) if @displaying_enchant
+    return item.price
+  end
+  #--------------------------------------------------------------------------
   # ● リフレッシュ
   #--------------------------------------------------------------------------
   def refresh(actor, kind)
     @pre_kind = kind if kind != nil
     @actor = actor
+    @displaying_enchant = false
     @data = []
     case @pre_kind
-    when "どうぐ";
+    when "どうぐ"
       for id in $game_party.get_sorted_items(0)
         next if $game_party.shop_items[id] == nil
         next if $game_party.shop_items[id] == 0
         next if Misc.item(0, id).kind == "skillbook"  # スキルブックを入れると画面が大きくなりすぎてbitmap failする。
         @data.push([0, id]) # アイテムデータをPush
       end
-    when "スキルブック";
+    when "スキルブック"
       for id in $game_party.get_sorted_items(0)
         next if $game_party.shop_items[id] == nil
         next if $game_party.shop_items[id] == 0
         next if Misc.item(0, id).kind != "skillbook"
         @data.push([0, id]) # アイテムデータをPush
       end
-    when "ぶき";
+    when "マジックアイテム"
+      @data = $game_party.shop_magicitems
+      @displaying_enchant = true
+    when "ぶき"
       for id in $game_party.get_sorted_items(1)
         next if $game_party.shop_weapons[id] == nil
         next if $game_party.shop_weapons[id] == 0
@@ -134,10 +144,18 @@ class Window_ShopBuy < WindowSelectable
   def draw_item(index)
     kind = @data[index][0]
     id = @data[index][1]
+    if @displaying_enchant
+      magic_hash = @data[index][2]
+    else
+      magic_hash = {}
+    end
     item = Misc.item(kind, id)
     rect = item_rect(index)
     price = if item.price == 0 then " " else item.price end # 値段が0はブランク
-    draw_item_name(0, rect.y, item, @actor.equippable?(item))
+    price *= 1.5  if @displaying_enchant
+    price = Integer(price)
+    item_info = [nil, true, 0, false, 0, magic_hash]
+    draw_item_name(0, rect.y, item, @actor.equippable?(item), item_info)
     self.contents.font.color.alpha = @actor.equippable?(item) ? 255 : 128
     y_adj = 6
     change_font_to_v(false)

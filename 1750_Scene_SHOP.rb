@@ -185,6 +185,13 @@ class SceneShop < SceneBase
           return
         end
         @menu_window.active = false
+      when 4 # マジックアイテム
+        unless @window_buy.refresh(@is.actor, "マジックアイテム")
+          @attention_window.set_text("ざいこが ありません")
+          wait_for_attention
+          return
+        end
+        @menu_window.active = false
       end
     elsif Input.trigger?(Input::B) #
       @is.refresh
@@ -248,18 +255,18 @@ class SceneShop < SceneBase
     if Input.trigger?(Input::C)
       kind = @window_buy.item[0]
       id = @window_buy.item[1]
-      item = Misc.item(kind, id)
-      if item.price > @is.actor.get_amount_of_money
+      price = @window_buy.selected_item_price           # 値段を取得
+      if price > @is.actor.get_amount_of_money
         @attention_window.set_text("おかねが たりません")
         wait_for_attention
-      elsif item.price == 0
+      elsif price == 0
         @attention_window.set_text("しなぎれです")
         wait_for_attention
       else
         $music.se_play("購入")
         # 物品購入ルーチン----------------------------------------------
-        @is.actor.gain_gold(-item.price)
-        $game_system.gain_consumed_gold(item.price)
+        @is.actor.gain_gold(-price)
+        $game_system.gain_consumed_gold(price)
         oos = $game_party.modify_shop_item([kind, id], -1)  # 在庫を減らす
         @is.actor.gain_item(kind, id, true)    # 鑑定済み
         ## --------------------------------------------------------------
@@ -286,8 +293,10 @@ class SceneShop < SceneBase
     elsif Input.trigger?(Input::B)
       # 武器防具選択や防具の部位選択へもどる
       case @window_buy.pre_kind
-      when "ぶき","どうぐ","スキルブック"; @menu_window.change_page(2, @is.actor)
-      else;                 @menu_window.change_page(3, @is.actor)
+      when "ぶき","どうぐ","スキルブック"
+        @menu_window.change_page(2, @is.actor)
+      else
+        @menu_window.change_page(3, @is.actor)
       end
       @window_buy.active = false
       @window_buy.visible = false
@@ -304,8 +313,9 @@ class SceneShop < SceneBase
       kind = @window_sell.item[0][0]
       id = @window_sell.item[0][1]
       item_data = Misc.item(kind, id) # itemのオブジェクト
-      item = @window_sell.item # itemのオブジェクトと装備・鑑定ステータス
-      stack = item[4] # スタック数
+      item = @window_sell.item  # itemのオブジェクトと装備・鑑定ステータス
+      stack = item[4]           # スタック数
+      enchant_hash = item[5]    # エンチャントハッシュ
       ## ----------------------------------------
       if item == nil
         cant_sell
@@ -320,7 +330,7 @@ class SceneShop < SceneBase
         cant_sell
         return
       end
-      Debug.write(c_m, "[0]:#{item[0]} [1]#{item[1]} [2]:#{item[2]} [3]:#{item[3]} [4]:#{item[4]}")
+      Debug.write(c_m, "[0]:#{item[0]} [1]#{item[1]} [2]:#{item[2]} [3]:#{item[3]} [4]:#{item[4]} [5]:#{item[5]}")
       ## スタックアイテムの場合
       if stack > 0
         $game_party.sell_shop_stack_item( [kind, id], stack)
@@ -330,7 +340,7 @@ class SceneShop < SceneBase
         Debug.write(c_m,"比率:#{ratio} 値段:#{price}")
       ## 通常アイテムの場合
       else
-        $game_party.modify_shop_item( [kind, id], 1)
+        $game_party.modify_shop_item( [kind, id], 1, enchant_hash)
         price = item_data.price / 2
       end
       ## アイテムの削除

@@ -2557,23 +2557,28 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   # ● アイテムの増加
   #--------------------------------------------------------------------------
-  def gain_item(kind, item_id, identified)
+  def gain_item(kind, item_id, identified, hash = {})
     item = Misc.item(kind, item_id)
     stack = item.stack > 0 ? item.stack : 0
-    hash = {}
+    ## すでにエンチャントされているアイテムの取得
+    unless hash.empty?
+      Debug.write(c_m, "====****(すでにエンチャント済み)MAGIC ITEM DETECTED ****==== #{hash}")
+      @bag.push [[kind, item_id], identified, 0, false, stack, hash]
+      return
+    end
     ## 抽選当選かつ手にしたアイテムが武具種で尚且つ宝箱シーンの場合
     diff = ConstantTable::DIFF_01[$game_map.map_id] # フロア係数
     sv = Misc.skill_value(SkillId::TREASUREHUNT, self)
     ratio = Integer(sv * diff)
     if rand(ConstantTable::MAGIC_ITEM_RATIO) == 0 and stack == 0 and $scene.is_a?(SceneTreasure)
-      hash = MAGIC::enchant(item)
+      hash = MAGICITEM.enchant(item)
       Debug.write(c_m, "====**** MAGIC ITEM DETECTED ****==== #{hash}")
     elsif ratio > rand(100) and stack == 0 and $scene.is_a?(SceneTreasure)
-      hash = MAGIC::enchant(item)
-      Debug.write(c_m, "====**** (TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
+      hash = MAGICITEM.enchant(item)
+      Debug.write(c_m, "====****(TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
     elsif $TEST and stack == 0
-      hash = MAGIC::enchant(item)
-      Debug.write(c_m, "====**** ($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
+      hash = MAGICITEM.enchant(item)
+      Debug.write(c_m, "====****($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
     end
 
     @bag.push [[kind, item_id], identified, 0, false, stack, hash]

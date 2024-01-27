@@ -185,7 +185,7 @@ class WindowItemInfo < WindowBase
       store_str("まふうじ") if @item.add_state_set.include?("封")
       # store_str("くび") if @item.critical > 0
     end
-    if kind == 1 or kind == 2
+    if (kind == 1) or (kind == 2)
       ## 主義を取得
       if @item.principle != "both"
         case @item.principle
@@ -204,24 +204,6 @@ class WindowItemInfo < WindowBase
       Debug.write(c_m, "#{com[1]}")
       @str = com[0] if com[0] != nil
       @str2 = com[1] if com[1] != nil
-#~       ## 治療を取得
-#~       temp = ""
-#~       temp += "・どく" if @item.remove_state_set.include?("毒")
-#~       temp += "・まひ" if @item.remove_state_set.include?("痺")
-#~       temp += "・せきか" if @item.remove_state_set.include?("石")
-#~       temp += "・くらやみ" if @item.remove_state_set.include?("暗")
-#~       temp += "・まふうじ" if @item.remove_state_set.include?("封")
-#~       temp += "・ペスト" if @item.remove_state_set.include?("病")
-#~       temp += "・やけど" if @item.remove_state_set.include?("火")
-#~       temp += "・はっきょう" if @item.remove_state_set.include?("狂")
-#~       temp += "・こごえ" if @item.remove_state_set.include?("凍")
-#~       temp += "・かんでん" if @item.remove_state_set.include?("電")
-#~       temp += "・すいみん" if @item.remove_state_set.include?("眠")
-#~       temp += "・あくしゅう" if @item.remove_state_set.include?("臭")
-#~       temp += "・しぼう" if @item.remove_state_set.include?("死")
-#~       if temp != ""
-#~         store_str("#{temp[1..-1]}をちりょう") # 最初の・を抜いたもの
-#~       end
     end
 
     ## special
@@ -236,7 +218,7 @@ class WindowItemInfo < WindowBase
     rune_str = ""
     if $scene.is_a?(SceneCamp)
       ## ルーンボーナスの表示
-      if @bag_pointer[5] != nil
+      if not @bag_pointer[5].empty?
         equip = @bag_pointer[2] > 0 ? true : false
         equip = @actor.check_rune_skill(@item.rank) ? equip : false
         for key in @bag_pointer[5].keys
@@ -252,8 +234,6 @@ class WindowItemInfo < WindowBase
             desc = "ばいだ+#{@bag_pointer[5][key]}"
           when :armor
             desc = "アーマー+#{@bag_pointer[5][key]}"
-          when :capacity_up
-            desc = "C.C.+#{@bag_pointer[5][key]}"
           when :range
             desc = "ロングレンジ"
           when :s_shield
@@ -264,7 +244,7 @@ class WindowItemInfo < WindowBase
             desc = "D.R.+#{@bag_pointer[5][key]}"
           when :initiative
             desc = "イニシアチブ+#{@bag_pointer[5][key]}"
-          when :damageresist
+          when :s_dresist
             desc = "ダメージレジスト+#{@bag_pointer[5][key]}"
           when :a_element
             desc = "ぞくせいぼうぎょ#{@bag_pointer[5][key]}"
