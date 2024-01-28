@@ -33,10 +33,11 @@ class WindowItemInfo < WindowBase
   #--------------------------------------------------------------------------
   # ● リフレッシュ
   #--------------------------------------------------------------------------
-  def refresh(item, actor = nil)
+  def refresh(item, actor = nil, enchant_hash = {})
     @actor = actor
     if item.is_a?(Weapons2) || item.is_a?(Armors2) || item.is_a?(Items2) || item.is_a?(Drops)
       @item = item
+      @bag_pointer = [[0, 0], false, 0, false, 0, enchant_hash]
     else
       kind = item[0][0]
       id = item[0][1]
@@ -216,7 +217,7 @@ class WindowItemInfo < WindowBase
     end
 
     rune_str = ""
-    if $scene.is_a?(SceneCamp)
+    if $scene.is_a?(SceneCamp) or $scene.is_a?(SceneShop)
       ## ルーンボーナスの表示
       if not @bag_pointer[5].empty?
         equip = @bag_pointer[2] > 0 ? true : false

@@ -732,10 +732,10 @@ class GameParty < GameUnit
     unless enchant_hash.empty?
       ## 売却の場合
       if n > 0
-        @shop_magicitems.push([kind, id, enchant_hash])
+        shop_magicitems.push([kind, id, enchant_hash])
       ## 購入の場合
       elsif n < 0
-        @shop_magicitems.delete([kind, id, enchant_hash])
+        shop_magicitems.delete([kind, id, enchant_hash])
       end
       return false
     end

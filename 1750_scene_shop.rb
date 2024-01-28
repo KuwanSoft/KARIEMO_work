@@ -255,6 +255,7 @@ class SceneShop < SceneBase
     if Input.trigger?(Input::C)
       kind = @window_buy.item[0]
       id = @window_buy.item[1]
+      enchant_hash = @window_buy.get_enchant_hash       # エンチャントハッシュの取得
       price = @window_buy.selected_item_price           # 値段を取得
       if price > @is.actor.get_amount_of_money
         @attention_window.set_text("おかねが たりません")
@@ -268,7 +269,7 @@ class SceneShop < SceneBase
         @is.actor.gain_gold(-price)
         $game_system.gain_consumed_gold(price)
         oos = $game_party.modify_shop_item([kind, id], -1)  # 在庫を減らす
-        @is.actor.gain_item(kind, id, true)    # 鑑定済み
+        @is.actor.gain_item(kind, id, true, enchant_hash)    # 鑑定済み
         ## --------------------------------------------------------------
         if oos
           text3 = ConstantTable::OOS_MESSAGE

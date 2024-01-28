@@ -5,7 +5,8 @@
 #==============================================================================
 
 class Window_ShopBuy < WindowSelectable
-  attr_reader   :pre_kind            # 表示中のアイテムの種類
+  attr_reader   :pre_kind             # 表示中のアイテムの種類
+  attr_reader   :displaying_enchant   # マジックアイテムの表示中か
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     x : ウィンドウの X 座標
@@ -68,14 +69,20 @@ class Window_ShopBuy < WindowSelectable
   # ● 選択中のアイテムオブジェクトを取得
   #--------------------------------------------------------------------------
   def item_obj
-    item = Misc.item(@data[index][0], @data[index][1])
+    Misc.item(@data[index][0], @data[index][1])
   end
   #--------------------------------------------------------------------------
   # ● 選択中のアイテムの値段を取得
   #--------------------------------------------------------------------------
   def selected_item_price
-    return Integer(item.price * 1.5) if @displaying_enchant
-    return item.price
+    return Integer(item_obj.price * 1.5) if @displaying_enchant
+    return item_obj.price
+  end
+  #--------------------------------------------------------------------------
+  # ● 選択中のアイテムのエンチャントハッシュを取得
+  #--------------------------------------------------------------------------
+  def get_enchant_hash
+    return item[2]
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ
@@ -125,7 +132,6 @@ class Window_ShopBuy < WindowSelectable
       self.active = true
       self.index = 0
     end
-    Debug.write(c_m, "@data.size #{@data.size}")
     @item_max = @data.size
     create_contents
     self.contents.clear
@@ -133,7 +139,7 @@ class Window_ShopBuy < WindowSelectable
       draw_item(i)
     end
     @index -= 1 if item == nil  # 購入した物品の在庫がきれた場合カーソルを戻す
-    @info.refresh(item_obj)     # アイテム情報の更新
+    @info.refresh(item_obj, actor, get_enchant_hash)     # アイテム情報の更新
     @wallet.refresh(actor)
     return true # 在庫があり、表示更新したらTRUEを返す
   end
