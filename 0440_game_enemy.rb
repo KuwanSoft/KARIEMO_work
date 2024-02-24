@@ -86,12 +86,12 @@ class GameEnemy < GameBattler
   #--------------------------------------------------------------------------
   # ● NoDの取得
   #--------------------------------------------------------------------------
-  def number_of_dice(dummy = false)
-    nod = enemy.nm == 1 ? 2 : 1
-    nod = enemy.npc == 1 ? 3 : nod
-    Debug.write(c_m, "High Number NoD Detected =>#{nod}") if nod > 1
-    return nod
-  end
+  # def number_of_dice(dummy = false)
+  #   nod = enemy.nm == 1 ? 2 : 1
+  #   nod = enemy.npc == 1 ? 3 : nod
+  #   Debug.write(c_m, "High Number NoD Detected =>#{nod}") if nod > 1
+  #   return nod
+  # end
   #--------------------------------------------------------------------------
   # ● アクターか否かの判定
   #--------------------------------------------------------------------------
@@ -192,42 +192,42 @@ class GameEnemy < GameBattler
   # ● DamageReduction値
   #    hitした場所で適用する場所を判定
   #--------------------------------------------------------------------------
-  def get_Damage_Reduction(shield, attacker, sub, part = 9)
-    if part != 9  # 戦闘以外のステータス参照時
-      case part
-      when 0; return dr_head      # GameBatter側を参照
-      when 1; return dr_body      # GameBatter側を参照
-      when 2; return dr_arm       # GameBatter側を参照
-      when 3; return dr_leg       # GameBatter側を参照
-      when 4; return enemy.dr_ph
-      end
-    end
-    case @hit_part
-    when 0 # 兜：頭部 10%
-      dr = dr_head
-    when 1 # 鎧：胴 50%
-      dr = dr_body
-    when 2 # 小手：腕 15%
-      dr = dr_arm
-    when 3 # 具足：脚 25%
-      dr = dr_leg
-    when 4 # 弱点
-      dr = enemy.dr_ph
-      ## 隠密かつダガー使用で2倍
-      # dr = attacker.onmitsu? && attacker.using_dagger?(sub) ? dr*2 : dr
-      Debug::write(c_m,"#{attacker.name} POWERHIT発生 敵DR:#{dr}")
-      shield = false        # 弱点は盾発動キャンセル
-      return dr.to_i
-    end
-    dr = dr.to_i
-    dr -= 1 if burn?
-    dr /= 2 if fracture? and (dr > 0)
-    if shield       # 盾防御時は2倍
-      dr *= 2 if (dr > 0)
-      Debug::write(c_m,"#{enemy.name} シールド防御発生 DR:#{dr}")
-    end
-    return dr
-  end
+  # def get_Damage_Reduction(shield, attacker, sub, part = 9)
+  #   if part != 9  # 戦闘以外のステータス参照時
+  #     case part
+  #     when 0; return dr_head      # GameBatter側を参照
+  #     when 1; return dr_body      # GameBatter側を参照
+  #     when 2; return dr_arm       # GameBatter側を参照
+  #     when 3; return dr_leg       # GameBatter側を参照
+  #     when 4; return enemy.dr_ph
+  #     end
+  #   end
+  #   case @hit_part
+  #   when 0 # 兜：頭部 10%
+  #     dr = dr_head
+  #   when 1 # 鎧：胴 50%
+  #     dr = dr_body
+  #   when 2 # 小手：腕 15%
+  #     dr = dr_arm
+  #   when 3 # 具足：脚 25%
+  #     dr = dr_leg
+  #   when 4 # 弱点
+  #     dr = enemy.dr_ph
+  #     ## 隠密かつダガー使用で2倍
+  #     # dr = attacker.onmitsu? && attacker.using_dagger?(sub) ? dr*2 : dr
+  #     Debug::write(c_m,"#{attacker.name} POWERHIT発生 敵DR:#{dr}")
+  #     shield = false        # 弱点は盾発動キャンセル
+  #     return dr.to_i
+  #   end
+  #   dr = dr.to_i
+  #   dr -= 1 if burn?
+  #   dr /= 2 if fracture? and (dr > 0)
+  #   if shield       # 盾防御時は2倍
+  #     dr *= 2 if (dr > 0)
+  #     Debug::write(c_m,"#{enemy.name} シールド防御発生 DR:#{dr}")
+  #   end
+  #   return dr
+  # end
   #--------------------------------------------------------------------------
   # ● DamageReduction値(シールドあり？)
   #    hitした場所
@@ -250,7 +250,6 @@ class GameEnemy < GameBattler
     end
     dr *= 2 if (dr > 0) && shield # 盾防御時は2倍
     dr -= reduce_dr               # ペナルティステート [DR減少] 判定
-    dr = [dr, 0].max
     return dr
   end
   #--------------------------------------------------------------------------
@@ -998,7 +997,7 @@ class GameEnemy < GameBattler
   #--------------------------------------------------------------------------
   # ● ステート無効化判定
   #     state : ステート文字列
-  # モンスターは病気にかからない
+  # モンスターは病気にかからない、重症化しない
   #--------------------------------------------------------------------------
   def state_resist?(state)
     return true if state == "窒" && undead?           # アンデッドは窒息無効
@@ -1008,6 +1007,7 @@ class GameEnemy < GameBattler
     return true if state == "夢" && devil?            # 悪魔は悪夢無効
     return true if state == "夢" && magical_creature? # 魔法生物は悪夢無効
     return true if state == "病"
+    return true if state == "重"
     return false
   end
   #--------------------------------------------------------------------------
@@ -1044,5 +1044,24 @@ class GameEnemy < GameBattler
   # ● 装備破壊（dummy）
   #--------------------------------------------------------------------------
   def rust_armor
+  end
+  #--------------------------------------------------------------------------
+  # ● 1hitあたりのエレメンタルダメージの取得
+  # 属性武器とエンチャントから取得（属性武器にはエレメンタルダメージエンチャントは乗らない）
+  #--------------------------------------------------------------------------
+  def get_element_damage_per_hit(sub = false)
+    return [0, 0]
+  end
+  #--------------------------------------------------------------------------
+  # ● 体力系異常の補正値(+)
+  #--------------------------------------------------------------------------
+  def vit_modifier
+    return enemy.vit_modifier
+  end
+  #--------------------------------------------------------------------------
+  # ● 精神系異常の補正値(+)
+  #--------------------------------------------------------------------------
+  def mnd_modifier
+    return enemy.mnd_modifier
   end
 end

@@ -355,6 +355,8 @@ class SceneTitle < SceneBase
     $data_states        = load_data("Data/States2.rvdata")  # 追加
     $data_classes       = load_data("Data/Classes2.rvdata")
 
+    $sd = Struct.new(:skill_id, :modifier, :result, :d20, :thres, :ratio) # スキル発動データ構造体
+
     return unless $TEST
     ## 以下はテストのみでしか実行されない。
     ## 暗号化アーカイブでは動作できない

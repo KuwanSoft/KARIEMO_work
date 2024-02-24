@@ -49,7 +49,8 @@ module MAGICITEM
     :s_perme    => 100,   # 武器・防具
     :cast       => 100,   # 武器・防具
     :s_block    => 100,   # 防具
-    :m_regist   => 100    # 防具
+    :m_regist   => 100,   # 防具
+    :curse      => 100    # 武器・防具
   }
   ## 特性値ボーナス抽選
   APTI_ODDS = {
@@ -99,7 +100,7 @@ module MAGICITEM
   #--------------------------------------------------------------------------
   # ● Oddsを出す
   #--------------------------------------------------------------------------
-  def make_weighted_items(keys, kind = 0)
+  def self.make_weighted_items(keys, kind = 0)
     total_odds = 0.0
     ## どのhashを使用するか
     case kind
@@ -108,7 +109,10 @@ module MAGICITEM
     when 2; hash = APTI_ODDS
     when 3; hash = STATE_ODDS
     end
-    keys.each {|key| total_odds += hash[key]}
+    keys.each do |key|
+      Debug.write(c_m, "key:#{key}")
+      total_odds += hash[key]
+    end
     weighted_items = keys.map do |key|
       probability = hash[key] / total_odds
       Debug.write(c_m, "Key:#{key}, Probability:#{probability}")
@@ -119,7 +123,7 @@ module MAGICITEM
   #--------------------------------------------------------------------------
   # ● 累積確率法にて抽選実施
   #--------------------------------------------------------------------------
-  def lottery_enchant_hash_key(weighted_items)
+  def self.lottery_enchant_hash_key(weighted_items)
     random_pick = rand                             # 0~1までの乱数
     cumulative = 0.0
     weighted_items.each do |key, probability|
@@ -147,17 +151,17 @@ module MAGICITEM
     when "sword", "axe", "spear", "bow", "dagger", "club", "katana"
       keys = [:curse, :ap, :swing, :damage, :double, :s_stamina, :range, :s_tactics, :initiative, :e_damage, :apti, :s_thunt, :s_perme, :cast]
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-      apti_keys = [:str, :int, :vid, :spd, :mnd, :luk]
+      apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
     when "throw", "arrow"
       return hash
     when "shield"
       keys = [:curse, :s_stamina, :s_tactics, :initiative, :s_dresist, :a_element, :exp, :apti, :s_thunt, :s_perme, :cast, :s_block, :m_regist, :s_shield]
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-      apti_keys = [:str, :int, :vid, :spd, :mnd, :luk]
+      apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
     when "armor", "helm", "leg", "arm", "other"
       keys = [:curse, :s_stamina, :s_tactics, :initiative, :s_dresist, :a_element, :exp, :apti, :s_thunt, :s_perme, :cast, :s_block, :m_regist]
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-      apti_keys = [:str, :int, :vid, :spd, :mnd, :luk]
+      apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
     end
     keys.delete(:e_damage) unless item.can_element_damage_enchant?  # 属性ダメージが付与可能か？
     key = lottery_enchant_hash_key(make_weighted_items(keys))       # エンチャントの抽選

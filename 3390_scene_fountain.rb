@@ -198,22 +198,7 @@ class SceneFountain < SceneBase
   # ● 何かをみつける(Positive)
   #--------------------------------------------------------------------------
   def detect_something(difficulty)
-    case difficulty
-    when 5;   diff = ConstantTable::DIFF_05[@current_d]
-    when 15;  diff = ConstantTable::DIFF_15[@current_d]
-    when 25;  diff = ConstantTable::DIFF_25[@current_d]
-    when 35;  diff = ConstantTable::DIFF_35[@current_d]
-    when 45;  diff = ConstantTable::DIFF_45[@current_d]
-    when 55;  diff = ConstantTable::DIFF_55[@current_d]
-    when 65;  diff = ConstantTable::DIFF_65[@current_d]
-    when 75;  diff = ConstantTable::DIFF_75[@current_d]
-    when 85;  diff = ConstantTable::DIFF_85[@current_d]
-    when 95;  diff = ConstantTable::DIFF_95[@current_d]
-    end
-    sv = Misc.skill_value(SkillId::EYE, @ps.actor)
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    if ratio > rand(100)
+    if @ps.actor.check_skill_activation(SkillId::EYE, difficulty).result
       @ps.actor.chance_skill_increase(SkillId::EYE)
       return true
     end
@@ -222,28 +207,28 @@ class SceneFountain < SceneBase
   #--------------------------------------------------------------------------
   # ● 回避する(Negative)
   #--------------------------------------------------------------------------
-  def avoid_badthing(rate)
-    case rate
-    when 5;   diff = ConstantTable::DIFF_05[@current_d]
-    when 15;  diff = ConstantTable::DIFF_15[@current_d]
-    when 25;  diff = ConstantTable::DIFF_25[@current_d]
-    when 35;  diff = ConstantTable::DIFF_35[@current_d]
-    when 45;  diff = ConstantTable::DIFF_45[@current_d]
-    when 55;  diff = ConstantTable::DIFF_55[@current_d]
-    when 65;  diff = ConstantTable::DIFF_65[@current_d]
-    when 75;  diff = ConstantTable::DIFF_75[@current_d]
-    when 85;  diff = ConstantTable::DIFF_85[@current_d]
-    when 95;  diff = ConstantTable::DIFF_95[@current_d]
-    end
-    sv = Misc.skill_value(SkillId::FOURLEAVES, @ps.actor)
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    if ratio > rand(100)
-      @ps.actor.chance_skill_increase(SkillId::FOURLEAVES)
-      return true
-    end
-    return false
-  end
+  # def avoid_badthing(rate)
+  #   case rate
+  #   when 5;   diff = ConstantTable::DIFF_05[@current_d]
+  #   when 15;  diff = ConstantTable::DIFF_15[@current_d]
+  #   when 25;  diff = ConstantTable::DIFF_25[@current_d]
+  #   when 35;  diff = ConstantTable::DIFF_35[@current_d]
+  #   when 45;  diff = ConstantTable::DIFF_45[@current_d]
+  #   when 55;  diff = ConstantTable::DIFF_55[@current_d]
+  #   when 65;  diff = ConstantTable::DIFF_65[@current_d]
+  #   when 75;  diff = ConstantTable::DIFF_75[@current_d]
+  #   when 85;  diff = ConstantTable::DIFF_85[@current_d]
+  #   when 95;  diff = ConstantTable::DIFF_95[@current_d]
+  #   end
+  #   sv = Misc.skill_value(SkillId::FOURLEAVES, @ps.actor)
+  #   ratio = Integer([sv * diff, 95].min)
+  #   ratio /= 2 if @ps.actor.tired?
+  #   if ratio > rand(100)
+  #     @ps.actor.chance_skill_increase(SkillId::FOURLEAVES)
+  #     return true
+  #   end
+  #   return false
+  # end
   #--------------------------------------------------------------------------
   # ● 深さ選択の更新
   #--------------------------------------------------------------------------

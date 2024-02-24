@@ -194,16 +194,12 @@ class GameBattleAction
     @reinforced_magic_lv = @magic_lv  # オリジナルのCPを保管
     return @magic_lv unless $game_temp.in_battle
     ## コンセントレート倍率
-    sv = Misc.skill_value(SkillId::CONCENTRATE, @battler)
-    diff = ConstantTable::DIFF_25[$game_map.map_id]
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @battler.tired?
     plus = 0
     @magic_lv.times do
-      plus += 1 if ratio > rand(100)
+      plus += 1 if @battler.check_skill_activation(SkillId::CONCENTRATE, 25).result
     end
     @reinforced_magic_lv += plus
-    Debug.write(c_m, "マジックレベルの上昇判定 CP:#{@magic_lv} reinforced:#{@reinforced_magic_lv}")
+    Debug.write(c_m, "マジックレベルの上昇判定 CP:#{@magic_lv} +#{plus} reinforced:#{@reinforced_magic_lv}")
     return @magic_lv
   end
   #--------------------------------------------------------------------------
@@ -463,21 +459,15 @@ class GameBattleAction
   def make_arrow_targets
     case battler.class_id
     when 7  # 狩人の場合は45%で発生
-      sv = Misc.skill_value(SkillId::MULTITARGET, battler)
-      diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
+      ratio = 45
     else    # その他は25%で発生
-      sv = Misc.skill_value(SkillId::MULTITARGET, battler)
-      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
+      ratio = 25
     end
-    ratio /= 2 if battler.tired?
-    ratio = [ratio, ConstantTable::MULTI_MAXRATIO].min
     result = 1
     ## 9体まで判定
     while result < 9
       Debug.write(c_m, "貫通判定 => #{ratio}% #{result}体目")
-      if ratio > rand(100)
+      if battler.check_skill_activation(SkillId::MULTITARGET, ratio).result
         result += 1
         Debug.write(c_m, "貫通判定 => HIT")
       else
@@ -501,18 +491,13 @@ class GameBattleAction
   def make_spear_targets
     case battler.class_id
     when 4  # 騎士の場合
-      sv = Misc.skill_value(SkillId::POLE_STAFF, battler)
-      diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
+      ratio = 35
     else
-      sv = Misc.skill_value(SkillId::POLE_STAFF, battler)
-      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
+      ratio = 25
     end
-    ratio /= 2 if battler.tired?
     result = 1
     ## 2体まで判定
-    if ratio > rand(100)
+    if battler.check_skill_activation(SkillId::POLE_STAFF, ratio).result
       result += 1
     end
     Debug.write(c_m,"貫通槍 #{result}体貫通(#{ratio}%)")

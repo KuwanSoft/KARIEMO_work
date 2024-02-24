@@ -26,7 +26,7 @@ class Window_BagSelection < WindowSelectable
       width = 382
       height = 210
       @wallet = WindowWallet.new
-      @help = Window_ShopHelp.new
+      @help = WindowShopHelp.new
     end
     super(x, y, width, height)
     self.visible = false

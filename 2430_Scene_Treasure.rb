@@ -1013,12 +1013,11 @@ class SceneTreasure < SceneBase
       i = 0
       good = 0
       result = "?"
-      value = @ps.actor.search_ratio
       case @timer
       when t1, t2, t3, t4, t5, t6, t7, t8
         good = 0
         while i < 3
-          if value > rand(100)
+          if @ps.actor.do_inspection
             good += 1 # 成功回数
           end
           i += 1
@@ -1033,7 +1032,7 @@ class SceneTreasure < SceneBase
           result = "?"    # 罠は発動しない
         when 1  # ？
           result = "?"    # 罠は発動しない
-        when 2  # */-
+        when 2  # *
           case @timer
           when t8; result = "*" if @devices[7] != "-"
           when t7; result = "*" if @devices[6] != "-"
@@ -1044,7 +1043,7 @@ class SceneTreasure < SceneBase
           when t2; result = "*" if @devices[1] != "-"
           when t1; result = "*" if @devices[0] != "-"
           end
-        when 3  # 1..3
+        when 3  # 1..3 or -
           case @timer
           when t8; result = @devices[7]
           when t7; result = @devices[6]
@@ -1129,8 +1128,7 @@ class SceneTreasure < SceneBase
         end
       when 198
         ## うまくはずせた
-        value = @ps.actor.disarm_ratio
-        if value > rand(100)
+        if @ps.actor.do_disarm
           $music.se_play("たからばこ")
           @inspect_window.device_array[@device_window.index] = true
           @inspect_window.refresh(@ps.actor)

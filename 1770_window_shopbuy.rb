@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_ShopBuy
+# ■ WindowShopBuy
 #------------------------------------------------------------------------------
 # ショップ画面で、購入できる商品の一覧を表示するウィンドウです。
 #==============================================================================
 
-class Window_ShopBuy < WindowSelectable
+class WindowShopBuy < WindowSelectable
   attr_reader   :pre_kind             # 表示中のアイテムの種類
   attr_reader   :displaying_enchant   # マジックアイテムの表示中か
   #--------------------------------------------------------------------------
@@ -15,7 +15,7 @@ class Window_ShopBuy < WindowSelectable
   def initialize
     @info = WindowItemInfo.new
     @wallet = WindowWallet.new
-    @help = Window_ShopHelp.new
+    @help = WindowShopHelp.new
     super(4, WLW*7+32+4+24, 512-8, WLH*12+32+8-24)
     self.z = 110
     self.visible = false
@@ -82,7 +82,8 @@ class Window_ShopBuy < WindowSelectable
   # ● 選択中のアイテムのエンチャントハッシュを取得
   #--------------------------------------------------------------------------
   def get_enchant_hash
-    return item[2]
+    return item[2] if @displaying_enchant
+    return {}
   end
   #--------------------------------------------------------------------------
   # ● リフレッシュ
@@ -181,6 +182,6 @@ class Window_ShopBuy < WindowSelectable
   # ● index更新時毎に呼び出される動作
   #--------------------------------------------------------------------------
   def action_index_change
-    @info.refresh(item_obj)
+    @info.refresh(item_obj, @actor, get_enchant_hash)
   end
 end

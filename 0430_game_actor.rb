@@ -745,55 +745,43 @@ class GameActor < GameBattler
     str = ""
     ## 毒塗がある場合
     if get_poison_number != 0
-      sv = Misc.skill_value(SkillId::POISONING, self)
-
       case @class_id
-      when 2; diff = ConstantTable::DIFF_95[$game_map.map_id] # フロア係数
-      else;   diff = ConstantTable::DIFF_85[$game_map.map_id] # フロア係数
+      when 2; ratio = 95
+      else;   ratio = 85
       end
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      if ratio > rand(100)
+      if check_skill_activation(SkillId::POISONING, ratio).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "毒"
       end
       case @class_id
-      when 2; diff = ConstantTable::DIFF_45[$game_map.map_id] # フロア係数
-      else;   diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
+      when 2; ratio = 45
+      else;   ratio = 35
       end
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      if ratio > rand(100)
+      if check_skill_activation(SkillId::POISONING, ratio).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "暗"
       end
       case @class_id
-      when 2; diff = ConstantTable::DIFF_35[$game_map.map_id] # フロア係数
-      else;   diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
+      when 2; ratio = 35
+      else;   ratio = 25
       end
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      if ratio > rand(100)
+      if check_skill_activation(SkillId::POISONING, ratio).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "痺"
       end
       case @class_id
-      when 2; diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-      else;   diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
+      when 2; ratio = 25
+      else;   ratio = 15
       end
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      if ratio > rand(100)
+      if check_skill_activation(SkillId::POISONING, ratio).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "狂"
       end
       case @class_id
-      when 2; diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
-      else;   diff = ConstantTable::DIFF_05[$game_map.map_id] # フロア係数
+      when 2; ratio = 15
+      else;   ratio = 5
       end
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      if ratio > rand(100)
+      if check_skill_activation(SkillId::POISONING, ratio).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "窒"
       end
@@ -1687,34 +1675,11 @@ class GameActor < GameBattler
     weapon_data = $data_weapons[wep_id]   # 装備中の武器データ取得
     ap = (get_weapon_skill_value(kind) / self.class.ap1) + self.class.ap2
     val = 0
-    ## 両手持ちからのボーナス（弓と杖は除く）
-    if t_hand?
-      case Misc.skill_value(SkillId::TWOHANDED, self)
-      when 50..999;   val = 2 # AP+2
-      else;           val = 0
-      end
-    ## 二刀流
-    elsif dual_wield?
-      case Misc.skill_value(SkillId::DUAL, self)
-      when 50..999;    no_penalty = true
-      else;           no_penalty = false
-      end
-      sv = Misc.skill_value(SkillId::DUAL, self)
-      diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      val = 1 if ratio > rand(100) && $game_temp.in_battle # AP+1ボーナス
-    end
     ap += val
     ## 二刀流スキルが一定あればペナルティはかからない
     if sub
-      ap /= 2 unless no_penalty # サブ武器は半減
+      ap /= 2 # サブ武器は半減
     end
-    # wep_id = sub ? @subweapon_id : @weapon_id
-    # kind = sub ? subweapon? : weapon?
-    # return 0 if !(sub) && @weapon_id == 0 # メイン武器無し
-    # return 0 if sub && @subweapon_id == 0 # サブ武器無し
-    # weapon_data = $data_weapons[wep_id]   # 装備中の武器データ取得
     ap += weapon_data.AP
     ap += get_AP_bonus                    # 装備品によるAPボーナス
     ap += get_ArrowAP                     # 弓のAP補正
@@ -1736,20 +1701,6 @@ class GameActor < GameBattler
     s = get_weapon_skill_value(kind) / c + 1
     s += 1 if @class_id == 5  # 忍者の場合
     val = 0
-    ## 二刀流、両手持ちからのボーナス
-    if t_hand?
-      sv = Misc.skill_value(SkillId::TWOHANDED, self)
-      diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      val = 1 if ratio > rand(100) && $game_temp.in_battle # Swing+1ボーナス
-    elsif dual_wield?
-      sv = Misc.skill_value(SkillId::DUAL, self)
-      diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if tired?
-      val = 1 if ratio > rand(100) && $game_temp.in_battle # Swing+1ボーナス
-    end
     s += val
     adjust = 0
     adjust += get_magic_attr(:swing)                      # マジックアイテム
@@ -1761,13 +1712,13 @@ class GameActor < GameBattler
   # 中衛 1～6
   # 後衛 1～5
   #--------------------------------------------------------------------------
-  def number_of_dice(sub)
-    return 1 if sub
-    return 1 if !(sub) && @weapon_id == 0 # メイン武器無し
-    return 1 if sub && @subweapon_id == 0 # サブ武器無し
-    return 3 if self.onmitsu? # バックスタブは確定で3
-    return self.class.nod
-  end
+  # def number_of_dice(sub)
+  #   return 1 if sub
+  #   return 1 if !(sub) && @weapon_id == 0 # メイン武器無し
+  #   return 1 if sub && @subweapon_id == 0 # サブ武器無し
+  #   return 3 if self.onmitsu? # バックスタブは確定で3
+  #   return self.class.nod
+  # end
   #--------------------------------------------------------------------------
   # ● 攻撃時メッセージ
   #--------------------------------------------------------------------------
@@ -2076,18 +2027,15 @@ class GameActor < GameBattler
   def shield_activate?
     return false if @armor2_id == 0   # 盾装備していない場合
     return false unless movable?
-    sv = get_weapon_skill_value("shield")
     case @class_id
     when 4  # 騎士
-      diff = ConstantTable::DIFF_55[$game_map.map_id] # フロア係数
+      diff = 55
     else
-      diff = ConstantTable::DIFF_40[$game_map.map_id] # フロア係数
+      diff = 40
     end
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if self.tired?
-    if ratio > rand(100)
+    if check_skill_activation(SkillId::SHIELD, diff).result
       @shield_block = true
-      Debug::write(c_m,"#{@name} 盾ブロック発動 発動率:#{ratio}%") # debug
+      Debug::write(c_m,"#{@name} 盾ブロック発動 発動率:#{diff}%") # debug
       self.chance_skill_increase(SkillId::SHIELD)  # パリィ
       return true
     end
@@ -2452,17 +2400,14 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def get_Power_Hit
     return false if @weapon_id == 0     # 素手の場合
-    sv = Misc.skill_value(SkillId::ANATOMY, self)       # 解剖学のスキル
     if self.onmitsu?
-      diff = ConstantTable::DIFF_50[$game_map.map_id]  # フロア係数
+      diff = 50
     else
-      diff = ConstantTable::DIFF_25[$game_map.map_id]  # フロア係数
+      diff = 25
     end
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if self.tired?
-    if ratio > rand(100)
+    if check_skill_activation(SkillId::ANATOMY, diff).result
       chance_skill_increase(SkillId::ANATOMY)         # 解剖学スキル上昇
-      Debug::write(c_m,"パワーヒット発生 成功率:#{ratio}%")
+      Debug::write(c_m,"パワーヒット発生 成功率:#{diff}%")
       return true
     end
     return false
@@ -2479,50 +2424,34 @@ class GameActor < GameBattler
     return result
   end
   #--------------------------------------------------------------------------
+  # ● 罠の調査成功判定
+  #--------------------------------------------------------------------------
+  def do_inspection
+    return check_skill_activation(SkillId::TRAP, 70).result
+  end
+  #--------------------------------------------------------------------------
   # ● 罠の調査成功値の取得
   #--------------------------------------------------------------------------
   def search_ratio
     ## 呪文で調べる場合
-    if @cast_spell_identify == true
-      return 90
-    end
-    sv = Misc.skill_value(SkillId::TRAP, self) # 罠の調査 特性値補正後のスキル値
-    case @class_id
-    when 2,5
-      diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
-    else
-      diff = ConstantTable::DIFF_60[$game_map.map_id]
-    end
-    ratio = sv * diff
-    case @class_id
-    when 2;   ratio = [ratio, 95].min # 盗賊
-    when 5;   ratio = [ratio, 90].min # 忍者
-    else;     ratio = [ratio, 80].min # その他
-    end
-    return Integer(ratio)
+    return 90 if @cast_spell_identify
+    data = check_skill_activation(SkillId::TRAP, 70)
+    return Integer([data.ratio * 5, 95].min)
+  end
+  #--------------------------------------------------------------------------
+  # ● 罠外しの成功判定
+  #--------------------------------------------------------------------------
+  def do_disarm
+    return check_skill_activation(SkillId::PICKLOCK, 70).result
   end
   #--------------------------------------------------------------------------
   # ● 罠外し成功値の取得
   #--------------------------------------------------------------------------
   def disarm_ratio
     ## 呪文で外す場合
-    if @cast_spell_identify == true
-      return 90
-    end
-    sv = Misc.skill_value(SkillId::PICKLOCK, self) # ピッキング 特性値補正後のスキル値
-    case @class_id
-    when 2,5
-      diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
-    else
-      diff = ConstantTable::DIFF_60[$game_map.map_id]
-    end
-    ratio = sv * diff
-    case @class_id                    # クラスによる上限値あり
-    when 2;   ratio = [ratio, 95].min # 盗賊
-    when 5;   ratio = [ratio, 90].min # 忍者・従士
-    else;     ratio = [ratio, 80].min # その他
-    end
-    return Integer(ratio)
+    return 90 if @cast_spell_identify
+    data = check_skill_activation(SkillId::PICKLOCK, 70)
+    return Integer([data.ratio * 5, 95].min)
   end
   #--------------------------------------------------------------------------
   # ● 宝箱をこじ開ける
@@ -3065,6 +2994,7 @@ class GameActor < GameBattler
     elsif magic.earth > 0
       self.mp_earth -= cost
     end
+    tired_casting(cost)             # 呪文詠唱による疲労増加
     return cost
   end
   #--------------------------------------------------------------------------
@@ -3634,9 +3564,9 @@ class GameActor < GameBattler
       result += $data_armors[@armor8_id].add_value
     end
     ## パーティマジック:観察眼ボーナス
-    if $game_party.pm_detect > 0 and (id == SkillId::EYE)
-      result += ConstantTable::PM_DETECT_BONUS
-    end
+    # if $game_party.pm_detect > 0 and (id == SkillId::EYE)
+    #   result += ConstantTable::PM_DETECT_BONUS
+    # end
     ## パーティマジック:危険予知ボーナス
     if $game_party.pm_detect > 0 and (id == SkillId::PREDICTION)
       result += ConstantTable::PM_PREDICTION_BONUS
@@ -3658,28 +3588,28 @@ class GameActor < GameBattler
     return result
   end
   #--------------------------------------------------------------------------
-  # ● 体力系異常の回避値(%)
+  # ● 体力系異常の補正値(+)
   #--------------------------------------------------------------------------
-  def vit_evade
-    return vit * 2
+  def vit_modifier
+    return (vit / 5)
   end
   #--------------------------------------------------------------------------
-  # ● 精神系異常の回避値(%)
+  # ● 精神系異常の補正値(+)
   #--------------------------------------------------------------------------
-  def mnd_evade
-    return mnd * 2
+  def mnd_modifier
+    return (mnd / 5)
   end
   #--------------------------------------------------------------------------
-  # ● 運系異常の回避値(%)
+  # ● 運系異常の補正値(+)＊武具破壊のみ
   #--------------------------------------------------------------------------
-  def luk_evade
-    return luk * 2
+  def luk_modifier
+    return (luk / 5)
   end
   #--------------------------------------------------------------------------
-  # ● 運系異常の回避値(%)　＊武具破壊のみ
+  # ● ドレイン系異常の補正値(+)
   #--------------------------------------------------------------------------
-  def all_evade
-    return str + int + vit + spd + mnd + luk
+  def all_modifier
+    return ((str + int + vit + spd + mnd + luk) / 5)
   end
   #--------------------------------------------------------------------------
   # ● 累計取得スキルポイントの計算
@@ -3907,14 +3837,13 @@ class GameActor < GameBattler
   # ● スカウトスキルチェック実施
   #--------------------------------------------------------------------------
   def scout_check
-    skill_id = SkillId::EYE # 観察眼
+    modifier = $game_party.pm_detect > 0 ? 1 : 0
+    skill_id = SkillId::EYE         # 観察眼
     sv = Misc.skill_value(skill_id, self)
     diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-    @s_ratio = Integer([sv * diff, 95].min)
-    @s_ratio /= 2 if self.tired?
-    @s_ratio = 0 unless movable? # 行動不能の場合
-    @s_r = rand(100)
-    @s_result = @s_ratio > @s_r ? true : false
+    @s_ratio = movable? ? get_d20(:skill, modifier) : 0
+    @s_r = Integer([[20 - (sv * diff / 5), 19].min, 1].max)
+    @s_result = (@s_ratio >= @s_r)
     chance_skill_increase(skill_id) # 試したら上昇
   end
   #--------------------------------------------------------------------------
@@ -3933,15 +3862,13 @@ class GameActor < GameBattler
   # ● シークレットの発見
   #--------------------------------------------------------------------------
   def find_something
-#~     ## ランダムグリッドがアクティブの場合はシークレット発見はスキップされる
-#~     kind = $game_system.check_randomevent($game_map.map_id, $game_map.x, $game_map.y)
-#~     return if kind == 0 # kind=0は何も無いということ。
-    skill_id = SkillId::EYE # 観察眼
-    sv = Misc.skill_value(skill_id, self) # 罠の調査 特性値補正後のスキル値
+    modifier = $game_party.pm_detect > 0 ? 1 : 0
+    skill_id = SkillId::EYE                         # 観察眼
+    sv = Misc.skill_value(skill_id, self)           # 罠の調査 特性値補正後のスキル値
     diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if self.tired?
-    if ratio > rand(100)
+    d20 = movable? ? get_d20(:skill, modifier) : 0
+    thres = Integer([[20 - (sv * diff / 5), 19].min, 1].max)
+    if d20 >= thres
       @find = true
       chance_skill_increase(skill_id)
       return true
@@ -4874,22 +4801,25 @@ class GameActor < GameBattler
     return weapon_data.element_type             # エンチャントの属性
   end
   #--------------------------------------------------------------------------
-  # ● エレメンタルダメージDiceNumberの取得
-  # 武器から取得
-  # 武器エンチャントから取得
-  # 属性重複ならダメージ上乗せだが、別属性の場合は武器側のみが有効
+  # ● 1hitあたりのエレメンタルダメージの取得
+  # 属性武器とエンチャントから取得（属性武器にはエレメンタルダメージエンチャントは乗らない）
   #--------------------------------------------------------------------------
   def get_element_damage_per_hit(sub = false)
-    return 0 if equip_element_weapon?(sub) == 0 # 武器属性無し・エンチャント無し
-    damage1 = damage2 = 0                       # 初期化
-    w_e_type = get_element_type                 # エンチャントの属性
+    return [0, 0] if equip_element_weapon?(sub) == 0 # 武器属性無し・エンチャント無し
+    Debug.write(c_m, "何かの属性ダメージ付の武器を持つ")
+    damage = 0                                  # 初期化
+    w_e_type = get_element_type(sub)            # 武器の属性取得
+    ## 武器に属性付与済み
     if w_e_type > 0
       ## 武器付属の属性ダメージ
       a = get_element_dice_number(sub)
       b = get_element_dice_max(sub)
       c = get_element_dice_plus(sub)
-      damage1 = Misc.dice(a, b, c)
-      Debug.write(c_m, "武器付属属性Damage1:#{damage1} #{a}d#{b}+#{c}")
+      damage = Misc.dice(a, b, c)
+      Debug.write(c_m, "武器付属属性(#{w_e_type})Damage:#{damage} #{a}d#{b}+#{c}")
+      return w_e_type, Integer(damage)
+    else
+      Debug.write(c_m, "エンチャント武器判定開始")
     end
     ## 装備武器のエンチャント情報の取得
     hash = get_weapon_enchant(sub)
@@ -4898,20 +4828,12 @@ class GameActor < GameBattler
       d = hash[:e_damage][:element_damage].scan(/(\S+)d/)[0][0].to_i
       e = hash[:e_damage][:element_damage].scan(/d(\d+)[+-]/)[0][0].to_i
       f = hash[:e_damage][:element_damage].scan(/([+-]\d+)/)[0][0].to_i
-      damage2 = Misc.dice(d, e, f)
-      if w_e_type == 0            # 武器属性が無くエンチャントありの場合
-        Debug.write(c_m, "武器エンチャント属性 Damage2:#{Integer(damage1)} #{d}d#{e}+#{f}")
-        return e_e_type, Integer(damage2)
-      end
-    end
-    ## 武器属性とエンチャント属性が一致の場合
-    if w_e_type == e_e_type
-      Debug.write(c_m, "武器付属属性==エンチャント属性 Damage1+2:#{Integer(damage1 + damage2)}")
-      return e_e_type, Integer(damage1 + damage2)
-    ## 武器属性とエンチャントが一致しない場合、武器属性ダメージを返す
+      damage = Misc.dice(d, e, f)
+      Debug.write(c_m, "武器エンチャント属性(#{e_e_type}) Damage:#{Integer(damage)} #{d}d#{e}+#{f}")
+      return e_e_type, Integer(damage)
     else
-      Debug.write(c_m, "武器付属属性 Damage1:#{Integer(damage1)}")
-      return w_e_type, Integer(damage1)
+      Debug.write(c_m, "エンチャント武器判定=>ルーンの知識が足りない")
+      return [0, 0] # ルーンスキルが足りない
     end
   end
 end

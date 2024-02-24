@@ -30,7 +30,7 @@
 #     show_vil_picture
 #     @back_s = Window_ShopBack_Small.new       # メッセージ枠小
 #     @attention_window = Window_ShopAttention.new(110)  # attention表示用
-#     @window_buy = Window_ShopBuy.new          # 買い物window
+#     @window_buy = WindowShopBuy.new          # 買い物window
 #     @window_sell = Window_BagSelection.new("売る", WLH*6)  # 売りwindow
 #     @window_det  = Window_BagSelection.new("鑑定", WLH*6)  # 鑑定window
 #     @window_cur = Window_BagSelection.new("解呪", WLH*6)   # 呪いを解くwindow
