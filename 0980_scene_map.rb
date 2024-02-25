@@ -68,9 +68,10 @@ class SceneMap < SceneBase
   # ● イベント画像の消去
   #--------------------------------------------------------------------------
   def erase_picture
-    return if @window_picure == nil
+    return unless defined?(@WindowPicture)
     @WindowPicture.temp_dispose
     @WindowPicture.visible = false
+    Debug.write(c_m, "イベント画像の消去完了")
   end
   #--------------------------------------------------------------------------
   # ● 矢印の定義

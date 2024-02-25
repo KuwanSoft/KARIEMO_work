@@ -419,37 +419,38 @@ class GameEnemy < GameBattler
 
       case roulette[rand(roulette.size)]
       when 1
-        @action.magic_id = enemy.magic1_id  # 呪文名
-        @action.magic_lv = enemy.magic1_cp  # 呪文強度
+        magic_id = enemy.magic1_id  # 呪文名
+        magic_lv = enemy.magic1_cp  # 呪文強度
       when 2
-        @action.magic_id = enemy.magic2_id  # 呪文名
-        @action.magic_lv = enemy.magic2_cp  # 呪文強度
+        magic_id = enemy.magic2_id  # 呪文名
+        magic_lv = enemy.magic2_cp  # 呪文強度
       when 3
-        @action.magic_id = enemy.magic3_id  # 呪文名
-        @action.magic_lv = enemy.magic3_cp  # 呪文強度
+        magic_id = enemy.magic3_id  # 呪文名
+        magic_lv = enemy.magic3_cp  # 呪文強度
       when 4
-        @action.magic_id = enemy.magic4_id  # 呪文名
-        @action.magic_lv = enemy.magic4_cp  # 呪文強度
+        magic_id = enemy.magic4_id  # 呪文名
+        magic_lv = enemy.magic4_cp  # 呪文強度
       when 5
-        @action.magic_id = enemy.magic5_id  # 呪文名
-        @action.magic_lv = enemy.magic5_cp  # 呪文強度
+        magic_id = enemy.magic5_id  # 呪文名
+        magic_lv = enemy.magic5_cp  # 呪文強度
       when 6
-        @action.magic_id = enemy.magic6_id  # 呪文名
-        @action.magic_lv = enemy.magic6_cp  # 呪文強度
+        magic_id = enemy.magic6_id  # 呪文名
+        magic_lv = enemy.magic6_cp  # 呪文強度
       end
-      Debug::write(c_m,"　┗戦闘行動:呪文の決定 ID#{@action.magic_id}")
-      Debug::write(c_m,"　　┗戦闘行動:呪文の強さ CP#{@action.magic_lv}")
+      Debug::write(c_m,"　┗戦闘行動:呪文の決定 ID#{magic_id}")
+      Debug::write(c_m,"　　┗戦闘行動:呪文の強さ CP#{magic_lv}")
       decrease = 0
       d_rate = ConstantTable::MLDECREASERATIO
-      (@action.magic_lv - 1).times do # 最大詠唱レベル回数分の減少レベルを判定
+      (magic_lv - 1).times do # 最大詠唱レベル回数分の減少レベルを判定
         if d_rate > rand(100) # 設定%で詠唱レベルが下がる
           decrease += 1   # 詠唱レベルを下げる
         else
           break           # 下がらない判定になった時点でBREAK
         end
       end
-      @action.magic_lv -= decrease  # 最大レベルから減少させる
-      @action.magic_lv = [[@action.magic_lv, 1].max, 6].min
+      magic_lv -= decrease  # 最大レベルから減少させる
+      magic_lv = [[magic_lv, 1].max, 6].min
+      @action.set_magic(magic_id, magic_lv) # 行動の設定
       Debug::write(c_m,"　　　┗戦闘行動:呪文の強さ補正後 CP#{@action.magic_lv}")
     elsif breath_activate?          # ブレス(メソッドでkindとbasicを入れ込む)
       Debug::write(c_m,"┗戦闘行動:ブレス決定 #{enemy.name}")

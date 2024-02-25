@@ -50,7 +50,7 @@ class GameActor < GameBattler
   attr_accessor :skill_point_store        # 総取得スキルポイント
   attr_accessor :sp_getback               # 取返しスキルポイント総量
   attr_accessor :sp_prev                  # 取返しスキルポイントハッシュ
-  attr_accessor :skill                    # スキル
+  attr_reader   :skill                    # スキル
   attr_accessor :friendship               # 信頼度ハッシュ
   attr_reader   :personality_p            # 性格１
   attr_reader   :personality_n            # 性格２
@@ -201,6 +201,24 @@ class GameActor < GameBattler
     @init_luk = 5                 # 初期パラメータ うんのよさ
   end
   #--------------------------------------------------------------------------
+  # ● スキル値の変更
+  #--------------------------------------------------------------------------
+  def set_skill(skill_id, value, initial=false)
+    @skill[skill_id] = 0 if @skill[skill_id] == nil
+    if initial
+      @skill[skill_id] = value
+    else
+      @skill[skill_id] += value
+    end
+    Debug.write(c_m, "#{@name} スキルの#{initial ? "初期化" : "上昇"} #{$data_skills[skill_id].name} 値:#{@skill[skill_id]}")
+  end
+  #--------------------------------------------------------------------------
+  # ● スキルを持っている？
+  #--------------------------------------------------------------------------
+  def has_skill?(skill_id)
+    return @skill.has_key?(skill_id)
+  end
+  #--------------------------------------------------------------------------
   # ● スキルの初期設定とマージ(lv up時に呼び出し追加スキルを記録）
   #     イベントでの特定取得スキルは skill_idへ
   #--------------------------------------------------------------------------
@@ -210,11 +228,10 @@ class GameActor < GameBattler
       next if skill == nil
       # 該当スキルが初期スキルか？または特定の習得スキル
       if skill.initial_skill?(self) or (skill.id == skill_id)
-        Debug::write(c_m,"スキルSET:#{skill.name} 現在値:#{@skill[skill.id]}")
-        if @skill[skill.id] == nil        # 該当スキルを持っていない？
-          value = 50
-          @skill[skill.id] = value        # 初期値
+        unless has_skill?(skill.id)          # 該当スキルを持っていない場合
+          set_skill(skill.id, 50, true)      # 初期値設定
         end
+        Debug::write(c_m,"スキルSET:#{skill.name} 値:#{@skill[skill.id]}")
       end
     end
   end
@@ -1560,6 +1577,17 @@ class GameActor < GameBattler
   # w: weapon? or subweapon?
   #--------------------------------------------------------------------------
   def get_weapon_skill_value(w)
+    ##################debug
+    for key in @skill.keys
+      if key == ""
+      elsif $data_skills[key].initial_skill?(self)
+        Debug.write(c_m, "#{$data_skills[key].name}は初期スキル")
+      else
+        Debug.write(c_m, "#{$data_skills[key].name}は初期スキルではない")
+      end
+    end
+    Debug.write(c_m, "スキル数:#{@skill.keys.size}")
+    ##################
     base_skill = 0
     case w
     when "shield";
@@ -2641,6 +2669,7 @@ class GameActor < GameBattler
 
     ## 二刀流からのボーナス
     if dual_wield?
+      TODO
       case Misc.skill_value(SkillId::DUAL, self)
       when 25..999;  val = 2  # +2
       else;          val = 0
@@ -3342,13 +3371,13 @@ class GameActor < GameBattler
     return if @skill[id] == 999
     ## レベル上昇による自動取得スキル
     if cls
-      @skill[id] += 1         # スキル増加
+      set_skill(id, 1)        # スキル増加
       @skill_point_store += 1 # 総取得SPに加算
     ## 使用による自然上昇スキル
     else
       value = 1
       Debug::write(c_m,"スキルID:#{id} PAGE:#{$data_skills[id].page}")
-      @skill[id] += value
+      set_skill(id, value)    # スキル増加
       ## スキル再取得判定-------------------------------
       @sp_getback ||= 0 # 再初期化
       @sp_prev ||= {}   # 再初期化
@@ -3480,8 +3509,8 @@ class GameActor < GameBattler
   #   3)現スキル値確率判定
   #--------------------------------------------------------------------------
   def chance_skill_increase(id)
-    return unless movable?  # 行動不能時は判定されない
-    return if @skill[id] == nil       # スキルを持っていなければスキップ
+    return unless movable?        # 行動不能時は判定されない
+    return unless has_skill?(id)  # スキルを持っていなければスキップ
     @skill_interval[id] = 0 if @skill_interval[id] == nil
 
     ## １：インターバルチェック
@@ -4077,10 +4106,9 @@ class GameActor < GameBattler
   # 無事使用できればTRUEを返す
   #--------------------------------------------------------------------------
   def use_skillbook2(item_data)
-    skill_id = item_data.purpose  # 該当スキルIDの取得
-    @skill[skill_id] ||= 0        # 未定義なら0でリセット
-    return false if @skill[skill_id] > 0 # 該当スキル取得済
-    @skill[skill_id] = 50
+    skill_id = item_data.purpose    # 該当スキルIDの取得
+    return false if has_skill?(skill_id)
+    set_skill(skill_id, 50, true)  # 該当スキルの初期化
     return true
   end
   #--------------------------------------------------------------------------
@@ -4088,8 +4116,8 @@ class GameActor < GameBattler
   # 無事使用できればTRUEを返す
   #--------------------------------------------------------------------------
   def use_skillbook(item_data)
-    skill_id = item_data.purpose  # 該当スキルIDの取得
-    return false if @skill[skill_id] == nil    # 該当スキル未取得
+    skill_id = item_data.purpose              # 該当スキルIDの取得
+    return false unless has_skill?(skill_id)  # 該当スキル未取得
 
     ## スキル値
     case item_data.rank
@@ -4106,7 +4134,7 @@ class GameActor < GameBattler
 
     ## 追加量分かつリミット以下で上昇させる
     add_value.times do
-      @skill[skill_id] += 1 if @skill[skill_id] < limit
+      set_skill(skill_id, 1) if @skill[skill_id] < limit
     end
     Debug.write(c_m, "スキルブック使用後 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
     return true
@@ -4118,11 +4146,7 @@ class GameActor < GameBattler
     ## 性格２
     case @personality_n
     when :Worrywart  # 心配性
-      ## 無ければ初期化
-      if @skill[SkillId::PACKING] == nil
-        @skill[SkillId::PACKING] = 0
-      end
-      @skill[SkillId::PACKING] += 150  # パッキング
+      set_skill(SkillId::PACKING, 150)  # パッキング
     when :Rough  # 大雑把
       @init_luk += 1
       self.luk += 1
@@ -4130,38 +4154,18 @@ class GameActor < GameBattler
     ## 性格１
     case @personality_p
     when :Sociable  # 社交的
-      ## 無ければ初期化
-      if @skill[SkillId::NEGOTIATION] == nil
-        @skill[SkillId::NEGOTIATION] = 0
-      end
-      @skill[SkillId::NEGOTIATION] += 150  # 交渉術
+      set_skill(SkillId::NEGOTIATION, 150)  # 交渉術
     when :Humility  # 謙虚
-      ## 無ければ初期化
-      if @skill[SkillId::LEARNING] == nil
-        @skill[SkillId::LEARNING] = 0
-      end
-      @skill[SkillId::LEARNING] += 150  # ラーニング
+      set_skill(SkillId::LEARNING, 150)  # ラーニング
     when :Kindness  # 親切
       @init_luk += 1
       self.luk += 1
     when :Responsible  # 責任感
-      ## 無ければ初期化
-      if @skill[SkillId::LEADERSHIP] == nil
-        @skill[SkillId::LEADERSHIP] = 0
-      end
-      @skill[SkillId::LEADERSHIP] += 150  # リーダーシップ
+      set_skill(SkillId::LEADERSHIP, 150)  # リーダーシップ
     when :Enthusiasm # 凝り性
-      ## 無ければ初期化
-      if @skill[SkillId::ANATOMY] == nil
-        @skill[SkillId::ANATOMY] = 0
-      end
-      @skill[SkillId::ANATOMY] += 150  # 解剖学
+      set_skill(SkillId::ANATOMY, 150)  # 解剖学
     when :MonsterMania # モンスターマニア
-      ## 無ければ初期化
-      if @skill[SkillId::DEMONOLOGY] == nil
-        @skill[SkillId::DEMONOLOGY] = 0
-      end
-      @skill[SkillId::DEMONOLOGY] += 150  # 魔物の知識
+      set_skill(SkillId::DEMONOLOGY, 150)  # 魔物の知識
     end
   end
   #--------------------------------------------------------------------------
@@ -4234,16 +4238,6 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def add_poison_weapon
     @poison_weapon = 1  # 0はdisable 1<の場合は毒塗あり
-    # main = (can_poison? % 2 == 1) ? true : false
-    # sub = (can_poison? / 2 % 2 == 1) ? true : false
-    # if main
-    #   num = rand(20) + rand(20) + rand(20) + rand(20) + 1
-    # else
-    #   return
-    # end
-    # @poison_weapon += num
-    # @poison_weapon = [@poison_weapon, 99].min
-    # Debug.write(c_m, "毒塗+: 残り#{@poison_weapon}回")
   end
   #--------------------------------------------------------------------------
   # ● 毒塗の残回数取得
@@ -4286,6 +4280,7 @@ class GameActor < GameBattler
   # ● インパクトスキルの取得
   #--------------------------------------------------------------------------
   def get_impact
+    TODO
     return false unless @action.attack? # 物理攻撃中に限る
     sv = Misc.skill_value(SkillId::IMPACT, self)
     case weapon?

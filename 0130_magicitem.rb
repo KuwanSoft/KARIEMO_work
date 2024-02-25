@@ -148,10 +148,12 @@ module MAGICITEM
       keys = [:curse, :ap, :swing, :damage, :double, :s_stamina, :range, :s_tactics, :initiative, :e_damage, :apti, :s_thunt, :s_perme, :cast]
       e_keys = [1, 2, 3, 5, 6, 7, 8]
       apti_keys = [:int, :mnd, :luk]
+      keys.delete(:e_damage) unless item.can_element_damage_enchant?  # 属性ダメージが付与可能か？
     when "sword", "axe", "spear", "bow", "dagger", "club", "katana"
       keys = [:curse, :ap, :swing, :damage, :double, :s_stamina, :range, :s_tactics, :initiative, :e_damage, :apti, :s_thunt, :s_perme, :cast]
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
       apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
+      keys.delete(:e_damage) unless item.can_element_damage_enchant?  # 属性ダメージが付与可能か？
     when "throw", "arrow"
       return hash
     when "shield"
@@ -163,13 +165,12 @@ module MAGICITEM
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
       apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
     end
-    keys.delete(:e_damage) unless item.can_element_damage_enchant?  # 属性ダメージが付与可能か？
     key = lottery_enchant_hash_key(make_weighted_items(keys))       # エンチャントの抽選
     case key
     when :curse
       hash[key] = 1
     when :ap
-      if item.hand == "two"
+      if item.is_a?(Weapons2) && item.hand == "two"
         case rank
         when 1..2; hash[key] = 2
         when 3..4; hash[key] = 4
@@ -183,7 +184,7 @@ module MAGICITEM
         end
       end
     when :cast
-      if item.hand == "two"
+      if item.is_a?(Weapons2) && item.hand == "two"
         case rank
         when 1..2; hash[key] = 2
         when 3..4; hash[key] = 4

@@ -49,7 +49,7 @@ class WindowPicture < WindowBase
   # ● 画像だけ消去、scene_mapで使用
   #--------------------------------------------------------------------------
   def temp_dispose
-    @small_picture.bitmap.dispose
+    @small_picture.bitmap.dispose unless @small_picture == nil
     @small_picture.dispose
     @text.bitmap.dispose
     @text.dispose

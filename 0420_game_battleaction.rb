@@ -192,7 +192,8 @@ class GameBattleAction
   #--------------------------------------------------------------------------
   def magic_lv
     @reinforced_magic_lv = @magic_lv  # オリジナルのCPを保管
-    return @magic_lv unless $game_temp.in_battle
+    return @magic_lv unless $game_temp.in_battle  # 戦闘中はコンセントレート発動無し
+    return @magic_lv unless @battler.actor?       # モンスターの場合は発動判定無し
     ## コンセントレート倍率
     plus = 0
     @magic_lv.times do
