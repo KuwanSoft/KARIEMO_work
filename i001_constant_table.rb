@@ -182,7 +182,6 @@ module ConstantTable
   ATLEAST = 5               # 転職時の特性値最低保証値
   NPC_NUM = 10              # npcの総種類(落書き含む)
   FEE_C = 8                 # 料金の係数
-  CANCEL_RATIO_PRE = 50     # 危険予知の振り向きキャンセル率
   NPC_MOOD_THRES = 5        # 5%以下でNPCは現れない
   MOOD_DECREASE_FIGHT = 500 # 戦闘時のNPCの不機嫌度追加
   PERMEATION_RATIO = 0.50   # 浸透呪文発動時のレジスト減少

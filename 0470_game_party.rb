@@ -2140,14 +2140,8 @@ class GameParty < GameUnit
   #--------------------------------------------------------------------------
   def check_prediction
     check = 0
-    floor = $game_map.map_id
     for member in existing_members
-      sv = Misc.skill_value(SkillId::PREDICTION, member)
-      diff = ConstantTable::DIFF_35[floor] # フロア係数
-      ratio = [sv * diff, 95].min
-      ratio = Integer(ratio)
-      ratio /= 2 if member.tired?
-      if ratio > rand(100)
+      if member.check_skill_activation(SkillId::PREDICTION, 5).result
         check += 1
         member.chance_skill_increase(SkillId::PREDICTION) # 危険予知
       end

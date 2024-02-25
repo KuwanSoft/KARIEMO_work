@@ -383,7 +383,7 @@ class GamePlayer < GameCharacter
     return if $game_map.interpreter.running?
     no_step = false # 床を動かすか
     if Input.trigger?(Input::DOWN)
-      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -391,11 +391,10 @@ class GamePlayer < GameCharacter
       turn_180
       $game_temp.used_action = ""
       $threedmap.start_drawing
-      roomguardcheck
       $game_mapkits.mapkit_check_and_store  # マップの更新
     end
     if Input.trigger?(Input::LEFT)
-      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -403,11 +402,10 @@ class GamePlayer < GameCharacter
       turn_left_90
       $game_temp.used_action = ""
       $threedmap.start_drawing
-      roomguardcheck
       $game_mapkits.mapkit_check_and_store  # マップの更新
     end
     if Input.trigger?(Input::RIGHT)
-      $game_temp.prediction = false if ConstantTable::CANCEL_RATIO_PRE > rand(100) # 危険予知キャンセル
+      $game_temp.prediction = false
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
@@ -415,7 +413,6 @@ class GamePlayer < GameCharacter
       turn_right_90
       $game_temp.used_action = ""
       $threedmap.start_drawing
-      roomguardcheck
       $game_mapkits.mapkit_check_and_store  # マップの更新
     end
 
@@ -523,9 +520,6 @@ class GamePlayer < GameCharacter
           $popup.visible = true
           no_step = true
         end
-      # elsif $threedmap.kakushi.visible
-      #   ashioto       # 扉は無いため音は足音
-      #   move_forward
       else
         $music.se_play("いたい")
         $popup.set_text("いたい!")
@@ -561,7 +555,6 @@ class GamePlayer < GameCharacter
     $threedmap.start_drawing(no_step)
     keyswitch_alloff                      # 鍵開け判定のスイッチをオフ
     visit_place                           # 一度訪れた座標の情報を記憶
-    roomguardcheck
     $game_party.find_something  # 秘密の発見チェック
     $game_party.find_other       # 他のパーティのチェック
     $game_mapkits.mapkit_check_and_store              # マップの更新
@@ -573,6 +566,10 @@ class GamePlayer < GameCharacter
   # ● ルームガードチェック
   #--------------------------------------------------------------------------
   def roomguardcheck
+    return if $popup.visible
+    return unless movable?
+    return if $game_map.interpreter.running?
+    return unless $threedmap.check_door == 1 # 素通り扉
     x = $game_player.x
     y = $game_player.y
     case self.direction
@@ -581,10 +578,9 @@ class GamePlayer < GameCharacter
     when 2; y += 1  # 南
     when 4; x -= 1  # 西
     end
-    return unless $threedmap.check_door == 1 # 素通り扉
     return unless $game_system.check_roomguard($game_map.map_id, x, y)
-    return unless $game_party.check_prediction >= ConstantTable::NEEDPREDICTION
-    $popup.set_text("*けはいをさっち*")
+    return unless $game_party.check_prediction > 0
+    $popup.set_text("*けはいをかんじる*")
     $popup.visible = true
     $game_temp.prediction = true
     Debug.write(c_m," PREDICTION:#{$game_temp.prediction} ")
@@ -720,6 +716,18 @@ class GamePlayer < GameCharacter
     super
     update_scroll(last_real_x, last_real_y)
     update_nonmoving(last_moving)
+    update_detect_roomguard
+  end
+  #--------------------------------------------------------------------------
+  # ● 玄室の気配察知
+  #--------------------------------------------------------------------------
+  def update_detect_roomguard
+    @dr_timer ||= 60
+    @dr_timer -= 1
+    if @dr_timer < 0
+      roomguardcheck
+      @dr_timer = 60 * (rand(10)+1)
+    end
   end
   #--------------------------------------------------------------------------
   # ● スクロール処理
@@ -776,10 +784,10 @@ class GamePlayer < GameCharacter
   #--------------------------------------------------------------------------
   # ● エンカウントの更新
   #--------------------------------------------------------------------------
-  def update_encounter
-    return if $game_temp.next_scene == "battle" # すでにエンカウント処理済
-    return unless $scene.is_a?(SceneMap)       # マップ以外
-  end
+  # def update_encounter
+  #   return if $game_temp.next_scene == "battle" # すでにエンカウント処理済
+  #   return unless $scene.is_a?(SceneMap)       # マップ以外
+  # end
   #--------------------------------------------------------------------------
   # ● 接触（重なり）によるイベント起動判定
   #--------------------------------------------------------------------------

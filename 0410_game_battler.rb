@@ -1402,10 +1402,8 @@ class GameBattler
       modifier += 1 if attacker.check_skill_activation(SkillId::DUAL, 15).result
       attacker.chance_skill_increase(SkillId::DUAL)
     end
-    # fn = check_fumble_number(attacker)        # ファンブル閾値取得
     cap = 0                                   # HIT毎の命中CAP 95%,90%,85%,,,
     Debug::write(c_m,"#{attacker.name} 初期AP:#{ap} 最大ヒット数:#{swing}")
-
     swing.times do
       sc += 1                 # SwingCount
       cap = [cap + 1, 10].min # ヒットキャップ 最大50%
@@ -2022,7 +2020,7 @@ class GameBattler
   def make_breath_damage_value(user, obj)
     reduce = 0
     times = ConstantTable::BREATH_REDUCE_TIME  # 判定数
-    @breath_barrier ||= 0                       # 未定義の場合
+    @breath_barrier ||= 0                      # 未定義の場合
     times += @breath_barrier
     Debug.write(c_m, "#{self.name} ブレス防御チャレンジ回数:#{times}")
     @breath_barrier *= ConstantTable::BB_REDU_RATE
@@ -2030,7 +2028,8 @@ class GameBattler
     Debug.write(c_m, "#{self.name} 次回用ブレス防御チャレンジボーナス減少:#{@breath_barrier}")
     base_dmg = user.breath_dmg                  # 現HPの1/4を代入済み
     for i in 1..times
-      if luk > rand(100)                        # 運%でダメージ軽減
+      ## 反射神経判定
+      if check_skill_activation(SkillId::REFLEXES, 25).result
         Debug.write(c_m, "ブレスダメージ:#{base_dmg}")
         base_dmg *= 0.75
         reduce += 1
@@ -3204,18 +3203,32 @@ class GameBattler
     for state in states
       result += state.condition_attackroll
     end
-    Debug.write(c_m, "condition_attackroll:#{result}") if result > 0
+    if not self.actor? && $game_troop.surprise
+      result += 1
+      Debug.write(c_m, "敵の先制攻撃によるアタックロール+1")
+    elsif self.actor? && $game_troop.preemptive
+      result += 1
+      Debug.write(c_m, "パーティの先制攻撃によるアタックロール+1")
+    end
+    Debug.write(c_m, "condition_attackroll:#{result}") if result != 0
     return result
   end
   #--------------------------------------------------------------------------
-  # ● セービングスロー用のコンディションの取得
+  # ● 状態異常セービングスロー用のコンディションの取得
   #--------------------------------------------------------------------------
   def condition_savingthrow
     result = 0
     for state in states
       result += state.condition_savingthrow
     end
-    Debug.write(c_m, "condition_savingthrow:#{result}") if result > 0
+    if self.actor? && $game_troop.surprise
+      result -= 1
+      Debug.write(c_m, "敵の先制攻撃によるセービングスロー-1")
+    elsif not self.actor? && $game_troop.preemptive
+      result -= 1
+      Debug.write(c_m, "パーティの先制攻撃によるセービングスロー-1")
+    end
+    Debug.write(c_m, "condition_savingthrow:#{result}") if result != 0
     return result
   end
   #--------------------------------------------------------------------------
@@ -3226,7 +3239,7 @@ class GameBattler
     for state in states
       result += state.condition_skill
     end
-    Debug.write(c_m, "condition_skill:#{result}") if result > 0
+    Debug.write(c_m, "condition_skill:#{result}") if result != 0
     return result
   end
   #--------------------------------------------------------------------------

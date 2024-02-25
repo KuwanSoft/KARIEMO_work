@@ -2668,21 +2668,21 @@ class GameActor < GameBattler
     spd_bonus = value
 
     ## 二刀流からのボーナス
-    if dual_wield?
-      TODO
-      case Misc.skill_value(SkillId::DUAL, self)
-      when 25..999;  val = 2  # +2
-      else;          val = 0
-      end
-    else
-      val = 0
-    end
+    # if dual_wield?
+    #   TODO
+    #   case Misc.skill_value(SkillId::DUAL, self)
+    #   when 25..999;  val = 2  # +2
+    #   else;          val = 0
+    #   end
+    # else
+    #   val = 0
+    # end
     d_bonus = val
 
     ## 隠密ボーナス
     h_bonus = ConstantTable::INIT_HIDE_BONUS if onmitsu?
 
-    value = t_bonus + p_bonus + f_bonus + spd_bonus + d_bonus + h_bonus + l_bonus + r_bonus
+    value = t_bonus + p_bonus + f_bonus + spd_bonus + h_bonus + l_bonus + r_bonus
     value *= cc_penalty
     value = Integer(value)
 

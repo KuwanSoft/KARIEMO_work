@@ -1456,11 +1456,11 @@ class SceneBattle < SceneBase
     $game_party.update_light        # 蝋燭の消費
     party_order_change
     modify_motivation_turn_end
-    $game_troop.turn_ending = true
+    # $game_troop.turn_ending = true
     $game_troop.preemptive = false
     $game_troop.surprise = false
     process_battle_event
-    $game_troop.turn_ending = false
+    # $game_troop.turn_ending = false
     $game_troop.identified_change     # 不確定・確定変更
     platoon_change if platoon_redraw  # 隊列変更
     start_party_command_selection

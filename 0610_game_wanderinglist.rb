@@ -162,18 +162,33 @@ class GameWanderingList
   end
   #--------------------------------------------------------------------------
   # ● エンカウントチェック
+  # when 8 # 北向き
+  # when 6 # 東向き
+  # when 2 # 南向き
+  # when 4 # 西向き
   #--------------------------------------------------------------------------
   def check_encount
     x = $game_player.x
     y = $game_player.y
+    direction = $game_player.direction
     ## 同じマスにいるかどうか
     for wandering in @data
       next if wandering == nil
       next unless x == wandering.x
       next unless y == wandering.y
-      Debug.write(c_m, "wanderingID:#{wandering.id}")
+      ## 同じ向きか判定(バックアタック判定)
+      case wandering.direction
+      when 1  # 北向き
+        return true, true if direction == 8
+      when 2  # 東向き
+        return true, true if direction == 6
+      when 3  # 南向き
+        return true, true if direction == 2
+      when 4  # 西向き
+        return true, true if direction == 4
+      end
       remove_wandering(wandering.id)
-      return true
+      return true, false
     end
     ## 休息中に限り一番近いノイズの大きさ％で毎休息ターンに判定が入る
     ## updateルーチンの内部の判定なのでフレームレートをかけて確率の調整

@@ -1180,7 +1180,8 @@ class SceneCamp < SceneBase
   #--------------------------------------------------------------------------
   def update_encounter
     return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
-    return unless $game_wandering.check_encount
+    encount, backatk = $game_wandering.check_encount
+    return unless encount
     ratio = ConstantTable::NM
     Debug::write(c_m,"***********【ENCOUNT type:休息中】***********")
     $game_troop.setup($game_map.map_id, (ratio > rand(100))) # マップIDを与える

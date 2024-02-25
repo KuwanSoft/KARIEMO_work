@@ -362,13 +362,15 @@ class SceneMap < SceneBase
   # ● エンカウントの処理
   #--------------------------------------------------------------------------
   def update_encounter
+    backatk = false
     ## 玄室チェック
     unless $game_system.check_roomguard($game_map.map_id, $game_player.x, $game_player.y)
       return if $game_map.interpreter.running?          # イベント実行中？
       return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
-      return unless $game_wandering.check_encount
+      encount, backatk = $game_wandering.check_encount  # エンカウント時の態勢を取得
+      return unless encount
       ratio = ConstantTable::NM
-      Debug::write(c_m,"***********【ENCOUNT type:Wondering】***********")
+      Debug::write(c_m,"***********【ENCOUNT type:Wondering back:#{backatk}】***********")
     ## 玄室がオンのとき
     else
       return if $game_map.interpreter.running?          # イベント実行中？
@@ -381,7 +383,8 @@ class SceneMap < SceneBase
     $game_troop.setup($game_map.map_id, (ratio > rand(100))) # マップIDを与える
     $game_temp.battle_proc = nil
     $game_temp.next_scene = "battle"
-    preemptive_or_surprise(ratio == 0)
+    $game_troop.surprise = true if backatk              # バックアタック検知
+    preemptive_or_surprise(ratio == 0) unless backatk
   end
   #--------------------------------------------------------------------------
   # ● 先制攻撃と不意打ちの確率判定

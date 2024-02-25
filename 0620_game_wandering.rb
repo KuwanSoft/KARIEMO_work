@@ -11,6 +11,7 @@ class GameWandering
   attr_reader   :id                 # 群ID
   attr_accessor   :x
   attr_accessor   :y
+  attr_reader     :direction
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #     mapkit_id : マップキット ID
