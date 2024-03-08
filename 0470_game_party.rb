@@ -730,14 +730,16 @@ class GameParty < GameUnit
     item_data = Misc.item(kind, id)
     ## エンチャント品の場合
     unless enchant_hash.empty?
-      ## 売却の場合
-      if n > 0
-        shop_magicitems.push([kind, id, enchant_hash])
-      ## 購入の場合
-      elsif n < 0
-        shop_magicitems.delete([kind, id, enchant_hash])
+      unless enchant_hash.has_key?(:curse)  # 呪いの品はそのまま売却される
+        ## 売却の場合
+        if n > 0
+          shop_magicitems.push([kind, id, enchant_hash])
+        ## 購入の場合
+        elsif n < 0
+          shop_magicitems.delete([kind, id, enchant_hash])
+        end
+        return false
       end
-      return false
     end
     ## 通常品の場合
     case kind

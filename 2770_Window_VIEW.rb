@@ -139,7 +139,7 @@ class WindowView < WindowBase
         self.contents.draw_text(0, WLH*19, self.width-32, WLH, sprintf("%d~%d",min_e,max_e),2)
       end
     elsif actor.subweapon? != "nothing"
-      self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%2d~%2d          ",min,max),2)
+      self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%2d~%2d            ",min,max),2)
       self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("%2d~%2d",min_s,max_s),2)
       self.contents.draw_text(0, WLH*18, self.width-32, WLH, sprintf("/          "),2)
       if (max_e > 0) || (max_s_e > 0)

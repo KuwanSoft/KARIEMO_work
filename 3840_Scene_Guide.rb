@@ -64,7 +64,7 @@ class Scene_Guide < SceneBase
   def start
     super
     create_menu_background      # 背景
-    @message_window = Window_Message.new          # メッセージウインドウ
+    @message_window = WindowMessage.new          # メッセージウインドウ
     @message_window.z = 200
     @message_window.y = 0
     @attention_window = Window_Attention.new # attention表示用

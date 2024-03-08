@@ -66,7 +66,7 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def create_windows
     @treasure_window = Window_Treasure.new
-    @message_window = Window_Message.new  # メッセージ枠
+    @message_window = WindowMessage.new  # メッセージ枠
     @message_window.z = 255               # 最前列へ
     @ps = WindowPartyStatus.new
     @pm = Window_PartyMagic.new
@@ -463,12 +463,7 @@ class SceneTreasure < SceneBase
     $music.se_play("仕掛け弓")
     floor = $game_map.map_id
     damage = Misc.dice(floor, 16, 0)
-    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
-    diff = ConstantTable::DIFF_30[floor] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    resist = ratio > rand(100) ? true : false # 抵抗判定
-    damage /= 2 if resist # 抵抗時はダメージ半減
+    damage /= 2 if @ps.actor.check_skill_activation(SkillId::REFLEXES, 30).result
     @ps.actor.hp -= damage
     text = sprintf("%sは %dのダメージを うけた。", @ps.actor.name, damage)
     $game_message.texts.push(text)
@@ -489,12 +484,7 @@ class SceneTreasure < SceneBase
     members.push($game_party.existing_members[rand($game_party.existing_members.size)])
     members.push($game_party.existing_members[rand($game_party.existing_members.size)])
     for member in members
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_30[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      if resist # 抵抗した場合
+      if member.check_skill_activation(SkillId::REFLEXES, 30).result
         text = sprintf("%sは ていこうした。", member.name)
       else      # 抵抗できなかった場合
         member.drain_mp
@@ -520,14 +510,8 @@ class SceneTreasure < SceneBase
       member.hp -= damage
       text = sprintf("%sは %dのダメージを うけた。", member.name, damage)
       $game_message.texts.push(text)
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_50[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 毒を付加
+      unless member.check_skill_activation(SkillId::REFLEXES, 50).result
+        member.add_state(state_id)  # 毒を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
@@ -551,12 +535,7 @@ class SceneTreasure < SceneBase
     members.push $game_party.existing_members[rand($game_party.existing_members.size)]
     for member in members
       damage = Misc.dice($game_map.map_id, 24, 0)
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_50[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      damage /= 2 if resist # 抵抗時はダメージ半減
+      damage /= 2 if member.check_skill_activation(SkillId::REFLEXES, 50).result
       member.hp -= damage
       text = sprintf("%sは %dのダメージを うけた。", member.name, damage)
       $game_message.texts.push(text)
@@ -577,12 +556,7 @@ class SceneTreasure < SceneBase
     members = $game_party.existing_members
     for member in members
       damage = Misc.dice($game_map.map_id, 24, 0)
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_75[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      damage = 0 if resist # 抵抗時はダメージ回避
+      damage = 0 if member.check_skill_activation(SkillId::REFLEXES, 75).result
       member.hp -= damage
       if resist
         text = sprintf("%sは ダメージを かいひした。", member.name)
@@ -612,34 +586,24 @@ class SceneTreasure < SceneBase
       member.hp -= damage
       text = sprintf("%sは %dのダメージを うけた。", member.name, damage)
       $game_message.texts.push(text)
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_75[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
       ## 状態異常判定#1
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 75).result
         state_id = StateId::POISON  # 毒
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 毒を付加
+        member.add_state(state_id)  # 毒を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
       ## 状態異常判定#2
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 75).result
         state_id = StateId::SICKNESS  # 病気
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 病気を付加
+        member.add_state(state_id)  # 病気を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
       ## 状態異常判定#3
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 75).result
         state_id = StateId::STONE  # 石化
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 異常を付加
+        member.add_state(state_id)  # 異常を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
@@ -660,12 +624,7 @@ class SceneTreasure < SceneBase
     $music.se_play("大電流")
     floor = $game_map.map_id
     damage = Misc.dice(floor, 100, 0)
-    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
-    diff = ConstantTable::DIFF_50[floor] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    resist = ratio > rand(100) ? true : false # 抵抗判定
-    if resist # 抵抗時
+    if @ps.actor.check_skill_activation(SkillId::REFLEXES, 50).result
       text = sprintf("%sは ダメージを かいひした。", @ps.actor.name)
     else
       @ps.actor.hp -= damage
@@ -688,7 +647,7 @@ class SceneTreasure < SceneBase
     for member in members
       ## 呪いもしくはステータス異常の場合
       if member.being_cursed? or not member.good_condition?
-        member.add_state(StateId::DEATH, 0)
+        member.add_state(StateId::DEATH)
         member.perform_collapse
         text = sprintf("%sは たましいを もっていかれた!", member.name)
         $game_message.texts.push(text)
@@ -733,13 +692,7 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def trap_11_effect
     $music.se_play("神の瞬き")
-    floor = $game_map.map_id
-    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
-    diff = ConstantTable::DIFF_75[floor] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    resist = ratio > rand(100) ? true : false # 抵抗判定
-    if resist # 抵抗時はダメージ半減
+    if @ps.actor.check_skill_activation(SkillId::REFLEXES, 75).result
       text = sprintf("%sは かいひした。", @ps.actor.name)
     else
       @ps.actor.god_blink
@@ -770,14 +723,8 @@ class SceneTreasure < SceneBase
     members = $game_party.existing_members
     state_id = StateId::SICKNESS
     for member in members
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_50[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 病気を付加
+      unless member.check_skill_activation(SkillId::REFLEXES, 50).result
+        member.add_state(state_id)  # 病気を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
@@ -792,13 +739,7 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def trap_19_effect
     $music.se_play("玉手箱")
-    floor = $game_map.map_id
-    sv = Misc.skill_value(SkillId::REFLEXES, @ps.actor)
-    diff = ConstantTable::DIFF_75[floor] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if @ps.actor.tired?
-    resist = ratio > rand(100) ? true : false # 抵抗判定
-    if resist
+    if @ps.actor.check_skill_activation(SkillId::REFLEXES, 75).result
       text = sprintf("%sは かいひした。", @ps.actor.name)
     else
       @ps.actor.aged(365)
@@ -815,16 +756,9 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def trap_20_effect
     $music.se_play("金切り声")
-    floor = $game_map.map_id
     members = $game_party.existing_members
     for member in members
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_30[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
-      ## 抵抗判定
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 30).result
         member.tired_trap
         text = member.name + "の ひろうが ぞうかした。"
         $game_message.texts.push(text)
@@ -840,19 +774,11 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def trap_21_effect
     $music.se_play("肥し爆弾")
-    floor = $game_map.map_id
-    members = $game_party.existing_members
-    for member in members
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_30[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
+    for member in $game_party.existing_members
       ## 状態異常判定
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 30).result
         state_id = StateId::STINK  # 悪臭
-        depth = $game_map.map_id * 10 # 深度を設定
-        member.add_state(state_id, depth)  # 悪臭を付加
+        member.add_state(state_id)  # 悪臭を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
       end
@@ -882,19 +808,11 @@ class SceneTreasure < SceneBase
   #--------------------------------------------------------------------------
   def trap_23_effect
     $music.se_play("サフォケーション")
-    floor = $game_map.map_id
-    members = $game_party.existing_members
-    for member in members
-      sv = Misc.skill_value(SkillId::REFLEXES, member)
-      diff = ConstantTable::DIFF_30[floor] # フロア係数
-      ratio = Integer([sv * diff, 95].min)
-      ratio /= 2 if member.tired?
+    for member in $game_party.existing_members
       ## 抵抗判定
-      resist = ratio > rand(100) ? true : false # 抵抗判定
-      unless resist
+      unless member.check_skill_activation(SkillId::REFLEXES, 30).result
         state_id = StateId::SUFFOCATION  # 窒息
-        depth = 0
-        member.add_state(state_id, depth)  # 窒息を付加
+        member.add_state(state_id)  # 窒息を付加
         text = member.name + $data_states[state_id].message1
         $game_message.texts.push(text)
         dead_effect(member)  # 死亡時の処理

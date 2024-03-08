@@ -11,7 +11,7 @@ class ScenePub < SceneBase
   #--------------------------------------------------------------------------
   def initialize
     $music.play("さかば")
-    @message_window = Window_Message.new  # message表示用
+    @message_window = WindowMessage.new  # message表示用
     @message_window.z = 255
     @back_s = Window_ShopBack_Small.new   # メッセージ枠小
     @attention_window = Window_ShopAttention.new(110)  # attention表示用

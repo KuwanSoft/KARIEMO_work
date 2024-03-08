@@ -126,8 +126,7 @@ class SceneEvilStatue < SceneBase
           when "negative"
             $music.me_play("邪神像：パーティの異常")
             for member in $game_party.existing_members
-              depth = $game_map.map_id * 10 # 深度を設定
-              member.add_state(StateId::SICKNESS, depth)  # 病気
+              member.add_state(StateId::SICKNESS)  # 病気
             end
             @mini.set_text("パーティが びょうきになった")
           end

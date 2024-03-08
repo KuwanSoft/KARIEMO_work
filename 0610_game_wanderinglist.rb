@@ -179,13 +179,13 @@ class GameWanderingList
       ## 同じ向きか判定(バックアタック判定)
       case wandering.direction
       when 1  # 北向き
-        return true, true if direction == 8
+        return true, true if direction == 8 && wandering.can_see_party?
       when 2  # 東向き
-        return true, true if direction == 6
+        return true, true if direction == 6 && wandering.can_see_party?
       when 3  # 南向き
-        return true, true if direction == 2
+        return true, true if direction == 2 && wandering.can_see_party?
       when 4  # 西向き
-        return true, true if direction == 4
+        return true, true if direction == 4 && wandering.can_see_party?
       end
       remove_wandering(wandering.id)
       return true, false
@@ -195,9 +195,9 @@ class GameWanderingList
     if $game_temp.resting && (check_noise_level > rand(100*Graphics.frame_rate))
       Debug.write(c_m, "休息中のエンカウント判定 ノイズレベル:#{check_noise_level}")
       remove_most_closest_wandering
-      return true
+      return true, true
     end
-    return false
+    return false, false
   end
   #--------------------------------------------------------------------------
   # ● 休息中エンカウント用（一番近い距離の群をエンカウント済みとして削除）

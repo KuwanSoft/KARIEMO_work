@@ -25,7 +25,7 @@ class SceneBbs < SceneBase
     $threedmap.start_drawing
     create_top_message
     create_list
-    @message_window = Window_Message.new  # attention表示用
+    @message_window = WindowMessage.new  # attention表示用
   end
   #--------------------------------------------------------------------------
   # ● トップメッセージの作成

@@ -798,12 +798,11 @@ class GameBattler
   #--------------------------------------------------------------------------
   # ● ステートの検査
   #     state_id : ステート ID
-  #    該当するステートが付加されていれば true を返す。
+  #    該当するステート深度が存在し1以上であれば判定
   #--------------------------------------------------------------------------
   def state?(state_id)
-    return @state_depth.keys.include?(state_id)
+    return @state_depth.keys.include?(state_id) && @state_depth[state_id] > 0
   end
-
   #--------------------------------------------------------------------------
   # ● ステートがフルかどうかの判定
   #     state_id : ステート ID
@@ -973,7 +972,7 @@ class GameBattler
           Debug::write(c_m," 死亡より復活成功")
           @hp = 1                         # HP を 1 に変更する
           self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth.delete(StateId::DEATH) # hashから削除
+          @state_depth[StateId::DEATH] = 0 # hashから削除
           return 0
         else
           Debug::write(c_m," 死亡より復活失敗=>腐敗")
@@ -986,8 +985,8 @@ class GameBattler
           Debug::write(c_m," 腐敗より復活成功")
           @hp = 1                         # HP を 1 に変更する くさる時を除く
           self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth.delete(StateId::ROTTEN)  # hashから削除
-          @state_depth.delete(StateId::DEATH)          # hashから削除
+          @state_depth[StateId::ROTTEN] = 0 # hashから削除
+          @state_depth[StateId::DEATH] = 0  # hashから削除
           return 0
         else                              # LOST処理
           Debug::write(c_m,"腐敗より復活失敗=>ロスト")
@@ -997,7 +996,7 @@ class GameBattler
         end
       end
     else
-      @state_depth.delete(state_id)       # hashから削除
+      @state_depth[state_id] = 0          # hashから削除
     end
     return 0
   end
@@ -1007,7 +1006,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def force_delete_state
     for id in @state_depth.keys
-      @state_depth.delete(id)
+      @state_depth[id] = 0
     end
   end
   #--------------------------------------------------------------------------
@@ -1344,27 +1343,6 @@ class GameBattler
     return check_skill_activation(SkillId::REFLEXES, 15).result
   end
   #--------------------------------------------------------------------------
-  # ● ファンブルの取得
-  #--------------------------------------------------------------------------
-  # def check_fumble_number(attacker)
-  #   if attacker.t_hand?
-  #     case Misc.skill_value(SkillId::TWOHANDED, attacker)
-  #     when 100..999;  val = 0 # ファンブル無効
-  #     when 25..99;  val = 1   # ファンブル5%
-  #     else;         val = 2   # ファンブル10%
-  #     end
-  #   elsif attacker.dual_wield?
-  #     case Misc.skill_value(SkillId::DUAL, attacker)
-  #     when 75..999; val = 0   # ファンブル無効
-  #     else;         val = 1   # ファンブル5%
-  #     end
-  #   else
-  #     val = 1                 # ファンブル5%
-  #   end
-  #   Debug.write(c_m, "ファンブルダイス値:#{val}")
-  #   return val
-  # end
-  #--------------------------------------------------------------------------
   # ● 【新】通常攻撃によるダメージ計算
   # 攻撃回数分以下を判定
   #--------------------------------------------------------------------------
@@ -1605,7 +1583,6 @@ class GameBattler
       Debug::write(c_m,"攻撃呪文ダメージ倍率 x#{multipiler} SKILL値:#{Misc.skill_value(SkillId::CONCENTRATE,user)}")
       @hits = hit
       damage = 0 if damage < 0                      # マイナスなら 0 に
-      damage = 0 if (purpose == "earthquake" && self.ignore_earthquake?)
       self.nodamage_flag = true if @hits == 0       # 一度もヒットしなければ
       Debug::write(c_m,"ダメージ呪文 HIT:#{hit} ダメージ:#{damage}")
     ######### 異常系呪文処理(レジストあり) ##########
@@ -2097,7 +2074,7 @@ class GameBattler
       end
     end
     ##> 吸収の場合
-    if @absorbed && (user != nil)
+    if user && @absorbed
       user.hp += (@hp_damage + @element_damage)
     end
     ##> スキル：ダメージレジストによるダメージ軽減
@@ -2124,8 +2101,7 @@ class GameBattler
     self.hp -= Integer(@element_damage)
     self.hp -= Integer(@element_subdamage)
     ## 破砕判定
-    if user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0) &&
-      (user != nil)
+    if user && user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0)
       break_stone
     end
   end
@@ -2198,7 +2174,7 @@ class GameBattler
     ###-------------------
 
     return if (plus + minus).empty?
-    Debug::write(c_m,"Battler名:#{self.name}")
+    Debug::write(c_m,"対象Battler名:#{self.name}")
     Debug::write(c_m,"異常配列:#{plus}") if plus.size != 0
     Debug::write(c_m,"回復配列:#{minus}") if minus.size != 0
 
@@ -2283,8 +2259,11 @@ class GameBattler
       ##========================================================================
       ##> クリティカル判定
       if state_id == StateId::CRITICAL
-        next if self.actor? && !(self.critical_received?) # モンスターの攻撃
-        next unless obj.check_critical                    # アクターの攻撃
+        if self.actor?
+          next if !(self.critical_received?)  # モンスターの攻撃
+        else
+          next unless obj.check_critical      # アクターの攻撃
+        end
       end
       ##========================================================================
       ## 聖職者のエクソシスト判定
@@ -2296,14 +2275,6 @@ class GameBattler
       ##========================================================================
       ## 悪夢判定
       next if (state_id == StateId::NIGHTMARE) && !(sleep?)
-      ##========================================================================
-      ## 地震による怯えの判定(discontinued)
-      if (state_id == StateId::FEAR && purpose == "earthquake")
-        if self.ignore_earthquake? # 浮遊か？
-          Debug::write(c_m,"浮遊状態の為 地震による怯え無効")
-          next
-        end
-      end
       ##========================================================================
       ## フィニッシュブローの判定
       if state_id == StateId::F_BLOW
@@ -2908,8 +2879,9 @@ class GameBattler
       when StateId::BLEEDING;     modifier += self.enemy.sr15   # 出血
       end
     end
-    @state_depth[state_id] ||= 0
-    modifier += 1 if @state_depth[state_id] > 0  # すでに罹患済みの場合はDICE数+1
+    if @state_depth[state_id] && @state_depth[state_id] > 0
+      modifier += 1 # すでに罹患済みの場合はDICE数+1
+    end
     return modifier
   end
   #--------------------------------------------------------------------------
@@ -3307,10 +3279,33 @@ class GameBattler
   end
   #--------------------------------------------------------------------------
   # ● スキル発動判定
+  # low_cap: (最大発動率のキャップ)
+  # 1: 95%
+  # 2: 90%
+  # 3: 85%
+  # 4: 80%
+  # 5: 75%
   #--------------------------------------------------------------------------
-  def check_skill_activation(skill_id, diff, modifier = 0)
+  def check_skill_activation(skill_id, diff, modifier = 0, second_skill_id = 0, low_cap = 1)
     data = $sd.new(skill_id, modifier)
     sv = Misc.skill_value(skill_id, self)
+    ## スキルを保持していない場合はfalse
+    if sv == 0
+      Debug.write(c_m, "#{self.name} スキル:#{$data_skills[skill_id].name}は未修得 => スキル発動無し")
+      data.ratio = data.thres = data.d20 = data.modifier = 0
+      data.result = false
+      return data
+    end
+    case skill_id
+    when SkillId::EYE, SkillId::PREDICTION, SkillId::MAPPING
+      modifier += $game_party.pm_detect > 0 ? 1 : 0
+    when SkillId::SWIM;
+      modifier += $game_party.pm_float > 0 ? 1 : 0
+    end
+    if second_skill_id != 0
+      sv += Misc.skill_value(second_skill_id, self)
+      Debug.write(c_m, "1stSkill:#{$data_skills[skill_id].name} 2ndSkill:#{$data_skills[second_skill_id].name} => Skill値:#{sv}")
+    end
     case diff
     when  5; diff = ConstantTable::DIFF_05[$game_map.map_id]
     when 10; diff = ConstantTable::DIFF_10[$game_map.map_id]
@@ -3332,19 +3327,20 @@ class GameBattler
     when 90; diff = ConstantTable::DIFF_90[$game_map.map_id]
     when 95; diff = ConstantTable::DIFF_95[$game_map.map_id]
     end
+    diff = 0 unless movable?  # 行動不能の場合は最低値へ
     unless $data_skills[skill_id].initial_skill?(self)
-      Debug.write(c_m, "保持スキル(#{$data_skills[skill_id].name})ではない為、不利適用")
+      Debug.write(c_m, "保持スキル(#{$data_skills[skill_id].name})ではない為、不利-1適用")
       data.modifier -= 1
     end
     if $data_skills[skill_id].advanced_skill?(self)
-      Debug.write(c_m, "得意スキル(#{$data_skills[skill_id].name})の為、有利適用")
+      Debug.write(c_m, "得意スキル(#{$data_skills[skill_id].name})の為、有利+1適用")
       data.modifier += 1
     end
     data.d20 = get_d20(:skill, data.modifier)
     data.ratio = (sv * diff / 5)
-    data.thres = Integer([[20 - data.ratio, 19].min, 1].max)
+    data.thres = Integer([[20 - data.ratio, 19].min, low_cap].max)
     data.result = (data.d20 >= data.thres)
-    Debug.write(c_m, "発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres} 発動値:#{data.ratio}")
+    Debug.write(c_m, "発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres} 発動値:#{data.ratio} low_cap:#{low_cap}")
     return data
   end
   #--------------------------------------------------------------------------

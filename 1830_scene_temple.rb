@@ -50,7 +50,7 @@ class SceneTemple < SceneBase
   def start
     super
     # show_vil_picture
-    @message_window = Window_Message.new    # message表示用
+    @message_window = WindowMessage.new    # message表示用
     @attention_window = Window_ShopAttention.new  # attention表示用
     @attention_window.y = WLH*24+8
     @attention_window.width = 310

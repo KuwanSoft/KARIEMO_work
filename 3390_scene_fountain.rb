@@ -434,16 +434,12 @@ class SceneFountain < SceneBase
   # ● 溺れチェック
   #--------------------------------------------------------------------------
   def check_drown
-    sv = Misc.skill_value(SkillId::SWIM, @ps.actor)
-    diff = ConstantTable::DIFF_95[@current_d]
-    ratio = Integer([sv * diff, 99].min)
+    unless @ps.actor.check_skill_activation(SkillId::SWIM, 95).result
+      drown
+      return
+    end
     @current_d.times do
       @ps.actor.chance_skill_increase(SkillId::SWIM)
-    end
-    ratio = 99 if @current_d == 1 # 一番の浅瀬は溺れない
-    Debug.write(c_m, "溺れる確率:#{100-ratio}% 深さ:#{@current_d}")
-    unless ratio > rand(100)
-      drown
     end
   end
   #--------------------------------------------------------------------------

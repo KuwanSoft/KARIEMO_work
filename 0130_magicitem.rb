@@ -135,6 +135,7 @@ module MAGICITEM
   # ● マジックハッシュの生成
   #--------------------------------------------------------------------------
   def self.enchant(item)
+    Debug.write(c_m, "#{item.name} マジックハッシュ抽選開始")
     hash = {}
     kind = item.kind
     id = item.id
@@ -164,6 +165,8 @@ module MAGICITEM
       keys = [:curse, :s_stamina, :s_tactics, :initiative, :s_dresist, :a_element, :exp, :apti, :s_thunt, :s_perme, :cast, :s_block, :m_regist]
       e_keys = [1, 2, 3, 4, 5, 6, 7, 8, 9]
       apti_keys = [:str, :int, :vit, :spd, :mnd, :luk]
+    else
+      return hash
     end
     key = lottery_enchant_hash_key(make_weighted_items(keys))       # エンチャントの抽選
     case key

@@ -114,126 +114,115 @@ class GameMapkit
   #--------------------------------------------------------------------------
   def remember_visit_place            # 記憶を更新
     actor = $game_actors[@actor_id]   # 冒険者のオブジェクトを取得
-    sv = Misc.skill_value(SkillId::MAPPING, actor)  # マッピング 特性値補正後のスキル値
-    diff = ConstantTable::DIFF_70[$game_map.map_id] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if actor.tired?
     actor.chance_skill_increase(SkillId::MAPPING)   # スキル上昇チャンス
     ## 距離による補正
+    here = ConstantTable::HEREMAPUPDATE
     c_dis = ConstantTable::CLOSERANGEMAPUPDATE
     l_dis = ConstantTable::LONGRANGEMAPUPDATE
+
+    if $threedmap.check_seeing_place( 0,  0) && actor.check_skill_activation(SkillId::MAPPING, here).result
+      update_map_data(0, 0)
+    end
     case $game_player.direction
     when 8; # 北向き
-      if $threedmap.check_seeing_place( 0,  0)
-        update_map_data(ratio, 0, 0)
+      if $threedmap.check_seeing_place(-1, -1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(-1, -1)
       end
-      if $threedmap.check_seeing_place(-1, -1)
-        update_map_data(ratio * c_dis, -1, -1)
+      if $threedmap.check_seeing_place( 0, -1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(0, -1)
       end
-      if $threedmap.check_seeing_place( 0, -1)
-        update_map_data(ratio * c_dis, 0, -1)
+      if $threedmap.check_seeing_place( 1, -1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(1, -1)
       end
-      if $threedmap.check_seeing_place( 1, -1)
-        update_map_data(ratio * c_dis, 1, -1)
+      if $threedmap.check_seeing_place(-2, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, -2)
       end
-      if $threedmap.check_seeing_place(-2, -2)
-        update_map_data(ratio * l_dis, -2, -2)
+      if $threedmap.check_seeing_place(-1, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-1, -2)
       end
-      if $threedmap.check_seeing_place(-1, -2)
-        update_map_data(ratio * l_dis, -1, -2)
+      if $threedmap.check_seeing_place( 0, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(0, -2)
       end
-      if $threedmap.check_seeing_place( 0, -2)
-        update_map_data(ratio * l_dis, 0, -2)
+      if $threedmap.check_seeing_place( 1, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(1, -2)
       end
-      if $threedmap.check_seeing_place( 1, -2)
-        update_map_data(ratio * l_dis, 1, -2)
-      end
-      if $threedmap.check_seeing_place( 2, -2)
-        update_map_data(ratio * l_dis, 2, -2)
+      if $threedmap.check_seeing_place( 2, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, -2)
       end
     when 2; # 南向き
-      if $threedmap.check_seeing_place( 0,  0)
-        update_map_data(ratio, 0, 0)
+      if $threedmap.check_seeing_place(-1, 1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(-1, 1)
       end
-      if $threedmap.check_seeing_place(-1, 1)
-        update_map_data(ratio * c_dis, -1, 1)
+      if $threedmap.check_seeing_place( 0, 1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(0, 1)
       end
-      if $threedmap.check_seeing_place( 0, 1)
-        update_map_data(ratio * c_dis, 0, 1)
+      if $threedmap.check_seeing_place( 1, 1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(1, 1)
       end
-      if $threedmap.check_seeing_place( 1, 1)
-        update_map_data(ratio * c_dis, 1, 1)
+      if $threedmap.check_seeing_place(-2, 2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, 2)
       end
-      if $threedmap.check_seeing_place(-2, 2)
-        update_map_data(ratio * l_dis, -2, 2)
+      if $threedmap.check_seeing_place(-1, 2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-1, 2)
       end
-      if $threedmap.check_seeing_place(-1, 2)
-        update_map_data(ratio * l_dis, -1, 2)
+      if $threedmap.check_seeing_place( 0, 2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(0, 2)
       end
-      if $threedmap.check_seeing_place( 0, 2)
-        update_map_data(ratio * l_dis, 0, 2)
+      if $threedmap.check_seeing_place( 1, 2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(1, 2)
       end
-      if $threedmap.check_seeing_place( 1, 2)
-        update_map_data(ratio * l_dis, 1, 2)
-      end
-      if $threedmap.check_seeing_place( 2, 2)
-        update_map_data(ratio * l_dis, 2, 2)
+      if $threedmap.check_seeing_place( 2, 2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, 2)
       end
     when 6; # 東向き
-      if $threedmap.check_seeing_place( 0,  0)
-        update_map_data(ratio, 0, 0)
+      if $threedmap.check_seeing_place( 1, -1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(1, -1)
       end
-      if $threedmap.check_seeing_place( 1, -1)
-        update_map_data(ratio * c_dis, 1, -1)
+      if $threedmap.check_seeing_place( 1, 0) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(1, 0)
       end
-      if $threedmap.check_seeing_place( 1, 0)
-        update_map_data(ratio * c_dis, 1, 0)
+      if $threedmap.check_seeing_place( 1, 1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(1, 1)
       end
-      if $threedmap.check_seeing_place( 1, 1)
-        update_map_data(ratio * c_dis, 1, 1)
+      if $threedmap.check_seeing_place( 2, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, -2)
       end
-      if $threedmap.check_seeing_place( 2, -2)
-        update_map_data(ratio * l_dis, 2, -2)
+      if $threedmap.check_seeing_place( 2, -1) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, -1)
       end
-      if $threedmap.check_seeing_place( 2, -1)
-        update_map_data(ratio * l_dis, 2, -1)
+      if $threedmap.check_seeing_place( 2,  0) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, 0)
       end
-      if $threedmap.check_seeing_place( 2,  0)
-        update_map_data(ratio * l_dis, 2, 0)
+      if $threedmap.check_seeing_place( 2,  1) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, 1)
       end
-      if $threedmap.check_seeing_place( 2,  1)
-        update_map_data(ratio * l_dis, 2, 1)
-      end
-      if $threedmap.check_seeing_place( 2,  2)
-        update_map_data(ratio * l_dis, 2, 2)
+      if $threedmap.check_seeing_place( 2,  2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(2, 2)
       end
     when 4;
-      if $threedmap.check_seeing_place( 0,  0)
-        update_map_data(ratio, 0, 0)
+      if $threedmap.check_seeing_place( -1, -1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(-1, -1)
       end
-      if $threedmap.check_seeing_place( -1, -1)
-        update_map_data(ratio * c_dis, -1, -1)
+      if $threedmap.check_seeing_place( -1, 0) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(-1, 0)
       end
-      if $threedmap.check_seeing_place( -1, 0)
-        update_map_data(ratio * c_dis, -1, 0)
+      if $threedmap.check_seeing_place( -1, 1) && actor.check_skill_activation(SkillId::MAPPING, c_dis).result
+        update_map_data(-1, 1)
       end
-      if $threedmap.check_seeing_place( -1, 1)
-        update_map_data(ratio * c_dis, -1, 1)
+      if $threedmap.check_seeing_place( -2, -2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, -2)
       end
-      if $threedmap.check_seeing_place( -2, -2)
-        update_map_data(ratio * l_dis, -2, -2)
+      if $threedmap.check_seeing_place( -2, -1) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, -1)
       end
-      if $threedmap.check_seeing_place( -2, -1)
-        update_map_data(ratio * l_dis, -2, -1)
+      if $threedmap.check_seeing_place( -2,  0) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, 0)
       end
-      if $threedmap.check_seeing_place( -2,  0)
-        update_map_data(ratio * l_dis, -2, 0)
+      if $threedmap.check_seeing_place( -2,  1) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, 1)
       end
-      if $threedmap.check_seeing_place( -2,  1)
-        update_map_data(ratio * l_dis, -2, 1)
-      end
-      if $threedmap.check_seeing_place( -2,  2)
-        update_map_data(ratio * l_dis, -2, 2)
+      if $threedmap.check_seeing_place( -2,  2) && actor.check_skill_activation(SkillId::MAPPING, l_dis).result
+        update_map_data(-2, 2)
       end
     end
     ratio = ConstantTable::FORGET_MAP_RATIO
@@ -246,18 +235,15 @@ class GameMapkit
   # ● 現在の位置からどの座標が直視可能か？
   #   ratio%でマップ描画
   #--------------------------------------------------------------------------
-  def update_map_data(ratio, adj_x, adj_y)
-    ratio = ratio.to_i
-    if ratio > rand(100)
-      mapid = $game_map.map_id
-      x = $game_player.x + adj_x
-      y = $game_player.y + adj_y
-      reset_new_mapdata
-      map = load_data(sprintf("Data/Map%03d.rvdata", mapid))
-      unless map.data[x, y, 0] == 1543
-        @map_data_t2.push([x, y, mapid])  # テンポラリ領域に描画
-        $game_player.visit_place(adj_x, adj_y)
-      end
+  def update_map_data(adj_x, adj_y)
+    mapid = $game_map.map_id
+    x = $game_player.x + adj_x
+    y = $game_player.y + adj_y
+    reset_new_mapdata
+    map = load_data(sprintf("Data/Map%03d.rvdata", mapid))
+    unless map.data[x, y, 0] == 1543
+      @map_data_t2.push([x, y, mapid])  # テンポラリ領域に描画
+      $game_player.visit_place(adj_x, adj_y)
     end
   end
   #--------------------------------------------------------------------------

@@ -100,7 +100,7 @@ class SceneRegistration < SceneBase
   # ● window類の初期準備
   #--------------------------------------------------------------------------
   def create_windows
-    @top_message = Window_Message_Top.new  # 上部枠
+    @top_message = WindowMessage_Top.new  # 上部枠
     @top_message.set_text("あなたの とくせいちを けっていしてください。")
     @top_message.visible = true
 

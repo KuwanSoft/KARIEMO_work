@@ -165,6 +165,9 @@ class Weapons2
   # ● 属性ダメージエンチャントが可能か？
   #--------------------------------------------------------------------------
   def can_element_damage_enchant?
-    return (@element_type == 0)
+    return (@element_type == 0) || (@kind != "bow")
+  end
+  def special
+    return @special.to_s
   end
 end

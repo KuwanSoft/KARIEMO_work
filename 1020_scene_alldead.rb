@@ -9,7 +9,7 @@ class SceneAllDead < SceneBase
   # ● 初期化処理
   #--------------------------------------------------------------------------
   def initialize
-    @message_window = Window_Message.new
+    @message_window = WindowMessage.new
   end
   #--------------------------------------------------------------------------
   # ● 開始処理

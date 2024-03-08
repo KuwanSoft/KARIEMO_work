@@ -31,12 +31,12 @@ class SceneCamp < SceneBase
     @ps = WindowPartyStatus.new            # パーティステータス
     @camp = Window_CAMP.new       # キャンプウィンドウ(準備フラグ)
     @pm = Window_PartyMagic.new
-    @equip = Window_EQUIP.new               # 装備ウィンドウ
+    @equip = WindowEquip.new               # 装備ウィンドウ
     @target_ps = WindowPartyStatus.new(true)     # partystatus
     @target_ps.turn_off
     @view = WindowView.new                 # ステータス閲覧ウィンドウ
     @back_s = Window_ShopBack_Small.new     # メッセージ枠
-    @swap_window = Window_SWAP.new          # SwapのActorリスト
+    @swap_window = WindowSwap.new          # SwapのActorリスト
     @swap_selection = Window_BagSelection.new("キャンプ", 80)  # インベントリ(Swap用)画面
     @delete_selection = Window_BagSelection.new("キャンプ", 80) # インベントリ(捨てる用)画面
     @info_selection = Window_BagSelection.new("キャンプ", 80) # インベントリ(調べる用)画面

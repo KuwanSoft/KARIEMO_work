@@ -1,10 +1,10 @@
 #==============================================================================
-# ■ Window_EQUIP(新)
+# ■ WindowEquip(新)
 #------------------------------------------------------------------------------
 # 　装備画面
 #==============================================================================
 
-class Window_EQUIP < WindowSelectable
+class WindowEquip < WindowSelectable
   attr_accessor :curse_pos
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
@@ -13,7 +13,7 @@ class Window_EQUIP < WindowSelectable
   #--------------------------------------------------------------------------
   def initialize
     super((512-340)/2, 80+WLH*2, 340, 32*6+32)
-    @ebase = Window_EQUIPBase.new    # 下地の定義
+    @ebase = WindowEquipBase.new    # 下地の定義
     self.active = false
     self.visible = false
     self.opacity = 0
@@ -164,10 +164,20 @@ class Window_EQUIP < WindowSelectable
         if item_data.mapkit?
           $game_mapkits[equip[0][1]].set_actor_id(@actor.actor_id)
         end
-        if item_data.curse > 0
+        ## 呪いのハッシュキーをチェック
+        if equip[5].has_key?(:curse) && equip[5][:curse] == 1
           equip[3] = true # 呪われているフラグオン
           return true # 呪われている
         end
+        Debug.write(c_m, "選択アイテムの装備化 next_position:#{@next_position}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.weapon_id:#{@actor.weapon_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor2_id:#{@actor.armor2_id} @actor.subweapon_id:#{@actor.subweapon_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor3_id:#{@actor.armor3_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor4_id:#{@actor.armor4_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor5_id:#{@actor.armor5_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor6_id:#{@actor.armor6_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor7_id:#{@actor.armor7_id}")
+        Debug.write(c_m, "選択アイテムの装備化 @actor.armor8_id:#{@actor.armor8_id}")
         return false  # 一度でも同じ物を発見して装備すれば以降は検査しない
       end
     end
@@ -239,14 +249,19 @@ class Window_EQUIP < WindowSelectable
             when "main","two" # メインハンド専用or両手持ち
               @weapons.push(item)
             when "sub" # サブハンド専用
-              ## メイン装備が弓の場合のみ矢を選択可能
-              if item_data.kind == "arrow"  # 矢
-                next unless actor.weapon? == "bow"
-                ## 弓矢を検知し両手持ちフラグを削除
-                @two_hand = false
+              ## 弓装備済みで矢が存在=>両手持ちフラグを消去
+              if actor.weapon? == "bow"
+                if item_data.kind == "arrow"
+                  @subs.push(item)
+                  @two_hand = false
+                end
+              elsif item_data.kind == "arrow" # 弓装備でないなら矢は候補にさせない
+                next
+              else
+                @subs.push(item)
               end
-              @subs.push(item)
             when "either" # 兼用
+              next if actor.weapon? == "bow"  # メインが弓ならば矢以外は表示させない
               @weapons.push(item)
               @subs.push(item)
             end

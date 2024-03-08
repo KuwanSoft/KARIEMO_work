@@ -939,11 +939,9 @@ class WindowBase < Window
   # ● 武器のアイコン表示
   #--------------------------------------------------------------------------
   def draw_weapon_icon(x, y, actor)
-
     ## backの表示
     back = Cache.system("weapon3_back")
     self.contents.blt(x, y, back, back.rect)
-
     ## 秘密の発見
     if actor.find
       actor.find = false

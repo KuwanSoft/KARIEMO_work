@@ -259,7 +259,11 @@ class GameEnemy < GameBattler
   # 炎3 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
-    str = ConstantTable::ELEMENTAL_STR[element_type]       # 属性STRの代入
+    str = ConstantTable::ELEMENTAL_STR[element_type]    # 属性Stringの代入
+    if ignore_earthquake? && str == "地"
+      self.resist_element_flag = true                   # 耐性フラグ
+      return 0
+    end
     return damage unless enemy.element_resistant.include?(str)   # 属性防御無し
     regex = /#{str}([0-9])/
     value = enemy.element_resistant.scan(regex)[0][0].to_i

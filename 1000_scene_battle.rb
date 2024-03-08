@@ -13,7 +13,7 @@ class SceneBattle < SceneBase
     $game_temp.in_battle = true
     $game_temp.lucky_role = false # ラッキーロールのリセット
     $game_temp.prediction = false # 危険予知キャンセル
-    @message_window = Window_BattleMessage.new
+    @message_window = WindowBattleMessage.new
     @damage = WindowDamage.new
     @e_damage = WindowElementDamage.new
     @action_battlers = []

@@ -109,7 +109,7 @@ class SceneGuild < SceneBase
     super
     $game_party.reset_party # パーティのリセット
     @delete_flag = false
-    @message_window = Window_Message.new          # message表示用
+    @message_window = WindowMessage.new          # message表示用
     @attention_window = Window_ShopAttention.new  # attention表示用
     @guildback = WindowGuildBack.new              # 壁紙
     @wait_list = WindowWait.new                   # 役場冒険者リスト
@@ -123,7 +123,7 @@ class SceneGuild < SceneBase
     @face_window = WindowFaceSelection.new        # ポートレートの選択
     @face_window.y = WLH*8
     @face_window.height = 448-(WLH*8)
-    @top_message = Window_Message_Top.new         # 上部枠
+    @top_message = WindowMessage_Top.new         # 上部枠
     @WindowPicture = WindowPicture.new(0, 0)
     @WindowPicture.create_picture("Graphics/System/guild", ConstantTable::NAME_GUILD)
   end

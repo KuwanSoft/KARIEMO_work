@@ -28,7 +28,7 @@ class SceneName < SceneBase
   # ● TopMessageの作成
   #--------------------------------------------------------------------------
   def create_window
-    @top_message = Window_Message_Top.new
+    @top_message = WindowMessage_Top.new
     text = @riddle ? "あなたの こたえは?" : "あなたのなまえは?"
     @top_message.set_text(text)
     @top_message.visible = true
@@ -59,7 +59,7 @@ class SceneName < SceneBase
   # ● 同名がいないか？
   #--------------------------------------------------------------------------
   def check_duplication(name)
-    for i in 1..30
+    for i in 1..29
       member = $game_actors[i]
       return true if member.name == name
     end

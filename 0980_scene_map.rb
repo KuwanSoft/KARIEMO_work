@@ -17,7 +17,7 @@ class SceneMap < SceneBase
     end
     $game_map.refresh
     @spriteset = SpritesetMap.new
-    @message_window = Window_Message.new
+    @message_window = WindowMessage.new
     @attention_window = Window_Attention.new # attention表示用
     @ps = WindowPartyStatus.new        # パーティステータス
     @sub_window = Window_SubWindow.new    # 情報枠の定義

@@ -458,24 +458,19 @@ class GameBattleAction
   # ● 貫通矢攻撃のターゲット作成
   #--------------------------------------------------------------------------
   def make_arrow_targets
-    case battler.class_id
-    when 7  # 狩人の場合は45%で発生
-      ratio = 45
-    else    # その他は25%で発生
-      ratio = 25
-    end
+    ratio = 45
     result = 1
     ## 9体まで判定
     while result < 9
-      Debug.write(c_m, "貫通判定 => #{ratio}% #{result}体目")
+      Debug.write(c_m, "貫通判定 => 成功率:#{ratio}% #{result}体目")
       if battler.check_skill_activation(SkillId::MULTITARGET, ratio).result
         result += 1
-        Debug.write(c_m, "貫通判定 => HIT")
+        Debug.write(c_m, "⇒貫通判定 => HIT")
       else
-        Debug.write(c_m, "貫通判定 => MISS")
+        Debug.write(c_m, "⇒貫通判定 => MISS")
         break
       end
-      ratio = [ratio - ((result-1)*3), 5].max     # 1体貫通することで貫通体*3%の確率減少
+      ratio = [ratio - ((result-1)*5), 5].max     # 1体貫通することで貫通体*3%の確率減少
     end
     targets = make_targets_group(result).compact
     ## 実際に存在し貫通した人数のみスキル上昇チャンス

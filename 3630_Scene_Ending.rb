@@ -9,7 +9,7 @@ class Scene_Ending < SceneBase
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
   def initialize
-    @message = Window_Message.new(0, 0, 544, 416)
+    @message = WindowMessage.new(0, 0, 544, 416)
     @text = [
 #~     "- Design -"
 #~     "Original Concept"

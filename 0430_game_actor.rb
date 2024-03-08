@@ -121,7 +121,6 @@ class GameActor < GameBattler
     clear_extra_values
     force_delete_state            # ステータス異常を消去
     generate_uuid                 # 一位の乱数を生成
-    @find = false
     @tired_thres_plus = 0         # 疲労許容度プラス
     @poison_weapon = {}           # 毒塗ハッシュ
     @cast_spell_identify = false
@@ -1253,23 +1252,12 @@ class GameActor < GameBattler
       raise
     end
     ## 基本職によるボーナス
-    # case @class_id
     str_plus += self.class.str_bonus
     int_plus += self.class.int_bonus
     vit_plus += self.class.vit_bonus
     spd_plus += self.class.spd_bonus
     mnd_plus += self.class.mnd_bonus
     luk_plus += self.class.luk_bonus
-    # when 2; spd_plus += ConstantTable::CLASS_BONUS # 盗賊
-    # when 3; int_plus += ConstantTable::CLASS_BONUS # 魔術師
-    # when 4; vit_plus += 0
-    # when 5; spd_plus += 0
-    # when 6; mnd_plus += 0
-    # when 7; str_plus += ConstantTable::CLASS_BONUS # 狩人
-    # when 8; mnd_plus += ConstantTable::CLASS_BONUS # 聖職者
-    # when 9; luk_plus += ConstantTable::CLASS_BONUS # 従士
-    # when 10;luk_plus += 0
-    # end
     @exp = exp
     # 一度しかレベルアップをチェックしない
     if @exp >= @exp_list[@level+1] and @exp_list[@level+1] > 0
@@ -1581,12 +1569,11 @@ class GameActor < GameBattler
     for key in @skill.keys
       if key == ""
       elsif $data_skills[key].initial_skill?(self)
-        Debug.write(c_m, "#{$data_skills[key].name}は初期スキル")
+        # Debug.write(c_m, "#{$data_skills[key].name}は初期スキル")
       else
-        Debug.write(c_m, "#{$data_skills[key].name}は初期スキルではない")
+        Debug.write(c_m, "****************** #{$data_skills[key].name}は初期スキルではない")
       end
     end
-    Debug.write(c_m, "スキル数:#{@skill.keys.size}")
     ##################
     base_skill = 0
     case w
@@ -2533,9 +2520,9 @@ class GameActor < GameBattler
     elsif ratio > rand(100) and stack == 0 and $scene.is_a?(SceneTreasure)
       hash = MAGICITEM.enchant(item)
       Debug.write(c_m, "====****(TreasureHunt)MAGIC ITEM DETECTED ****==== #{hash}")
-    elsif $TEST and stack == 0
-      hash = MAGICITEM.enchant(item)
-      Debug.write(c_m, "====****($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
+    # elsif $TEST and stack == 0
+    #   hash = MAGICITEM.enchant(item)
+    #   Debug.write(c_m, "====****($TESTフラグ)MAGIC ITEM DETECTED ****==== #{hash}")
     end
 
     @bag.push [[kind, item_id], identified, 0, false, stack, hash]
@@ -2667,30 +2654,12 @@ class GameActor < GameBattler
     end
     spd_bonus = value
 
-    ## 二刀流からのボーナス
-    # if dual_wield?
-    #   TODO
-    #   case Misc.skill_value(SkillId::DUAL, self)
-    #   when 25..999;  val = 2  # +2
-    #   else;          val = 0
-    #   end
-    # else
-    #   val = 0
-    # end
-    d_bonus = val
-
     ## 隠密ボーナス
     h_bonus = ConstantTable::INIT_HIDE_BONUS if onmitsu?
 
     value = t_bonus + p_bonus + f_bonus + spd_bonus + h_bonus + l_bonus + r_bonus
     value *= cc_penalty
     value = Integer(value)
-
-    # Debug.write(c_m, "戦術スキルイニシアチブ値:#{t_bonus}")
-    # Debug.write(c_m, "性格ボーナス:+#{p_bonus} 前衛ボーナス:+#{f_bonus} リーダー:+#{l_bonus} ルーン:+#{r_bonus}")
-    # Debug.write(c_m, "SPD特性値ボーナス:+#{spd_bonus}(SPD:#{spd})")
-    # Debug.write(c_m, "二刀流ボーナス:#{d_bonus} 隠密ボーナス:#{h_bonus}")
-    # Debug.write(c_m, "base_init:#{value} c.c.ペナルティ:#{cc_penalty}")
 
     return value
   end
@@ -3597,17 +3566,17 @@ class GameActor < GameBattler
     #   result += ConstantTable::PM_DETECT_BONUS
     # end
     ## パーティマジック:危険予知ボーナス
-    if $game_party.pm_detect > 0 and (id == SkillId::PREDICTION)
-      result += ConstantTable::PM_PREDICTION_BONUS
-    end
+    # if $game_party.pm_detect > 0 and (id == SkillId::PREDICTION)
+    #   result += ConstantTable::PM_PREDICTION_BONUS
+    # end
     ## パーティマジック:マッピングボーナス
-    if $game_party.pm_detect > 0 and (id == SkillId::MAPPING)
-      result += ConstantTable::PM_MAPPING_BONUS
-    end
+    # if $game_party.pm_detect > 0 and (id == SkillId::MAPPING)
+    #   result += ConstantTable::PM_MAPPING_BONUS
+    # end
     ## パーティマジック:水泳ボーナス
-    if $game_party.pm_float > 0 and (id == SkillId::SWIM)
-      result += ConstantTable::PM_SWIM_BONUS
-    end
+    # if $game_party.pm_float > 0 and (id == SkillId::SWIM)
+    #   result += ConstantTable::PM_SWIM_BONUS
+    # end
     ## ガイドスキル:観察眼ボーナス
     result += $game_mercenary.skill_check("eye") if id == SkillId::EYE
     ## ガイドスキル:勤勉ボーナス
@@ -3666,10 +3635,11 @@ class GameActor < GameBattler
     Debug::write(c_m,"#{@name} 忠誠心=>#{@loyalty_pazuzu}")
   end
   #--------------------------------------------------------------------------
-  # ● 貫通矢可能？
+  # ● レゴラス可能？
   #--------------------------------------------------------------------------
   def can_arrow?
     return true if weapon? == "bow"       # 弓の装備？
+    return true if weapon? == "throw"     # 投擲の装備？
     return false
   end
   #--------------------------------------------------------------------------
@@ -3866,14 +3836,11 @@ class GameActor < GameBattler
   # ● スカウトスキルチェック実施
   #--------------------------------------------------------------------------
   def scout_check
-    modifier = $game_party.pm_detect > 0 ? 1 : 0
-    skill_id = SkillId::EYE         # 観察眼
-    sv = Misc.skill_value(skill_id, self)
-    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-    @s_ratio = movable? ? get_d20(:skill, modifier) : 0
-    @s_r = Integer([[20 - (sv * diff / 5), 19].min, 1].max)
-    @s_result = (@s_ratio >= @s_r)
-    chance_skill_increase(skill_id) # 試したら上昇
+    data = check_skill_activation(SkillId::EYE, 25)
+    @s_ratio = data.d20
+    @s_r = data.thres
+    @s_result = data.result
+    chance_skill_increase(SkillId::EYE) # 試したら上昇
   end
   #--------------------------------------------------------------------------
   # ● スカウトスキルチェック実施
@@ -3891,15 +3858,10 @@ class GameActor < GameBattler
   # ● シークレットの発見
   #--------------------------------------------------------------------------
   def find_something
-    modifier = $game_party.pm_detect > 0 ? 1 : 0
-    skill_id = SkillId::EYE                         # 観察眼
-    sv = Misc.skill_value(skill_id, self)           # 罠の調査 特性値補正後のスキル値
-    diff = ConstantTable::DIFF_15[$game_map.map_id] # フロア係数
-    d20 = movable? ? get_d20(:skill, modifier) : 0
-    thres = Integer([[20 - (sv * diff / 5), 19].min, 1].max)
-    if d20 >= thres
+    data = check_skill_activation(SkillId::EYE, 15)
+    if data.result
+      chance_skill_increase(SkillId::EYE)
       @find = true
-      chance_skill_increase(skill_id)
       return true
     end
     return false
@@ -4278,35 +4240,26 @@ class GameActor < GameBattler
   end
   #--------------------------------------------------------------------------
   # ● インパクトスキルの取得
+  # 発動率75%キャップ (100-75)/5=5
   #--------------------------------------------------------------------------
   def get_impact
-    TODO
     return false unless @action.attack? # 物理攻撃中に限る
-    sv = Misc.skill_value(SkillId::IMPACT, self)
     case weapon?
     ## 弓はインパクト発生しない
     when "bow"
       return false
     ## メイス・杖・ワンドの場合
     when "club","staff","wand"
-      diff = ConstantTable::DIFF_35[$game_map.map_id]
+      result = check_skill_activation(SkillId::IMPACT, 25, 1, 0, 5).result
     else
-      ## 両手持ちの場合
-      if t_hand?
-        diff = ConstantTable::DIFF_35[$game_map.map_id]
-      ## その他の片手持ち武器
-      else
-        diff = ConstantTable::DIFF_10[$game_map.map_id]
+      if t_hand?  # 両手持ちの場合、両手持ちスキルが上乗せされる。
+        result = check_skill_activation(SkillId::IMPACT, 15, 0, SkillId::TWOHANDED, 5).result
+      else        # その他の片手持ち武器
+        result = check_skill_activation(SkillId::IMPACT, 15, 0, 0, 5).result
       end
     end
-    ratio = Integer([sv * diff, 75].min)  # 75%キャップ
-    ratio /= 2 if self.tired?
-    if ratio > rand(100)
-      Debug.write(c_m, "IMPACT発生 #{ratio}%")
-      chance_skill_increase(SkillId::IMPACT)
-      return true
-    end
-    return false
+    chance_skill_increase(SkillId::IMPACT) if result
+    return result
   end
   #--------------------------------------------------------------------------
   # ● 神の瞬き
@@ -4314,12 +4267,12 @@ class GameActor < GameBattler
   def god_blink
     position = rand(6)+1
     case position
-    when 1; @str -= 1        # パラメータ ちからのつよさ
-    when 2; @int -= 1        # パラメータ ちえ
-    when 3; @vit -= 1        # パラメータ たいりょく
-    when 4; @spd -= 1        # パラメータ みのこなし
-    when 5; @mnd -= 1        # パラメータ せいしんりょく
-    when 6; @luk -= 1        # パラメータ うんのよさ
+    when 1; @str = [1, @str-1].max        # パラメータ ちからのつよさ
+    when 2; @int = [1, @int-1].max        # パラメータ ちえ
+    when 3; @vit = [1, @vit-1].max       # パラメータ たいりょく
+    when 4; @spd = [1, @spd-1].max        # パラメータ みのこなし
+    when 5; @mnd = [1, @mnd-1].max       # パラメータ せいしんりょく
+    when 6; @luk = [1, @luk-1].max       # パラメータ うんのよさ
     end
     Debug.write(c_m, "神の瞬きが発生 部位:#{["str","int","vit","spd","mnd","luk"][position-1]}")
   end
@@ -4636,8 +4589,7 @@ class GameActor < GameBattler
   def recover_nausea
     ratio = ConstantTable::REST_NAUSEA_RECOVER_RATIO_PER_TURN
     state_id = StateId::NAUSEA
-    @state_depth[state_id] ||= 0
-    return unless @state_depth[state_id] > 0
+    return unless @state_depth[state_id]
     return unless ratio > rand(100)
     @state_depth[state_id] -= 1
     Debug.write(c_m, "休息中の吐き気の累積値-1回復")
@@ -4675,6 +4627,11 @@ class GameActor < GameBattler
   # 炎2 = 炎ダメージ 1/3倍
   #--------------------------------------------------------------------------
   def calc_element_damage(element_type, damage)
+    ## 地震無効？
+    if ignore_earthquake? && element_type == 6
+      self.resist_element_flag = true                   # 耐性フラグ
+      return 0
+    end
     rank = elemental_resist?(element_type)
     return damage if rank == 0
     damage = Integer(damage * 1/(rank+1))  # 属性防御x5箇所
@@ -4738,7 +4695,7 @@ class GameActor < GameBattler
     for iteminfo in @bag
       return iteminfo[5] if (iteminfo[2] == 1) && !(sub)
       ## サブ武器では無い=>盾
-      if (iteminfo[2] == 2) && sub && Misc.item(item[0][0], item[0][1]).is_a?(Weapons2)
+      if (iteminfo[2] == 2) && sub && Misc.item(iteminfo[0][0], iteminfo[0][1]).is_a?(Weapons2)
         return iteminfo[5]
       end
     end
