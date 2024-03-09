@@ -16,24 +16,23 @@ module Debug
   # ● 【開発用】バージョンをファイルに書き出す
   #     GoogleDriveにversion_list.txtを作成する
   #--------------------------------------------------------------------------
-  def self.write_version(now_version, release_date, build, line_count, publish = false, unique_id = 99999999)
+  def self.write_version(release_date, build, line_count, publish = false, unique_id = 99999999)
     return unless $TEST
     if FileTest.exist?(@version_path+@version_file)
       ## version_list.txtの最新版を読み込み現行とコンペア
       file = File.open(@version_path+@version_file, "r")
-      ver = file.readline
-      now_version_f = ver.scan(/(.\.\d+)./)[0][0]
-      release_date_f = ver.scan(/\d.\d+.(\d+)-/)[0][0]
-      build_f = ver.scan(/\S+-(\d+)/)[0][0]
+      file_contents = file.readline
+      # now_version_f = file_contents.scan(/(.\.\d+)./)[0][0]
+      release_date_f = file_contents.scan(/([0-9]{6})-/)[0][0]
+      build_f = file_contents.scan(/[0-9]{6}-(\d+)/)[0][0]
       file.close
-      Debug::write(c_m, "version check:#{now_version_f}=>#{now_version}")
+      # Debug::write(c_m, "version check:#{now_version_f}=>#{now_version}")
       Debug::write(c_m, "release_date check:#{release_date_f}=>#{release_date}")
       Debug::write(c_m, "build check:#{build_f}=>#{build}")
-      if now_version.to_i == now_version_f.to_i &&
-        release_date.to_i == release_date_f.to_i &&
-        build.to_i == build_f.to_i
+      # if now_version.to_i == now_version_f.to_i &&
+      if release_date.to_i == release_date_f.to_i && build.to_i == build_f.to_i
         Debug::write(c_m, "同バージョン検知 SKIP")
-        return unless publish
+        return
       else
         Debug::write(c_m, "新規バージョン検知")
       end
@@ -41,11 +40,8 @@ module Debug
       File.open(@version_path+@version_file, "w")
     end
     ## バージョンストリングを作成
-    # for fn in Dir.glob("Kariemo_*")
-      # Debug.write(c_m, "#{fn} deleted") if File.delete(fn) == 1
-    # end
-    now_version = sprintf("%.3f",now_version)
-    version = "#{now_version}.#{release_date}-#{build}"
+    # now_version = sprintf("%.3f",now_version)
+    builddate = "BUILD:#{release_date}-#{build}"
     # name = File.open("Kariemo_"+version, "w")
     # name.close
     ## シングルファイルの強制作成
@@ -68,12 +64,8 @@ module Debug
     ## ファイルにアペンドで通常通り書き出す
     file = File.open(@version_path+@version_file, "a") # ファイルをオープン
     diff = (line_count - temp[0][0].to_i)
-    if publish
-      file.puts ConstantTable::PUBLISHED_FLAG
-      file.puts "【" + sprintf("%-16s", version) + " " + Time.now.strftime("%j %H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}(diff:#{diff})" + "】"
-    end
-    file.puts sprintf("%-16s", version) + " " + Time.now.strftime("%H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}(diff:#{diff})"
-    single.print sprintf("%-16s", version) + " " + Time.now.strftime("%H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}"
+    file.puts sprintf("%-16s", builddate) + " " + Time.now.strftime("%H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}(diff:#{diff})"
+    single.print sprintf("%-16s", builddate) + " " + Time.now.strftime("%H:%M:%S") +" "+ sprintf("ID:%8d", unique_id) + " LINEs:#{line_count}"
     single.close
     file.close  # 一旦クローズ
     ## 内容をreverseさせる#######################

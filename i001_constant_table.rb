@@ -22,7 +22,6 @@ module ConstantTable
   MOVE_SPEED = 32
   MOVE_SPEED_RUN = 64
   TIMEOUT_POSTPROCESS = 5000
-  PUBLISHED_FLAG = "======<New Published Version Detected>======"
 
   EXP_ROOT_VALUE = 1000     # 経験値の基本増加値
   BASE_EXP = 100            # 取得経験値ベース
