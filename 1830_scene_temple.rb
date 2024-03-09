@@ -275,7 +275,7 @@ class SceneTemple < SceneBase
     elsif @time == 400
       name = @cure_actor.name
       if @cure_actor.actor?
-        a = @cure_actor.recover_all(true)   # 治療の実施 結果をaに入力
+        a = @cure_actor.judge_comeback
         Debug::write(c_m,"復活の結果 RETURN:#{a}")
         case a
         when 0;result = "よくなりました"

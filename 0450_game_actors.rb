@@ -163,4 +163,14 @@ class GameActors
       member.recover_fatigue_by(value)              # 1秒で1疲労回復,マップでは階層分減る
     end
   end
+  #--------------------------------------------------------------------------
+  # ● 腐敗を進める
+  #--------------------------------------------------------------------------
+  def rotting
+    for member in @data
+      next if member == nil
+      next if $game_party.party_member?(member.id)  # パーティ内でなければ
+      member.rotting
+    end
+  end
 end

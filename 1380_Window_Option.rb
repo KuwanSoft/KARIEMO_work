@@ -48,8 +48,9 @@ class Window_Option < WindowSelectable
   # ● リセットカウンタとビルド
   #--------------------------------------------------------------------------
   def show_reset_count_and_build
-    str = "BUILD:" + "#{load_data("Data/Version2.rvdata")[:uniqueid]}"
+    version_hash = load_data("Data/Version2.rvdata")
+    build = "BUILD:#{version_hash[:date]}-#{version_hash[:build]}"
     self.contents.draw_text(0, WLH*11, self.width-32, WLH, "ResetCount:#{Debug.check_reset_count}", 2)
-    self.contents.draw_text(0, WLH*12, self.width-32, WLH, str, 2)
+    self.contents.draw_text(0, WLH*12, self.width-32, WLH, build, 2)
   end
 end

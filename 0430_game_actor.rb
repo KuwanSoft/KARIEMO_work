@@ -2548,11 +2548,7 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def permeation
     value = 1
-    sv = Misc.skill_value(SkillId::PERMEATION, self)
-    diff = ConstantTable::DIFF_25[$game_map.map_id] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if tired?
-    if ratio > rand(100)
+    if check_skill_activation(SkillId::PERMEATION, 25).result
       value = ConstantTable::PERMEATION_RATIO
       chance_skill_increase(SkillId::PERMEATION) # 浸透呪文
     elsif onmitsu?
@@ -4470,18 +4466,18 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   # ● 呪文用NoDの取得
   #--------------------------------------------------------------------------
-  def get_magic_nod
-    value = 1
-    sv = Misc.skill_value(SkillId::PERMEATION, self)
-    diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if tired?
-    if ratio > rand(100)
-      value = 2
-      chance_skill_increase(SkillId::PERMEATION) # 浸透呪文
-    end
-    return value
-  end
+  # def get_magic_nod
+  #   value = 1
+  #   sv = Misc.skill_value(SkillId::PERMEATION, self)
+  #   diff = ConstantTable::DIFF_50[$game_map.map_id] # フロア係数
+  #   ratio = Integer([sv * diff, 95].min)
+  #   ratio /= 2 if tired?
+  #   if ratio > rand(100)
+  #     value = 2
+  #     chance_skill_increase(SkillId::PERMEATION) # 浸透呪文
+  #   end
+  #   return value
+  # end
   #--------------------------------------------------------------------------
   # ● マップデータの書き込み
   #--------------------------------------------------------------------------
@@ -4786,6 +4782,19 @@ class GameActor < GameBattler
     else
       Debug.write(c_m, "エンチャント武器判定=>ルーンの知識が足りない")
       return [0, 0] # ルーンスキルが足りない
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 腐敗を進める
+  #--------------------------------------------------------------------------
+  def rotting
+    value = [vit(true), 19].min
+    if value > rand(20)
+      return
+    elsif rotten?
+      change_state_depth(StateId::ROTTEN, 1)
+    elsif dead?
+      change_state_depth(StateId::DEATH, 1)
     end
   end
 end

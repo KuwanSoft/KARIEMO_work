@@ -20,8 +20,8 @@ class SceneTitle < SceneBase
     load_database
     # ゲームオブジェクトを作成
     create_game_objects
-    create_version                    # バージョンコードを作成
-    write_uniqueid                    # ユニークIDの書き出し
+    # create_version                    # バージョンコードを作成
+    # write_uniqueid                    # ユニークIDの書き出し
     if check_terminated               # 中断ファイルあり=>ロード
       do_load(true)
     elsif check_continue              # セーブファイルあり=>ロード
@@ -497,105 +497,105 @@ class SceneTitle < SceneBase
   #--------------------------------------------------------------------------
   # ● バージョンの確認と修正
   #--------------------------------------------------------------------------
-  def create_version
-    ## ゲームタイトルをiniへ書き込み
-    str = $data_system.game_title
-    IniFile.write("Game.ini", "Game", "Title", str) # INIファイル操作
-    Debug.write(c_m, "Game Title re-write in Game.ini :#{str}")
-    ## バージョンデータオブジェクトの取得
-    # updateBuildIDXXXXXXXX.rvdataのファイルが存在すればそれが、新規のVersion_idとする。
-    #-------------------------------------------------------------------------
-    version_data = "Data/Version2.rvdata"
-    @version_hash = load_data(version_data)
-    array = Dir.glob("updateBuildID*.rvdata")
-    ## build id 変更無し
-    if array.size == 0
-      Debug.write(c_m, "updateBuildID 無し=> UniqueID変更無し")
-      ## PUBLISH.batで起動
-      ## version fileにMARKを入れるため
-      if $BTEST and $TEST
-        Debug.write(c_m, "$BTEST+$TEST検知 => 公開Release")
-        update_version_file(true)
-      end
-    ## build id 変更有り
-    elsif array.size == 1
-      File.delete(array[0])
-      Debug.write(c_m, "updateBuildID File detected and deleted")
-      ## build id 変更ルーチン
-      new = array[0].scan(/updateBuildID(\d+).rvdata/)[0][0].to_i
-      @version_hash[:uniqueid] = new
-      Debug.write(c_m, "Version2.rvdataのunique_id更新:#{new}")
-      ## 通常の開発
-      if $TEST
-        Debug.write(c_m, "$TEST検知")
-        update_version_file
-      else
-        ## update_buildファイルがありながら$TESTでない場合
-        raise StandardError.new('updateBuildID file exists but not in test/dev mode')
-      end
-    elsif array.size > 1
-      ## 複数のファイルが存在
-      raise StandardError.new("too many updateBuildID files exist")
-    else
-      raise StandardError.new("Unknown Error")
-    end
-  end
+  # def create_version
+  #   ## ゲームタイトルをiniへ書き込み
+  #   str = $data_system.game_title
+  #   IniFile.write("Game.ini", "Game", "Title", str) # INIファイル操作
+  #   Debug.write(c_m, "Game Title re-write in Game.ini :#{str}")
+  #   ## バージョンデータオブジェクトの取得
+  #   # updateBuildIDXXXXXXXX.rvdataのファイルが存在すればそれが、新規のVersion_idとする。
+  #   #-------------------------------------------------------------------------
+  #   version_data = "Data/Version2.rvdata"
+  #   @version_hash = load_data(version_data)
+  #   array = Dir.glob("updateBuildID*.rvdata")
+  #   ## build id 変更無し
+  #   if array.size == 0
+  #     Debug.write(c_m, "updateBuildID 無し=> UniqueID変更無し")
+  #     ## PUBLISH.batで起動
+  #     ## version fileにMARKを入れるため
+  #     if $BTEST and $TEST
+  #       Debug.write(c_m, "$BTEST+$TEST検知 => 公開Release")
+  #       update_version_file(true)
+  #     end
+  #   ## build id 変更有り
+  #   elsif array.size == 1
+  #     File.delete(array[0])
+  #     Debug.write(c_m, "updateBuildID File detected and deleted")
+  #     ## build id 変更ルーチン
+  #     new = array[0].scan(/updateBuildID(\d+).rvdata/)[0][0].to_i
+  #     @version_hash[:uniqueid] = new
+  #     Debug.write(c_m, "Version2.rvdataのunique_id更新:#{new}")
+  #     ## 通常の開発
+  #     if $TEST
+  #       Debug.write(c_m, "$TEST検知")
+  #       update_version_file
+  #     else
+  #       ## update_buildファイルがありながら$TESTでない場合
+  #       raise StandardError.new('updateBuildID file exists but not in test/dev mode')
+  #     end
+  #   elsif array.size > 1
+  #     ## 複数のファイルが存在
+  #     raise StandardError.new("too many updateBuildID files exist")
+  #   else
+  #     raise StandardError.new("Unknown Error")
+  #   end
+  # end
   #--------------------------------------------------------------------------
   # ● バージョンの確認と修正 $TESTのみ
   # 保存ボタンを押した後のテストプレイ中に呼び出される想定
   # これにより、version.rvdataファイルが更新される。
   #--------------------------------------------------------------------------
-  def update_version_file(publish = false)
-    @version_hash[:ver] = nil
-    # now_ver = $data_system.game_title.scan(/.*ver(\d+)\./)[0][0].to_i
-    # now_rel = $data_system.game_title.scan(/.*ver\d+\.(\d+)/)[0][0].to_i
-    # old_ver = old_version.to_s.scan(/(\d+)\./)[0][0].to_i
-    # old_rel = old_version.to_s.scan(/\d+\.(\d+)/)[0][0].to_i
-    # if now_ver == old_ver
-    #   if now_rel == old_rel
-    #     ## 同バージョン
-    #     up = false
-    #   elsif now_rel > old_rel
-    #     ## リリースアップ
-    #     up = true
-    #   end
-    # elsif now_ver > old_ver
-    #   ## バージョン更新
-    #   up = true
-    # else
-    #   ## バージョンダウン検知
-    #   Debug.write(c_m, "VersionDown検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
-    #   raise VersionDown
-    # end
-    ## バージョンorリリースアップ更新
-    # if up
-    #   Debug::write(c_m, "Version ID差異検知 updating ID")
-    #   Debug::write(c_m, "VersionUP検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
-    #   release_date = Time.now.strftime("%y%m%d")
-    #   build = 1
-    #   @version_hash[:date] = release_date
-    #   @version_hash[:build] = build
-    # ## 同じバージョン検知
-    # elsif up == false
-      Debug::write(c_m, "BUILD UP実行")
-      release_date = Time.now.strftime("%y%m%d")
-      @version_hash[:date] = release_date
-      @version_hash[:build] += 1 # Increment
-    # end
-    save_data(@version_hash, "Data/Version2.rvdata")
-    line_count = Misc.count_script_lines
-    ## Google Driveへversion_list.txtの更新を行う
-    Debug::write_version(release_date, @version_hash[:build], line_count, publish, @version_hash[:uniqueid])
-  end
+  # def update_version_file(publish = false)
+  #   @version_hash[:ver] = nil
+  #   # now_ver = $data_system.game_title.scan(/.*ver(\d+)\./)[0][0].to_i
+  #   # now_rel = $data_system.game_title.scan(/.*ver\d+\.(\d+)/)[0][0].to_i
+  #   # old_ver = old_version.to_s.scan(/(\d+)\./)[0][0].to_i
+  #   # old_rel = old_version.to_s.scan(/\d+\.(\d+)/)[0][0].to_i
+  #   # if now_ver == old_ver
+  #   #   if now_rel == old_rel
+  #   #     ## 同バージョン
+  #   #     up = false
+  #   #   elsif now_rel > old_rel
+  #   #     ## リリースアップ
+  #   #     up = true
+  #   #   end
+  #   # elsif now_ver > old_ver
+  #   #   ## バージョン更新
+  #   #   up = true
+  #   # else
+  #   #   ## バージョンダウン検知
+  #   #   Debug.write(c_m, "VersionDown検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
+  #   #   raise VersionDown
+  #   # end
+  #   ## バージョンorリリースアップ更新
+  #   # if up
+  #   #   Debug::write(c_m, "Version ID差異検知 updating ID")
+  #   #   Debug::write(c_m, "VersionUP検知 #{old_ver}.#{old_rel} => #{now_ver}.#{now_rel}")
+  #   #   release_date = Time.now.strftime("%y%m%d")
+  #   #   build = 1
+  #   #   @version_hash[:date] = release_date
+  #   #   @version_hash[:build] = build
+  #   # ## 同じバージョン検知
+  #   # elsif up == false
+  #     Debug::write(c_m, "BUILD UP実行")
+  #     release_date = Time.now.strftime("%y%m%d")
+  #     @version_hash[:date] = release_date
+  #     @version_hash[:build] += 1 # Increment
+  #   # end
+  #   save_data(@version_hash, "Data/Version2.rvdata")
+  #   line_count = Misc.count_script_lines
+  #   ## Google Driveへversion_list.txtの更新を行う
+  #   Debug::write_version(release_date, @version_hash[:build], line_count, publish, @version_hash[:uniqueid])
+  # end
   #--------------------------------------------------------------------------
   # ● ユニークIDの書き出し
   #--------------------------------------------------------------------------
-  def write_uniqueid
-    str = "UNIQUE ID:" + @version_hash[:uniqueid].to_s
-    Debug::write(c_m, "---------------------------------")
-    Debug::write(c_m, str)
-    Debug::write(c_m, "---------------------------------")
-  end
+  # def write_uniqueid
+  #   str = "UNIQUE ID:" + @version_hash[:uniqueid].to_s
+  #   Debug::write(c_m, "---------------------------------")
+  #   Debug::write(c_m, str)
+  #   Debug::write(c_m, "---------------------------------")
+  # end
   #--------------------------------------------------------------------------
   # ● CALLされないクラスを抽出する
   #--------------------------------------------------------------------------

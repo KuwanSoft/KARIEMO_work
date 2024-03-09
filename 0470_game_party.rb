@@ -1761,7 +1761,7 @@ class GameParty < GameUnit
         next                                  # 次のメンバー
       end
       member.recover_nausea                   # 吐き気の回復
-      next unless member.good_condition?      # 健康でないと回復しない
+      next unless member.can_rest?            # 健康でないと回復しない(教会に運び込まれない程度)睡眠は妨げない
       ## HP回復
       unless member.hp > member.maxhp * member.resting_thres  # 回復上限％
         if member.personality_n == :OnesOwnpace

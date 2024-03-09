@@ -731,7 +731,7 @@ class WindowBase < Window
     x_adj = 22; y_adj = 62
     bitmaps = []
     for state in actor.states.sort {|a, b| a.priority <=> b.priority}
-      Debug::write(c_m, "#{state.name} priority:#{state.priority}")
+      # Debug::write(c_m, "#{state.name} priority:#{state.priority}")
       bitmaps.push(Cache.state(state.name))
     end
     # bitmaps.push(Cache.state("石化")) if actor.stone?

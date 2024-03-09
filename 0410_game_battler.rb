@@ -500,7 +500,7 @@ class GameBattler
     Debug.write(c_m, "#{self.name} HP:#{@hp}=>#{hp}")
     if state?(StateId::DEATH) or state?(StateId::ROTTEN)  # 死亡・腐敗の場合は無視
       Debug::write(c_m,"すでに死亡・腐敗状態である")
-      @hp = 0
+      # @hp = 0
       return
     end
     ## HP回復
@@ -514,7 +514,7 @@ class GameBattler
       self.add_tired(@hp - hp)      # HP減少分を疲労度に加算
     end
     ## 一撃死かつアクターの場合(行方不明者は除く)
-    if hp < 1 and self.actor? and not self.survivor?
+    if (hp < 1) && self.actor? && !(self.survivor?)
       ## フォーリーブスをチェック
       if check_skill_activation(SkillId::FOURLEAVES, 25).result
         @hp = 1
@@ -524,8 +524,8 @@ class GameBattler
         return
       end
     end
-    @hp = [[hp, maxhp].min, 0].max                  # 最大値以上は回復させない
-    if @hp < 1 and not state?(StateId::DEATH)       # HPが0以下の場合
+    @hp = [[hp, maxhp].min, 0].max                  # 最大値以上は回復させない,0以下にはさせない
+    if @hp < 1 && !(state?(StateId::DEATH))         # HPが0以下の場合
       add_state(StateId::DEATH)                     # 戦闘不能 (ステート 1 番) を付加
       @added_states.push(StateId::DEATH)
       perform_collapse unless $game_temp.in_battle  # 戦闘時以外で断末魔
@@ -563,21 +563,14 @@ class GameBattler
   # ● 全回復
   #     教会で使用するonly_stateはステートだけ回復させる
   #--------------------------------------------------------------------------
-  def recover_all(only_state = false, miracle = false)
+  def recover_all(only_state = false)
+    for i in @state_depth.keys
+      remove_state(i)
+    end
     unless only_state
       @hp = maxhp
       recover_mp
     end
-    for i in @state_depth.keys
-      if i == StateId::DEATH and miracle == true   # 奇跡での復活
-        remove_state(i, 9)
-      elsif i == StateId::DEATH                    # 教会での復活
-        result = remove_state(i)
-      else
-        remove_state(i)
-      end
-    end
-    return result == nil ? 0 : result # 結果がNilの場合は死亡でない
   end
   #--------------------------------------------------------------------------
   # ● 戦闘不能判定
@@ -801,7 +794,7 @@ class GameBattler
   #    該当するステート深度が存在し1以上であれば判定
   #--------------------------------------------------------------------------
   def state?(state_id)
-    return @state_depth.keys.include?(state_id) && @state_depth[state_id] > 0
+    return @state_depth.keys.include?(state_id) && (@state_depth[state_id] > 0)
   end
   #--------------------------------------------------------------------------
   # ● ステートがフルかどうかの判定
@@ -873,8 +866,7 @@ class GameBattler
     add_depth = state.get_accumlative_value # 該当ステートの累積値を取得
     return if state == nil                  # データが無効？
     return if state_ignore?(state_id)       # 無視するべきステート？
-    @state_depth[state_id] ||= 0            # Keyがなければ初期化
-    @state_depth[state_id] += add_depth     # 深度を追加
+    change_state_depth(state_id, add_depth)
     modify_motivation(7)                    # 気力減退:状態異常にかかる
     Debug::write(c_m,"#{self.name} #{$data_states[state_id].name} 深度:#{@state_depth[state_id]}")
     if state_id == StateId::DEATH
@@ -934,7 +926,6 @@ class GameBattler
   #--------------------------------------------------------------------------
   # ● 宿屋に泊まれる？
   #     バッドステータスは宿屋に泊まれない。
-  #
   #--------------------------------------------------------------------------
   def can_rest?
     if @state_depth.keys.size == 0
@@ -960,45 +951,33 @@ class GameBattler
     return max_state.show_name
   end
   #--------------------------------------------------------------------------
+  # ● 深度の変更
+  #--------------------------------------------------------------------------
+  def change_state_depth(state_id, value)
+    @state_depth[state_id] ||= 0
+    @state_depth[state_id] += value
+    Debug.write(c_m, "深度の変更:#{value} => #{@state_depth[state_id]}")
+    if @state_depth[state_id] < 0
+      remove_state(state_id)
+      return true
+    end
+    return false
+  end
+  #--------------------------------------------------------------------------
   # ● ステートの解除
   #     state_id:ステートID return b:0 成功1腐敗2ロスト magic?:呪文CP
   #--------------------------------------------------------------------------
-  def remove_state(state_id, cp = 0)
-    return 0 unless state?(state_id)      # このステートが付加されていない？
-    return 0 if state_id == StateId::ROTTEN # 腐敗については単独で解除しない
+  def remove_state(state_id)
+    return unless state?(state_id)        # このステートが付加されていない？
+    return if state_id == StateId::ROTTEN # 腐敗については単独で解除しない(judge_comebackで定義)
     if state_id == StateId::DEATH and @hp == 0         # 戦闘不能 (ステート 1 番) なら
-      unless state?(StateId::ROTTEN)      # 腐敗状態？
-        if judge_comeback(cp)             # 復活判定
-          Debug::write(c_m," 死亡より復活成功")
-          @hp = 1                         # HP を 1 に変更する
-          self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth[StateId::DEATH] = 0 # hashから削除
-          return 0
-        else
-          Debug::write(c_m," 死亡より復活失敗=>腐敗")
-          self.aged(365,false)				    # 年齢上昇
-          add_state(StateId::ROTTEN)      # 腐敗を付加
-          return 1
-        end
-      else                                # 腐敗からの復活
-        if judge_comeback(cp)             # 復活判定
-          Debug::write(c_m," 腐敗より復活成功")
-          @hp = 1                         # HP を 1 に変更する くさる時を除く
-          self.aged(365,true)	            # 年齢上昇+体力低下フラグオン
-          @state_depth[StateId::ROTTEN] = 0 # hashから削除
-          @state_depth[StateId::DEATH] = 0  # hashから削除
-          return 0
-        else                              # LOST処理
-          Debug::write(c_m,"腐敗より復活失敗=>ロスト")
-          $game_party.remove_actor(self.id)
-          self.lost                       # ロスト処理
-          return 2
-        end
-      end
-    else
       @state_depth[state_id] = 0          # hashから削除
+      @hp = 1
+      return
     end
-    return 0
+    @state_depth[state_id] = 0          # hashから削除
+    modify_motivation(8)                # 気力増加状態異常から回復
+    @removed_states.push(state_id)
   end
   #--------------------------------------------------------------------------
   # ● ステートの強制解除
@@ -1010,23 +989,53 @@ class GameBattler
     end
   end
   #--------------------------------------------------------------------------
-  # ● 復活判定 cp: 0=教会 1~6=呪文
-  #    教会・アイテム:死亡・腐敗とも成功率(%) = (体力-8)*3+75
-  #    呪文:死亡・腐敗とも成功率(%) = (体力-8)*cp+40
+  # ● 復活判定
+  # 死のステートの深度を時間判定で増やしていく。
+  # VITが深度を時間で増やすのに抗う。
+  # 深度は1~20まで95%~5%と変化する。
+  # 死亡したばかりは成功率が高いということ。
+  # vit/20で深度が溜まる判定に抗う。この判定は何分毎に発生するかは要調整。
+  # 金額は対象のレベルに依存。
+  # 呪文での成功率は90%~5%
+  # 教会での成功率は95%~25%までとする。
+  # 呪文でのCPは純粋に5%ずつ成功率を上乗せする。
+  # cp2 = +5%, cp3 = +10%, cp4 = +15%
+  # RC: 0:成功 1:腐敗 2:ロスト
   #--------------------------------------------------------------------------
-  def judge_comeback(cp)
-    case cp
-    when 0
-      rate = [self.vit - 8, 0].max * 3 + 75
-    when 1..6
-      rate = [self.vit - 8, 0].max * cp + 40
-    when 9
-      rate = 100
+  def judge_comeback(cp=0)
+    max = min = 0
+    if $scene.is_a?(SceneTemple)
+      max = 1   # 95%
+      min = 15  # 25%
+    else
+      max = 2   # 90%
+      min = 19  #  5%
     end
-    rate = [[rate, 95].min, 5].max unless rate == 100 # 5%～95%の範囲での判定
-    Debug::write(c_m,"復活判定開始:#{self.name} 成功確率:#{rate}%")
-    return true if rate > rand(100)
-    return false
+    if rotten?
+      depth = @state_depth[StateId::ROTTEN]
+    elsif dead?
+      depth = @state_depth[StateId::DEATH]
+    end
+    thres = [[(depth - [cp - 1, 0].max), max].max, min].min
+    if rand(20) >= thres
+      Debug.write(c_m, "#{self.name} 成功率:#{(20-thres)*5}% thres:#{thres} depth:#{depth} cp:#{cp} => 復活成功")
+      remove_state(StateId::ROTTEN)
+      remove_state(StateId::DEATH)
+      self.aged(365,true)	              # 年齢上昇+体力低下フラグオン
+      return 0
+    else
+      Debug.write(c_m, "#{self.name} 成功率:#{(20-thres)*5}% thres:#{thres} depth:#{depth} cp:#{cp} => 復活失敗")
+      if rotten?
+        ## 腐敗からの復活失敗ロスト確定
+        $game_party.remove_actor(self.id)
+        self.lost                       # ロスト処理
+        return 2
+      else
+        ## 死亡からの復活失敗
+        add_state(StateId::ROTTEN)      # 腐敗を付加
+        return 1
+      end
+    end
   end
   #--------------------------------------------------------------------------
   # ● 制約の取得
@@ -1145,20 +1154,14 @@ class GameBattler
       Debug::write(c_m,"回復値:#{value} #{rec_depth}")
 
       ## 新・自然回復判定
-      @state_depth[i] -= rec_depth
-      if @state_depth[i] <= 0
-        ## 回復値で累積値が0以下になる
-        @state_depth[i] = 0 # リセット
-        remove_state(i)
-        @removed_states.push(i)
+      if change_state_depth(i, -rec_depth)
         Debug::write(c_m,"【自然回復】ステート自然解除成功 ID#{i}")
       ## 5%で絶対回復される
-      elsif 5 > rand(100)
+      elsif rand(20) == 0
         remove_state(i)
-        @removed_states.push(i)
         Debug::write(c_m,"【5%絶対回復】ステート自然解除成功 ID#{i}")
       else
-        Debug::write(c_m,"【自然回復】ステート自然回復 ID#{i} 現在異常深度:#{@state_depth[i]}")
+        Debug::write(c_m,"【自然回復】ステート自然回復失敗 ID#{i} 現在異常深度:#{@state_depth[i]}")
       end
     end
   end
@@ -1348,8 +1351,9 @@ class GameBattler
   #--------------------------------------------------------------------------
   def make_attack_damage_value(attacker, sub = false)
     s = sub ? "サブ" : "メイン"
-    Debug.write(c_m, "⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩⇩")
-    Debug::write(c_m,"[#{attacker.name} ⇒⇒#{s}攻撃⇒⇒ #{self.name}]")
+    Debug.write(c_m, "---------------------------------------------------")
+    Debug.write(c_m,"[#{attacker.name} ⇒⇒#{s}攻撃⇒⇒ #{self.name}]")
+    Debug.write(c_m, "---------------------------------------------------")
     modifier = 0
     armor = self.armor                        # アーマー値の取得
     if armor > 0
@@ -1393,6 +1397,7 @@ class GameBattler
         Debug::write(c_m,"【#{sc}】ファンブル検知 DICE出目:#{d20} #{sc}回以降スキップ")
         break
       elsif d20 >= fightlv
+        Debug::write(c_m,"【#{sc}】ヒット検知 DICE出目:#{d20}")
         result = true
       else
         Debug::write(c_m,"【#{sc}】ミス！ FL:#{fightlv} HitCap:#{(20-cap)*5}% DICE:#{d20}")
@@ -1531,7 +1536,7 @@ class GameBattler
     m_dice_plus = obj.damage.scan(/([+-]\d+)/)[0][0].to_i
     ## レジストの計算
     mfl = Integer(self.resist * user.permeation)  # 防御側抵抗に攻撃側呪文浸透を掛ける
-    mfl = [[mfl, 1].max, 19].min                        # 最低5%ヒット
+    mfl = [[mfl, 1].max, 19].min                  # 最低5%ヒット
     magic_lv.times do
       hit += 1 if user.get_max_magic_dice_throw > mfl
     end
@@ -2361,15 +2366,14 @@ class GameBattler
           end
           Debug::write(c_m,"異常回復値:#{value}")
         end
-        @state_depth[state_id] -= value             # 深度を減退
+        change_state_depth(state_id, -value)
         Debug::write(c_m,"深度#{value}P回復=>#{@state_depth[state_id]}")
       else
         Debug::write(c_m,"アイテム回復")
-        @state_depth[state_id] -= 999           # 深度を減退
+        change_state_depth(state_id, -999)
       end
       ## 異常回復判定
       if @state_depth[state_id] <= 0              # 深度が0以下
-        @state_depth[state_id] = 0
         Debug::write(c_m,"state_id:#{state_id} #{state} depth:#{@state_depth[state_id]}") # debug
         remove_state(state_id, cp)                # 呪文でのステートを解除
         @removed_states.push(state_id)            # 解除したステートを記録する
@@ -3146,13 +3150,11 @@ class GameBattler
     return 1.0
   end
   #--------------------------------------------------------------------------
-  # ● マジックAP計算用NODの最大値を返す
+  # ● マジックAP計算用DICEの最大値を返す
   #--------------------------------------------------------------------------
   def get_max_magic_dice_throw
-    mnod = self.get_magic_nod
-    array = []
-    array.push(rand(20)+1)
-    return array.max
+    modifier = 0
+    return get_d20(:magicroll, modifier)
   end
   #--------------------------------------------------------------------------
   # ● REDRAWフラグ管理
@@ -3175,7 +3177,7 @@ class GameBattler
     for state in states
       result += state.condition_attackroll
     end
-    if not self.actor? && $game_troop.surprise
+    if !(self.actor?) && $game_troop.surprise
       result += 1
       Debug.write(c_m, "敵の先制攻撃によるアタックロール+1")
     elsif self.actor? && $game_troop.preemptive
@@ -3196,7 +3198,7 @@ class GameBattler
     if self.actor? && $game_troop.surprise
       result -= 1
       Debug.write(c_m, "敵の先制攻撃によるセービングスロー-1")
-    elsif not self.actor? && $game_troop.preemptive
+    elsif !(self.actor?) && $game_troop.preemptive
       result -= 1
       Debug.write(c_m, "パーティの先制攻撃によるセービングスロー-1")
     end
@@ -3217,11 +3219,12 @@ class GameBattler
   #--------------------------------------------------------------------------
   # ● その他用のコンディションの取得
   #--------------------------------------------------------------------------
-  def condition_other
+  def condition_magicroll
     result = 0
     for state in states
-      result += state.condition_other
+      result += state.condition_magicroll
     end
+    Debug.write(c_m, "condition_magicroll:#{result}") if result != 0
     return result
   end
   #--------------------------------------------------------------------------
@@ -3236,7 +3239,7 @@ class GameBattler
     when :attackroll;   dice += condition_attackroll
     when :savingthrow;  dice += condition_savingthrow
     when :skill;        dice += condition_skill
-    when :other;        dice += condition_other
+    when :magicroll;    dice += condition_magicroll
     else
       raise StandardError.new('Not defined situation')
     end
@@ -3329,18 +3332,18 @@ class GameBattler
     end
     diff = 0 unless movable?  # 行動不能の場合は最低値へ
     unless $data_skills[skill_id].initial_skill?(self)
-      Debug.write(c_m, "保持スキル(#{$data_skills[skill_id].name})ではない為、不利-1適用")
+      Debug.write(c_m, "#{self.name} 保持スキル(#{$data_skills[skill_id].name})ではない為、不利-1適用")
       data.modifier -= 1
     end
     if $data_skills[skill_id].advanced_skill?(self)
-      Debug.write(c_m, "得意スキル(#{$data_skills[skill_id].name})の為、有利+1適用")
+      Debug.write(c_m, "#{self.name} 得意スキル(#{$data_skills[skill_id].name})の為、有利+1適用")
       data.modifier += 1
     end
     data.d20 = get_d20(:skill, data.modifier)
     data.ratio = (sv * diff / 5)
     data.thres = Integer([[20 - data.ratio, 19].min, low_cap].max)
     data.result = (data.d20 >= data.thres)
-    Debug.write(c_m, "発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres} 発動値:#{data.ratio} low_cap:#{low_cap}")
+    Debug.write(c_m, "#{self.name} 発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres} 発動値:#{data.ratio} low_cap:#{low_cap}")
     return data
   end
   #--------------------------------------------------------------------------

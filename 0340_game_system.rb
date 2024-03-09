@@ -398,6 +398,7 @@ class GameSystem
     ## 30分毎
     if (@timer % (3600*30) == 0)
       Debug.write(c_m, "====================30分毎処理")
+      $game_actors.rotting
     end
     ## 60分毎
     if (@timer % (3600*60) == 0)
