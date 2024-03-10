@@ -169,6 +169,8 @@ class GameActors
   def rotting
     for member in @data
       next if member == nil
+      next if member.survivor?
+      next unless member.rotting?                   # 死亡か腐敗のみ
       next if $game_party.party_member?(member.id)  # パーティ内でなければ
       member.rotting
     end

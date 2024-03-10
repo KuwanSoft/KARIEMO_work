@@ -57,22 +57,22 @@ class SceneMap < SceneBase
     @locate_window = Window_Missing.new
     define_arrow
   end
-  #--------------------------------------------------------------------------
-  # ● イベント画像の定義
-  #--------------------------------------------------------------------------
-  def set_picture(path)
-    @WindowPicture = WindowPicture.new(160-16, 192)
-    @WindowPicture.create_picture( path, "")
-  end
-  #--------------------------------------------------------------------------
-  # ● イベント画像の消去
-  #--------------------------------------------------------------------------
-  def erase_picture
-    return unless defined?(@WindowPicture)
-    @WindowPicture.temp_dispose
-    @WindowPicture.visible = false
-    Debug.write(c_m, "イベント画像の消去完了")
-  end
+  # #--------------------------------------------------------------------------
+  # # ● イベント画像の定義
+  # #--------------------------------------------------------------------------
+  # def set_picture(path)
+  #   @WindowPicture = WindowPicture.new(160-16, 192)
+  #   @WindowPicture.create_picture( path, "")
+  # end
+  # #--------------------------------------------------------------------------
+  # # ● イベント画像の消去
+  # #--------------------------------------------------------------------------
+  # def erase_picture
+  #   return unless defined?(@WindowPicture)
+  #   @WindowPicture.temp_dispose
+  #   @WindowPicture.visible = false
+  #   Debug.write(c_m, "イベント画像の消去完了")
+  # end
   #--------------------------------------------------------------------------
   # ● 矢印の定義
   #--------------------------------------------------------------------------

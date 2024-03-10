@@ -54,7 +54,7 @@ class SceneBase
   def create_frame
     if self.is_a?(SceneMap) or self.is_a?(SceneBattle) or self.is_a?(SceneTreasure) or
       self.is_a?(SceneCamp) or self.is_a?(SceneFountain) or self.is_a?(SceneBbs) or
-      self.is_a?(Scene_NPC) or self.is_a?(Scene_ToolShop) then
+      self.is_a?(Scene_NPC) or self.is_a?(Scene_ToolShop) or self.is_a?(SceneEncounter) then
       width = 432+4
       height = 360+4
       x = (512-(432+4))/2
@@ -236,5 +236,21 @@ class SceneBase
     if $game_party.all_dead?
       $scene = SceneGameover.new
     end
+  end
+  # --------------------------------------------------------------------------
+  # ● イベント画像の定義
+  # --------------------------------------------------------------------------
+  def set_picture(path)
+    @WindowPicture = WindowPicture.new(160-16, 192)
+    @WindowPicture.create_picture( path, "")
+  end
+  # --------------------------------------------------------------------------
+  # ● イベント画像の消去
+  # --------------------------------------------------------------------------
+  def erase_picture
+    return unless defined?(@WindowPicture)
+    @WindowPicture.temp_dispose
+    @WindowPicture.visible = false
+    Debug.write(c_m, "イベント画像の消去完了")
   end
 end

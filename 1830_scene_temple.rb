@@ -275,12 +275,17 @@ class SceneTemple < SceneBase
     elsif @time == 400
       name = @cure_actor.name
       if @cure_actor.actor?
-        a = @cure_actor.judge_comeback
-        Debug::write(c_m,"復活の結果 RETURN:#{a}")
-        case a
-        when 0;result = "よくなりました"
-        when 1;result = "くさりはじめました"
-        when 2;result = "まいそうされます"
+        if @cure_actor.dead? || @cure_actor.rotten?
+          a = @cure_actor.judge_comeback
+          Debug::write(c_m,"復活の結果 RETURN:#{a}")
+          case a
+          when 0;result = "よくなりました"
+          when 1;result = "くさりはじめました"
+          when 2;result = "まいそうされます"
+          end
+        else
+          @cure_actor.recover_all(true)
+          result = "よくなりました"
         end
       else  # NPCの場合
         result = "よくなりました"

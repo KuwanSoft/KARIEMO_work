@@ -731,7 +731,7 @@ class WindowBase < Window
     x_adj = 22; y_adj = 62
     bitmaps = []
     for state in actor.states.sort {|a, b| a.priority <=> b.priority}
-      # Debug::write(c_m, "#{state.name} priority:#{state.priority}")
+      next unless actor.state?(state.id)
       bitmaps.push(Cache.state(state.name))
     end
     # bitmaps.push(Cache.state("石化")) if actor.stone?
@@ -1166,7 +1166,7 @@ class WindowBase < Window
     rect = Rect.new(0, 0, 62, 16)
     self.contents.blt(x, y, back, rect)
     ## メーター中身の描画
-    stamina = Integer(100 * actor.resting_thres)
+    stamina = [Integer(100 * actor.resting_thres), 0].max
     width = Integer(stamina / 2.083)
     rect = Rect.new(0, 0, width, 4)
     self.contents.blt(x+7, y+6, bar, rect)

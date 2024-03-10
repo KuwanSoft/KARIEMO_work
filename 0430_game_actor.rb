@@ -4584,12 +4584,10 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def recover_nausea
     ratio = ConstantTable::REST_NAUSEA_RECOVER_RATIO_PER_TURN
-    state_id = StateId::NAUSEA
-    return unless @state_depth[state_id]
+    return unless nausea?
     return unless ratio > rand(100)
-    @state_depth[state_id] -= 1
+    change_state_depth(StateId::NAUSEA, -1)
     Debug.write(c_m, "休息中の吐き気の累積値-1回復")
-    remove_state(state_id) if @state_depth[state_id] <= 0
   end
   #--------------------------------------------------------------------------
   # ● 属性抵抗の有無（アクターのみ）
@@ -4796,5 +4794,11 @@ class GameActor < GameBattler
     elsif dead?
       change_state_depth(StateId::DEATH, 1)
     end
+  end
+  #--------------------------------------------------------------------------
+  # ● 腐敗している？
+  #--------------------------------------------------------------------------
+  def rotting?
+    return (state?(StateId::ROTTEN) || state?(StateId::DEATH))
   end
 end

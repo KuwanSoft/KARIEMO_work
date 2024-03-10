@@ -329,6 +329,7 @@ class GameBattler
   def states
     result = []
     for i in @state_depth.keys.sort
+      next unless @state_depth[i] > 0
       result.push($data_states[i])
     end
     return result
@@ -565,7 +566,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def recover_all(only_state = false)
     for i in @state_depth.keys
-      remove_state(i)
+      remove_state(i) if @state_depth[i] > 0
     end
     unless only_state
       @hp = maxhp
@@ -577,14 +578,14 @@ class GameBattler
   #--------------------------------------------------------------------------
   def dead?
     return true if @hidden  # 逃走も戦死とする。
-    return (@hp == 0 and not @immortal)
+    return (@hp == 0 && !(@immortal))
   end
   #--------------------------------------------------------------------------
   # ● 存在判定
   #    石化も腐敗も存在判定でfalse判定
   #--------------------------------------------------------------------------
   def exist?
-    return (not @hidden and not dead? and not stone? and not rotten?)
+    return (!(@hidden) && !(dead?) && !(stone?) && !(rotten?))
   end
   #--------------------------------------------------------------------------
   # ● コマンド入力可能判定
@@ -816,15 +817,15 @@ class GameBattler
   #    この条件は、戦闘不能のときに毒を付加しようとした場合などに該当する。
   #    攻撃力下降のときに攻撃力上昇を付加するような場合には該当しない。
   #--------------------------------------------------------------------------
-  def state_ignore?(state_id)
-    for state in states
-      if state.state_set.include?(state_id) and
-         not $data_states[state_id].state_set.include?(state.id)
-        return true
-      end
-    end
-    return false
-  end
+  # def state_ignore?(state_id)
+  #   for state in states
+  #     if state.state_set.include?(state_id) and
+  #        not $data_states[state_id].state_set.include?(state.id)
+  #       return true
+  #     end
+  #   end
+  #   return false
+  # end
   #--------------------------------------------------------------------------
   # ● 相殺するべきステートかどうかの判定
   #     state_id : ステート ID
@@ -865,7 +866,7 @@ class GameBattler
     state = $data_states[state_id]          # ステートデータを取得
     add_depth = state.get_accumlative_value # 該当ステートの累積値を取得
     return if state == nil                  # データが無効？
-    return if state_ignore?(state_id)       # 無視するべきステート？
+    # return if state_ignore?(state_id)       # 無視するべきステート？
     change_state_depth(state_id, add_depth)
     modify_motivation(7)                    # 気力減退:状態異常にかかる
     Debug::write(c_m,"#{self.name} #{$data_states[state_id].name} 深度:#{@state_depth[state_id]}")
@@ -919,6 +920,7 @@ class GameBattler
       return true
     end
     for id in @state_depth.keys
+      next unless @state_depth[id] > 0
       return false if $data_states[id].priority != 0
     end
     return true
@@ -942,11 +944,13 @@ class GameBattler
     return "Good" if @state_depth.keys.empty?
     max_state = nil
     for state_id in @state_depth.keys
+      next unless @state_depth[state_id] > 0
       max_state = $data_states[state_id] if max_state == nil
       if max_state.priority < $data_states[state_id].priority
         max_state = $data_states[state_id]
       end
     end
+    return "Good" if max_state == nil
     return "Good" if max_state.priority == 0
     return max_state.show_name
   end
@@ -956,7 +960,7 @@ class GameBattler
   def change_state_depth(state_id, value)
     @state_depth[state_id] ||= 0
     @state_depth[state_id] += value
-    Debug.write(c_m, "深度の変更:#{value} => #{@state_depth[state_id]}")
+    Debug.write(c_m, "#{self.name} #{$data_states[state_id].name} 深度の変更:#{value} => #{@state_depth[state_id]}")
     if @state_depth[state_id] < 0
       remove_state(state_id)
       return true
@@ -969,7 +973,6 @@ class GameBattler
   #--------------------------------------------------------------------------
   def remove_state(state_id)
     return unless state?(state_id)        # このステートが付加されていない？
-    return if state_id == StateId::ROTTEN # 腐敗については単独で解除しない(judge_comebackで定義)
     if state_id == StateId::DEATH and @hp == 0         # 戦闘不能 (ステート 1 番) なら
       @state_depth[state_id] = 0          # hashから削除
       @hp = 1
@@ -1021,6 +1024,7 @@ class GameBattler
       Debug.write(c_m, "#{self.name} 成功率:#{(20-thres)*5}% thres:#{thres} depth:#{depth} cp:#{cp} => 復活成功")
       remove_state(StateId::ROTTEN)
       remove_state(StateId::DEATH)
+      recover_all(true)
       self.aged(365,true)	              # 年齢上昇+体力低下フラグオン
       return 0
     else
@@ -1136,6 +1140,7 @@ class GameBattler
   def remove_states_auto
     clear_action_results
     for i in @state_depth.keys.clone
+      next unless @state_depth[i] > 0
       next if i == StateId::HIDING    # 隠密についてはスルー
       next unless $data_states[i].battle_only if self.actor? # 戦闘時のみ以外のステートは自然回復しない
       Debug::write(c_m,"ステート自然解除判定開始(#{self.name}) ID#{i} 異常深度:#{@state_depth[i]}")

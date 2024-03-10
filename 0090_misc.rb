@@ -121,8 +121,9 @@ module Misc
   #--------------------------------------------------------------------------
   # ● イベントエンカウントの処理
   #--------------------------------------------------------------------------
-  def self.encount_team_battle
+  def self.encount_team_battle(surprise=false)
     $game_troop.setup($game_map.map_id, false, 0, true)
+    $game_troop.surprise = surprise
     $game_temp.next_scene = "battle"
     $game_temp.event_battle = true
     Debug::write(c_m,"***********【ENCOUNT type:Team】***********")

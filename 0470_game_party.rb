@@ -2445,7 +2445,9 @@ class GameParty < GameUnit
   # ● 休息時の強制入眠
   #--------------------------------------------------------------------------
   def force_sleep
+    Debug.write(c_m, "休息の為強制入眠")
     for member in existing_members
+      Debug.write(c_m, "#{member.name}")
       member.add_state(StateId::SLEEP)
     end
   end
