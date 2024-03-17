@@ -2813,6 +2813,7 @@ class GameActor < GameBattler
   def add_thres(value)
     @tired_thres_plus ||= 0
     @tired_thres_plus = value # 純粋に入れ替えとなるため重ね掛けの意味なし
+    Debug.write(c_m, "疲労許容値:#{tired_thres}(+#{@tired_thres_plus})")
   end
   #--------------------------------------------------------------------------
   # ● 疲労許容閾値

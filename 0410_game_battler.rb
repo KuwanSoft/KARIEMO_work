@@ -1177,7 +1177,6 @@ class GameBattler
     for state in states
       if state.release_by_damage
         remove_state(state.id)
-        @removed_states.push(state.id)
       end
     end
   end
@@ -1186,7 +1185,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def break_stone
     return unless stone?        # 石化でなければ終了
-    return unless 5 > rand(100) # 5%で破砕
+    return unless rand(20) == 0 # 5%で破砕
     add_state(StateId::BROKEN)
     @added_states.push(StateId::BROKEN)
     Debug::write(c_m,"ダメージにより破砕!:#{self.name}")
@@ -3188,6 +3187,10 @@ class GameBattler
     elsif self.actor? && $game_troop.preemptive
       result += 1
       Debug.write(c_m, "パーティの先制攻撃によるアタックロール+1")
+    end
+    if self.actor? && ($game_party.light < 1)
+      result -= 1
+      Debug.write(c_m, "灯り無しによるアタックロール-1")
     end
     Debug.write(c_m, "condition_attackroll:#{result}") if result != 0
     return result

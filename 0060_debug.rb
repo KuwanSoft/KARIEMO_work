@@ -245,7 +245,7 @@ module Debug
       str = "-----> TOD: #{Time.now.strftime("%y%m%d %H:%M:%S")}"
       file.puts NKF.nkf("-sm0W8x", str.to_s)
       version_hash = load_data("Data/Version2.rvdata")
-      str = "VER:#{"#{version_hash[:ver]}"+"."+"#{version_hash[:date]}"+"-"+"#{version_hash[:build]}"} / UNIQUE_ID:#{version_hash[:unique_id]} / PLAYID:#{$game_system.playid}"
+      str = "Build:#{"#{version_hash[:date]}"+"-"+"#{version_hash[:build]}"} / UNIQUE_ID:#{version_hash[:uniqueid]} / PLAYID:#{$game_system.playid}"
       file.puts NKF.nkf("-sm0W8x", str.to_s)
     else
       file.puts NKF.nkf("-sm0W8x", string.to_s)
@@ -303,17 +303,6 @@ module Debug
     return "#{hour}:#{min}:#{sec}"
   end
   #--------------------------------------------------------------------------
-  # ● リセットカウントファイルの初期化(TESTのみ)
-  #--------------------------------------------------------------------------
-  # def self.init_rcfile
-  #   file = @path+@reset_file
-  #   unless FileTest.exist?(file)
-  #     rc_obj = RCount.new
-  #     save_data(rc_obj, file)
-  #     Debug.write(c_m, "RCfile初期化")
-  #   end
-  # end
-  #--------------------------------------------------------------------------
   # ● リセットカウントの取得
   #--------------------------------------------------------------------------
   def self.check_reset_count
@@ -322,18 +311,6 @@ module Debug
     data[playid] ||= 0
     return data[playid]
   end
-  #--------------------------------------------------------------------------
-  # ● リセットカウントの増加
-  #--------------------------------------------------------------------------
-  # def self.increase_reset_count
-  #   playid = $game_system.playid
-  #   file = @path+@reset_file
-  #   data = load_data(file)
-  #   data[playid] ||= 0
-  #    = rc.data[pi] == nil ? 1 : rc.data[pi] + 1
-  #   Debug.write(c_m, "RESET Count +1 playid:#{pi}")
-  #   save_data(rc, file)
-  # end
   #--------------------------------------------------------------------------
   # ● リセットカウントデータのロード
   # 無ければ空のhashを返す

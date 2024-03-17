@@ -367,10 +367,20 @@ class SceneMap < SceneBase
     unless $game_system.check_roomguard($game_map.map_id, $game_player.x, $game_player.y)
       return if $game_map.interpreter.running?          # イベント実行中？
       return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
-      encount, backatk = $game_wandering.check_encount  # エンカウント時の態勢を取得
+      encount, backatk = $game_wandering.check_encount  # エンカウント判定と態勢を取得
       return unless encount
       ratio = ConstantTable::NM
-      Debug::write(c_m,"***********【ENCOUNT type:Wondering back:#{backatk}】***********")
+      ## NPCのランダムエンカウント
+      npc_ratio = ConstantTable::NPC_ENCOUNT
+      npc_ratio = 20 if $TEST
+      if npc_ratio > rand(20)
+        $game_temp.npc_id = 0 # リセット
+        $game_temp.next_scene = "npc"
+        Debug::write(c_m,"***********【ENCOUNT type:Wondering NPC】***********")
+        return
+      else
+        Debug::write(c_m,"***********【ENCOUNT type:Wondering back:#{backatk}】***********")
+      end
     ## 玄室がオンのとき
     else
       return if $game_map.interpreter.running?          # イベント実行中？
@@ -383,8 +393,11 @@ class SceneMap < SceneBase
     $game_troop.setup($game_map.map_id, (ratio > rand(100))) # マップIDを与える
     $game_temp.battle_proc = nil
     $game_temp.next_scene = "battle"
-    $game_troop.surprise = true if backatk              # バックアタック検知
-    preemptive_or_surprise(ratio == 0) unless backatk
+    if backatk || ($game_party.light < 1)
+      $game_troop.surprise = true # バックアタック検知
+    else
+      preemptive_or_surprise(ratio == 0)
+    end
   end
   #--------------------------------------------------------------------------
   # ● 先制攻撃と不意打ちの確率判定

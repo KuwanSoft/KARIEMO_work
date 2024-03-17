@@ -1114,31 +1114,27 @@ class SceneBattle < SceneBase
     @message_window.visible = true
     text = sprintf(Vocab::EscapeStart)
     $game_message.texts.push(text)
-    # if $game_temp.next_drop_box   # 玄室の場合
-    #   ratio = ConstantTable::ESCAPE_RATIO_G
-    # elsif $game_temp.event_battle # イベントバトル
-    #   ratio = ConstantTable::ESCAPE_RATIO_E
-    # else                          # ワンダリング
-    #   ratio = ConstantTable::ESCAPE_RATIO_W
-    # end
-    # penalty = 0
     case $game_party.get_movable_members.size
-    when 6; ratio = 95
-    when 5; ratio = 85
-    when 4; ratio = 75
-    when 3; ratio = 65
-    when 2; ratio = 55
-    when 1; ratio = 45
-    when 0; ratio = 5
+    when 6; ratio = 1
+    when 5; ratio = 3
+    when 4; ratio = 5
+    when 3; ratio = 7
+    when 2; ratio = 9
+    when 1; ratio = 11
+    when 0; ratio = 19
     end
     # penalty += $game_party.dead_members.size * ConstantTable::PENALTY_ESCAPE
     # penalty += $game_troop.get_sharp_eye * ConstantTable::SHARP_EYE_P
     # ratio -= penalty
-    Debug::write(c_m,"逃走処理 成功率:#{ratio}%")
+    ratio += $game_troop.get_sharp_eye
+
     if $game_troop.preemptive
       success = true
+    elsif $game_troop.surprise
+      success = false           # すべて失敗する
     else
-      success = (rand(100) < ratio)
+      success = (rand(20) >= ratio)
+      Debug::write(c_m,"逃走(#{success}) 成功率:#{(20-ratio)*5}%")
     end
     $music.se_play("逃走")
     if success

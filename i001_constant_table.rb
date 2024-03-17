@@ -234,6 +234,7 @@ module ConstantTable
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
   RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
   CALL_RF_RATIO = 15        # 仲間を呼ぶ確率
+  NPC_ENCOUNT = 1           # NPCとのランダムエンカウント確率 5%
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids

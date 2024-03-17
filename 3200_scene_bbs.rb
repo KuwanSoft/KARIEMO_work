@@ -8,13 +8,13 @@ class SceneBbs < SceneBase
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
-  def initialize(specific_id = 0)
-    @specific_id = specific_id
-    if $TEST
-      for id in 1..90
-        $game_party.add_memo(0, id)
-      end
-    end
+  def initialize(specific_ids = [])
+    @specific_ids = specific_ids
+    # if $TEST
+    #   for id in 1..90
+    #     $game_party.add_memo(0, id)
+    #   end
+    # end
   end
   #--------------------------------------------------------------------------
   # ● 開始処理
@@ -45,14 +45,16 @@ class SceneBbs < SceneBase
   #--------------------------------------------------------------------------
   def create_list
     @id_array = []
+    ## 指定のメッセージIDがあれば代入
+    if @specific_ids.size != 0
+      for id in @specific_ids
+        @id_array.push id
+      end
+    end
     while true do
       @id_array.push(rand($data_bbs.size))   # ランダムでIDを取得
       @id_array.uniq!
       break if @id_array.size == 4           # 4つ抽出するまで
-    end
-    ## 指定のメッセージIDがあれば代入
-    if @specific_id != 0
-      @id_array[0] = @specific_id-1
     end
     s1 = "らくがき##{@id_array[0]}"
     s2 = "らくがき##{@id_array[1]}"
