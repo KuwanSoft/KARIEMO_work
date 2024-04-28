@@ -1734,15 +1734,15 @@ class GameParty < GameUnit
   def resting
     fountain = $game_temp.drawing_fountain
     case check_survival_skill
-    when 0;  val = 100; multiplier = 0.01; rate = 0.15
-    when 1;  val = 50;  multiplier = 0.02; rate = 0.15
-    when 2;  val = 25;  multiplier = 0.02; rate = 0.15
-    when 3;  val = 20;  multiplier = 0.03; rate = 0.15
-    when 4;  val = 15;  multiplier = 0.03; rate = 0.15
-    when 5;  val = 10;  multiplier = 0.04; rate = 0.15
-    when 6;  val =  9;  multiplier = 0.04; rate = 0.15
-    when 7;  val =  8;  multiplier = 0.05; rate = 0.15
-    when 8;  val =  7;  multiplier = 0.05; rate = 0.15
+    when 0;  val = 100; multiplier = 0.01; rate = 0.85
+    when 1;  val = 50;  multiplier = 0.02; rate = 0.85
+    when 2;  val = 25;  multiplier = 0.02; rate = 0.85
+    when 3;  val = 20;  multiplier = 0.03; rate = 0.85
+    when 4;  val = 15;  multiplier = 0.03; rate = 0.85
+    when 5;  val = 10;  multiplier = 0.04; rate = 0.85
+    when 6;  val =  9;  multiplier = 0.04; rate = 0.85
+    when 7;  val =  8;  multiplier = 0.05; rate = 0.85
+    when 8;  val =  7;  multiplier = 0.05; rate = 0.85
     end
     ## 魔法の水汲み場フラグ
     if fountain
@@ -1832,6 +1832,17 @@ class GameParty < GameUnit
       member.recover_fatigue(rate)
     end
     return true
+  end
+  #--------------------------------------------------------------------------
+  # ● 村帰還による疲労回復
+  # 休息で回復する疲労の最低値（村と洞窟の即休息の為の行き来を減らす）
+  #--------------------------------------------------------------------------
+  def recover_fatigue_at_village
+    Debug.write(c_m, "村帰還での疲労回復開始")
+    for member in existing_members
+      rate = ConstantTable::RECOVER_THRES
+      member.recover_fatigue_to_in_time(rate)
+    end
   end
   #--------------------------------------------------------------------------
   # ● パーティのバックアタック無効チェック

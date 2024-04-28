@@ -367,7 +367,7 @@ class SceneMap < SceneBase
     unless $game_system.check_roomguard($game_map.map_id, $game_player.x, $game_player.y)
       return if $game_map.interpreter.running?          # イベント実行中？
       return if $game_temp.next_scene == "battle"       # すでにエンカウント処理済
-      encount, backatk = $game_wandering.check_encount  # エンカウント判定と態勢を取得
+      encount, backatk = $game_wandering.check_encount  # エンカウント判定と態勢を取得、群を消去済み
       return unless encount
       ratio = ConstantTable::NM
       ## NPCのランダムエンカウント
@@ -1396,7 +1396,6 @@ class SceneMap < SceneBase
       return if @window_other.member_size != 0  # 表示するメンバーがまだいる
       end_search_other_party
     elsif Input.trigger?(Input::B)
-#~       $game_system.input_party_location # 現在のパーティ構成をインプット
       end_search_other_party
     end
   end

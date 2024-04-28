@@ -24,7 +24,7 @@ module ConstantTable
   TIMEOUT_POSTPROCESS = 5000
 
   EXP_ROOT_VALUE = 1000     # 経験値の基本増加値
-  BASE_EXP = 100            # 取得経験値ベース
+  BASE_EXP = 200            # 取得経験値ベース
   GOLD_ROOT = 6.30957       # ゴールドは6のTR乗で計算する
   BASE_GOLD = 2             # ベースゴールドの計算
   BASE_TRE_GOLD = 100       # 宝箱のゴールド抽選
@@ -235,6 +235,7 @@ module ConstantTable
   RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
   CALL_RF_RATIO = 15        # 仲間を呼ぶ確率
   NPC_ENCOUNT = 1           # NPCとのランダムエンカウント確率 5%
+  RECOVER_THRES = 0.85      # 15%までは村への帰還で疲労回復する
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids

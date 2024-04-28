@@ -696,11 +696,11 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def make_exp_list
     @exp_list[1] = @exp_list[250] = 0
-    m = ConstantTable::EXP_ROOT_VALUE   # 1000
+    m = ConstantTable::EXP_ROOT_VALUE   # 10000
     ratio = self.class.exp_ratio                # 戦士1.04
     for i in 2..250   # レベル最大250
       @exp_list[i] = @exp_list[i-1] + Integer(m)
-      m *= ratio.to_f     # 1000 * 1.04
+      m *= ratio.to_f     # 10000 * 1.04
     end
     Debug.write(c_m, "キャラクタ経験値リスト class:#{@class_id}")
     for i in 1..40
@@ -3245,6 +3245,16 @@ class GameActor < GameBattler
       value = ConstantTable::RECOVERRATE_IN_REST # 回復%
       recover_fatigue(value)
       Debug.write(c_m, "#{value}%回復=> #{@fatigue}pts")
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 疲労回復閾値まで一気に回復（村への帰還で使用）
+  #--------------------------------------------------------------------------
+  def recover_fatigue_to_in_time(rate)
+    ## 疲労値が限度を超えている？
+    while (tired_ratio > rate)
+      recover_fatigue(1)
+      Debug.write(c_m, "#{@name} 疲労回復=> #{@fatigue}pts")
     end
   end
   #--------------------------------------------------------------------------
