@@ -135,6 +135,13 @@ class GameBattleAction
     @basic = 6
   end
   #--------------------------------------------------------------------------
+  # ● ブルータルアタックを設定
+  #--------------------------------------------------------------------------
+  def set_brutalattack
+    @kind = 0
+    @basic = 9
+  end
+  #--------------------------------------------------------------------------
   # ● マルチショットを設定
   #--------------------------------------------------------------------------
   def set_multishot
@@ -212,10 +219,10 @@ class GameBattleAction
     @item_id = item_id
   end
   #--------------------------------------------------------------------------
-  # ● すべての物理攻撃判定（通常・奇襲・マルチショット）
+  # ● すべての物理攻撃判定（通常・奇襲・マルチショット・ブルータルアタック）
   #--------------------------------------------------------------------------
   def physical_attack?
-    return (@kind == 0 and [0, 6, 7].include?(@basic))
+    return (@kind == 0 and [0, 6, 7, 9].include?(@basic))
   end
   #--------------------------------------------------------------------------
   # ● 通常攻撃判定
@@ -246,6 +253,12 @@ class GameBattleAction
   #--------------------------------------------------------------------------
   def guard?
     return (@kind == 0 and @basic == 1)
+  end
+  #--------------------------------------------------------------------------
+  # ● ブルータルアタック中判定
+  #--------------------------------------------------------------------------
+  def brutalattack?
+    return (@kind == 0 and @basic == 9)
   end
   #--------------------------------------------------------------------------
   # ● 隠れ中判定
@@ -408,6 +421,8 @@ class GameBattleAction
       return make_attack_targets
     elsif supattack?
       return make_attack_targets
+    elsif brutalattack?
+      return make_attack_targets
     elsif turn_undead?
       return make_all_targets
     elsif encourage?
@@ -525,7 +540,7 @@ class GameBattleAction
     case obj.target_num
     when "cp"; target_number += magic_lv        # CP体への対象(風/剣/竜巻)
     when "3+cp"; target_number += magic_lv + 3  # 3+CP体への対象(炎1、澱め)
-    when "cp*2"; target_number += magic_lv * 2  # 2*CP体への対象(剣)
+    when "cp*3"; target_number += magic_lv * 3  # 3*CP体への対象(風)
     else
       target_number = obj.target_num
     end
@@ -745,6 +760,7 @@ class GameBattleAction
       when 6; action = "ふいうち"
       when 7; action = "マルチショット"
       when 8; action = "ぼうぎょ"
+      when 9; action = Vocab::Command10
       end
     when 1;
       action = "じゅもんしょ"

@@ -184,6 +184,8 @@ module Vocab
   Dokatana2_2       = "すばやくまあいを つめた。"
   Dokatana3_1       = "%sは %sを"
   Dokatana3_2       = "きりはらった。"
+  Dobrutal_1       = "%sは %sに"
+  Dobrutal_2       = "はげしくあたっていった。"
 
   # キャラクターのコマンドリスト
   Command01   = "こうげき"
@@ -195,7 +197,7 @@ module Vocab
   Command07   = "ターンU.D."
   Command08   = "エンカレッジ"
   Command09   = "チャネリング"
-  Command10   = "*"
+  Command10   = "B.アタック"
   Command11   = "*"
   Command12   = "せいしんとういつ"
   Command13   = "*"

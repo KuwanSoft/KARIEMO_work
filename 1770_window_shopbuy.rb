@@ -159,8 +159,7 @@ class WindowShopBuy < WindowSelectable
     item = Misc.item(kind, id)
     rect = item_rect(index)
     price = if item.price == 0 then " " else item.price end # 値段が0はブランク
-    price *= 1.5  if @displaying_enchant
-    price = Integer(price)
+    price = Integer(price * 1.5)  if @displaying_enchant
     item_info = [nil, true, 0, false, 0, magic_hash]
     draw_item_name(0, rect.y, item, @actor.equippable?(item), item_info)
     self.contents.font.color.alpha = @actor.equippable?(item) ? 255 : 128

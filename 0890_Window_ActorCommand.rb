@@ -29,7 +29,7 @@ class Window_ActorCommand < WindowSelectable
   #~   Command07   = "ターンアンデッド"
   #~   Command08   = "エンカレッジ"
   #~   Command09   = ""
-  #~   Command10   = ""
+  #~   Command10   = "B.アタック"
   #~   Command11   = ""
   #~   Command12   = "めいそう"
   #~   Command13   = ""
@@ -93,6 +93,10 @@ class Window_ActorCommand < WindowSelectable
     ## チャネリング
     if actor.can_channeling?
       @commands.push(Vocab::Command09) unless actor.tired?
+    end
+    ## ブルータルアタック
+    if actor.can_brutalattack?
+      @commands.push(Vocab::Command10) unless actor.tired?
     end
 
     @item_max = @commands.size

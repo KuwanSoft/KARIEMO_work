@@ -144,6 +144,7 @@ class GameBattler
   attr_reader   :sacrifice_hp             # 身代わりHP
   attr_reader   :fascinated               # 魅了値
   attr_accessor :insert                   # 連続動作フラグ
+  attr_accessor :brutal                   # ブルータルアタックフラグ
   attr_reader   :resisted_states          # 無効化したSTATE_ID
   attr_reader   :countered                # カウンタを食らったフラグ
   #--------------------------------------------------------------------------
@@ -221,6 +222,7 @@ class GameBattler
     @veil_element = ""        # ベールの属性
     @arranged = false         # 隊列変更後？
     @counter = false
+    @countered = false        # カウンターフラグ
   end
   #--------------------------------------------------------------------------
   # ● スプライトとの通信用変数をクリア
@@ -306,7 +308,7 @@ class GameBattler
     @veil_poison = false
     @veil_air = false
     @status_up_flag = false         # ポーション使用時
-    @countered = false
+    # @countered = false
     @hp_damage = 0
     @hp_subdamage = 0
     @element_damage = 0
@@ -318,6 +320,7 @@ class GameBattler
     @subhits = 0
     @tornade_dmg_upper = 0
     @drain_power = 0                # 1ターンでドレインパワーをリセット
+    @brutal = false                 # ブルータルアタックフラグ
     @added_states = []              # 付加されたステート (ID の配列)
     @resisted_states = []           # 無効化されたステート (ID の配列)
     @removed_states = []            # 解除されたステート (ID の配列)
@@ -1086,6 +1089,10 @@ class GameBattler
     for state in states
       return true if state.double_damage
     end
+    if @action.brutalattack?
+      Debug.write(c_m, "ブルータルアタック中の為、被２倍撃")
+      return true
+    end
     return false
   end
   #--------------------------------------------------------------------------
@@ -1225,6 +1232,10 @@ class GameBattler
     result = base_AP(sub)
     for state in states
       result /= 2 if state.reduce_hit_ratio # くらやみのステートの場合はAP半分
+    end
+    if @action.brutalattack?
+      result *= 2
+      Debug.write(c_m, "ブルータルアタックの為、AP2倍=>:#{result}")
     end
     return result
   end
@@ -2539,6 +2550,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def trap_effect(trap_name)
     clear_action_results
+    floor = $game_map.map_id
     ## 罠の種類
     case trap_name
     when ConstantTable::TRAP_NAME14 # ピット
@@ -2607,6 +2619,7 @@ class GameBattler
     when 1; base_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
     when 2; base_damage = [@hp * strength / 100, 1].max      # 現在HPの強度%をもっていかれる。
     end
+    return if base_damage >= @hp  # 現在HPを超すダメージは与えない
     @element_damage = self.calc_element_damage(@damage_element_type, base_damage)
     execute_damage(nil)                             # ダメージ反映
   end
@@ -3174,6 +3187,12 @@ class GameBattler
     @countered = true
   end
   #--------------------------------------------------------------------------
+  # ● カウンター食らったフラグのリセット
+  #--------------------------------------------------------------------------
+  def unset_countered
+    @countered = false
+  end
+  #--------------------------------------------------------------------------
   # ● 攻撃ロール用のコンディションの取得
   #--------------------------------------------------------------------------
   def condition_attackroll
@@ -3257,7 +3276,7 @@ class GameBattler
     sv = Misc.skill_value(SkillId::FOURLEAVES, self)
     diff = ConstantTable::DIFF_05[$game_map.map_id] # フロア係数
     if rand(20) >= Integer([[20 - (sv * diff / 5), 19].min, 1].max)
-      chance_skill_increase(SkillId::FOURLEAVES)
+      # chance_skill_increase(SkillId::FOURLEAVES)
       dice += 1
       Debug.write(c_m, "フォーリーブスによるd20有利+1")
     end

@@ -1722,22 +1722,12 @@ class GameActor < GameBattler
     return [s, (weapon_data.max_hits + adjust)].min  # どちらか小さい方
   end
   #--------------------------------------------------------------------------
-  # ● 判定用ダイス数の取得
-  # 前衛 1～7
-  # 中衛 1～6
-  # 後衛 1～5
-  #--------------------------------------------------------------------------
-  # def number_of_dice(sub)
-  #   return 1 if sub
-  #   return 1 if !(sub) && @weapon_id == 0 # メイン武器無し
-  #   return 1 if sub && @subweapon_id == 0 # サブ武器無し
-  #   return 3 if self.onmitsu? # バックスタブは確定で3
-  #   return self.class.nod
-  # end
-  #--------------------------------------------------------------------------
   # ● 攻撃時メッセージ
   #--------------------------------------------------------------------------
   def attack_message
+    if @action.brutalattack?
+      return Vocab::Dobrutal_1, Vocab::Dobrutal_2
+    end
     case weapon?  # "sword"
     when "sword"
       case rand(3) + 1
@@ -2747,6 +2737,13 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def can_channeling?
     return true if @class_id == 6 and @level > 4
+    return false
+  end
+  #--------------------------------------------------------------------------
+  # ● ブルータルアタック可能？　*戦士の特殊コマンド
+  #--------------------------------------------------------------------------
+  def can_brutalattack?
+    return true if @class_id == 1 and @level > 4
     return false
   end
   #--------------------------------------------------------------------------

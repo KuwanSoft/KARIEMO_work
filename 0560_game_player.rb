@@ -387,33 +387,36 @@ class GamePlayer < GameCharacter
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
-      $game_temp.arrow_direction = :down
+      # $game_temp.arrow_direction = :down
       turn_180
       $game_temp.used_action = ""
       $threedmap.start_drawing
       $game_mapkits.mapkit_check_and_store  # マップの更新
+      $game_temp.need_sub_refresh = true
     end
     if Input.trigger?(Input::LEFT)
       $game_temp.prediction = false
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
-      $game_temp.arrow_direction = :left
+      # $game_temp.arrow_direction = :left
       turn_left_90
       $game_temp.used_action = ""
       $threedmap.start_drawing
       $game_mapkits.mapkit_check_and_store  # マップの更新
+      $game_temp.need_sub_refresh = true
     end
     if Input.trigger?(Input::RIGHT)
       $game_temp.prediction = false
       $game_temp.drawing_fountain = false
       $popup.visible = false
       ashioto
-      $game_temp.arrow_direction = :right
+      # $game_temp.arrow_direction = :right
       turn_right_90
       $game_temp.used_action = ""
       $threedmap.start_drawing
       $game_mapkits.mapkit_check_and_store  # マップの更新
+      $game_temp.need_sub_refresh = true
     end
 
     ## 走る
@@ -425,7 +428,7 @@ class GamePlayer < GameCharacter
         $popup.visible = false
         return
       end
-      $game_temp.arrow_direction = :up
+      # $game_temp.arrow_direction = :up
       $game_temp.prediction = false     # 危険予知キャンセル
       $game_temp.drawing_fountain = false
       if $threedmap.check_can_forward   # 目の前に壁が無ければ
@@ -468,7 +471,7 @@ class GamePlayer < GameCharacter
         $popup.visible = false
         return
       end
-      $game_temp.arrow_direction = :pup
+      # $game_temp.arrow_direction = :pup
       if $threedmap.check_can_forward # 目の前に壁が無い
         if $threedmap.check_water     # 水がある
           $popup.set_text("すすめない")

@@ -55,7 +55,7 @@ class SceneMap < SceneBase
     # @h_command = Window_HerbCommand.new
     ## KANDI
     @locate_window = Window_Missing.new
-    define_arrow
+    # define_arrow
   end
   # #--------------------------------------------------------------------------
   # # ● イベント画像の定義
@@ -76,22 +76,22 @@ class SceneMap < SceneBase
   #--------------------------------------------------------------------------
   # ● 矢印の定義
   #--------------------------------------------------------------------------
-  def define_arrow
-    @arrow = Sprite.new
-    @arrow.bitmap = Cache.system("arrow_up")
-    @arrow.x = (512-@arrow.width)/2
-    @arrow.y = 14
-    @arrow.z = 255
-    @arrow.visible = false
-    @a_timer = 0
-  end
+  # def define_arrow
+  #   @arrow = Sprite.new
+  #   @arrow.bitmap = Cache.system("arrow_up")
+  #   @arrow.x = (512-@arrow.width)/2
+  #   @arrow.y = 14
+  #   @arrow.z = 255
+  #   @arrow.visible = false
+  #   @a_timer = 0
+  # end
   #--------------------------------------------------------------------------
   # ● 矢印のdispose
   #--------------------------------------------------------------------------
-  def dispose_arrows
-    @arrow.dispose
-    @arrow.bitmap.dispose
-  end
+  # def dispose_arrows
+  #   @arrow.dispose
+  #   @arrow.bitmap.dispose
+  # end
   #--------------------------------------------------------------------------
   # ● メッセージ表示が終わるまでウェイト
   #--------------------------------------------------------------------------
@@ -183,7 +183,7 @@ class SceneMap < SceneBase
     @window_other.dispose
     @window_lock.dispose
     @skill_gain.dispose
-    dispose_arrows
+    # dispose_arrows
     snapshot_for_background
     erase_picture
     $threedmap.no_visible_all_wall
@@ -225,7 +225,7 @@ class SceneMap < SceneBase
     $game_party.update                      # スキルインターバルの更新
     @yesno.update
     @skill_gain.update
-    update_arrows
+    # update_arrows
     update_poinsongas_damage
     update_bomb
 
@@ -372,7 +372,6 @@ class SceneMap < SceneBase
       ratio = ConstantTable::NM
       ## NPCのランダムエンカウント
       npc_ratio = ConstantTable::NPC_ENCOUNT
-      npc_ratio = 20 if $TEST
       if npc_ratio > rand(20)
         $game_temp.npc_id = 0 # リセット
         $game_temp.next_scene = "npc"
@@ -1500,32 +1499,32 @@ class SceneMap < SceneBase
   #--------------------------------------------------------------------------
   # ● 矢印のアップデート
   #--------------------------------------------------------------------------
-  def update_arrows
-    @a_timer -= 1 if @a_timer > 0
-    if @a_timer == 0
-      @arrow.visible = false
-    end
-    if Input.repeat?(Input::UP) || Input.trigger?(Input::DOWN) || Input.trigger?(Input::LEFT) || Input.trigger?(Input::RIGHT) || Input.trigger?(Input::C)
-      draw_arrow
-    end
-  end
+  # def update_arrows
+  #   @a_timer -= 1 if @a_timer > 0
+  #   if @a_timer == 0
+  #     @arrow.visible = false
+  #   end
+  #   if Input.repeat?(Input::UP) || Input.trigger?(Input::DOWN) || Input.trigger?(Input::LEFT) || Input.trigger?(Input::RIGHT) || Input.trigger?(Input::C)
+  #     draw_arrow
+  #   end
+  # end
   #--------------------------------------------------------------------------
   # ● 矢印の描画
   #--------------------------------------------------------------------------
-  def draw_arrow
-    case $game_temp.arrow_direction
-    when :up;     @arrow.bitmap = Cache.system("arrow_up")
-    when :pup;    @arrow.bitmap = Cache.system("arrow_pup")
-    when :left;   @arrow.bitmap = Cache.system("arrow_left")
-    when :right;  @arrow.bitmap = Cache.system("arrow_right")
-    when :down;   @arrow.bitmap = Cache.system("arrow_down")
-    else
-      return
-    end
-    @arrow.visible = true
-    @a_timer = 25
-    $game_temp.arrow_direction = nil
-  end
+  # def draw_arrow
+  #   case $game_temp.arrow_direction
+  #   when :up;     @arrow.bitmap = Cache.system("arrow_up")
+  #   when :pup;    @arrow.bitmap = Cache.system("arrow_pup")
+  #   when :left;   @arrow.bitmap = Cache.system("arrow_left")
+  #   when :right;  @arrow.bitmap = Cache.system("arrow_right")
+  #   when :down;   @arrow.bitmap = Cache.system("arrow_down")
+  #   else
+  #     return
+  #   end
+  #   @arrow.visible = true
+  #   @a_timer = 25
+  #   $game_temp.arrow_direction = nil
+  # end
   #--------------------------------------------------------------------------
   # ● じっとしていると毒をうける
   #--------------------------------------------------------------------------

@@ -122,7 +122,7 @@ class Window_SubWindow < WindowBase
     self.contents.clear_rect(rect4)
     self.contents.clear_rect(rect5)
     self.contents.clear_rect(rect6)
-    rect7 = Rect.new(124, 0, 32, 32)
+    rect7 = Rect.new(124, 0+ADJ_Y, 32, 32)
     self.contents.clear_rect(rect7)
     ## 食料の表示
     bitmap = Cache.system_icon("food")
@@ -139,10 +139,15 @@ class Window_SubWindow < WindowBase
     self.contents.blt(244-10, 0+ADJ_Y, bitmap, bitmap.rect)
     value = see ? $game_wandering.get_size : "?"
     self.contents.draw_text(264-10, 4, 32, 32, value)
-    ## 呪文禁止床の表示
-    # return unless $threedmap.check_slient_floor
-    # bitmap = Cache.state("呪文封じ")
-    # self.contents.blt(124, 0, bitmap, bitmap.rect)
+    ## 向きの表示
+    case $game_player.direction
+    when 8; dir = "N"
+    when 6; dir = "E"
+    when 2; dir = "S"
+    when 4; dir = "W"
+    end
+    dir = see ? dir : "?"
+    self.contents.draw_text(124+2+2, 0+ADJ_Y+2, 32, 32, dir, 1)
     toggle_lantern
   end
 end

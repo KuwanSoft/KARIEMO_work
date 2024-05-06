@@ -137,6 +137,14 @@ class SceneBattle < SceneBase
     end
   end
   #--------------------------------------------------------------------------
+  # ● アニメーション表示が終わるまでウェイト
+  #--------------------------------------------------------------------------
+  def wait_for_damage
+    while (@damage.running || @e_damage.running)
+      update_basic
+    end
+  end
+  #--------------------------------------------------------------------------
   # ● 早送り判定
   #--------------------------------------------------------------------------
   def show_fast?
@@ -709,6 +717,9 @@ class SceneBattle < SceneBase
       when Vocab::Command06   # 不意打ち
         @active_battler.action.set_supattack
         start_target_enemy_selection
+      when Vocab::Command10   # ブルータルアタック
+        @active_battler.action.set_brutalattack
+        start_target_enemy_selection
       when Vocab::Command08   # エンカレッジ
         @active_battler.action.set_encourage
         next_actor
@@ -727,6 +738,7 @@ class SceneBattle < SceneBase
       when Vocab::Command12   # 瞑想
         @active_battler.action.set_meditation
         next_actor
+
       when Vocab::Command09   # チャネリング
         @active_battler.action.set_channeling
         next_actor
@@ -1348,6 +1360,11 @@ class SceneBattle < SceneBase
     # end
     if @active_battler.action.valid?
       execute_action
+      ## ガード時のみ毒と出血を我慢する
+      unless @active_battler.action.guard?
+        display_poison_damage(@active_battler)
+        display_bleeding_damage(@active_battler)
+      end
       @target_enemy_window.refresh # 敵ウインドウの更新
     end
 #~     unless @active_battler.action.forcing
@@ -1400,8 +1417,8 @@ class SceneBattle < SceneBase
         execute_action_supattack
       when 7  # マルチショット
         execute_action_multishot
-      when 9  # 連続不意打ち
-        execute_action_multisupattack
+      when 9  # ブルータルアタック
+        execute_action_attack
       end
     when 1  # 呪文を唱える
       magic = $data_magics[@active_battler.action.magic_id] # オブジェクト取得
@@ -1439,11 +1456,12 @@ class SceneBattle < SceneBase
     @message_window.clear
     remove_states_auto
     display_current_state
+    unset_countered
     ## --------------------------------
     $game_party.increase_skills_per_turn  # 戦術スキル上昇判定
     $game_party.clear_arranged_flag
-    display_poison_damage           # 毒ダメージ処理
-    display_bleeding_damage         # 出血ダメージ処理
+    # display_poison_damage           # 毒ダメージ処理
+    # display_bleeding_damage         # 出血ダメージ処理
     $game_party.regeneration_effect # リジェネの処理
     display_healing                 # ゾンビ等の自動回復
     apply_turn_end_magic_effect     # ターン経過による呪文の効果減少
@@ -1493,6 +1511,15 @@ class SceneBattle < SceneBase
   #--------------------------------------------------------------------------
   def platoon_redraw
     return $game_troop.platoon_redraw # 隊列再描画
+  end
+  #--------------------------------------------------------------------------
+  # ● ターン終了による被カウンター状態フラグの解消
+  #--------------------------------------------------------------------------
+  def unset_countered
+    members = $game_party.members + $game_troop.members + $game_summon.members + $game_mercenary.members
+    for member in members
+      member.unset_countered
+    end
   end
   #--------------------------------------------------------------------------
   # ● ターン終了による残りターン減少
@@ -2794,24 +2821,16 @@ class SceneBattle < SceneBase
   #--------------------------------------------------------------------------
   # ● 毒のダメージ表示
   #--------------------------------------------------------------------------
-  def display_poison_damage
-    ## 全パーティへの適用
-    for member in $game_party.existing_members + $game_summon.existing_members + $game_mercenary.existing_members + $game_troop.existing_members
-      member.slip_damage_effect(1) # 毒ダメージ適用
-      display_poison_effects(member)
-      member.perform_collapse
-    end
+  def display_poison_damage(target)
+    target.slip_damage_effect(1) # 毒ダメージ適用
+    display_poison_effects(target)
   end
   #--------------------------------------------------------------------------
-  # ● 毒のダメージ表示
+  # ● 出血のダメージ表示
   #--------------------------------------------------------------------------
-  def display_bleeding_damage
-    ## 全パーティへの適用
-    for member in $game_party.existing_members + $game_summon.existing_members + $game_mercenary.existing_members + $game_troop.existing_members
-      member.slip_damage_effect(2) # 出血ダメージ適用
-      display_bleeding_effects(member)
-      member.perform_collapse
-    end
+  def display_bleeding_damage(target)
+    target.slip_damage_effect(2) # 出血ダメージ適用
+    display_bleeding_effects(target)
   end
   #--------------------------------------------------------------------------
   # ● 奇跡のメニューの表示
@@ -2954,7 +2973,7 @@ class SceneBattle < SceneBase
     end
   end
   #--------------------------------------------------------------------------
-  # ● ターンエンドの毒ダメージ表示
+  # ● 行動後の毒ダメージ表示
   #--------------------------------------------------------------------------
   def display_poison_effects(target)
     return if target.actor?
@@ -2964,6 +2983,7 @@ class SceneBattle < SceneBase
     @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("毒ダメージ")
     wait(45)
+    wait_for_damage
   end
   #--------------------------------------------------------------------------
   # ● ターンエンドの出血ダメージ表示
@@ -2976,6 +2996,7 @@ class SceneBattle < SceneBase
     @e_damage.start_drawing(target.screen_x, target.screen_y, target.damage_element_type, target.element_damage)
     $music.se_play("出血ダメージ")
     wait(45)
+    wait_for_damage
   end
   #--------------------------------------------------------------------------
   # ● ターンエンドのヒーリング表示

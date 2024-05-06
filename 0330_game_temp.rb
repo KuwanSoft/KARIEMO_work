@@ -59,7 +59,6 @@ class GameTemp
   attr_accessor :prediction               # 危険予知
   attr_accessor :magic_not_working        # 帰還呪文発動失敗
   attr_accessor :mood_npc                 # NPC機嫌メーター
-  attr_accessor :arrow_direction          # 矢印表示
   attr_accessor :camp_enable              # キャンプコマンド可能か
   attr_accessor :bomb                     # 可燃性ガス爆発イベント
   attr_accessor :drawing_fountain         # 魔法の水汲み場
@@ -115,7 +114,7 @@ class GameTemp
     @prediction = false
     @magic_not_working = false
     @mood_npc = {}
-    @arrow_direction = nil
+    # @arrow_direction = nil
     @camp_enable = true                 # 通常状態はキャンプ可能
     @bomb = [0, 0, 0, 0]
     @drawing_fountain = false

@@ -69,10 +69,6 @@ class GameTroop < GameUnit
     @group3 = []
     @group4 = []
   end
-  def surprise=(new)
-    @surprise = new
-    Debug.write(c_m, "troop.surprise値変更=>#{@surprise}")
-  end
   #--------------------------------------------------------------------------
   # ● 生存しているグループメンバーの配列取得
   #--------------------------------------------------------------------------
@@ -131,7 +127,7 @@ class GameTroop < GameUnit
     id_array = [] # 出現候補のモンスターID配列
     for e in $data_monsters
       next if e == nil              # 未定義
-      next if e.floor == 0          # 出現階未定義
+      next if e.floor.to_i == 0     # 出現階未定義
       next if e.nm == 1 unless nm   # NMフラグオフ
       next if e.nm == 0 if nm       # NMフラグオン
       next if e.team == 0 if team_battle      # 悪意を持った冒険者チームの一員
