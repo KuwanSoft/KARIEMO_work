@@ -13,19 +13,8 @@ class Window_MonsterLibrary < WindowBase
     @identified = true
     @id_array = []
     @delete_id = [1,21,41]
-    if $TEST  # テストプレイ時
-      for e in $data_monsters
-        next if e == nil
-        next unless e.valid == 1
-        @id_array.push(e.id)
-      end
-      @id_array -= @delete_id
-      @id_array.uniq!
-      @size = @id_array.size
-    else      # 通常プレイ時
-      @id_array = $game_party.get_encountered_enemies
-      @size = @id_array.size
-    end
+    @id_array = $game_party.get_encountered_enemies
+    @size = @id_array.size
     @graphic = Sprite.new
   end
   #--------------------------------------------------------------------------

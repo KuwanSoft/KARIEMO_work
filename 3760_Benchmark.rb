@@ -54,7 +54,7 @@ module Benchmark
     return if $game_system == nil
     time = Time.now
     yield
-    return unless $TEST
+    # return unless $TEST
     total = (Time.now - time).to_f
     $game_system.update_highest_alert(name, total)
     $game_system.update_average_alert(name, total)

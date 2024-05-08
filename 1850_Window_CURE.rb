@@ -28,7 +28,7 @@ class Window_CURE < WindowSelectable
       fee = cure_actor.get_current_fee
     elsif cure_actor.npc?
       fee = cure_actor.fee
-      fee = 1 if $TEST
+      # fee = 1 if $TEST
     else
       fee = 999999999999
     end

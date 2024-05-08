@@ -98,6 +98,10 @@ class Window_ActorCommand < WindowSelectable
     if actor.can_brutalattack?
       @commands.push(Vocab::Command10) unless actor.tired?
     end
+    ## イーグルアイ
+    if actor.can_eagleeye?
+      @commands.push(Vocab::Command11) unless actor.tired?
+    end
 
     @item_max = @commands.size
     drawing

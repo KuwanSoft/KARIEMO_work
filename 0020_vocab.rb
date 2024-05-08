@@ -198,7 +198,7 @@ module Vocab
   Command08   = "エンカレッジ"
   Command09   = "チャネリング"
   Command10   = "B.アタック"
-  Command11   = "*"
+  Command11   = "イーグルアイ"
   Command12   = "せいしんとういつ"
   Command13   = "*"
   Command14   = "*"

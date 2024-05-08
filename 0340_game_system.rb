@@ -211,12 +211,12 @@ class GameSystem
     @party_food[unique_id] = 5
     @party_pm[unique_id] = {}
     ## テストはきめうち
-    if $TEST
-      @party_mapid[unique_id] = 1
-      @party_x_loc[unique_id] = 23
-      @party_y_loc[unique_id] = 19
-      return
-    end
+    # if $TEST
+    #   @party_mapid[unique_id] = 1
+    #   @party_x_loc[unique_id] = 23
+    #   @party_y_loc[unique_id] = 19
+    #   return
+    # end
     ## 該当フロアにおいて行方不明者の配置可能場所をランダムで決定
     map = load_data(sprintf("Data/Map%03d.rvdata", floor))  # マップオブジェクトの取得
     while true

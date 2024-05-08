@@ -142,9 +142,9 @@ class GameBattleAction
     @basic = 9
   end
   #--------------------------------------------------------------------------
-  # ● マルチショットを設定
+  # ● イーグルアイを設定
   #--------------------------------------------------------------------------
-  def set_multishot
+  def set_eagleeye
     @kind = 0
     @basic = 7
   end
@@ -219,7 +219,7 @@ class GameBattleAction
     @item_id = item_id
   end
   #--------------------------------------------------------------------------
-  # ● すべての物理攻撃判定（通常・奇襲・マルチショット・ブルータルアタック）
+  # ● すべての物理攻撃判定（通常・奇襲・イーグルアイ・ブルータルアタック）
   #--------------------------------------------------------------------------
   def physical_attack?
     return (@kind == 0 and [0, 6, 7, 9].include?(@basic))
@@ -259,6 +259,12 @@ class GameBattleAction
   #--------------------------------------------------------------------------
   def brutalattack?
     return (@kind == 0 and @basic == 9)
+  end
+  #--------------------------------------------------------------------------
+  # ● イーグルアイ中判定
+  #--------------------------------------------------------------------------
+  def eagleeye?
+    return (@kind == 0 and @basic == 7)
   end
   #--------------------------------------------------------------------------
   # ● 隠れ中判定
@@ -403,14 +409,14 @@ class GameBattleAction
     @initiative = battler.base_initiative             # 戦術+SPD補正+前衛+隠密
     @initiative += fast_attack?                       # 長柄武器ボーナス
     r1 = rand(10) + 1                                 # 1~10の乱数を追加
-    r2 = rand(10) + 1
     name = Misc.get_string(battler.name, 23)
-    @initiative += r1 + r2
+    @initiative += r1
     @initiative += battler.initiative_bonus           # 時よ速まれのボーナス
     @initiative = rapid_cast? ? @initiative : @initiative / 2 if magic?
     @initiative /= 2 if battler.reduce_initiative?    # 凍結ペナルティ
     @initiative = 1 if battler.actor? && $game_troop.surprise # バックアタック時
     @initiative = 0 if hiding?                        # 隠れようとしている？コマンド実行時
+    @initiative = 0 if eagleeye?                      # イーグルアイ中
     @initiative = -10 if casting_stopmagic?
   end
   #--------------------------------------------------------------------------
@@ -422,6 +428,8 @@ class GameBattleAction
     elsif supattack?
       return make_attack_targets
     elsif brutalattack?
+      return make_attack_targets
+    elsif eagleeye?
       return make_attack_targets
     elsif turn_undead?
       return make_all_targets
@@ -758,7 +766,7 @@ class GameBattleAction
       when 4; action = "すがたをかくす"
       when 5; action = "にげだす"
       when 6; action = "ふいうち"
-      when 7; action = "マルチショット"
+      when 7; action = Vocab::Command11
       when 8; action = "ぼうぎょ"
       when 9; action = Vocab::Command10
       end

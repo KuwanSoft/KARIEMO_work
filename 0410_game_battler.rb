@@ -131,6 +131,8 @@ class GameBattler
   attr_reader   :motivation               # 気力値
   attr_accessor :cast_turn_undead         # ターンアンデッドを詠唱したか
   attr_accessor :cast_encourage           # エンカレッジを詠唱したか
+  attr_accessor :cast_brutalattack        # ブルータルアタックを詠唱したか
+  attr_accessor :cast_eagleeye            # イーグルアイを詠唱したか
   attr_accessor :redraw                   # 隊列変更による再描画フラグ
   attr_accessor :forward                  # 隊列変更(前に来た！)
   attr_accessor :disappear                # 隊列変更(後ろに下がる)
@@ -195,6 +197,8 @@ class GameBattler
     @regeneration = 0         # 傷よ塞がれの残りターン数
     @cast_turn_undead = false # ターンアンデッドは戦闘に1回のみ　＊聖職者用
     @cast_encourage = false   # エンカレッジは戦闘に1回のみ　＊従士用
+    @cast_brutalattack = false  # ブルータルアタック使用フラグ　＊戦士用
+    @cast_eagleeye = false    # イーグルアイ使用フラグ　＊狩人用
     @preparation = false      # 戦闘準備スキル
     @meditation = false       # 瞑想済みフラグ
     @healing_done = false     # ヒーリング実施済フラグ
@@ -1234,8 +1238,8 @@ class GameBattler
       result /= 2 if state.reduce_hit_ratio # くらやみのステートの場合はAP半分
     end
     if @action.brutalattack?
-      result *= 2
-      Debug.write(c_m, "ブルータルアタックの為、AP2倍=>:#{result}")
+      result += self.level
+      Debug.write(c_m, "ブルータルアタックの為、AP+Level(#{self.level})=>:#{result}")
     end
     return result
   end
@@ -1473,6 +1477,11 @@ class GameBattler
     # エクソシストチェック
     if exorcist_check(attacker)
       Debug::write(c_m,"#{self.name} 悪魔族＆エクソシスト：被2倍撃") # debug
+      double += 1
+    end
+    ## イーグルアイチェック
+    if attacker.action.eagleeye?
+      Debug::write(c_m,"Attacker:#{attacker.name} イーグルアイ使用=>2倍撃") # debug
       double += 1
     end
     damage *= double
@@ -2112,6 +2121,7 @@ class GameBattler
     ## いずれかのダメージが正の数
     if @hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0
       remove_states_shock   # 衝撃によるステート解除
+      cancel_eagleeye       # イーグルアイキャンセル
       judge_spell_break     # スペルブレイク判定
       judge_bone_crash      # 骨折判定
       judge_severe          # 重症判定
@@ -2123,6 +2133,17 @@ class GameBattler
     ## 破砕判定
     if user && user.action.attack? && (@hp_damage > 0 || @element_damage > 0 || @hp_subdamage > 0 || @element_subdamage > 0)
       break_stone
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● イーグルアイのキャンセル
+  #--------------------------------------------------------------------------
+  def cancel_eagleeye
+    return unless @action.eagleeye?
+    Debug::write(c_m,"イーグルアイのキャンセル")
+    unless state?(StateId::STUN)              # すでに付加されている？
+      add_state(StateId::STUN)                # ステートを付加
+      @added_states.push(StateId::STUN)       # 付加したステートを記録
     end
   end
   #--------------------------------------------------------------------------
@@ -2228,7 +2249,7 @@ class GameBattler
       when "ス"; state_id = StateId::STUN
       when "魅"; state_id = StateId::MUPPET
       when "吐"; state_id = StateId::NAUSEA
-      when "出"; state_id = StateId::BLEEDING
+      when "血"; state_id = StateId::BLEEDING
       when "重"; state_id = StateId::SEVERE
       when "無"; return
       when "後"; next
@@ -2357,7 +2378,7 @@ class GameBattler
       when "ス"; state_id = StateId::STUN
       when "魅"; state_id = StateId::MUPPET
       when "吐"; state_id = StateId::NAUSEA
-      when "出"; state_id = StateId::BLEEDING
+      when "血"; state_id = StateId::BLEEDING
       when "重"; state_id = StateId::SEVERE
       when "無"; return
       when "後"; next
@@ -2390,9 +2411,8 @@ class GameBattler
       ## 異常回復判定
       if @state_depth[state_id] <= 0              # 深度が0以下
         Debug::write(c_m,"state_id:#{state_id} #{state} depth:#{@state_depth[state_id]}") # debug
-        remove_state(state_id, cp)                # 呪文でのステートを解除
+        remove_state(state_id)                    # 呪文でのステートを解除
         @removed_states.push(state_id)            # 解除したステートを記録する
-        modify_motivation(8)                      # 気力増加状態異常から回復
       end
     end
 
@@ -3261,9 +3281,12 @@ class GameBattler
   def get_d20(situation, modifier = 0)
     array = []
     dice = 0    # 最初のダイス値
+    fumble_thres = 1  # 0のみがfumble
     advantage = disadvantage = fumble = false
     case situation
-    when :attackroll;   dice += condition_attackroll
+    when :attackroll;
+      dice += condition_attackroll
+      fumble_thres = 2 if @action.brutalattack? # 0,1両方がfumbleとなる
     when :savingthrow;  dice += condition_savingthrow
     when :skill;        dice += condition_skill
     when :magicroll;    dice += condition_magicroll
@@ -3291,18 +3314,18 @@ class GameBattler
     else;       num = 5 # +4
     end
     num.times do array.push(rand(20)) end
-    fumble = true if array.min == 0             # DICE出目が一つでも0になるとファンブルとなる。Advantage時はfumbleは無い。
+    fumble = true if array.min < fumble_thres # DICE出目が一つでも0になるとファンブルとなる。Advantage時はfumbleは無い。
     if advantage
       fumble = false
       Debug.write(c_m, "#=> (#{situation})【Adv】DICE数:#{num} 結果:#{array.max} DICE_array:#{array} 事前補正:#{modifier}")
       return fumble, array.max if situation == :attackroll
       return array.max
     elsif disadvantage
-      Debug.write(c_m, "#=> (#{situation})【Dis】DICE数:#{num} 結果:#{array.min} DICE_array:#{array} 事前補正:#{modifier}")
+      Debug.write(c_m, "#=> (#{situation})【Dis】DICE数:#{num} 結果:#{array.min} DICE_array:#{array} 事前補正:#{modifier} ファンブル?:#{fumble}")
       return fumble, array.min if situation == :attackroll
       return array.min
     else
-      Debug.write(c_m, "#=> (#{situation})【Nut】DICE数:#{num} DICE_array:#{array} 事前補正:#{modifier}")
+      Debug.write(c_m, "#=> (#{situation})【Nut】DICE数:#{num} DICE_array:#{array} 事前補正:#{modifier} ファンブル?:#{fumble}")
       return fumble, array.max if situation == :attackroll
       return array[0]
     end
@@ -3370,7 +3393,7 @@ class GameBattler
     data.ratio = (sv * diff / 5)
     data.thres = Integer([[20 - data.ratio, 19].min, low_cap].max)
     data.result = (data.d20 >= data.thres)
-    Debug.write(c_m, "#{self.name} 発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres} 発動値:#{data.ratio} low_cap:#{low_cap}")
+    Debug.write(c_m, "#{self.name} 発動:#{data.result} SKILL:#{$data_skills[data.skill_id].name} スキル値:#{sv} D20:#{data.d20} 発動閾値:#{data.thres}(#{100-(data.thres*5)}%) 発動値:#{data.ratio} 発動キャップ:#{100-(low_cap*5)}%")
     return data
   end
   #--------------------------------------------------------------------------

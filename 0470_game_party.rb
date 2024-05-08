@@ -669,29 +669,25 @@ class GameParty < GameUnit
   # テストプレイは全アイテム在庫追加
   #--------------------------------------------------------------------------
   def define_initial_shop_item
-    num = 100
     for item in $data_items
       next if item == nil
-      if item.stock > 0 or $TEST
-        num = $TEST ? num : item.stock
+      if item.stock > 0
         next if item.rank == 0
-        modify_shop_item([0, item.id], num)
+        modify_shop_item([0, item.id], item.stock)
       end
     end
     for item in $data_weapons
       next if item == nil
-      if item.stock > 0 or $TEST
-        num = $TEST ? num : item.stock
+      if item.stock > 0
         next if item.rank == 0
-        modify_shop_item([1, item.id], num)
+        modify_shop_item([1, item.id], item.stock)
       end
     end
     for item in $data_armors
       next if item == nil
-      if item.stock > 0 or $TEST
-        num = $TEST ? num : item.stock
+      if item.stock > 0
         next if item.rank == 0
-        modify_shop_item([2, item.id], num)
+        modify_shop_item([2, item.id], item.stock)
       end
     end
   end
@@ -1534,6 +1530,8 @@ class GameParty < GameUnit
     Debug::write(c_m,"@pm_fog:#{@pm_fog}") # debug
     Debug::write(c_m,"@pm_protect:#{@pm_protect}") # debug
     $game_temp.need_sub_refresh = true    # リフレッシュ
+    $game_temp.need_ps_refresh = true    # リフレッシュ
+    $game_temp.need_pm_refresh = true
   end
   #--------------------------------------------------------------------------
   # ● パーティマジックの消滅
@@ -2476,6 +2474,26 @@ class GameParty < GameUnit
   def shop_magicitems
     @shop_magicitems ||= []
     return @shop_magicitems
+  end
+  #--------------------------------------------------------------------------
+  # ● スペシャルコマンドの再使用化
+  # rate:0 =>  5%
+  # rate:1 => 10%
+  # rate:2 => 15%
+  # rate:3 => 20%
+  # rate:4 => 25%
+  #--------------------------------------------------------------------------
+  def refresh_special
+    rate = ConstantTable::REFRESH_RATIO
+    for member in members
+      if rand(20) <= rate
+        member.cast_turn_undead = false
+        member.cast_encourage = false
+        member.cast_brutalattack = false
+        member.cast_eagleeye = false
+        Debug.write(c_m, "#{member.name}=> コマンドリフレッシュ成功")
+      end
+    end
   end
 end
 

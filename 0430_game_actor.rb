@@ -2743,7 +2743,16 @@ class GameActor < GameBattler
   # ● ブルータルアタック可能？　*戦士の特殊コマンド
   #--------------------------------------------------------------------------
   def can_brutalattack?
+    return false if @cast_brutalattack == true
     return true if @class_id == 1 and @level > 4
+    return false
+  end
+  #--------------------------------------------------------------------------
+  # ● イーグルアイ可能？　*狩人の特殊コマンド
+  #--------------------------------------------------------------------------
+  def can_eagleeye?
+    return false if @cast_eagleeye == true
+    return true if @class_id == 7 and @level > 4
     return false
   end
   #--------------------------------------------------------------------------
@@ -3094,7 +3103,7 @@ class GameActor < GameBattler
       a *= 0.95
     end
     @fatigue += Integer(a)
-    # Debug::write(c_m,"疲労度加算:#{name} +#{a} 合計:#{@fatigue}(#{(tired_ratio*100).to_i}%)")
+    Debug::write(c_m,"疲労度加算:#{name} +#{a} 合計:#{@fatigue}(#{(tired_ratio*100).to_i}%)")
   end
   #--------------------------------------------------------------------------
   # ● 重量オーバー
@@ -3202,7 +3211,7 @@ class GameActor < GameBattler
   #     マップID+1の乱数から発生する　マップ2で0~1の疲れ
   #--------------------------------------------------------------------------
   def tired_step
-    return if 95 > rand(100) # 5%でしか先の判定を行わない
+    return if 0 == rand(100) # 1%でしか先の判定を行わない
     t = rand($game_map.map_id+1)
     add_tired(t)
     return self.index, t
@@ -4248,6 +4257,7 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def get_impact
     return false unless @action.attack? # 物理攻撃中に限る
+    result = false
     case weapon?
     ## 弓はインパクト発生しない
     when "bow"
@@ -4292,7 +4302,7 @@ class GameActor < GameBattler
   # ● 地上へ飛べを忘れる
   #--------------------------------------------------------------------------
   def forget_home_magic
-    return if $TEST
+    # return if $TEST
     for id in @magic
       if $data_magics[id].purpose == "home"
         @magic.delete(id)

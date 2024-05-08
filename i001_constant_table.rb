@@ -127,7 +127,7 @@ module ConstantTable
   CANCEL_RATE_T = 35        # 疲労状態での行動キャンセル確率
   CANCEL_RATE_S = 25        # 感電状態での行動キャンセル確率
   MAX_ATTR = 15             # 特性値の最大値までのプラス値
-  DEF_CHANCE = rand(5)+3    # デフォルトの宝箱アイテムチャンス数
+  DEF_CHANCE = rand(8)+3    # デフォルトの宝箱アイテムチャンス数
   VIEWMAPLIGHT = 10         # マップ閲覧時のライトタイムペナルティ
   BREATH_REDUCE_TIME = 20   # ブレスの運によるダメージ減少チャレンジ回数
   BREATH_HP_C = 2           # ブレスダメージ（HPを割る数）
@@ -226,7 +226,6 @@ module ConstantTable
   MAX_EXP_LEVEL = 20        # 経験値計算上の最高レベル
   BROKEN_RATIO = 15         # 鍵穴を壊す確率
   MAX_ATTEMPTS = 5          # 最大宝箱調査回数
-  STUN_EVISON = 5           # スタン回避率
   SEVERE_THRES = 50         # 重症化のHPロスト閾値
   REST_NAUSEA_RECOVER_RATIO_PER_TURN = 5  # 吐き気の累積値1を減少させる休息のターン毎の確率
   UNLOCK_MAGIC_ID = 37      # 扉よ開けの呪文ID
@@ -236,6 +235,7 @@ module ConstantTable
   CALL_RF_RATIO = 15        # 仲間を呼ぶ確率
   NPC_ENCOUNT = 1           # NPCとのランダムエンカウント確率 5%
   RECOVER_THRES = 0.85      # 15%までは村への帰還で疲労回復する
+  REFRESH_RATIO = 4         # 25%の確率で特殊コマンドのリフレッシュが行われる
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids

@@ -58,7 +58,7 @@ class SceneStart < SceneBase
     INITIAL_ACTORS.setup_4    # 初期キャラクタ4
     INITIAL_ACTORS.setup_5    # 初期キャラクタ5
     INITIAL_ACTORS.setup_6    # 初期キャラクタ6
-    return unless $TEST
+    # return unless $TEST
     for id in 7..20
       INITIAL_ACTORS.make_random_actor(id) # 初期ランダムキャラクタ
     end

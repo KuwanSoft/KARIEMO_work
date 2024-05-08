@@ -720,6 +720,9 @@ class SceneBattle < SceneBase
       when Vocab::Command10   # ブルータルアタック
         @active_battler.action.set_brutalattack
         start_target_enemy_selection
+      when Vocab::Command11   # イーグルアイ
+        @active_battler.action.set_eagleeye
+        start_target_enemy_selection
       when Vocab::Command08   # エンカレッジ
         @active_battler.action.set_encourage
         next_actor
@@ -1416,7 +1419,7 @@ class SceneBattle < SceneBase
       when 6  # 不意をつく
         execute_action_supattack
       when 7  # マルチショット
-        execute_action_multishot
+        execute_action_attack
       when 9  # ブルータルアタック
         execute_action_attack
       end
@@ -1457,6 +1460,7 @@ class SceneBattle < SceneBase
     remove_states_auto
     display_current_state
     unset_countered
+    refresh_special
     ## --------------------------------
     $game_party.increase_skills_per_turn  # 戦術スキル上昇判定
     $game_party.clear_arranged_flag
@@ -1478,6 +1482,9 @@ class SceneBattle < SceneBase
     $game_troop.identified_change     # 不確定・確定変更
     platoon_change if platoon_redraw  # 隊列変更
     start_party_command_selection
+  end
+  def refresh_special
+    $game_party.refresh_special
   end
   #--------------------------------------------------------------------------
   # ● 発狂による隊列変更
@@ -1666,6 +1673,9 @@ class SceneBattle < SceneBase
   def execute_action_attack
     counter = false # カウンターフラグ初期化
     skip = false    # 心眼による攻撃スキップフラグ
+    ## 特殊攻撃であれば使用済みフラグオン
+    @active_battler.cast_brutalattack = true if @active_battler.action.brutalattack?
+    @active_battler.cast_eagleeye = true if @active_battler.action.eagleeye?
     no_counter = @active_battler.can_back_attack? ? true : false # 遠距離攻撃にはカウンタ不可
     if @active_battler.countered
       Debug.write(c_m, "カウンターフラグあり、以降の攻撃はスキップ。カウンターフラグは一度攻撃済みの証拠")
@@ -2169,7 +2179,6 @@ class SceneBattle < SceneBase
       return false if magic.for_opponent?
       ## FFが強い？
       c = battler.fizzle_field > ConstantTable::FF_UPPERRATE ? 3 : 1
-      return true if $TEST
       ratio = [magic_level - 1, 0].max
       ratio *= c
       ## 性格で逆流確率が-2%される

@@ -31,7 +31,7 @@ class WindowContinuePS < WindowBase
     text1 = sprintf("X:%02d", x)
     text2 = sprintf("Y:%02d", y)
     ##> 全滅パーティは場所がわからない
-    if $game_party.annihilation? and not $TEST
+    if $game_party.annihilation?
       text1 = "X:??"
       text2 = "Y:??"
       str = "B?F"
