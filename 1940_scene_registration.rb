@@ -183,6 +183,7 @@ class SceneRegistration < SceneBase
     elsif @command_window.active
       update_command_selection
     end
+    $game_system.update
   end
   #--------------------------------------------------------------------------
   # ● apti window選択の更新

@@ -243,29 +243,29 @@ class GameTroop < GameUnit
   def call_rf(group_id)
     case group_id
     when 0  # Group1
-      return false if existing_g1_members.size == 9 # すでにフルの場合
-      enemy_id = existing_g1_members[0].enemy_id
-      identified = existing_g1_members[0].identified
-      screen_x = existing_g1_members[0].screen_x
-      screen_y = existing_g1_members[0].screen_x
+      return false if @group1.size == 9 # すでにフルの場合
+      enemy_id = @group1[0].enemy_id
+      identified = @group1[0].identified
+      screen_x = @group1[0].screen_x
+      screen_y = @group1[0].screen_y
     when 1  # Group2
-      return false if existing_g2_members.size == 9 # すでにフルの場合
-      enemy_id = existing_g2_members[0].enemy_id
-      identified = existing_g2_members[0].identified
-      screen_x = existing_g2_members[0].screen_x
-      screen_y = existing_g2_members[0].screen_x
+      return false if @group2.size == 9 # すでにフルの場合
+      enemy_id = @group2[0].enemy_id
+      identified = @group2[0].identified
+      screen_x = @group2[0].screen_x
+      screen_y = @group2[0].screen_y
     when 2  # Group3
-      return false if existing_g3_members.size == 9 # すでにフルの場合
-      enemy_id = existing_g3_members[0].enemy_id
-      identified = existing_g3_members[0].identified
-      screen_x = existing_g3_members[0].screen_x
-      screen_y = existing_g3_members[0].screen_x
+      return false if @group3.size == 9 # すでにフルの場合
+      enemy_id = @group3[0].enemy_id
+      identified = @group3[0].identified
+      screen_x = @group3[0].screen_x
+      screen_y = @group3[0].screen_y
     when 3  # Group4
-      return false if existing_g4_members.size == 9 # すでにフルの場合
-      enemy_id = existing_g4_members[0].enemy_id
-      identified = existing_g4_members[0].identified
-      screen_x = existing_g4_members[0].screen_x
-      screen_y = existing_g4_members[0].screen_x
+      return false if @group4.size == 9 # すでにフルの場合
+      enemy_id = @group4[0].enemy_id
+      identified = @group4[0].identified
+      screen_x = @group4[0].screen_x
+      screen_y = @group4[0].screen_y
     end
     enemy = GameEnemy.new(@enemies.size, enemy_id, group_id)
     enemy.identified = identified       # 確定化フラグのSync
@@ -273,8 +273,14 @@ class GameTroop < GameUnit
     enemy.screen_y = screen_y
     Debug::write(c_m,"増援=> 敵の名前:#{enemy.original_name} MAXHP:#{enemy.maxhp} INDEX:#{enemy.index} Group:#{enemy.group_id+1}")
     @enemies.push(enemy)                # 全敵のリストにPUSH
-    refresh_group                       # 敵グループのリフレッシュ
-    identified_change                   # 確定不確定変換
+    case group_id
+    when 0; @group1.push(enemy)
+    when 1; @group2.push(enemy)
+    when 2; @group3.push(enemy)
+    when 3; @group4.push(enemy)
+    end
+    # refresh_group                       # 敵グループのリフレッシュ
+    # identified_change                   # 確定不確定変換
     return true
   end
   #--------------------------------------------------------------------------

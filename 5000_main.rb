@@ -144,6 +144,8 @@ def dump_report(e)
   Debug::write_bugreport()  # headerの記入
   Debug::write_bugreport("Exception Class: #{e.inspect}")
   Debug::write_bugreport("Exception Strings: #{e.message}")
+  Debug::write_bugreport("Exception Strings: #{e.message}")
+  Debug::write_bugreport("Player Location: map:#{$game_map.map_id} x:#{$game_player.x} y:#{$game_player.y}")
   str = "[backtrace]"
   Debug::write_bugreport(str)
   e.backtrace.each do |array|

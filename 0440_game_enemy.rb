@@ -61,8 +61,8 @@ class GameEnemy < GameBattler
   def define_hp(enemy)
     dice_number = enemy.hp_a
     dice_max = enemy.hp_b
-    dice_plus = enemy.hp_c
-    @maxhp = Misc.dice(dice_number, dice_max, dice_plus)
+    dice_plus = enemy.hp_c.to_i
+    @maxhp = [Misc.dice(dice_number, dice_max, dice_plus), 1].max
     @hp = maxhp
   end
   #--------------------------------------------------------------------------
@@ -1068,5 +1068,11 @@ class GameEnemy < GameBattler
   #--------------------------------------------------------------------------
   def mnd_modifier
     return enemy.mnd_modifier
+  end
+  #--------------------------------------------------------------------------
+  # ● エクソシスト・クリティカル系異常の補正値(+)
+  #--------------------------------------------------------------------------
+  def all_modifier
+    return (enemy.mnd_modifier + enemy.vit_modifier)
   end
 end

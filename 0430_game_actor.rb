@@ -128,6 +128,7 @@ class GameActor < GameBattler
     @attempts = 0
     @in_church = false            # 教会での治療フラグ
     @process = 0                  # 教会での経過時間
+    fulfill_food
   end
   #--------------------------------------------------------------------------
   # ● 酒場や訓練場での並び替え順番
@@ -2218,6 +2219,7 @@ class GameActor < GameBattler
         limit = ConstantTable::GARBAGE_STACK if item.garbage?  # ガラクタ？
         limit = ConstantTable::MONEY_LIMIT if item.money?      # ゴールド？
         limit = ConstantTable::TOKEN_LIMIT if item.token?      # ゴールド？
+        limit = ConstantTable::FOOD_STACK if item.food?       # 食糧？
         if num1 + num2 <= limit
           @bag[i][4] = num1 + num2
           @bag[j+i][4] = 0
@@ -2405,6 +2407,7 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def get_Power_Hit
     return false if @weapon_id == 0     # 素手の場合
+    return true if @action.eagleeye?
     if self.onmitsu?
       diff = 50
     else
@@ -2740,28 +2743,56 @@ class GameActor < GameBattler
     return false
   end
   #--------------------------------------------------------------------------
+  # ● ターンアンデッド可能？
+  #--------------------------------------------------------------------------
+  def can_turn_undead?
+    return false if cast_turn_undead == true    # すでに詠唱済み？
+    return have_turn_undead?
+  end
+  #--------------------------------------------------------------------------
+  # ● ターンアンデッド持ちか
+  #--------------------------------------------------------------------------
+  def have_turn_undead?
+    return (@class_id == 8 && @level > 4)
+  end
+  #--------------------------------------------------------------------------
   # ● ブルータルアタック可能？　*戦士の特殊コマンド
   #--------------------------------------------------------------------------
   def can_brutalattack?
     return false if @cast_brutalattack == true
-    return true if @class_id == 1 and @level > 4
-    return false
+    return have_brutalattack?
+  end
+  #--------------------------------------------------------------------------
+  # ● ブルータルアタック持ちか
+  #--------------------------------------------------------------------------
+  def have_brutalattack?
+    return (@class_id == 1 && @level > 4)
   end
   #--------------------------------------------------------------------------
   # ● イーグルアイ可能？　*狩人の特殊コマンド
   #--------------------------------------------------------------------------
   def can_eagleeye?
     return false if @cast_eagleeye == true
-    return true if @class_id == 7 and @level > 4
-    return false
+    return have_eagleeye?
+  end
+  #--------------------------------------------------------------------------
+  # ● イーグルアイ持ちか
+  #--------------------------------------------------------------------------
+  def have_eagleeye?
+    return (@class_id == 7 && @level > 4)
   end
   #--------------------------------------------------------------------------
   # ● エンカレッジ可能？　*従士の特殊コマンド
   #--------------------------------------------------------------------------
   def can_encourage?
     return false if @cast_encourage == true
-    return true if @class_id == 9 and @level > 4
-    return false
+    return have_encourage?
+  end
+  #--------------------------------------------------------------------------
+  # ● エンカレッジ持ちか
+  #--------------------------------------------------------------------------
+  def have_encourage?
+    return (@class_id == 9 && @level > 4)
   end
   #--------------------------------------------------------------------------
   # ● 高速詠唱発動判定
@@ -2845,10 +2876,16 @@ class GameActor < GameBattler
     return @fatigue.to_f / tired_thres
   end
   #--------------------------------------------------------------------------
-  # ● 休息回復上限％
+  # ● 残りのスタミナ％
   #--------------------------------------------------------------------------
   def resting_thres
     return (1 - tired_ratio)
+  end
+  #--------------------------------------------------------------------------
+  # ● 休息による回復上限％　実際はスタミナ75%を切った所から最大回復上限割合が減少していく
+  #--------------------------------------------------------------------------
+  def recover_thres
+    return [(1.25 - tired_ratio), 1].min
   end
   #--------------------------------------------------------------------------
   # ● 呪文の習得
@@ -3053,24 +3090,24 @@ class GameActor < GameBattler
     case rand(4)
     when 0;
       return if @maxmp_fire == 0
-      return if @mp_fire > @maxmp_fire * resting_thres
+      return if @mp_fire > @maxmp_fire * recover_thres
       self.mp_fire += [@maxmp_fire * multiplier, rand(2)].max.to_i
-      Debug::write(c_m,"MP(Fire)回復:#{@mp_fire}/#{@maxmp_fire} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Fire)回復:#{@mp_fire}/#{@maxmp_fire} 疲労度:#{recover_thres}")
     when 1;
       return if @maxmp_water == 0
-      return if @mp_water > @maxmp_water * resting_thres
+      return if @mp_water > @maxmp_water * recover_thres
       self.mp_water += [@maxmp_water * multiplier, rand(2)].max.to_i
-      Debug::write(c_m,"MP(Water)回復:#{@mp_water}/#{@maxmp_water} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Water)回復:#{@mp_water}/#{@maxmp_water} 疲労度:#{recover_thres}")
     when 2;
       return if @maxmp_air == 0
-      return if @mp_air > @maxmp_air * resting_thres
+      return if @mp_air > @maxmp_air * recover_thres
       self.mp_air += [@maxmp_air * multiplier, rand(2)].max.to_i
-      Debug::write(c_m,"MP(Air)回復:#{@mp_air}/#{@maxmp_air} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Air)回復:#{@mp_air}/#{@maxmp_air} 疲労度:#{recover_thres}")
     when 3;
       return if @maxmp_earth == 0
-      return if @mp_earth > @maxmp_earth * resting_thres
+      return if @mp_earth > @maxmp_earth * recover_thres
       self.mp_earth += [@maxmp_earth * multiplier, rand(2)].max.to_i
-      Debug::write(c_m,"MP(Earth)回復:#{@mp_earth}/#{@maxmp_earth} 疲労度:#{resting_thres}")
+      Debug::write(c_m,"MP(Earth)回復:#{@mp_earth}/#{@maxmp_earth} 疲労度:#{recover_thres}")
     end
   end
   #--------------------------------------------------------------------------
@@ -3211,10 +3248,9 @@ class GameActor < GameBattler
   #     マップID+1の乱数から発生する　マップ2で0~1の疲れ
   #--------------------------------------------------------------------------
   def tired_step
-    return if 0 == rand(100) # 1%でしか先の判定を行わない
+    return unless ConstantTable::TIRED_STEP > rand(20) # 5%でしか先の判定を行わない
     t = rand($game_map.map_id+1)
     add_tired(t)
-    return self.index, t
   end
   #--------------------------------------------------------------------------
   # ● 疲労回復
@@ -3246,7 +3282,7 @@ class GameActor < GameBattler
   def recover_fatigue_to_in_rest(rate)
     ## 疲労値が限度を超えている？
     if tired_ratio > rate
-      ## 疲労を2%ずつ回復
+      ## 疲労を1%ずつ回復
       Debug.write(c_m, "現在疲労値:#{@fatigue}pts")
       value = ConstantTable::RECOVERRATE_IN_REST # 回復%
       recover_fatigue(value)
@@ -3358,7 +3394,7 @@ class GameActor < GameBattler
     ## 使用による自然上昇スキル
     else
       value = 1
-      Debug::write(c_m,"スキルID:#{id} PAGE:#{$data_skills[id].page}")
+      Debug::write(c_m,"#{@name} スキルID:#{id} PAGE:#{$data_skills[id].page}")
       set_skill(id, value)    # スキル増加
       ## スキル再取得判定-------------------------------
       @sp_getback ||= 0 # 再初期化
@@ -3537,8 +3573,8 @@ class GameActor < GameBattler
     end
     if diff > rand(100)
       @skill_interval[id] = $data_skills[id].interval * 60
-      Debug.write(c_m, "#{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}")
-      Debug.write(c_m, "#{$data_skills[id].name} スキル値:#{sv} MAPID:#{map_id} c:#{c} 確率:#{1.0/c*100}%")
+      Debug.write(c_m, "#{@name} #{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}")
+      Debug.write(c_m, "#{@name} #{$data_skills[id].name} スキル値:#{sv} MAPID:#{map_id} c:#{c} 確率:#{1.0/c*100}%")
       skill_increase(id)             # 0.1ポイント上昇
     end
   end
@@ -3965,63 +4001,63 @@ class GameActor < GameBattler
   # ● 新たなレシピ
   #     m1: 素材１ID  m2:素材２ID  result:結果ID (*素材はDROP 結果はITEM）
   #--------------------------------------------------------------------------
-  def get_newrecipe(m1, m2, result)
-    @alembic_recipe ||= {}  # 未定義の場合用
-    @alembic_recipe[m1*1000+m2] = result
-    @alembic_recipe[m2*1000+m1] = result
-  end
+  # def get_newrecipe(m1, m2, result)
+  #   @alembic_recipe ||= {}  # 未定義の場合用
+  #   @alembic_recipe[m1*1000+m2] = result
+  #   @alembic_recipe[m2*1000+m1] = result
+  # end
   #--------------------------------------------------------------------------
   # ● チェックレシピ (*片側のみ調べる)
   #--------------------------------------------------------------------------
-  def check_newrecipe(m1, m2)
-    return @alembic_recipe[m1*1000+m2]
-  end
+  # def check_newrecipe(m1, m2)
+  #   return @alembic_recipe[m1*1000+m2]
+  # end
   #--------------------------------------------------------------------------
   # ● ハーブバッグの作成
   #     ハーブのみバッグから抽出しdelete、そしてハーブバッグを作成
   #--------------------------------------------------------------------------
-  def make_herbbag
-    result = []
-    for i in 0...@bag.size
-      item_data = Misc.item(@bag[i][0][0], @bag[i][0][1])
-      if item_data.kind == "herb"
-        result.push(@bag[i])
-        @bag[i] = nil
-      end
-    end
-    @bag.compact!
-    @herb_bag = result
-    sort_herbbag
-  end
+  # def make_herbbag
+  #   result = []
+  #   for i in 0...@bag.size
+  #     item_data = Misc.item(@bag[i][0][0], @bag[i][0][1])
+  #     if item_data.kind == "herb"
+  #       result.push(@bag[i])
+  #       @bag[i] = nil
+  #     end
+  #   end
+  #   @bag.compact!
+  #   @herb_bag = result
+  #   sort_herbbag
+  # end
   #--------------------------------------------------------------------------
   # ● ハーブバッグのソート
   #     同じハーブをスタックさせる
   #--------------------------------------------------------------------------
-  def sort_herbbag
-    return if @herb_bag.size == 0
-    Debug.write(c_m, self.name+" => SORT_HERBBAG開始")
-    ## スタック品をまとめる
-    for i in 0...(@herb_bag.size-1)
-      id = @herb_bag[i][0][1]
-      item = Misc.item(3, id)
-      ii = @herb_bag.size-1-i
-      for j in 1..ii
-        next unless id == @herb_bag[j+i][0][1]   # 同じid？
-        num1 = @herb_bag[i][4]
-        num2 = @herb_bag[j+i][4]
-        limit = 99                      # ハーブは99
-        if num1 + num2 <= limit
-          @herb_bag[i][4] = num1 + num2
-          @herb_bag[j+i] = nil          # スタック数0はNILに
-        else
-          new_n = num1 + num2 - limit   # スタック数をあぶれた個数計算
-          @herb_bag[i][4] = limit
-          @herb_bag[j+i][4] = new_n
-        end
-      end
-    end
-    @herb_bag.compact!                  # NILを消去
-  end
+  # def sort_herbbag
+  #   return if @herb_bag.size == 0
+  #   Debug.write(c_m, self.name+" => SORT_HERBBAG開始")
+  #   ## スタック品をまとめる
+  #   for i in 0...(@herb_bag.size-1)
+  #     id = @herb_bag[i][0][1]
+  #     item = Misc.item(3, id)
+  #     ii = @herb_bag.size-1-i
+  #     for j in 1..ii
+  #       next unless id == @herb_bag[j+i][0][1]   # 同じid？
+  #       num1 = @herb_bag[i][4]
+  #       num2 = @herb_bag[j+i][4]
+  #       limit = 99                      # ハーブは99
+  #       if num1 + num2 <= limit
+  #         @herb_bag[i][4] = num1 + num2
+  #         @herb_bag[j+i] = nil          # スタック数0はNILに
+  #       else
+  #         new_n = num1 + num2 - limit   # スタック数をあぶれた個数計算
+  #         @herb_bag[i][4] = limit
+  #         @herb_bag[j+i][4] = new_n
+  #       end
+  #     end
+  #   end
+  #   @herb_bag.compact!                  # NILを消去
+  # end
   #--------------------------------------------------------------------------
   # ● 矢のAPの取得
   #--------------------------------------------------------------------------
@@ -4818,5 +4854,94 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def rotting?
     return (state?(StateId::ROTTEN) || state?(StateId::DEATH))
+  end
+  #--------------------------------------------------------------------------
+  # ● 初期食料(宿屋に宿泊)
+  #--------------------------------------------------------------------------
+  def fulfill_food
+    gain_food(ConstantTable::INITIAL_FOOD)
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の総量
+  #--------------------------------------------------------------------------
+  def get_amount_of_food
+    result = 0
+    for item_info in @bag
+      next unless item_info[0][0] == ConstantTable::FOOD_ID[0]
+      next unless item_info[0][1] == ConstantTable::FOOD_ID[1]
+      result += item_info[4]
+    end
+    return result
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の消費
+  #--------------------------------------------------------------------------
+  def consume_food
+    for item_info in @bag
+      next unless item_info[0][0] == ConstantTable::FOOD_ID[0]
+      next unless item_info[0][1] == ConstantTable::FOOD_ID[1]
+      item_info[4] -= 1 # 食糧のスタックを1消費
+      sort_bag_2  # スタック0を削除
+      return true # 消費の成功
+    end
+    return false  # 消費の失敗(食糧無し)
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の削除（村への帰還時）
+  #--------------------------------------------------------------------------
+  def delete_food
+    for item_info in @bag
+      next unless item_info[0][0] == ConstantTable::FOOD_ID[0]
+      next unless item_info[0][1] == ConstantTable::FOOD_ID[1]
+      item_info[4] = 0 # 食糧のスタックを全消費
+    end
+    sort_bag_2  # スタック0を削除
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の増減（減らす場合は１ずつ）
+  # amount: 1~30 or -1
+  #--------------------------------------------------------------------------
+  def gain_food(amount)
+    if amount > 0
+      @bag.push([ConstantTable::FOOD_ID, true, 0, false, amount, {}])
+      combine_food
+      Debug.write(c_m, "#{@name} 食糧の増加+#{amount}")
+      return true
+    else
+      ## 食糧の減少
+      Debug.write(c_m, "#{@name} 食糧の消費#{amount}")
+      return consume_food
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧をひとつに
+  #--------------------------------------------------------------------------
+  def combine_food
+    return if @bag.size == 0
+    Debug.write(c_m, self.name+" => 食糧まとめ開始")
+    total = 0
+    ## 全食糧を抽出
+    for item_info in @bag
+      item_obj = Misc.item(item_info[0][0], item_info[0][1])
+      next unless item_obj.kind == "food"
+      total += item_info[4]
+    end
+    ## 最初にまとめる
+    first = true
+    for index in 0...@bag.size
+      item_obj = Misc.item(@bag[index][0][0], @bag[index][0][1])
+      next unless item_obj.kind == "food"
+      ## 最初のもの
+      if first
+        @bag[index][4] = total
+        first = false
+      ## そうでないものは削除
+      else
+        @bag[index] = nil
+      end
+    end
+    ## Nilを削除
+    @bag.compact!
+    sort_bag_2
   end
 end

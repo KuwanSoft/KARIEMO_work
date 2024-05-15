@@ -370,9 +370,9 @@ class SceneMap < SceneBase
       encount, backatk = $game_wandering.check_encount  # エンカウント判定と態勢を取得、群を消去済み
       return unless encount
       ratio = ConstantTable::NM
-      ## NPCのランダムエンカウント
+      ## NPCのランダムエンカウント 10%をダブルで1%としている
       npc_ratio = ConstantTable::NPC_ENCOUNT
-      if npc_ratio > rand(20)
+      if (npc_ratio > rand(20)) && (npc_ratio > rand(20))
         $game_temp.npc_id = 0 # リセット
         $game_temp.next_scene = "npc"
         Debug::write(c_m,"***********【ENCOUNT type:Wondering NPC】***********")

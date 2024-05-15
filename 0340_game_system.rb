@@ -114,7 +114,7 @@ class GameSystem
       @party_light[deleted_id] = nil
       @party_light_time[deleted_id] = nil
       @party_ticket[deleted_id] = nil
-      @party_food[deleted_id] = nil
+      # @party_food[deleted_id] = nil
       @party_pm[deleted_id] = nil unless @party_pm == nil
     end
   end
@@ -152,7 +152,7 @@ class GameSystem
     @party_light = [] if @party_light == nil
     @party_light_time = [] if @party_light_time == nil
     @party_ticket = [] if @party_ticket == nil
-    @party_food = [] if @party_food == nil
+    # @party_food = [] if @party_food == nil
     @party_pm = [] if @party_pm == nil         # パーティマジックの残りのデータ
   end
   #--------------------------------------------------------------------------
@@ -170,7 +170,7 @@ class GameSystem
     @party_light[unique_id] = $game_party.light           # 灯りの保存
     @party_light_time[unique_id] = $game_party.light_time # 灯り内部カウンタの保存
     @party_ticket[unique_id] = $game_party.save_ticket
-    @party_food[unique_id] = $game_party.food
+    # @party_food[unique_id] = $game_party.get_party_food
     @party_pm[unique_id] = $game_party.get_pm_data        # パーティマジックのハッシュデータ
     Debug::write(c_m,"ユニークID:#{unique_id} パーティメンバーリスト:#{@party_member[unique_id].join(',')}")
   end
@@ -208,7 +208,7 @@ class GameSystem
     @party_light[unique_id] = 5
     @party_light_time[unique_id] = 5
     @party_ticket[unique_id] = 1
-    @party_food[unique_id] = 5
+    # @party_food[unique_id] = 5
     @party_pm[unique_id] = {}
     ## テストはきめうち
     # if $TEST
@@ -245,7 +245,7 @@ class GameSystem
     $game_party.in_party                      # 迷宮に残るフラグオン
     $game_party.unique_id = unique_id
     $game_party.light = @party_light[unique_id]           # 灯りの引継ぎ
-    $game_party.food = @party_food[unique_id] if @party_food != nil
+    # $game_party.get_party_food = @party_food[unique_id] if @party_food != nil
     $game_party.restore_pm(@party_pm[unique_id]) if @party_pm != nil
     $game_party.light_time = @party_light_time[unique_id] # 灯り内部カウンタの引継ぎ
     $game_party.save_ticket = @party_ticket[unique_id]    # QS数の引継ぎ

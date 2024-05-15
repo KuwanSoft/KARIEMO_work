@@ -99,6 +99,7 @@ class SceneMaze < SceneBase
           $game_player.turn_up
           $game_system.assign_unique_id   # unique_idをアサイン
           $game_party.define_NPC_shop     # NPCショップ在庫を定義
+          $game_party.fulfill_food        # 食糧の購入
           $game_system.define_evil_statue # 邪神像イベントの定義
           $game_system.respawn_survivor   # 行方不明者の登録
           @entering.visible = true

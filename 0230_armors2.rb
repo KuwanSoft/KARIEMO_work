@@ -164,5 +164,11 @@ class Armors2
   def can_element_damage_enchant?
     return false
   end
+  #--------------------------------------------------------------------------
+  # ● food
+  #--------------------------------------------------------------------------
+  def food?
+    return false
+  end
 end
 

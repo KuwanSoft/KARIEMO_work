@@ -1,37 +1,38 @@
 class Items2
-  attr_accessor :id
-  attr_accessor :sort
-  attr_accessor :name
-  attr_accessor :name2
-  attr_accessor :kind
-  attr_accessor :rank
-  attr_accessor :icon
-  attr_accessor :purpose
-  attr_accessor :weight
-  attr_accessor :consumable
-  attr_accessor :use
-  attr_accessor :target
-  attr_accessor :target_num
-  attr_accessor :anim_id
-  attr_accessor :stack
-  attr_accessor :element
-  attr_accessor :add_state_set
-  attr_accessor :remove_state_set
-  attr_accessor :apply
-  attr_accessor :special
-  attr_accessor :price
-  attr_accessor :token
-  attr_accessor :tool_shop
-  attr_accessor :key
-  attr_accessor :ex
-  attr_accessor :stock
-  attr_accessor :hide
-  attr_accessor :depth
-  attr_accessor :cp
-  attr_accessor :comment
-  attr_accessor :damage
-  attr_accessor :ing1_id
-  attr_accessor :ing2_id
+  attr_reader :id
+  attr_reader :sort
+  attr_reader :name
+  attr_reader :name2
+  attr_reader :kind
+  attr_reader :rank
+  attr_reader :icon
+  attr_reader :purpose
+  attr_reader :weight
+  attr_reader :consumable
+  attr_reader :use
+  attr_reader :target
+  attr_reader :target_num
+  attr_reader :anim_id
+  attr_reader :stack
+  attr_reader :element
+  attr_reader :add_state_set
+  attr_reader :element_type
+  attr_reader :remove_state_set
+  attr_reader :apply
+  attr_reader :special
+  attr_reader :price
+  attr_reader :token
+  attr_reader :tool_shop
+  attr_reader :key
+  attr_reader :ex
+  attr_reader :stock
+  attr_reader :hide
+  attr_reader :depth
+  attr_reader :cp
+  attr_reader :comment
+  attr_reader :damage
+  attr_reader :ing1_id
+  attr_reader :ing2_id
   #--------------------------------------------------------------------------
   # ● 名前を取得
   #--------------------------------------------------------------------------
@@ -181,6 +182,12 @@ class Items2
   #--------------------------------------------------------------------------
   def token?
     return (@kind == "token")
+  end
+  #--------------------------------------------------------------------------
+  # ● food
+  #--------------------------------------------------------------------------
+  def food?
+    return (@kind == "food")
   end
   #--------------------------------------------------------------------------
   # ● ガラクタか？

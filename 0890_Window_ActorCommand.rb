@@ -79,11 +79,11 @@ class Window_ActorCommand < WindowSelectable
       @commands.push(Vocab::Command05)
     end
     ## ターンアンデッド
-    if actor.can_turn_undead?
+    if actor.have_turn_undead?
       @commands.push(Vocab::Command07) unless actor.tired?
     end
     ## # エンカレッジ
-    if actor.can_encourage?
+    if actor.have_encourage?
       @commands.push(Vocab::Command08) unless actor.tired?
     end
     ## 精神統一
@@ -95,11 +95,11 @@ class Window_ActorCommand < WindowSelectable
       @commands.push(Vocab::Command09) unless actor.tired?
     end
     ## ブルータルアタック
-    if actor.can_brutalattack?
+    if actor.have_brutalattack?
       @commands.push(Vocab::Command10) unless actor.tired?
     end
     ## イーグルアイ
-    if actor.can_eagleeye?
+    if actor.have_eagleeye?
       @commands.push(Vocab::Command11) unless actor.tired?
     end
 
@@ -108,6 +108,19 @@ class Window_ActorCommand < WindowSelectable
   end
   #--------------------------------------------------------------------------
   # ● 描画
+  # # キャラクターのコマンドリスト
+  # Command01   = "こうげき"
+  # Command02   = "みをまもる"
+  # Command03   = "アイテムをつかう"
+  # Command04   = "じゅもんのしょ"
+  # Command05   = "すがたをかくす"
+  # Command06   = "ふいをつく"
+  # Command07   = "ターンU.D."
+  # Command08   = "エンカレッジ"
+  # Command09   = "チャネリング"
+  # Command10   = "B.アタック"
+  # Command11   = "イーグルアイ"
+  # Command12   = "せいしんとういつ"
   #--------------------------------------------------------------------------
   def drawing
     index = 0
@@ -116,7 +129,7 @@ class Window_ActorCommand < WindowSelectable
       self.contents.font.color.alpha = 255
       rect = item_rect(index)
       ## 魔封じ状態の場合
-      if @actor.silent? and command == Vocab::Command04
+      if @actor.silent? && command == Vocab::Command04
         self.contents.font.color.alpha = 128
         @disabled.push(index)
       end
@@ -126,6 +139,19 @@ class Window_ActorCommand < WindowSelectable
           self.contents.font.color.alpha = 128
           @disabled.push(index)
         end
+      end
+      ## 特殊コマンド使用不可
+      if !(@actor.can_brutalattack?) && (command == Vocab::Command10)
+        self.contents.font.color.alpha = 128
+        @disabled.push(index)
+      end
+      if !(@actor.can_eagleeye?) && (command == Vocab::Command11)
+        self.contents.font.color.alpha = 128
+        @disabled.push(index)
+      end
+      if !(@actor.can_turn_undead?) && (command == Vocab::Command07)
+        self.contents.font.color.alpha = 128
+        @disabled.push(index)
       end
       self.contents.draw_text(rect.x+@adjust_x, rect.y+@adjust_y, rect.width, WLH, command)
       index += 1

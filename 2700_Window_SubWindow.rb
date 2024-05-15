@@ -127,7 +127,7 @@ class Window_SubWindow < WindowBase
     ## 食料の表示
     bitmap = Cache.system_icon("food")
     self.contents.blt(84-80, 0+ADJ_Y, bitmap, bitmap.rect)
-    self.contents.draw_text(104-80, 4, 32, 32, "#{$game_party.food}")
+    self.contents.draw_text(104-80, 4, 32, 32, "#{$game_party.get_party_food}")
     ## 玄室の数表示
     see = $game_party.check_can_see_rg  # 危険予知の上昇判定
     bitmap = Cache.system_icon("treasure")

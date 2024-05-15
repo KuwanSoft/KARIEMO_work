@@ -474,10 +474,6 @@ class WindowBase < Window
     name = $data_skills[index].name
     if actor.skill[index] == nil          # 未取得の場合
       value = "***"
-    ## 従士の場合
-    # elsif actor.class_id == 9
-    #   value = actor.skill[index] / 10.0
-    #   value = Misc.skill_value(index, actor) if include_adjust
     ## そのクラスの保持スキルで無い場合
     elsif not $data_skills[index].initial_skill?(actor)
       value = actor.skill[index] / 10.0
@@ -488,10 +484,14 @@ class WindowBase < Window
       value = - actor.skill[index] / 10.0 # 負の符号を表示用に取る
       value = "***" if include_adjust
       color = stone_color
-#~       self.contents.font.color = color
     else
       value = actor.skill[index] / 10.0
       value = Misc.skill_value(index, actor) if include_adjust
+    end
+    if value != "***"
+      bar = Cache.system("skill_bar2")
+      bar_width = [[value*2, 0].max, bar.width].min
+      self.contents.blt( x+16, y+16, bar, Rect.new(0, 0, bar_width, bar.height))
     end
     self.contents.blt( x, y+6, icon, r)
     self.contents.draw_text( x+CUR, y, self.width-32, 24, name)

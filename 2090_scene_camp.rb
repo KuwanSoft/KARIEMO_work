@@ -484,7 +484,7 @@ class SceneCamp < SceneBase
   # ● 呪文の使用 (味方対象以外の使用効果を適用)
   #--------------------------------------------------------------------------
   def use_magic_nontarget(success = true)
-    rc = @ps.actor.reserve_cast(@magic, @magic_level)  # MPを消費
+    rc = @ps.actor.reserve_cast(@magic, @magic_level)  # MPを消費&スキル上昇判定
     case rc
     when true; $music.se_play("呪文詠唱RC")
     when false; $music.se_play("呪文詠唱")
@@ -504,7 +504,7 @@ class SceneCamp < SceneBase
       @attention_window.set_text("* うまくいかなかった *")
       wait_for_attention
     elsif success
-      magic_skill_increase_chance(@ps.actor, @magic, @magic_level)
+      # magic_skill_increase_chance(@ps.actor, @magic, @magic_level)
       # @target_ps.turn_on     # 一度詠唱結果を出す
       # @target_ps.update
       @attention_window.set_text("#{@magic.name}!")
@@ -530,29 +530,29 @@ class SceneCamp < SceneBase
   #--------------------------------------------------------------------------
   # ● 呪文スキル上昇
   #--------------------------------------------------------------------------
-  def magic_skill_increase_chance(actor, magic, magic_level)
-    case magic.domain
-    when 0;
-      magic_level.times do
-        actor.chance_skill_increase(SkillId::RATIONAL) # スキル：呪文の知識(-)
-      end
-    when 1;
-      magic_level.times do
-        actor.chance_skill_increase(SkillId::MYSTIC) # スキル：呪文の知識(+)
-      end
-    end
-    ##> 四大元素スキルの上昇
-    if magic.fire > 0
-      skill = SkillId::FIRE
-    elsif magic.water > 0
-      skill = SkillId::WATER
-    elsif magic.air > 0
-      skill = SkillId::AIR
-    elsif magic.earth > 0
-      skill = SkillId::EARTH
-    end
-    magic_level.times do actor.chance_skill_increase(skill) end
-  end
+  # def magic_skill_increase_chance(actor, magic, magic_level)
+  #   case magic.domain
+  #   when 0;
+  #     magic_level.times do
+  #       actor.chance_skill_increase(SkillId::RATIONAL) # スキル：呪文の知識(-)
+  #     end
+  #   when 1;
+  #     magic_level.times do
+  #       actor.chance_skill_increase(SkillId::MYSTIC) # スキル：呪文の知識(+)
+  #     end
+  #   end
+  #   ##> 四大元素スキルの上昇
+  #   if magic.fire > 0
+  #     skill = SkillId::FIRE
+  #   elsif magic.water > 0
+  #     skill = SkillId::WATER
+  #   elsif magic.air > 0
+  #     skill = SkillId::AIR
+  #   elsif magic.earth > 0
+  #     skill = SkillId::EARTH
+  #   end
+  #   magic_level.times do actor.chance_skill_increase(skill) end
+  # end
   #↑↑↑↑↑↑↑↑↑↑↑呪文ルーチン↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
   #--------------------------------------------------------------------------
   # ● パーティメニューの更新 VIEW画面
@@ -1134,7 +1134,7 @@ class SceneCamp < SceneBase
     if Input.trigger?(Input::C)
       case @food.index
       when 0  # はい
-        return if $game_party.food < 1        # 食糧がない場合はスキップ
+        return if $game_party.get_party_food < 1        # 食糧がない場合はスキップ
         $threedmap.change_gray_all_wall(200)  # トーンの変更
         @food.active = false
         @food.rest                            # 休息中表示
@@ -1165,10 +1165,10 @@ class SceneCamp < SceneBase
       @rest_counter = ConstantTable::REST_COUNTER
       $game_party.chance_skill_increase(SkillId::SURVIVALIST) # スキル：野営の知識
       $game_party.resting               # パーティ休息１ターン
-      $game_party.food -= 1             # 食糧の消費
+      $game_party.consume_food          # 食糧の消費
       @ps.refresh
       @food.rest  # 休息中表示
-      if $game_party.food == 0          # 食糧の枯渇
+      if $game_party.get_party_food == 0          # 食糧の枯渇
         end_lunch
       end
     elsif Input.trigger?(Input::C)

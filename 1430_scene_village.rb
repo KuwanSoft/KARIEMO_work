@@ -16,6 +16,7 @@ class SceneVillage < SceneBase
     $game_system.clear_queue              # スキルメッセージキュークリア
     $game_party.reset_tired_thres_plus    # 疲労許容値プラスのリセット
     $game_party.clear_poison              # 毒塗のリセット
+    $game_party.reduce_food               # 食糧の削除
     $game_party.recover_fatigue_at_village  # 村帰還での疲労回復
     @injured = WindowInjuredMembers.new  # 負傷者のリスト
   end

@@ -227,6 +227,7 @@ class GameBattler
     @arranged = false         # 隊列変更後？
     @counter = false
     @countered = false        # カウンターフラグ
+    @vulnerable = false       # スタンによる脆弱化
   end
   #--------------------------------------------------------------------------
   # ● スプライトとの通信用変数をクリア
@@ -304,7 +305,6 @@ class GameBattler
     @identified_flag = false
     @insert = false                 # 連続行動
     @smoke = false
-    @vulnerable = false             # 脆弱化
     @callhome_flag = false
     @veil_ice = false               # ベール系アイテム
     @veil_fire = false
@@ -1093,10 +1093,6 @@ class GameBattler
     for state in states
       return true if state.double_damage
     end
-    if @action.brutalattack?
-      Debug.write(c_m, "ブルータルアタック中の為、被２倍撃")
-      return true
-    end
     return false
   end
   #--------------------------------------------------------------------------
@@ -1237,9 +1233,9 @@ class GameBattler
     for state in states
       result /= 2 if state.reduce_hit_ratio # くらやみのステートの場合はAP半分
     end
-    if @action.brutalattack?
+    if @action.eagleeye?
       result += self.level
-      Debug.write(c_m, "ブルータルアタックの為、AP+Level(#{self.level})=>:#{result}")
+      Debug.write(c_m, "イーグルアイの為、AP+Level(#{self.level})=>:#{result}")
     end
     return result
   end
@@ -1479,9 +1475,9 @@ class GameBattler
       Debug::write(c_m,"#{self.name} 悪魔族＆エクソシスト：被2倍撃") # debug
       double += 1
     end
-    ## イーグルアイチェック
-    if attacker.action.eagleeye?
-      Debug::write(c_m,"Attacker:#{attacker.name} イーグルアイ使用=>2倍撃") # debug
+    ## ブルータルアタックチェック
+    if attacker.action.brutalattack?
+      Debug::write(c_m,"Attacker:#{attacker.name} ブルータルアタック使用=>2倍撃") # debug
       double += 1
     end
     damage *= double
@@ -3207,10 +3203,11 @@ class GameBattler
     @countered = true
   end
   #--------------------------------------------------------------------------
-  # ● カウンター食らったフラグのリセット
+  # ● カウンター食らったフラグと弱体化（スタン）のターン終了時リセット
   #--------------------------------------------------------------------------
-  def unset_countered
+  def unset_specialstate
     @countered = false
+    @vulnerable = false
   end
   #--------------------------------------------------------------------------
   # ● 攻撃ロール用のコンディションの取得

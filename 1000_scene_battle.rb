@@ -234,6 +234,8 @@ class SceneBattle < SceneBase
     @na = Window_newAttention.new
     @pcs = Window_PartyCmdSummary.new
     @pm = Window_PartyMagic.new
+    @window_enemy = Window_MonsterLibrary.new
+    @window_enemy.visible = false
   end
   #--------------------------------------------------------------------------
   # ● 情報表示ビューポートの解放
@@ -259,6 +261,7 @@ class SceneBattle < SceneBase
     @na.dispose
     @pcs.dispose
     @pm.dispose
+    @window_enemy.dispose
     dispose_summon_status
     @miracle.dispose if @miracle != nil
   end
@@ -926,6 +929,7 @@ class SceneBattle < SceneBase
   # ● 対象敵キャラ選択の更新
   #--------------------------------------------------------------------------
   def update_target_enemy_selection
+    @window_enemy.visible = false
     if Input.trigger?(Input::B)
       end_target_enemy_selection
       back_before_selection
@@ -935,6 +939,10 @@ class SceneBattle < SceneBase
       end_magic_selection
       end_item_selection
       next_actor
+    elsif Input.press?(Input::A)
+      return unless @target_enemy_window.enemy.identified # 不確定では表示されない
+      @window_enemy.visible = true
+      @window_enemy.show_individual(@target_enemy_window.enemy.enemy_id)
     end
   end
   #--------------------------------------------------------------------------
@@ -1191,16 +1199,13 @@ class SceneBattle < SceneBase
       $game_message.texts.push(text)
     end
     $game_message.new_page
-    # wait_for_message
-    # exp, exp_plus = $game_troop.exp_total
     food, food_plus = $game_troop.food_total
     @drop_items = $game_troop.make_drop_items  # 固有ドロップ
     ## 戦利品ハッシュを取得
     booty_hash = $game_troop.get_drop
     $game_party.get_root(booty_hash)
-    # $game_party.total_exp += exp # 今までに取得した経験値の保存
-    $game_party.food += food     # 食糧の獲得
-    $game_party.friendship_change# 信頼度の成長
+    $game_party.get_food(food)      # 食糧の獲得
+    $game_party.friendship_change   # 信頼度の成長
 
     ## パーティ脅威度と宝箱中身の決定
     if $game_temp.next_drop_box # 玄室の場合
@@ -1459,7 +1464,7 @@ class SceneBattle < SceneBase
     @message_window.clear
     remove_states_auto
     display_current_state
-    unset_countered
+    unset_specialstate
     refresh_special
     ## --------------------------------
     $game_party.increase_skills_per_turn  # 戦術スキル上昇判定
@@ -1520,12 +1525,12 @@ class SceneBattle < SceneBase
     return $game_troop.platoon_redraw # 隊列再描画
   end
   #--------------------------------------------------------------------------
-  # ● ターン終了による被カウンター状態フラグの解消
+  # ● ターン終了による被カウンター状態とスタンフラグの解消
   #--------------------------------------------------------------------------
-  def unset_countered
+  def unset_specialstate
     members = $game_party.members + $game_troop.members + $game_summon.members + $game_mercenary.members
     for member in members
-      member.unset_countered
+      member.unset_specialstate
     end
   end
   #--------------------------------------------------------------------------

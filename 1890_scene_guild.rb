@@ -177,6 +177,7 @@ class SceneGuild < SceneBase
     elsif @wait_list_dup.active
       update_target_selection
     end
+    $game_system.update
   end
   #--------------------------------------------------------------------------
   # ● コマンド選択の更新

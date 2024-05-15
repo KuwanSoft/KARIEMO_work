@@ -185,7 +185,7 @@ class SceneInn < SceneBase
           @message_window.visible = true
         ## 料金を持っている
         elsif @menu_window.cost <= @is.actor.get_amount_of_money
-          @is.actor.gain_gold(-@menu_window.cost)     # 料金の徴収
+          @is.actor.gain_gold(-@menu_window.cost)             # 料金の徴収
           $game_system.gain_consumed_gold(@menu_window.cost)
           @menu_window.visible = false
           @menu_window.active = false

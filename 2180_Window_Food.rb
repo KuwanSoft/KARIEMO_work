@@ -28,7 +28,7 @@ class Window_Food < WindowSelectable
   def refresh
     self.contents.clear
     self.contents.draw_text(STA, WLH*0, self.width-(32+STA*2), WLH, "しばらくやすみますか?", 1)
-    self.contents.draw_text(STA, WLH*1, self.width-(32+STA*2), WLH, "しょくりょう:#{$game_party.food}", 1)
+    self.contents.draw_text(STA, WLH*1, self.width-(32+STA*2), WLH, "しょくりょう:#{$game_party.get_party_food}", 1)
     self.contents.draw_text(@adjust_x, WLH*2, self.width-32, WLH, "はい")
     self.contents.draw_text(@adjust_x, WLH*3, self.width-32, WLH, "いいえ")
   end
@@ -40,7 +40,7 @@ class Window_Food < WindowSelectable
     self.index = -1 # 矢印を消す
     self.contents.clear
     self.contents.draw_text(0, WLH*0, self.width-32, WLH, "きゅうそくちゅう...", 1)
-    self.contents.draw_text(0, WLH*1, self.width-32, WLH, "しょくりょう:#{$game_party.food}", 1)
+    self.contents.draw_text(0, WLH*1, self.width-32, WLH, "しょくりょう:#{$game_party.get_party_food}", 1)
     self.contents.draw_text(0, WLH*3, self.width-32, WLH, "[A]でぬけます", 2)
   end
 end

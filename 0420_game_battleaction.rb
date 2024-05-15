@@ -204,7 +204,7 @@ class GameBattleAction
     ## コンセントレート倍率
     plus = 0
     @magic_lv.times do
-      plus += 1 if @battler.check_skill_activation(SkillId::CONCENTRATE, 25).result
+      plus += 1 if @battler.check_skill_activation(SkillId::CONCENTRATE, 15).result
     end
     @reinforced_magic_lv += plus
     Debug.write(c_m, "マジックレベルの上昇判定 CP:#{@magic_lv} +#{plus} reinforced:#{@reinforced_magic_lv}")

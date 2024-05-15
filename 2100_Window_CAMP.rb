@@ -9,7 +9,7 @@ class Window_CAMP < WindowSelectable
   #     y : ウィンドウの Y 座標
   #--------------------------------------------------------------------------
   def initialize
-    super((512-190)/2, 74, 190, WLH*8+32)
+    super((512-190)/2, 74+36, 190, WLH*8+32)
     self.visible = false
     self.active = false
     self.opacity = 255

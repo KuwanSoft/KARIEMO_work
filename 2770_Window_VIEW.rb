@@ -56,10 +56,10 @@ class WindowView < WindowBase
     str2 = sprintf("%s", actor.class.name)
     self.contents.draw_text(WLW*18, WLH*1, WLW*12, WLH, str2, 2)
 
-    self.contents.draw_text(WLW*19, WLH*3, WLW*10, WLH, "Marks")
-    self.contents.draw_text(WLW*17, WLH*3, WLW*13, WLH, actor.marks, 2)
-    self.contents.draw_text(WLW*19, WLH*4, WLW*4, WLH, "Age")
-    self.contents.draw_text(WLW*27, WLH*4, WLW*3, WLH, actor.age, 2)
+    self.contents.draw_text(WLW*19, WLH*4, WLW*10, WLH, "Marks")
+    self.contents.draw_text(WLW*17, WLH*4, WLW*13, WLH, actor.marks, 2)
+    self.contents.draw_text(WLW*19, WLH*3, WLW*4, WLH, "Age")
+    self.contents.draw_text(WLW*27, WLH*3, WLW*3, WLH, actor.age, 2)
     self.contents.draw_text(WLW*19, WLH*5, WLW*6, WLH, "R.I.P.")
     self.contents.draw_text(WLW*27, WLH*5, WLW*3, WLH, actor.rip, 2)
 

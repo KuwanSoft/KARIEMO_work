@@ -57,7 +57,7 @@ class GameParty < GameUnit
   attr_accessor :find_door_result       # 隠し扉発見
   attr_accessor :lost                   # ロストキャラクターの情報
   attr_accessor :save_ticket            # クイックセーブ残り回数
-  attr_accessor :food                   # 食料
+  # attr_accessor :food                   # 食料
   attr_reader   :keywords               # パーティの保持するキーワード
   attr_reader   :memo_store           # パーティのメモ
   #--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class GameParty < GameUnit
     @unique_id = 0
     @trash = []
     @save_ticket = 0          # クイックセーブの残り回数
-    @food = 0
+    # @food = 0
     @q_progress = 0
     @already_sound = false
 
@@ -1322,10 +1322,10 @@ class GameParty < GameUnit
     @light_time = 0
     @save_ticket = ConstantTable::INITIAL_TICKET
     @save_ticket += ConstantTable::TICKET_BONUS if sarvant_avail?
-    @food = ConstantTable::INITIAL_FOOD
-    if check_survival_skill > 0 # 野営の知識があると食料増加
-      @food += 15
-    end
+    # @food = ConstantTable::INITIAL_FOOD
+    # if check_survival_skill > 0 # 野営の知識があると食料増加
+    #   @food += 15
+    # end
   end
   #--------------------------------------------------------------------------
   # ● パーティの灯りを再補充（ランダムグリッドイベントにて）
@@ -1518,9 +1518,9 @@ class GameParty < GameUnit
       $game_temp.locate_power = magic_level
       $scene = SceneMap.new
       return
-    when "food"                                 # 保存食
-      Debug::write(c_m,"アイテム使用による食料の増加")
-      @food += ConstantTable::FOOD1
+    # when "food"                                 # 保存食
+    #   Debug::write(c_m,"アイテム使用による食料の増加")
+    #   @food += ConstantTable::FOOD1
     end
     Debug::write(c_m,"@pm_float:#{@pm_float}") # debug
     Debug::write(c_m,"@pm_light:#{@pm_light}") # debug
@@ -1727,7 +1727,7 @@ class GameParty < GameUnit
   # ● 休息の1ターン
   # MAXHPの1%を回復。回復量が1HPに満たない場合は50%で1HP
   # 毒の場合は逆にHPが減る　なおかつ　回復は疲労度で変動　呪いはスキップ
-  # rateは現在疲労度%、5%以上の疲労がある場合に5%分の疲労度除去判定が毎ターン入るということ。
+  # rateは現在疲労度%、85%以上の疲労がある場合に85%までの疲労度除去判定が毎ターン入るということ。
   #--------------------------------------------------------------------------
   def resting
     fountain = $game_temp.drawing_fountain
@@ -1744,7 +1744,6 @@ class GameParty < GameUnit
     end
     ## 魔法の水汲み場フラグ
     if fountain
-      rate = 0.15
       val /= 2
       multiplier *= 2
     end
@@ -1761,11 +1760,11 @@ class GameParty < GameUnit
       member.recover_nausea                   # 吐き気の回復
       next unless member.can_rest?            # 健康でないと回復しない(教会に運び込まれない程度)睡眠は妨げない
       ## HP回復
-      unless member.hp > member.maxhp * member.resting_thres  # 回復上限％
+      unless member.hp > member.maxhp * member.recover_thres  # 回復上限％
         if member.personality_n == :OnesOwnpace
           recover = Integer(recover*1.1)
         end
-        member.hp += recover                    # HPの回復
+        member.hp += recover                  # HPの回復
         Debug.write(c_m, "休息: #{member.name} HP回復量:+#{recover} 割る数:#{val} MP回復%:#{multiplier} 魔法の水汲み場?:#{fountain}")
       end
       ## MP回復
@@ -1982,10 +1981,8 @@ class GameParty < GameUnit
   # ● １歩歩いた時の疲労
   #--------------------------------------------------------------------------
   def get_tired_for_step
-    str = ""
     for member in existing_members
       idx, num = member.tired_step
-      str += "actor_id#{idx}: 疲労度+#{num}|"
     end
   end
   #--------------------------------------------------------------------------
@@ -2110,20 +2107,6 @@ class GameParty < GameUnit
     drop_items = Treasure::lottery_treasure(table)
     gold = Treasure::calc_gp(table)
     $scene = SceneTreasure.new(drop_items, gold)
-  end
-  #--------------------------------------------------------------------------
-  # ● 食糧の減退
-  #--------------------------------------------------------------------------
-  def reduce_food
-    @food = 0
-    Debug.write(c_m, "食糧減=>#{@food}")
-  end
-  #--------------------------------------------------------------------------
-  # ● 食糧の発見
-  #--------------------------------------------------------------------------
-  def find_food
-    @food += 30
-    Debug.write(c_m, "食糧の増加=>#{@food}")
   end
   #--------------------------------------------------------------------------
   # ● 性格ボーナスでバックアタック確率減少
@@ -2484,15 +2467,92 @@ class GameParty < GameUnit
   # rate:4 => 25%
   #--------------------------------------------------------------------------
   def refresh_special
-    rate = ConstantTable::REFRESH_RATIO
     for member in members
+      case member.motivation
+      when 0..50; rate = 0
+      when 51..99; rate = 2
+      when 100..110; rate = 4
+      when 111..120; rate = 5
+      when 121..130; rate = 6
+      when 131..140; rate = 7
+      when 141..150; rate = 8
+      when 151..200; rate = 9
+      end
       if rand(20) <= rate
         member.cast_turn_undead = false
         member.cast_encourage = false
         member.cast_brutalattack = false
         member.cast_eagleeye = false
-        Debug.write(c_m, "#{member.name}=> コマンドリフレッシュ成功")
+        Debug.write(c_m, "#{member.name}=> コマンドリフレッシュ(#{(rate+1)*5})成功")
       end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● パーティ全体の合計食料値から休息できるターン数の取得
+  #--------------------------------------------------------------------------
+  def get_party_food
+    result = 0
+    for member in members           # 全員分の食料
+      result += member.get_amount_of_food
+    end
+    ## 一旦食料を平滑化する
+    person = result / existing_members.size
+    return person                 # 休息用に使用できる食料量
+  end
+  #--------------------------------------------------------------------------
+  # ● 誰が一番多くの食料を持つ
+  #--------------------------------------------------------------------------
+  def who_has_most
+    most = 0
+    who = nil
+    for member in members
+      if most < member.get_amount_of_food
+        who = member
+        most = member.get_amount_of_food
+      end
+    end
+    return who
+  end
+  #--------------------------------------------------------------------------
+  # ● パーティの食料値の増加
+  #--------------------------------------------------------------------------
+  def get_food(add)
+    for member in existing_members
+      member.gain_food(add)
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● パーティの食料値の消費1ターン
+  #--------------------------------------------------------------------------
+  def consume_food
+    $game_party.existing_members.size.times do
+      unless who_has_most.gain_food(-1)
+        p "食糧消費エラー"
+      end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の減退:宝箱の罠
+  #--------------------------------------------------------------------------
+  def reduce_food
+    for member in members
+      member.delete_food
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 食糧の発見
+  #--------------------------------------------------------------------------
+  def find_food
+    add = rand(10) + rand(10) + rand(10)
+    get_food(add)
+    Debug.write(c_m, "食糧の増加=>#{add}")
+  end
+  #--------------------------------------------------------------------------
+  # ● 迷宮突入時の食料補給
+  #--------------------------------------------------------------------------
+  def fulfill_food
+    for member in existing_members
+      member.fulfill_food
     end
   end
 end

@@ -37,6 +37,7 @@ module ConstantTable
   GARBAGE_STACK = 99        # ガラクタのスタック数
   MONEY_LIMIT = 999999      # ゴールドの最大スタック数
   TOKEN_LIMIT = 9999        # トークンの最大スタック数
+  FOOD_STACK = 180          # 食糧の最大スタック数
   MAX_CHAR = 8              # 名前の最大文字数
   NO_NAME = "ななしのごんへ亜"  # デフォルトの名前
   MAX_MAGIC_LEVEL = 6       # 最大詠唱レベル
@@ -191,6 +192,7 @@ module ConstantTable
   PRED_RG = 11              # 危険予知スキル係数（ルームガード数検知）
   GOLD_ID = [3,1]           # ゴールドのID
   EXP_ID = [3,79]           # けいけんちのID
+  FOOD_ID = [0,34]          # 食糧のID
   RATIO_CLEAR_POTION_EFFECT = 5 # ポーション効果が毎ターン消える可能性
   POTION_STR = 5            # ポーションの効果量
   POTION_AP = 5             # ポーションの効果量
@@ -231,11 +233,12 @@ module ConstantTable
   UNLOCK_MAGIC_ID = 37      # 扉よ開けの呪文ID
   RATE_WEAKELEMENT = 1.5    # 弱点属性時のダメージ倍率
   TIRED_TRAP_PER_FLOOR = 100  # 金切声での疲労度per階層
-  RECOVERRATE_IN_REST = 2   # 休息による疲労回復%
+  RECOVERRATE_IN_REST = 1   # 休息による疲労回復%
   CALL_RF_RATIO = 15        # 仲間を呼ぶ確率
-  NPC_ENCOUNT = 1           # NPCとのランダムエンカウント確率 5%
+  NPC_ENCOUNT = 2           # NPCとのランダムエンカウント確率 10% * 10% = 1%
   RECOVER_THRES = 0.85      # 15%までは村への帰還で疲労回復する
-  REFRESH_RATIO = 4         # 25%の確率で特殊コマンドのリフレッシュが行われる
+  TIRED_STEP = 1            # 5%で疲労
+  INITIAL_FOOD = 30         # 初期食料
 
   ## 行方不明者のID(Unique_IDも同一)を配列で返す
   def self.get_survivor_ids
