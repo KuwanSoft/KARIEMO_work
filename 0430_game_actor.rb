@@ -762,43 +762,23 @@ class GameActor < GameBattler
     str = ""
     ## 毒塗がある場合
     if get_poison_number != 0
-      case @class_id
-      when 2; ratio = 95
-      else;   ratio = 85
-      end
-      if check_skill_activation(SkillId::POISONING, ratio).result
+      if check_skill_activation(SkillId::POISONING, 85).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "毒"
       end
-      case @class_id
-      when 2; ratio = 45
-      else;   ratio = 35
-      end
-      if check_skill_activation(SkillId::POISONING, ratio).result
+      if check_skill_activation(SkillId::POISONING, 35).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "暗"
       end
-      case @class_id
-      when 2; ratio = 35
-      else;   ratio = 25
-      end
-      if check_skill_activation(SkillId::POISONING, ratio).result
+      if check_skill_activation(SkillId::POISONING, 25).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "痺"
       end
-      case @class_id
-      when 2; ratio = 25
-      else;   ratio = 15
-      end
-      if check_skill_activation(SkillId::POISONING, ratio).result
+      if check_skill_activation(SkillId::POISONING, 15).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "狂"
       end
-      case @class_id
-      when 2; ratio = 15
-      else;   ratio = 5
-      end
-      if check_skill_activation(SkillId::POISONING, ratio).result
+      if check_skill_activation(SkillId::POISONING, 5).result
         chance_skill_increase(SkillId::POISONING) # ポイゾニング
         str += "窒"
       end
@@ -814,7 +794,14 @@ class GameActor < GameBattler
     end
 
     ## 呪文：剣に力を
-    str += "火凍電" if self.enchant_turn > 0
+    case @enchant_power
+    when 1; str += "火"
+    when 2; str += "火凍"
+    when 3; str += "火凍電"
+    when 4; str += "火凍電封"
+    when 5; str += "火凍電封怖"
+    when 6; str += "火凍電封怖弱"
+    end
     ## クリティカルスキル持ち
     str += "首" if can_neck_chop?
     ## エクソシストスキル持ち
@@ -959,7 +946,7 @@ class GameActor < GameBattler
   def base_resist
     result = 0
     for item in armors.compact do result += item.resist / 5 end
-    result += @level / 4 if @class_id == 4  # 騎士の場合はレベル÷５が足される
+    result += @level / 5 if @class_id == 4  # 騎士の場合はレベル÷５が足される
     result += 2 if $game_party.pm_fog > 0   # PARTYMAGIC効果
     result += ConstantTable::POTION_MARMOR if @potion_effect == "marmor+"
     return @summon_resist if self.summon?   # 召喚モンスターRESIST値
@@ -1250,7 +1237,7 @@ class GameActor < GameBattler
       str_plus = int_plus = luk_plus += 5
       vit_plus = spd_plus = mnd_plus += -5
     else
-      raise
+      Debug.assert(false, "Invalid principle")
     end
     ## 基本職によるボーナス
     str_plus += self.class.str_bonus
@@ -4569,7 +4556,7 @@ class GameActor < GameBattler
     elsif self.state?(StateId::DEATH)  # しぼう
       fee = [@level ** ConstantTable::FEE_DIE, 100].max
     else
-      ## 病気・骨折・石化・吐き気・重症は足し算される。
+      ## 病気・骨折・石化・重症は足し算される。
       if self.state?(StateId::SICKNESS) # 病気
         fee += [@level ** ConstantTable::FEE_MIA, 50].max
       end

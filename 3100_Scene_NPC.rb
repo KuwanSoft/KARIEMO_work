@@ -351,7 +351,7 @@ class Scene_NPC < SceneBase
           end_member_select
         else
           str = ["うまくいかなかった。"]
-          displease(rand(@default_p), str) # 初期値を上限とした乱数
+          displease(rand(@default_p)+rand(@default_p), str) # 初期値を上限とした乱数を2度
           end_member_select
         end
       when S4  # お金を渡す
@@ -718,7 +718,7 @@ class Scene_NPC < SceneBase
         @ps.actor.bag.delete_at @item_window.index
         @patient = @default_p
         @mood_window.refresh(@patient)          # 機嫌の更新
-        p $data_npcs[@npc_id].get_keyword(kind, id)
+        # p $data_npcs[@npc_id].get_keyword(kind, id)
         key, gkind, gid = $data_npcs[@npc_id].get_keyword(kind, id)
         Misc.check_keyword(key) # キーワードをストア
         wait_for_message

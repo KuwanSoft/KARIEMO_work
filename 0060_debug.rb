@@ -376,4 +376,12 @@ module Debug
     @defined_klass_list ||= []
     @defined_klass_list.push(klass_name)
   end
+  #--------------------------------------------------------------------------
+  # ● Assert
+  #--------------------------------------------------------------------------
+  def self.assert(arg, message = "no message")
+    unless arg
+      raise StandardError.new("#{message}")
+    end
+  end
 end

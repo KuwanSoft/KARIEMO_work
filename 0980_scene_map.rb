@@ -581,7 +581,7 @@ class SceneMap < SceneBase
     end
 
     if $game_temp.get_mood_percentage(npc_id) <= ConstantTable::NPC_MOOD_THRES
-      Debug::write(c_m,"NPCエンカウントキャンセル:NPC機嫌が悪い 現在:#{$game_temp.get_mood_percentage(npc_id)}%")
+      Debug::write(c_m,"NPCエンカウントキャンセル:NPC機嫌が悪い 現在:#{$game_temp.get_mood_percentage(npc_id)}% < #{ConstantTable::NPC_MOOD_THRES}")
       $game_temp.next_scene = nil
       return
     end
@@ -601,7 +601,7 @@ class SceneMap < SceneBase
     when 8; $music.play("NPC8")     # エモノヤ
     when 9; $music.play("NPC9")     # 猿の王
     end
-    $popup.set_text("なにかが", "ちかづいてきた")
+    $popup.set_text("だれかが", "ちかづいてきた")
     $popup.visible = true
     Graphics.wait(160)
     @spriteset.update

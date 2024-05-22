@@ -271,14 +271,10 @@ class GameEnemy < GameBattler
       self.weak_flag = true                             # 弱点フラグ
       return Integer(damage * ConstantTable::RATE_WEAKELEMENT)
     end
-    case value
-    when 2..5
-      self.resist_element_flag = true                   # 耐性フラグ
-      Debug::write(c_m,"属性抵抗 ダメージ1/#{value}倍: TYPE(#{element_type})")
-      return Integer(damage * 1/value)
-    else
-      raise StandardError.new("invalid value, should be in 2..5")
-    end
+    Debug.assert((2..5).include?(value), "invalid value, should be in 2..5")
+    self.resist_element_flag = true                   # 耐性フラグ
+    Debug::write(c_m,"属性抵抗 ダメージ1/#{value}倍: TYPE(#{element_type})")
+    return Integer(damage * 1/value)
   end
   #--------------------------------------------------------------------------
   # ● 呪文無効化確率の取得

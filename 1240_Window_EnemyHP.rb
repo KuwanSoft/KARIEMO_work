@@ -9,7 +9,7 @@ class Window_EnemyHP < WindowBase
   # ● 初期化
   #--------------------------------------------------------------------------
   def initialize
-    super((512-256)/2, 146+32, 256, WLH*9+32)
+    super((512-192)/2, 146+32+16, 192, WLH*9+32)
     self.windowskin = Cache.system("Window_Black")
     self.opacity = 128
     create_contents
@@ -27,19 +27,21 @@ class Window_EnemyHP < WindowBase
       str = ""
       if party[i].identified
         hp = "#{sprintf("%3d", party[i].hp)}/#{sprintf("%3d", party[i].maxhp)}"
+        str += "魅" if party[i].muppet?    # 魅了
+        str += "痺" if party[i].paralysis? # 麻痺
+        str += "狂" if party[i].mad?       # 発狂
+        str += "眠" if party[i].sleep?     # 睡眠
+        str += "弱" if party[i].exposure?  # 弱点暴露
+        str += "血" if party[i].bleeding?  # 出血
+        str += "毒" if party[i].poison?    # 毒
+        str += "骨" if party[i].fracture?  # 骨折
+        str += "封" if party[i].silence?   # 魔封じ
+        str += "暗" if party[i].blind?     # 暗闇
+        str += "怖" if party[i].fear?      # 恐怖
+        str += "吐" if party[i].nausea?    # 吐き気
+        str += "火" if party[i].burn?      # 火傷
         str += "電" if party[i].shock?     # 感電
         str += "凍" if party[i].freeze?    # 凍結
-        str += "火" if party[i].burn?      # 火傷
-        str += "怖" if party[i].fear?      # 恐怖
-        str += "毒" if party[i].poison?    # 毒
-        str += "血" if party[i].bleeding?  # 出血
-        str += "吐" if party[i].nausea?    # 吐き気
-        str += "暗" if party[i].blind?     # 暗闇
-        str += "封" if party[i].silence?   # 魔封じ
-        str += "眠" if party[i].sleep?     # 睡眠
-        str += "痺" if party[i].paralysis? # 麻痺
-        str += "骨" if party[i].fracture?  # 骨折
-        str += "狂" if party[i].mad?       # 発狂
         str += "+"  if party[i].have_healing? > 0 # ヒーリング
       else
         case party[i].maxhp.to_s.length

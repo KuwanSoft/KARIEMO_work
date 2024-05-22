@@ -1133,7 +1133,8 @@ class ThreeDmap < SceneMap
     when 141;  return 0xFF0000
     when 142;  return 0xFF0000
     when 143;  return 0xFF0000
-    when 112;  return 0xFF0000        # 回転床
+    when 112;  return 0x1F0000        # 回転床
+    when 120;  return 0x1F1111        # 回転床
 
     # 呪文禁止床
     when 144;  return 0x70000
@@ -1234,14 +1235,14 @@ class ThreeDmap < SceneMap
     ## 帰還の魔法陣（留守）
     when 119;   return 0x180000   # key:0x18
 
-    when 120;   return 0xC1100
-    when 121;   return 0xC0110
-    when 122;   return 0xC0011
-    when 123;   return 0xC1001
-    when 124;   return 0xC0111
-    when 125;   return 0xC1011
-    when 126;   return 0xC1101
-    when 127;   return 0xC1110
+    # when 120;   return 0xC1100
+    # when 121;   return 0xC0110
+    # when 122;   return 0xC0011
+    # when 123;   return 0xC1001
+    # when 124;   return 0xC0111
+    # when 125;   return 0xC1011
+    # when 126;   return 0xC1101
+    # when 127;   return 0xC1110
     # イベント床４(邪神像)
     when 40;    return 0xD1000
     when 41;    return 0xD0100

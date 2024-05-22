@@ -625,12 +625,11 @@ class GameParty < GameUnit
   #--------------------------------------------------------------------------
   def chance_skillgain_packing
     for member in existing_members
-      next unless member.carry_ratio > ConstantTable::PACK_SG_THRES
-      Debug.write(c_m, "#{member.name} c_ratio#{member.carry_ratio}")
-      if member.carry_ratio > rand(100)
-        member.chance_skill_increase(SkillId::PACKING)  # パッキング
-        member.chance_skill_increase(SkillId::STAMINA)  # スタミナ
-      end
+      next unless member.movable?                     # 行動可能?
+      next unless member.carry_ratio > rand(100)      # 所持割合で判定
+      next unless member.carry_ratio > rand(100)      # 所持割合で再判定
+      member.chance_skill_increase(SkillId::PACKING)  # パッキング
+      member.chance_skill_increase(SkillId::STAMINA)  # スタミナ
     end
   end
   #--------------------------------------------------------------------------

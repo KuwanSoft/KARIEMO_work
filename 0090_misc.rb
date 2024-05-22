@@ -462,6 +462,7 @@ module Misc
     when "夢"; state_id = StateId::NIGHTMARE
     when "魅"; state_id = StateId::MUPPET
     when "臭"; state_id = StateId::STINK
+    when "露"; state_id = StateId::EXPOSURE
     else; state_id = StateId::DUMMY
     end
     return state_id

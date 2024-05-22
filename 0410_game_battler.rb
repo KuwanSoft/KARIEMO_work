@@ -95,7 +95,7 @@ class GameBattler
   attr_accessor :fascinate_flag           # 我が声を聴けフラグ
   attr_accessor :mindpower_flag           # マインドパワーフラグ
   attr_accessor :mind_power               # マインドパワー残り
-  attr_accessor :enchant_turn             # エンチャント残り
+  attr_accessor :enchant_power            # 「つるぎにちから」を強度
   attr_accessor :enchant_flag             # エンチャントフラグ
   attr_accessor :provoke_power            # 挑発力
   attr_accessor :provoke_flag             # 挑発フラグ
@@ -205,7 +205,7 @@ class GameBattler
     @sacrifice_hp = 0         # 身代わりのHP
     @interruption = false
     @mind_power = 0           # マインドパワー攻撃力
-    @enchant_turn = 0         # エンチャント残りターン
+    @enchant_power = 0        # エンチャント強度
     @provoke_power = 0        # 挑発力
     @drain = false            # ドレインフラグ
     @protection_times = 0      # 痛みをそらせ残り回数
@@ -618,7 +618,7 @@ class GameBattler
   # ● 魔封じor呪文禁止床判定
   #--------------------------------------------------------------------------
   def silent?
-    return (silence? or $threedmap.check_slient_floor)
+    return (silence? || $threedmap.check_slient_floor)
   end
   #--------------------------------------------------------------------------
   # ● 魔封じ中判定
@@ -627,29 +627,17 @@ class GameBattler
     return state?(StateId::CONTAINMENT) # 魔封じか？
   end
   #--------------------------------------------------------------------------
-  # ● 暴走状態判定
+  # ● 暴走(魅了)状態判定
   #--------------------------------------------------------------------------
   def muppet?
     return state?(StateId::MUPPET)
   end
-  #--------------------------------------------------------------------------
-  # ● 混乱状態判定
-  #--------------------------------------------------------------------------
-  # def confusion?
-  #   return (not @hidden and restriction == 3)
-  # end
   #--------------------------------------------------------------------------
   # ● 防御中判定
   #--------------------------------------------------------------------------
   def guarding?
     return @action.guard?
   end
-  #--------------------------------------------------------------------------
-  # ● 完全防御中判定
-  #--------------------------------------------------------------------------
-#~   def perfect_defence?
-#~     return @action.perfect_defence?
-#~   end
   #--------------------------------------------------------------------------
   # ● 疲労判定
   #--------------------------------------------------------------------------
@@ -763,6 +751,12 @@ class GameBattler
   #--------------------------------------------------------------------------
   def rotten?
     return state?(StateId::ROTTEN)
+  end
+  #--------------------------------------------------------------------------
+  # ● 弱点暴露判定
+  #--------------------------------------------------------------------------
+  def exposure?
+    return state?(StateId::EXPOSURE)
   end
   #--------------------------------------------------------------------------
   # ● 属性修正値の取得
@@ -1640,6 +1634,7 @@ class GameBattler
       when 4; diff = 75
       when 5; diff = 85
       when 6; diff = 95
+      when 7..99; diff = 95
       end
       if user.check_skill_activation(SkillId::NEGOTIATION, diff).result and self.humanoid?
         self.action.set_escape
@@ -1844,7 +1839,7 @@ class GameBattler
       @mindpower_flag = true
       damage = 0
     when "enchant"    # 剣に力を
-      @enchant_turn = 3 * magic_lv + 1
+      @enchant_power = [magic_lv, 6].min
       @enchant_flag = true
       damage = 0
     when "provoke"    # 恨みを集めろ
@@ -2247,6 +2242,7 @@ class GameBattler
       when "吐"; state_id = StateId::NAUSEA
       when "血"; state_id = StateId::BLEEDING
       when "重"; state_id = StateId::SEVERE
+      when "臭"; state_id = StateId::STINK
       when "無"; return
       when "後"; next
       when nil;  break          # リストの最後
@@ -2376,6 +2372,7 @@ class GameBattler
       when "吐"; state_id = StateId::NAUSEA
       when "血"; state_id = StateId::BLEEDING
       when "重"; state_id = StateId::SEVERE
+      when "臭"; state_id = StateId::STINK
       when "無"; return
       when "後"; next
       when nil; break
@@ -3288,7 +3285,7 @@ class GameBattler
     when :skill;        dice += condition_skill
     when :magicroll;    dice += condition_magicroll
     else
-      raise StandardError.new('Not defined situation')
+      Debug.assert(false, 'Not defined situation')
     end
     ## 事前定義の補正を適用
     dice += modifier

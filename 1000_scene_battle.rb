@@ -1539,7 +1539,7 @@ class SceneBattle < SceneBase
   def reduce_duration
     members = $game_party.members + $game_troop.members + $game_summon.members + $game_mercenary.members
     for member in members
-      member.enchant_turn -= 1 if member.enchant_turn > 0   # 剣に力を
+      member.enchant_power -= 1 if (member.enchant_power > 0) && (1 > rand(20))  # 剣に力を
       member.provoke_power -= 1 if member.provoke_power > 0 # 恨みを集めろ
       member.lucky_turn -= 1 if member.lucky_turn > 0       # 加護を与えよ
       member.prevent_drain -= 1 if member.prevent_drain > 0

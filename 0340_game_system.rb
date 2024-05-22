@@ -222,8 +222,8 @@ class GameSystem
     while true
       x = rand(50)
       y = rand(50)
-      next if map.data[x, y, 0] == 1543                     # ブロックか？
-      next if [128..143].include?(map.data[x, y, 2])        # 水ブロック？
+      next if map.data[x, y, 0] == ConstantTable::BLOCK_ID_STONE  # ブロックか？
+      next if map.data[x, y, 2] == ConstantTable::BLOCK_ID_WATER  # 水ブロック？
       @party_mapid[unique_id] = floor
       @party_x_loc[unique_id] = x
       @party_y_loc[unique_id] = y
@@ -579,6 +579,13 @@ class GameSystem
     case map_id
     when 1; rg_hash = ConstantTable::RE_1F
     when 2; rg_hash = ConstantTable::RE_2F
+    when 3; rg_hash = ConstantTable::RE_3F
+    when 4; rg_hash = ConstantTable::RE_4F
+    when 5; rg_hash = ConstantTable::RE_5F
+    when 6; rg_hash = ConstantTable::RE_6F
+    when 7; rg_hash = ConstantTable::RE_7F
+    when 8; rg_hash = ConstantTable::RE_8F
+    when 9; rg_hash = ConstantTable::RE_9F
     end
     items = make_weighted_items(rg_hash)
     return lottery_random_event(items)

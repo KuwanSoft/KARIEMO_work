@@ -70,13 +70,10 @@ class GameMap
   def setup_random
     map = load_data(sprintf("Data/Map%03d.rvdata", 15))
     for i in map.events.keys  # マップデータからイベントKeyを抽出
-      if @events[i+ConstantTable::RG_EVENTID_OFFSET] != nil
-        raise StandardError.new("event setup error, too many events setup @event[#{i+ConstantTable::RG_EVENTID_OFFSET}] != nil")
-      else
-        random = true
-        fixed = false
-        @events[i+ConstantTable::RG_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
-      end
+      Debug.assert(@events[i+ConstantTable::RG_EVENTID_OFFSET] == nil, "event setup error, too many events setup @event[#{i+ConstantTable::RG_EVENTID_OFFSET}] != nil")
+      random = true
+      fixed = false
+      @events[i+ConstantTable::RG_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
     end
   end
   #--------------------------------------------------------------------------
@@ -86,13 +83,10 @@ class GameMap
   def setup_fixed
     map = load_data(sprintf("Data/Map%03d.rvdata", 10))
     for i in map.events.keys  # マップデータからイベントKeyを抽出
-      if @events[i+ConstantTable::FIXED_EVENTID_OFFSET] != nil
-        raise StandardError.new("event setup error, too many events setup @event[#{i+ConstantTable::FIXED_EVENTID_OFFSET}] != nil")
-      else
-        random = false
-        fixed = true
-        @events[i+ConstantTable::FIXED_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
-      end
+      Debug.assert(@events[i+ConstantTable::FIXED_EVENTID_OFFSET] == nil, "event setup error, too many events setup @event[#{i+ConstantTable::FIXED_EVENTID_OFFSET}] != nil")
+      random = false
+      fixed = true
+      @events[i+ConstantTable::FIXED_EVENTID_OFFSET] = GameEvent.new(@map_id, map.events[i], random, fixed)
     end
   end
   #--------------------------------------------------------------------------
@@ -774,8 +768,8 @@ class GameMap
       i += 1
       x = rand(50)
       y = rand(50)
-      next if map.data[x, y, 0] == 1543               # ブロックか？
-      next if [128..143].include?(map.data[x, y, 2])  # 水ブロック？
+      next if map.data[x, y, 0] == ConstantTable::BLOCK_ID_STONE  # ブロックか？
+      next if map.data[x, y, 2] == ConstantTable::BLOCK_ID_WATER  # 水ブロック？
       if $game_player.visit_place?(floor, x, y)
         result = true
         break
