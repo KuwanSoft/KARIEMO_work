@@ -13,6 +13,7 @@ class SceneBattle < SceneBase
     $game_temp.in_battle = true
     $game_temp.lucky_role = false # ラッキーロールのリセット
     $game_temp.prediction = false # 危険予知キャンセル
+    $game_temp.battle_geo = {:geo => :none, :rank => 0} # 地相のリセット
     @message_window = WindowBattleMessage.new
     @damage = WindowDamage.new
     @e_damage = WindowElementDamage.new
@@ -338,6 +339,7 @@ class SceneBattle < SceneBase
     $game_party.increase_skills_after_battle  # その他のスキル上昇
     turn_on_face
     $game_system.remove_undefeated_monster if result == :win  # 勝利したら未討伐モンスターの削除
+    $game_system.increment_count_battle       # 戦闘数カウント
     ## NPC戦闘フラグの解除とNPC DEADフラグ
     unless $game_temp.npc_battle == 0
       if result == :win
@@ -2097,6 +2099,7 @@ class SceneBattle < SceneBase
           end
           display_action_effects(target, magic)
         end
+        change_geo(magic)
       else  ##---> 妨害された場合
         wait(20)
         display_fizzle
@@ -3023,5 +3026,41 @@ class SceneBattle < SceneBase
     @damage.start_drawing(target.screen_x, target.screen_y, target.hp_healing, false, true)
     $music.se_play("ヒーリング")
     wait(45)
+  end
+  #--------------------------------------------------------------------------
+  # ● 地相の変更
+  #--------------------------------------------------------------------------
+  def change_geo(magic)
+    if (magic.fire > 0)
+      if ($game_temp.battle_geo[:geo] == :fire) # 同属性
+        $game_temp.battle_geo[:rank] += 1
+      else
+        $game_temp.battle_geo[:geo] = :fire     # 属性変更
+        $game_temp.battle_geo[:rank] = 1
+      end
+    elsif (magic.water > 0)
+      if ($game_temp.battle_geo[:geo] == :water)           # 同属性
+        $game_temp.battle_geo[:rank] += 1
+      else
+        $game_temp.battle_geo[:geo] = :water
+        $game_temp.battle_geo[:rank] = 1
+      end
+    elsif (magic.air > 0)
+      if ($game_temp.battle_geo[:geo] == :air)           # 同属性
+        $game_temp.battle_geo[:rank] += 1
+      else
+        $game_temp.battle_geo[:geo] = :air
+        $game_temp.battle_geo[:rank] = 1
+      end
+    elsif (magic.earth > 0)
+      if ($game_temp.battle_geo[:geo] == :earth)           # 同属性
+        $game_temp.battle_geo[:rank] += 1
+      else
+        $game_temp.battle_geo[:geo] = :earth
+        $game_temp.battle_geo[:rank] = 1
+      end
+    end
+    return if $game_temp.battle_geo[:geo] == :none
+    Debug.write(c_m, "地相の状態: #{$game_temp.battle_geo[:geo]} #{$game_temp.battle_geo[:rank]}")
   end
 end

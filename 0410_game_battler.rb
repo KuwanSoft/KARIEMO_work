@@ -1527,24 +1527,26 @@ class GameBattler
     hit = 0     # ステート変化内部計算用　何回適用判定するか
     ## コンセントレート倍率
     multipiler = 1
-    c = user.magic_damage_multipiler
-    if user.check_skill_activation(SkillId::CONCENTRATE, 75).result
-      Debug.write(c_m, "ダメージUP1(基本75%) =>成功")
-      multipiler *= c
-      if user.check_skill_activation(SkillId::CONCENTRATE, 50).result
-        Debug.write(c_m, "ダメージUP2(基本50%) =>成功")
-        multipiler *= c
-        if user.check_skill_activation(SkillId::CONCENTRATE, 25).result
-          Debug.write(c_m, "ダメージUP3(基本25%) =>成功")
-          multipiler *= c
-          if user.check_skill_activation(SkillId::CONCENTRATE, 5).result
-            Debug.write(c_m, "ダメージUP4(基本5%) =>成功")
-            multipiler *= c
-          end
-        end
-      end
-    end
-    Debug.write(c_m, "コンセントレート 最終倍率:x#{multipiler} 個別倍率:x#{c}")
+    multipiler = apply_geo(obj, magic_lv) # 地相の効果を適用
+    Debug.write(c_m, "地相倍率: x#{multipiler}") unless multipiler == 1
+    # c = user.magic_damage_multipiler
+    # if user.check_skill_activation(SkillId::CONCENTRATE, 75).result
+    #   Debug.write(c_m, "ダメージUP1(基本75%) =>成功")
+    #   multipiler *= c
+    #   if user.check_skill_activation(SkillId::CONCENTRATE, 50).result
+    #     Debug.write(c_m, "ダメージUP2(基本50%) =>成功")
+    #     multipiler *= c
+    #     if user.check_skill_activation(SkillId::CONCENTRATE, 25).result
+    #       Debug.write(c_m, "ダメージUP3(基本25%) =>成功")
+    #       multipiler *= c
+    #       if user.check_skill_activation(SkillId::CONCENTRATE, 5).result
+    #         Debug.write(c_m, "ダメージUP4(基本5%) =>成功")
+    #         multipiler *= c
+    #       end
+    #     end
+    #   end
+    # end
+    # Debug.write(c_m, "コンセントレート 最終倍率:x#{multipiler} 個別倍率:x#{c}")
     m_dice_num = obj.damage.scan(/(\S+)d/)[0][0].to_i
     m_dice_max = obj.damage.scan(/d(\d+)[+-]/)[0][0].to_i
     m_dice_plus = obj.damage.scan(/([+-]\d+)/)[0][0].to_i
@@ -3409,5 +3411,27 @@ class GameBattler
     result = (d20 >= thres)
     Debug.write(c_m, "結果:#{result} STATE:#{state_info.name} RC:#{resistance_score} #{state_info.attribute}_modifier:#{s_modifier} D20:#{d20} 発動閾値:#{thres}")
     return result
+  end
+  #--------------------------------------------------------------------------
+  # ● 地相の効果適用
+  #--------------------------------------------------------------------------
+  def apply_geo(obj, magic_lv)
+    return 1 unless $game_temp.in_battle
+    return 1 unless obj.is_a?(Magics)
+    return 1 if (obj.fire > 0) && ($game_temp.battle_geo[:geo] != :fire)
+    return 1 if (obj.water > 0) && ($game_temp.battle_geo[:geo] != :water)
+    return 1 if (obj.air > 0) && ($game_temp.battle_geo[:geo] != :air)
+    return 1 if (obj.earth > 0) && ($game_temp.battle_geo[:geo] != :earth)
+    case $game_temp.battle_geo[:rank]
+    when 0; return 1
+    when 1; return 1.15
+    when 2; return 1.30
+    when 3; return 1.45
+    when 4; return 1.60
+    when 5; return 1.75
+    when 6; return 2.00
+    else
+      Debug.assert(false, "geo rank is invalid")
+    end
   end
 end

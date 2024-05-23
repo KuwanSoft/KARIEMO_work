@@ -938,4 +938,12 @@ class GameSystem
   def get_called_klass
     return @called_klass_list
   end
+  #--------------------------------------------------------------------------
+  # ● 戦闘数の記録
+  #--------------------------------------------------------------------------
+  def increment_count_battle
+    @battle_count ||= 0
+    @battle_count += 1
+    Debug.write(c_m, "累計戦闘回数=> #{@battle_count}")
+  end
 end

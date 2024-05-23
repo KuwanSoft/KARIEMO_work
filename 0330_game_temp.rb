@@ -63,6 +63,7 @@ class GameTemp
   attr_accessor :bomb                     # 可燃性ガス爆発イベント
   attr_accessor :drawing_fountain         # 魔法の水汲み場
   attr_accessor :need_rename              # セーブのリネームフラグ
+  attr_accessor :battle_geo               # 地相
   #--------------------------------------------------------------------------
   # ● オブジェクト初期化
   #--------------------------------------------------------------------------
@@ -119,6 +120,7 @@ class GameTemp
     @bomb = [0, 0, 0, 0]
     @drawing_fountain = false
     @need_rename = false
+    @battle_geo = {:geo => :none, :rank => 0}
   end
   #--------------------------------------------------------------------------
   # ● 顔描画と走る
