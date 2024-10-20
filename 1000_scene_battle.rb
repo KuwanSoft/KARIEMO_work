@@ -17,6 +17,7 @@ class SceneBattle < SceneBase
     @message_window = WindowBattleMessage.new
     @damage = WindowDamage.new
     @e_damage = WindowElementDamage.new
+    @geo = WindowBattleGeo.new
     @action_battlers = []
     create_info_viewport
     @screen1 = GameScreen.new #メンバー用
@@ -71,6 +72,7 @@ class SceneBattle < SceneBase
     @damage.dispose
     @e_damage.dispose
     @spriteset.dispose
+    @geo.dispose
     $threedmap.define_all_wall($game_map.map_id)
     # dispose_battle_back
     $game_temp.event_battle = false     # バトルイベントフラグ解除
@@ -548,6 +550,7 @@ class SceneBattle < SceneBase
       @party_command_window.active = true
       @party_command_window.visible = true
       @party_command_window.index = 0
+      @geo.refresh
       @actor_command_window.active = false
       @actor_command_window.visible = false
       @actor_status_window.visible = false
@@ -910,6 +913,8 @@ class SceneBattle < SceneBase
       if @active_battler.range == "C"             # 武器レンジが近距離か？
         @target_enemy_window.restrict_target_back
       end
+    elsif !(@active_battler.front?)               # キャラが後列の場合
+      @target_enemy_window.restrict_target_back
     end
     @actor_command_window.active = false
     @actor_command_window.visible = false
@@ -1292,6 +1297,7 @@ class SceneBattle < SceneBase
     @actor_command_window.active = false
     @actor_command_window.visible = false
     @actor_status_window.visible = false
+    @geo.visible = false
     @ps.turn_on
     @actor_index = -1
     @active_battler = nil
@@ -1490,6 +1496,9 @@ class SceneBattle < SceneBase
     platoon_change if platoon_redraw  # 隊列変更
     start_party_command_selection
   end
+  #--------------------------------------------------------------------------
+  # ● 特殊コマンドのリフレッシュ
+  #--------------------------------------------------------------------------
   def refresh_special
     $game_party.refresh_special
   end
@@ -2969,7 +2978,7 @@ class SceneBattle < SceneBase
       $game_party.in_party                        # 迷宮に残るフラグオフ
       $game_system.remove_unique_id               # ユニークIDの削除
       caster.forget_home_magic                    # 呪文を忘れる
-      $scene = SceneVillage.new                  # 村へ
+      $scene = SceneVillage.new(true)                  # 村へ
     else
       Debug::write(c_m,"ESCAPE失敗")
       ## 戦闘の強制終了
@@ -3033,28 +3042,28 @@ class SceneBattle < SceneBase
   def change_geo(magic)
     if (magic.fire > 0)
       if ($game_temp.battle_geo[:geo] == :fire) # 同属性
-        $game_temp.battle_geo[:rank] += 1
+        $game_temp.battle_geo[:rank] = [$game_temp.battle_geo[:rank]+1, 6].min
       else
         $game_temp.battle_geo[:geo] = :fire     # 属性変更
         $game_temp.battle_geo[:rank] = 1
       end
     elsif (magic.water > 0)
       if ($game_temp.battle_geo[:geo] == :water)           # 同属性
-        $game_temp.battle_geo[:rank] += 1
+        $game_temp.battle_geo[:rank] = [$game_temp.battle_geo[:rank]+1, 6].min
       else
         $game_temp.battle_geo[:geo] = :water
         $game_temp.battle_geo[:rank] = 1
       end
     elsif (magic.air > 0)
       if ($game_temp.battle_geo[:geo] == :air)           # 同属性
-        $game_temp.battle_geo[:rank] += 1
+        $game_temp.battle_geo[:rank] = [$game_temp.battle_geo[:rank]+1, 6].min
       else
         $game_temp.battle_geo[:geo] = :air
         $game_temp.battle_geo[:rank] = 1
       end
     elsif (magic.earth > 0)
       if ($game_temp.battle_geo[:geo] == :earth)           # 同属性
-        $game_temp.battle_geo[:rank] += 1
+        $game_temp.battle_geo[:rank] = [$game_temp.battle_geo[:rank]+1, 6].min
       else
         $game_temp.battle_geo[:geo] = :earth
         $game_temp.battle_geo[:rank] = 1

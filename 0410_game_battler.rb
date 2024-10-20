@@ -589,10 +589,10 @@ class GameBattler
   end
   #--------------------------------------------------------------------------
   # ● 存在判定
-  #    石化も腐敗も存在判定でfalse判定
+  #    腐敗も存在判定でfalse判定
   #--------------------------------------------------------------------------
   def exist?
-    return (!(@hidden) && !(dead?) && !(stone?) && !(rotten?))
+    return (!(@hidden) && !(dead?) && !(rotten?))
   end
   #--------------------------------------------------------------------------
   # ● コマンド入力可能判定
@@ -2894,6 +2894,7 @@ class GameBattler
     ## アクター側
     if self.actor? && $game_party.pm_fog > 0
       modifier += 1
+      Debug.write(c_m, "#{self.name} #{state_info.name} 霧よ護れボーナス+1")
     ## モンスター側
     elsif not self.actor?
       case state_id
@@ -2917,7 +2918,9 @@ class GameBattler
     end
     if @state_depth[state_id] && @state_depth[state_id] > 0
       modifier += 1 # すでに罹患済みの場合はDICE数+1
+      Debug.write(c_m, "#{self.name} #{state_info.name} 既に罹患済み")
     end
+    Debug.write(c_m, "#{self.name} #{state_info.name} 補正値:#{modifier}")
     return modifier
   end
   #--------------------------------------------------------------------------
@@ -2942,12 +2945,7 @@ class GameBattler
   #--------------------------------------------------------------------------
   def reserve_cast(magic, magic_lv)
     return unless self.actor? # モンスターはスキップ
-    case self.class_id
-    when 3,6,8  # 魔・賢・聖
-      ratio = 50
-    else
-      ratio = 35
-    end
+    ratio = 45
     if check_skill_activation(SkillId::R_CAST, ratio).result
       self.chance_skill_increase(SkillId::R_CAST)     # リザーブキャスト
       Debug::write(c_m,"消費MPリカバリー発生検知 確率#{ratio}%")
@@ -3409,7 +3407,7 @@ class GameBattler
     end
     thres = Integer([[resistance_score - s_modifier, 19].min, 1].max)
     result = (d20 >= thres)
-    Debug.write(c_m, "結果:#{result} STATE:#{state_info.name} RC:#{resistance_score} #{state_info.attribute}_modifier:#{s_modifier} D20:#{d20} 発動閾値:#{thres}")
+    Debug.write(c_m, "結果:#{result} #{state_info.name}基礎適用値:#{resistance_score} #{state_info.attribute}_modifier:#{s_modifier} D20SavingThrow:#{d20}>=#{thres}")
     return result
   end
   #--------------------------------------------------------------------------

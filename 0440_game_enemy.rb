@@ -461,10 +461,13 @@ class GameEnemy < GameBattler
     end
     ## 通常攻撃設定
     if @action.kind == 0  # 呪文以外の行動判定開始
-      Debug::write(c_m,"┗戦闘行動:呪文・ブレス以外の行動判定開始")
-      @action.basic = 0
-      Debug::write(c_m,"　┗通常物理攻撃決定 #{enemy.name}")
-      @action.decide_random_target
+      if front?
+        Debug::write(c_m,"┗戦闘行動:呪文・ブレス以外の行動判定開始")
+        @action.basic = 0
+        Debug::write(c_m,"　┗通常物理攻撃決定 #{enemy.name}")
+        @action.decide_random_target
+      elsif can_back_attack?
+      end
     end
     add_fascinate(-5) # 毎ターン減少する
   end
@@ -573,58 +576,49 @@ class GameEnemy < GameBattler
   end
   #--------------------------------------------------------------------------
   # ● ブレス発動か？
-  # ブレスの発動率は初期値から徐々に上昇していく。いったんブレスを行うと0に戻る。
+  # ブレスの発動率は初期値から徐々に上昇していく。いったんブレスを行うと5に戻る。
   #--------------------------------------------------------------------------
   def breath_activate?
     ## ファーストターン時の設定
     if @breath_action_ratio == 0
-      @breath_action_ratio += rand(ConstantTable::BREATH_RATIO_FLU+1)+ConstantTable::BREATH_RATIO # 15%~25%
+      @breath_action_ratio += ConstantTable::BREATH_RATIO # 15%
     else
       ## 翌ターンより率が上昇
-      @breath_action_ratio += ConstantTable::BREATH_RATIO_ADD  # +15%
+      @breath_action_ratio += ConstantTable::BREATH_RATIO_ADD  # +10%
     end
     ratio = [[@breath_action_ratio, 95].min, 5].max
-    if enemy.skill.include?("ブ") && ratio > rand(100)
-      result = true
+    return false unless ratio > rand(100)
+    if enemy.skill.include?("ブ")
       @action.basic = 0
-    elsif enemy.skill.include?("炎") && ratio > rand(100)
-      result = true
+    elsif enemy.skill.include?("炎")
       @action.basic = 1
-    elsif enemy.skill.include?("氷") && ratio > rand(100)
-      result = true
+    elsif enemy.skill.include?("氷")
       @action.basic = 2
-    elsif enemy.skill.include?("雷") && ratio > rand(100)
-      result = true
+    elsif enemy.skill.include?("雷")
       @action.basic = 3
-    elsif enemy.skill.include?("ポ") && ratio > rand(100)
-      result = true
+    elsif enemy.skill.include?("ポ")
       @action.basic = 4
-    elsif enemy.skill.include?("死") && ratio > rand(100)
-      result = true
+    elsif enemy.skill.include?("死")
       @action.basic = 5
-    else
-      result = false
-    end
-
-    if result
-      @action.kind = 3
-      c = ConstantTable::BREATH_HP_C # HPを割る数
-      @breath_dmg = [@hp / c, 1].max  # 現HPの1/2
-      case @action.basic
-      when 0; obj = $data_magics[ConstantTable::BREATH1_ID]  # ノーマルブレス
-      when 1; obj = $data_magics[ConstantTable::BREATH2_ID]  # 火のブレス
-      when 2; obj = $data_magics[ConstantTable::BREATH3_ID]  # 氷のブレス
-      when 3; obj = $data_magics[ConstantTable::BREATH4_ID]  # 雷のブレス
-      when 4; obj = $data_magics[ConstantTable::BREATH5_ID]  # 毒のブレス
-      when 5; obj = $data_magics[ConstantTable::BREATH6_ID]  # 死のブレス
-      end
-      @breath_dmg *= obj.damage.to_f    # ブレスダメージ倍率（呪文で定義）
-      @breath_dmg = Integer(@breath_dmg)
-      Debug.write(c_m, "ブレス攻撃決定 発動率:#{@breath_action_ratio}% ﾌﾞﾚｽﾀﾞﾒｰｼﾞ:#{@breath_dmg} ﾀﾞﾒｰｼﾞ倍率:#{obj.damage.to_f}")
-      @breath_action_ratio = 0
     else
       return false
     end
+
+    @action.kind = 3
+    c = ConstantTable::BREATH_HP_C # HPを割る数
+    @breath_dmg = [@hp / c, 1].max  # 現HPの1/4
+    case @action.basic
+    when 0; obj = $data_magics[ConstantTable::BREATH1_ID]  # ノーマルブレス
+    when 1; obj = $data_magics[ConstantTable::BREATH2_ID]  # 火のブレス
+    when 2; obj = $data_magics[ConstantTable::BREATH3_ID]  # 氷のブレス
+    when 3; obj = $data_magics[ConstantTable::BREATH4_ID]  # 雷のブレス
+    when 4; obj = $data_magics[ConstantTable::BREATH5_ID]  # 毒のブレス
+    when 5; obj = $data_magics[ConstantTable::BREATH6_ID]  # 死のブレス
+    end
+    @breath_dmg *= obj.damage.to_f    # ブレスダメージ倍率（呪文で定義）
+    @breath_dmg = Integer(@breath_dmg)
+    Debug.write(c_m, "ブレス攻撃決定 発動率:#{@breath_action_ratio}% ﾌﾞﾚｽﾀﾞﾒｰｼﾞ:#{@breath_dmg} ﾀﾞﾒｰｼﾞ倍率:#{obj.damage.to_f}")
+    @breath_action_ratio = 5  # 5%にリセット
   end
   #--------------------------------------------------------------------------
   # ● スキル"盾"のシールドブロック時のダメージ半減処理
@@ -1070,5 +1064,11 @@ class GameEnemy < GameBattler
   #--------------------------------------------------------------------------
   def all_modifier
     return (enemy.mnd_modifier + enemy.vit_modifier)
+  end
+  #--------------------------------------------------------------------------
+  # ● 前列？
+  #--------------------------------------------------------------------------
+  def front?
+    return [0,1].include?(@group_id)  # 画面上に表示されるか
   end
 end

@@ -181,6 +181,9 @@ class View_Map < WindowBase
           end
           # パーティの場所を表示
           unless ndp
+            if $game_system.check_roomguard(mapid, x, y) && $game_party.check_can_see_rg
+              @floor[i][j].bitmap = Cache.map_tile("roomguard")         # アクティブ玄室
+            end
             case $game_player.direction
             when 6; bitmap = Cache.map_tile("PARTY_E")
             when 2; bitmap = Cache.map_tile("PARTY_S")

@@ -697,11 +697,11 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   def make_exp_list
     @exp_list[1] = @exp_list[250] = 0
-    m = ConstantTable::EXP_ROOT_VALUE   # 10000
+    m = ConstantTable::EXP_ROOT_VALUE   # 1000
     ratio = self.class.exp_ratio                # 戦士1.04
     for i in 2..250   # レベル最大250
       @exp_list[i] = @exp_list[i-1] + Integer(m)
-      m *= ratio.to_f     # 10000 * 1.04
+      m *= ratio.to_f     # 1000 * 1.04
     end
     Debug.write(c_m, "キャラクタ経験値リスト class:#{@class_id}")
     for i in 1..40
@@ -1130,7 +1130,7 @@ class GameActor < GameBattler
       plus = Integer(exp * 0.05)
       exp *= 1.05
     end
-    exp *= 2 if check_double_bonus
+    exp = check_exp_bonus(exp)
     @exp += Integer(exp + plus)
     Debug::write(c_m,"経験値取得 #{@name} EXP+#{Integer(exp)}(+#{plus})")
     return Integer(exp + plus)
@@ -2609,8 +2609,8 @@ class GameActor < GameBattler
     value = p_bonus = f_bonus = h_bonus = l_bonus = r_bonus = 0
     ## 戦術スキルからベースイニシアチブ値
     t_bonus = Misc.skill_value(SkillId::TACTICS, self) / 8 + 8
-    p_bonus = ConstantTable::FLEXIBLE_BONUS if @personality_p == :Flexible # 臨機応変
-    f_bonus = ConstantTable::FRONT_BONUS if [0,1,2].include?(index) # 前衛ボーナス
+    p_bonus = ConstantTable::FLEXIBLE_BONUS if @personality_p == :Flexible  # 臨機応変
+    f_bonus = ConstantTable::FRONT_BONUS if front?                          # 前衛ボーナス
     l_bonus = ConstantTable::LEADER_INIT_BONUS if leader?
     r_bonus = get_magic_attr(:initiative)
     ## 特性値ボーナス
@@ -3414,14 +3414,13 @@ class GameActor < GameBattler
   #--------------------------------------------------------------------------
   # ● 勤勉スキルによる経験値上昇ボーナス
   #--------------------------------------------------------------------------
-  def check_double_bonus
-    return false if not $scene.is_a?(SceneBattle)    # 戦闘中以外
-    sv = Misc.skill_value(SkillId::HARDLEARN, self)
-    diff = ConstantTable::DIFF_05[$game_map.map_id]  # フロア係数
-    ratio = Integer([sv * diff, 95].min)
-    ratio /= 2 if self.tired?
-    result = (ratio > rand(100))
-    Debug.write(c_m, "#{self.name}=>勤勉判定成功") if result
+  def check_exp_bonus(exp)
+    return exp if not $scene.is_a?(SceneBattle)    # 戦闘中以外
+    ## 流れ者(+1%)
+    ratio = @personality_n == :Drifter ? 1 : 0
+    ratio += Misc.skill_value(SkillId::HARDLEARN, self)
+    result = exp * (ratio+100) / 100
+    Debug.write(c_m, "#{self.name}=>EXPボーナス適用 EXP:(#{exp})=>(#{result}) ボーナス:#{ratio}%")
     return result
   end
   #--------------------------------------------------------------------------
@@ -3560,7 +3559,7 @@ class GameActor < GameBattler
     end
     if diff > rand(100)
       @skill_interval[id] = $data_skills[id].interval * 60
-      Debug.write(c_m, "#{@name} #{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}")
+      Debug.write(c_m, "#{@name} #{$data_skills[id].name} インターバル開始 カウンタ:#{@skill_interval[id]}") if $data_skills[id].interval != 0
       Debug.write(c_m, "#{@name} #{$data_skills[id].name} スキル値:#{sv} MAPID:#{map_id} c:#{c} 確率:#{1.0/c*100}%")
       skill_increase(id)             # 0.1ポイント上昇
     end
@@ -4116,7 +4115,6 @@ class GameActor < GameBattler
   def use_skillbook(item_data)
     skill_id = item_data.purpose              # 該当スキルIDの取得
     return false unless has_skill?(skill_id)  # 該当スキル未取得
-
     ## スキル値
     case item_data.rank
     when 2; limit = ConstantTable::SKILLBOOK_L_1
@@ -4128,13 +4126,13 @@ class GameActor < GameBattler
     if self.personality_p == :Sincere # 素直
       add_value += ConstantTable::SKILLBOOK_ADD_PLUS
     end
-    Debug.write(c_m, "スキルブック使用前 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
-
+    Debug.write(c_m, "スキルブック使用前 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:+#{add_value/10.0}")
     ## 追加量分かつリミット以下で上昇させる
-    add_value.times do
+    set_skill(skill_id, 1)  # 最初の0.1はリミットいっぱいでも上昇する
+    (add_value-1).times do
       set_skill(skill_id, 1) if @skill[skill_id] < limit
     end
-    Debug.write(c_m, "スキルブック使用後 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:#{add_value/10.0}")
+    Debug.write(c_m, "スキルブック使用後 SKILLID:#{skill_id} リミット:#{limit} 現在値:#{@skill[skill_id]} 追加量:+#{add_value/10.0}")
     return true
   end
   #--------------------------------------------------------------------------
@@ -4930,5 +4928,11 @@ class GameActor < GameBattler
     ## Nilを削除
     @bag.compact!
     sort_bag_2
+  end
+  #--------------------------------------------------------------------------
+  # ● 前衛？
+  #--------------------------------------------------------------------------
+  def front?
+    return [0,1,2].include?(index) # 前衛ボーナス
   end
 end

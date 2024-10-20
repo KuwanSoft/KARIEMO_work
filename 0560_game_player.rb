@@ -901,7 +901,7 @@ class GamePlayer < GameCharacter
       $music.se_play("階段")
       $game_party.in_party
       $game_system.remove_unique_id
-      $scene = SceneVillage.new
+      $scene = SceneVillage.new(true)
       return
     end
     ## 向きを確定する

@@ -903,10 +903,10 @@ class SceneMap < SceneBase
     if Input.trigger?(Input::C)
       return if @ps.actor.bag.size == 0   # バッグが空であればスキップ
       return unless @ps.actor.movable?    # 行動不能であればスキップ
+      @inventory.index = 0
       @inventory.refresh(@ps.actor)
       @inventory.visible = true
       @inventory.active = true
-      @inventory.index = 0
       @ps.active = false
       @back_s.visible = false
       @search.visible = false

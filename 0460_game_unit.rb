@@ -73,13 +73,13 @@ class GameUnit
     end
   end
   #--------------------------------------------------------------------------
-  # ● ターゲットのランダムな決定
+  # ● ターゲットのランダムな決定（前衛のみ対象となる）
   #--------------------------------------------------------------------------
   def random_target(battler)
     target_candidates = []
-    target_candidates += existing_members
+    target_candidates += existing_front_members # 前衛のみ追加
     ## 対象がパーティで攻撃者がモンスターであり召喚獣で無く、ガイドでも無い--------
-    if self.is_a?(GameParty) and !(battler.actor?) and !(battler.summon?) and !(battler.mercenary?)
+    if self.is_a?(GameParty) && !(battler.actor?) && !(battler.summon?) && !(battler.mercenary?)
       ## 攻撃対象にガイドを加える
       unless $game_mercenary.all_dead?
         target_candidates += $game_mercenary.existing_members
@@ -120,7 +120,6 @@ class GameUnit
   #     index : インデックス
   #--------------------------------------------------------------------------
   def smooth_target(index)
-    Debug.write(c_m, "index: #{index}")
     case index
     ## ガイド対象攻撃
     when ConstantTable::GUIDE_INDEX
@@ -140,13 +139,17 @@ class GameUnit
     ## 敵への攻撃の場合
     if self.is_a?(GameTroop)
       while true
-        Debug::write(c_m,"Target smoothing!!")
+        Debug::write(c_m,"Target smoothing!! Index:#{adj_index}")
         adj_index += 1
         member = members[adj_index]
         adj_index = -1 if member == nil # memberが最後まできたらindexを先頭へ戻す
         if member != nil and member.exist?
-          Debug::write(c_m,"-> NextTarget:#{member.name}")
-          return member
+          if member.group_id < 2  # 前衛か？
+            Debug::write(c_m,"-> NextTarget:#{member.name} Index:#{adj_index}")
+            return member
+          else
+            Debug.write(c_m, "-> 後衛選出の為スキップ Index:#{adj_index}")
+          end
         end
       end
     ## パーティへの攻撃の場合
@@ -155,7 +158,7 @@ class GameUnit
     elsif member.summon?
       return existing_members[0]
     end
-    raise StandardError.new("cannot set target")
+    Debug.assert(false, "cannot set target")
   end
   #--------------------------------------------------------------------------
   # ● ターゲットのスムーズな決定 (戦闘不能)
@@ -165,5 +168,17 @@ class GameUnit
     member = members[index]
     return member if member != nil and member.dead?
     return dead_members[0]
+  end
+  #--------------------------------------------------------------------------
+  # ● 生存しているメンバーの前列取得
+  #--------------------------------------------------------------------------
+  def existing_front_members
+    result = []
+    for battler in members
+      next unless battler.exist?
+      next unless battler.front?
+      result.push(battler)
+    end
+    return result
   end
 end

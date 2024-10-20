@@ -349,7 +349,7 @@ class GameBattleAction
   #--------------------------------------------------------------------------
   # ● ランダムターゲット
   #--------------------------------------------------------------------------
-  def decide_random_target
+  def decide_random_target(front_only = true)
     if for_friend?
       target = friends_unit.random_target
     else
@@ -536,9 +536,6 @@ class GameBattleAction
       return $game_party.existing_members + $game_summon.existing_members + $game_mercenary.existing_members
     end
   end
-  def make_reverse_group_target
-
-  end
   #--------------------------------------------------------------------------
   # ● スキルまたはアイテムのターゲット作成
   #     obj : スキルまたはアイテム
@@ -573,9 +570,12 @@ class GameBattleAction
           end
         else                    # 攻撃者がENEMYの場合
           unless reverse
+            unless battler.front? # 敵は前衛ではない
+              target_number = 3 if target_number > 3  # 4人以上対象のグループ攻撃
+            end
             targets = make_party_targets(target_number)
           else
-            targets = make_targets_group(target_number, battler.index)
+            targets = make_targets_group(target_number, battler.index)  # 自身がいる敵グループ
           end
         end
       elsif obj.solo?           # 敵単体(数指定)("S")
@@ -594,10 +594,20 @@ class GameBattleAction
           end
         end
       elsif obj.all?            # 敵全体("A")
-        unless reverse
-          targets = opponents_unit.existing_members
+        # 攻撃者がACTORの場合
+        if battler.actor? or battler.summon? or battler.mercenary?
+          unless reverse
+            targets = get_all_groups(!(battler.front?))
+          else
+            targets = friends_unit.existing_members
+          end
+        ## 攻撃者がモンスターの場合
         else
-          targets = friends_unit.existing_members
+          unless reverse
+            targets = get_all_groups(!(battler.front?))
+          else
+            targets = friends_unit.existing_members
+          end
         end
         ##> モンスターの攻撃：アクターで無い場合は精霊も対象に
         unless battler.actor? or battler.summon? or battler.mercenary?
@@ -798,5 +808,40 @@ class GameBattleAction
   def counter_target_push(active_battler)
     @counter_target.clear
     @counter_target.push(active_battler)
+  end
+  #--------------------------------------------------------------------------
+  # ● 全体対象攻撃
+  #--------------------------------------------------------------------------
+  def get_all_groups(front_only = true)
+    result = []
+    if battler.actor?
+      unless $game_troop.existing_g1_members.size == 0
+        result += $game_troop.existing_g1_members
+      end
+      unless $game_troop.existing_g2_members.size == 0
+        result += $game_troop.existing_g2_members
+      end
+      ## 前列グループのみの場合
+      if front_only
+        return result
+      end
+      unless $game_troop.existing_g3_members.size == 0
+        result += $game_troop.existing_g3_members
+      end
+      unless $game_troop.existing_g4_members.size == 0
+        result += $game_troop.existing_g4_members
+      end
+      return result
+    else
+      if front_only
+        for index in [0,1,2]
+          if $game_party.members[index].exist?
+            result.push($game_party.members[index])
+          end
+        end
+      else
+        result += $game_party.existing_members
+      end
+    end
   end
 end

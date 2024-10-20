@@ -141,7 +141,7 @@ class SceneEvilStatue < SceneBase
             wait_for_effect
             $game_party.in_party
             $game_system.remove_unique_id
-            $scene = SceneVillage.new
+            $scene = SceneVillage.new(true)
           when "negative"
             $music.me_play("邪神像：ランダム移動")
             @mini.set_text("あたりをひかりがつつんだ")

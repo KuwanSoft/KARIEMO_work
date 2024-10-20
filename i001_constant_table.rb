@@ -51,8 +51,7 @@ module ConstantTable
   PENALTY_CLASS_CHANGE = 0  # クラス変更時のペナルティ
   TIRED_RATIO = 20          # 最大疲労度計算におけるmaxhpの倍率
   BREATH_RATIO = 15         # ブレスの初期確率
-  BREATH_RATIO_FLU = 10     # ブレスの発動率ゆらぎ
-  BREATH_RATIO_ADD = 15     # ブレスの発動増加度
+  BREATH_RATIO_ADD = 10     # ブレスの発動増加度
   NM = 2                    # NMとの遭遇確率（％）
   OPEN_TREASURE = 25        # 宝箱を破壊してこじ開ける成功率（25%）
   INITIAL_LP = 10           # 初期ラーニングポイント
@@ -130,7 +129,7 @@ module ConstantTable
   DEF_CHANCE = rand(8)+3    # デフォルトの宝箱アイテムチャンス数
   VIEWMAPLIGHT = 10         # マップ閲覧時のライトタイムペナルティ
   BREATH_REDUCE_TIME = 20   # ブレスの運によるダメージ減少チャレンジ回数
-  BREATH_HP_C = 2           # ブレスダメージ（HPを割る数）
+  BREATH_HP_C = 4           # ブレスダメージ（HPを割る数）
   NEEDPREDICTION = 1        # 必要な危険予知の数
   TIREDPLUSRATIO = 10       # 疲労許容値プラス%
   BURY = 6                  # 土へ還れのMND係数
@@ -323,14 +322,14 @@ module ConstantTable
   STINKRATIO = 5        # 臭う確率
 
   ## 宿屋の料金と疲労回復量
-  INN1_FEE = 10    #
-  INN2_FEE = 40   #
-  INN3_FEE = 180  #
-  INN4_FEE = 1000 #
-  INN1_RECOVER = 24    #
+  INN1_FEE = 5    #
+  INN2_FEE = 33   #
+  INN3_FEE = 153  #
+  INN4_FEE = 1750 #
+  INN1_RECOVER = 20    #
   INN2_RECOVER = 60    #
-  INN3_RECOVER = 182
-  INN4_RECOVER = 728
+  INN3_RECOVER = 180
+  INN4_RECOVER = 5000
 
   ## 古びた錠前の難易度
   LOCK_NUM_B1F = 1
